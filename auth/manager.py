@@ -6,8 +6,6 @@ from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, s
 from auth.database import User, get_user_db
 from config import SECRET
 
-SECRET = SECRET
-
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SECRET

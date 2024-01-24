@@ -16,7 +16,6 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    MutableMapping,
     NamedTuple,
     Optional,
     Sequence,
@@ -78,8 +77,7 @@ TimeoutTypes = Union[
     Tuple[Optional[float], Optional[float], Optional[float], Optional[float]],
     "Timeout",
 ]
-ProxyTypes = Union[URLTypes, "Proxy"]
-ProxiesTypes = Union[ProxyTypes, Dict[URLTypes, Union[None, ProxyTypes]]]
+ProxiesTypes = Union[URLTypes, "Proxy", Dict[URLTypes, Union[None, URLTypes, "Proxy"]]]
 
 AuthTypes = Union[
     Tuple[Union[str, bytes], Union[str, bytes]],
@@ -89,7 +87,7 @@ AuthTypes = Union[
 
 RequestContent = Union[str, bytes, Iterable[bytes], AsyncIterable[bytes]]
 ResponseContent = Union[str, bytes, Iterable[bytes], AsyncIterable[bytes]]
-ResponseExtensions = MutableMapping[str, Any]
+ResponseExtensions = Mapping[str, Any]
 
 RequestData = Mapping[str, Any]
 
@@ -106,7 +104,7 @@ FileTypes = Union[
 ]
 RequestFiles = Union[Mapping[str, FileTypes], Sequence[Tuple[str, FileTypes]]]
 
-RequestExtensions = MutableMapping[str, Any]
+RequestExtensions = Mapping[str, Any]
 
 
 class SyncByteStream:

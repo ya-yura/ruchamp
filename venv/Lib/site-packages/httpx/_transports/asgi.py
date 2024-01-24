@@ -103,7 +103,7 @@ class ASGITransport(AsyncBaseTransport):
             "headers": [(k.lower(), v) for (k, v) in request.headers.raw],
             "scheme": request.url.scheme,
             "path": request.url.path,
-            "raw_path": request.url.raw_path.split(b"?")[0],
+            "raw_path": request.url.raw_path,
             "query_string": request.url.query,
             "server": (request.url.host, request.url.port),
             "client": self.client,
@@ -161,14 +161,8 @@ class ASGITransport(AsyncBaseTransport):
         try:
             await self.app(scope, receive, send)
         except Exception:  # noqa: PIE-786
-            if self.raise_app_exceptions:
+            if self.raise_app_exceptions or not response_complete.is_set():
                 raise
-
-            response_complete.set()
-            if status_code is None:
-                status_code = 500
-            if response_headers is None:
-                response_headers = {}
 
         assert response_complete.is_set()
         assert status_code is not None

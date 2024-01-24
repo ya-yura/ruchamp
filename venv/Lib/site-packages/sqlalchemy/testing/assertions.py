@@ -1,18 +1,13 @@
 # testing/assertions.py
-# Copyright (C) 2005-2024 the SQLAlchemy authors and contributors
+# Copyright (C) 2005-2022 the SQLAlchemy authors and contributors
 # <see AUTHORS file>
 #
 # This module is part of SQLAlchemy and is released under
 # the MIT License: https://www.opensource.org/licenses/mit-license.php
-# mypy: ignore-errors
 
+from __future__ import absolute_import
 
-from __future__ import annotations
-
-from collections import defaultdict
 import contextlib
-from copy import copy
-from itertools import filterfalse
 import re
 import sys
 import warnings
@@ -31,13 +26,14 @@ from .. import util
 from ..engine import default
 from ..engine import url
 from ..sql.selectable import LABEL_STYLE_TABLENAME_PLUS_COL
+from ..util import compat
 from ..util import decorator
 
 
 def expect_warnings(*messages, **kw):
     """Context manager which expects one or more warnings.
 
-    With no arguments, squelches all SAWarning emitted via
+    With no arguments, squelches all SAWarning and RemovedIn20Warning emitted via
     sqlalchemy.util.warn and sqlalchemy.util.warn_limited.   Otherwise
     pass string expressions that will match selected warnings via regex;
     all non-matching warnings are sent through.
@@ -47,7 +43,9 @@ def expect_warnings(*messages, **kw):
     Note that the test suite sets SAWarning warnings to raise exceptions.
 
     """  # noqa
-    return _expect_warnings_sqla_only(sa_exc.SAWarning, messages, **kw)
+    return _expect_warnings(
+        (sa_exc.RemovedIn20Warning, sa_exc.SAWarning), messages, **kw
+    )
 
 
 @contextlib.contextmanager
@@ -60,7 +58,7 @@ def expect_warnings_on(db, *messages, **kw):
     """
     spec = db_spec(db)
 
-    if isinstance(db, str) and not spec(config._current):
+    if isinstance(db, util.string_types) and not spec(config._current):
         yield
     else:
         with expect_warnings(*messages, **kw):
@@ -84,15 +82,11 @@ def emits_warning(*messages):
 
 
 def expect_deprecated(*messages, **kw):
-    return _expect_warnings_sqla_only(
-        sa_exc.SADeprecationWarning, messages, **kw
-    )
+    return _expect_warnings(sa_exc.SADeprecationWarning, messages, **kw)
 
 
 def expect_deprecated_20(*messages, **kw):
-    return _expect_warnings_sqla_only(
-        sa_exc.Base20DeprecationWarning, messages, **kw
-    )
+    return _expect_warnings(sa_exc.Base20DeprecationWarning, messages, **kw)
 
 
 def emits_warning_on(db, *messages):
@@ -144,29 +138,6 @@ _SEEN = None
 _EXC_CLS = None
 
 
-def _expect_warnings_sqla_only(
-    exc_cls,
-    messages,
-    regex=True,
-    search_msg=False,
-    assert_=True,
-):
-    """SQLAlchemy internal use only _expect_warnings().
-
-    Alembic is using _expect_warnings() directly, and should be updated
-    to use this new interface.
-
-    """
-    return _expect_warnings(
-        exc_cls,
-        messages,
-        regex=regex,
-        search_msg=search_msg,
-        assert_=assert_,
-        raise_on_any_unexpected=True,
-    )
-
-
 @contextlib.contextmanager
 def _expect_warnings(
     exc_cls,
@@ -174,9 +145,11 @@ def _expect_warnings(
     regex=True,
     search_msg=False,
     assert_=True,
+    py2konly=False,
     raise_on_any_unexpected=False,
     squelch_other_warnings=False,
 ):
+
     global _FILTERS, _SEEN, _EXC_CLS
 
     if regex or search_msg:
@@ -207,6 +180,7 @@ def _expect_warnings(
             real_warn = warnings.warn
 
         def our_warn(msg, *arg, **kw):
+
             if isinstance(msg, _EXC_CLS):
                 exception = type(msg)
                 msg = str(msg)
@@ -236,13 +210,19 @@ def _expect_warnings(
                 if not squelch_other_warnings:
                     real_warn(msg, *arg, **kw)
 
-        with mock.patch("warnings.warn", our_warn):
+        with mock.patch("warnings.warn", our_warn), mock.patch(
+            "sqlalchemy.util.SQLALCHEMY_WARN_20", True
+        ), mock.patch(
+            "sqlalchemy.util.deprecations.SQLALCHEMY_WARN_20", True
+        ), mock.patch(
+            "sqlalchemy.engine.row.LegacyRow._default_key_style", 2
+        ):
             try:
                 yield
             finally:
                 _SEEN = _FILTERS = _EXC_CLS = None
 
-                if assert_:
+                if assert_ and (not py2konly or not compat.py3k):
                     assert not seen, "Warnings were not seen: %s" % ", ".join(
                         "%r" % (s.pattern if regex else s) for s in seen
                     )
@@ -261,17 +241,6 @@ def global_cleanup_assertions():
 
 def _assert_no_stray_pool_connections():
     engines.testing_reaper.assert_all_closed()
-
-
-def int_within_variance(expected, received, variance):
-    deviance = int(expected * variance)
-    assert (
-        abs(received - expected) < deviance
-    ), "Given int value %s is not within %d%% of expected value %s" % (
-        received,
-        variance * 100,
-        expected,
-    )
 
 
 def eq_regex(a, b, msg=None):
@@ -352,10 +321,8 @@ def startswith_(a, fragment, msg=None):
 def eq_ignore_whitespace(a, b, msg=None):
     a = re.sub(r"^\s+?|\n", "", a)
     a = re.sub(r" {2,}", " ", a)
-    a = re.sub(r"\t", "", a)
     b = re.sub(r"^\s+?|\n", "", b)
     b = re.sub(r" {2,}", " ", b)
-    b = re.sub(r"\t", "", b)
 
     assert a == b, msg or "%r != %r" % (a, b)
 
@@ -369,6 +336,9 @@ def _assert_proper_exception_context(exception):
     these exceptions in a cause chain.
 
     """
+
+    if not util.py3k:
+        return
 
     if (
         exception.__context__ is not exception.__cause__
@@ -404,7 +374,7 @@ def assert_warns(except_cls, callable_, *args, **kwargs):
 
 
     """
-    with _expect_warnings_sqla_only(except_cls, [".*"]):
+    with _expect_warnings(except_cls, [".*"], squelch_other_warnings=True):
         return callable_(*args, **kwargs)
 
 
@@ -419,11 +389,12 @@ def assert_warns_message(except_cls, msg, callable_, *args, **kwargs):
     rather than regex.match().
 
     """
-    with _expect_warnings_sqla_only(
+    with _expect_warnings(
         except_cls,
         [msg],
         search_msg=True,
         regex=False,
+        squelch_other_warnings=True,
     ):
         return callable_(*args, **kwargs)
 
@@ -437,12 +408,13 @@ def assert_raises_message_context_ok(
 def _assert_raises(
     except_cls, callable_, args, kwargs, msg=None, check_context=False
 ):
+
     with _expect_raises(except_cls, msg, check_context) as ec:
         callable_(*args, **kwargs)
     return ec.error
 
 
-class _ErrorContainer:
+class _ErrorContainer(object):
     error = None
 
 
@@ -467,16 +439,12 @@ def _expect_raises(except_cls, msg=None, check_context=False):
         ec.error = err
         success = True
         if msg is not None:
-            # I'm often pdbing here, and "err" above isn't
-            # in scope, so assign the string explicitly
-            error_as_string = str(err)
-            assert re.search(msg, error_as_string, re.UNICODE), "%r !~ %s" % (
-                msg,
-                error_as_string,
-            )
+            assert re.search(
+                msg, util.text_type(err), re.UNICODE
+            ), "%r !~ %s" % (msg, err)
         if check_context and not are_we_already_in_a_traceback:
             _assert_proper_exception_context(err)
-        print(str(err).encode("utf-8"))
+        print(util.text_type(err).encode("utf-8"))
 
     # it's generally a good idea to not carry traceback objects outside
     # of the except: block, but in this case especially we seem to have
@@ -497,7 +465,7 @@ def expect_raises_message(except_cls, msg, check_context=True):
     return _expect_raises(except_cls, msg=msg, check_context=check_context)
 
 
-class AssertsCompiledSQL:
+class AssertsCompiledSQL(object):
     def assert_compile(
         self,
         clause,
@@ -520,8 +488,6 @@ class AssertsCompiledSQL:
         render_schema_translate=False,
         default_schema_name=None,
         from_linting=False,
-        check_param_order=True,
-        use_literal_execute_for_simple_int=False,
     ):
         if use_default_dialect:
             dialect = default.DefaultDialect()
@@ -535,16 +501,13 @@ class AssertsCompiledSQL:
 
             if dialect is None:
                 dialect = config.db.dialect
-            elif dialect == "default" or dialect == "default_qmark":
-                if dialect == "default":
-                    dialect = default.DefaultDialect()
-                else:
-                    dialect = default.DefaultDialect("qmark")
+            elif dialect == "default":
+                dialect = default.DefaultDialect()
                 dialect.supports_default_values = supports_default_values
                 dialect.supports_default_metavalue = supports_default_metavalue
             elif dialect == "default_enhanced":
                 dialect = default.StrCompileDialect()
-            elif isinstance(dialect, str):
+            elif isinstance(dialect, util.string_types):
                 dialect = url.URL.create(dialect).get_dialect()()
 
         if default_schema_name:
@@ -565,9 +528,6 @@ class AssertsCompiledSQL:
         if render_postcompile:
             compile_kwargs["render_postcompile"] = True
 
-        if use_literal_execute_for_simple_int:
-            compile_kwargs["use_literal_execute_for_simple_int"] = True
-
         if for_executemany:
             kw["for_executemany"] = True
 
@@ -587,14 +547,14 @@ class AssertsCompiledSQL:
         if compile_kwargs:
             kw["compile_kwargs"] = compile_kwargs
 
-        class DontAccess:
+        class DontAccess(object):
             def __getattribute__(self, key):
                 raise NotImplementedError(
                     "compiler accessed .statement; use "
                     "compiler.current_executable"
                 )
 
-        class CheckCompilerAccess:
+        class CheckCompilerAccess(object):
             def __init__(self, test_statement):
                 self.test_statement = test_statement
                 self._annotations = {}
@@ -611,10 +571,6 @@ class AssertsCompiledSQL:
                         self._inline = test_statement._inline
                     if hasattr(test_statement, "_return_defaults"):
                         self._return_defaults = test_statement._return_defaults
-
-            @property
-            def _variant_mapping(self):
-                return self.test_statement._variant_mapping
 
             def _default_dialect(self):
                 return self.test_statement._default_dialect()
@@ -657,38 +613,29 @@ class AssertsCompiledSQL:
                 hash(cache_key_no_warnings[0])
 
         param_str = repr(getattr(c, "params", {}))
-        param_str = param_str.encode("utf-8").decode("ascii", "ignore")
-        print(("\nSQL String:\n" + str(c) + param_str).encode("utf-8"))
+        if util.py3k:
+            param_str = param_str.encode("utf-8").decode("ascii", "ignore")
+            print(
+                ("\nSQL String:\n" + util.text_type(c) + param_str).encode(
+                    "utf-8"
+                )
+            )
+        else:
+            print(
+                "\nSQL String:\n"
+                + util.text_type(c).encode("utf-8")
+                + param_str
+            )
 
-        cc = re.sub(r"[\n\t]", "", str(c))
+        cc = re.sub(r"[\n\t]", "", util.text_type(c))
 
         eq_(cc, result, "%r != %r on dialect %r" % (cc, result, dialect))
 
         if checkparams is not None:
-            if render_postcompile:
-                expanded_state = c.construct_expanded_state(
-                    params, escape_names=False
-                )
-                eq_(expanded_state.parameters, checkparams)
-            else:
-                eq_(c.construct_params(params), checkparams)
+            eq_(c.construct_params(params), checkparams)
         if checkpositional is not None:
-            if render_postcompile:
-                expanded_state = c.construct_expanded_state(
-                    params, escape_names=False
-                )
-                eq_(
-                    tuple(
-                        [
-                            expanded_state.parameters[x]
-                            for x in expanded_state.positiontup
-                        ]
-                    ),
-                    checkpositional,
-                )
-            else:
-                p = c.construct_params(params, escape_names=False)
-                eq_(tuple([p[x] for x in c.positiontup]), checkpositional)
+            p = c.construct_params(params)
+            eq_(tuple([p[x] for x in c.positiontup]), checkpositional)
         if check_prefetch is not None:
             eq_(c.prefetch, check_prefetch)
         if check_literal_execute is not None:
@@ -707,76 +654,16 @@ class AssertsCompiledSQL:
                 },
                 check_post_param,
             )
-        if check_param_order and getattr(c, "params", None):
-
-            def get_dialect(paramstyle, positional):
-                cp = copy(dialect)
-                cp.paramstyle = paramstyle
-                cp.positional = positional
-                return cp
-
-            pyformat_dialect = get_dialect("pyformat", False)
-            pyformat_c = clause.compile(dialect=pyformat_dialect, **kw)
-            stmt = re.sub(r"[\n\t]", "", str(pyformat_c))
-
-            qmark_dialect = get_dialect("qmark", True)
-            qmark_c = clause.compile(dialect=qmark_dialect, **kw)
-            values = list(qmark_c.positiontup)
-            escaped = qmark_c.escaped_bind_names
-
-            for post_param in (
-                qmark_c.post_compile_params | qmark_c.literal_execute_params
-            ):
-                name = qmark_c.bind_names[post_param]
-                if name in values:
-                    values = [v for v in values if v != name]
-            positions = []
-            pos_by_value = defaultdict(list)
-            for v in values:
-                try:
-                    if v in pos_by_value:
-                        start = pos_by_value[v][-1]
-                    else:
-                        start = 0
-                    esc = escaped.get(v, v)
-                    pos = stmt.index("%%(%s)s" % (esc,), start) + 2
-                    positions.append(pos)
-                    pos_by_value[v].append(pos)
-                except ValueError:
-                    msg = "Expected to find bindparam %r in %r" % (v, stmt)
-                    assert False, msg
-
-            ordered = all(
-                positions[i - 1] < positions[i]
-                for i in range(1, len(positions))
-            )
-
-            expected = [v for _, v in sorted(zip(positions, values))]
-
-            msg = (
-                "Order of parameters %s does not match the order "
-                "in the statement %s. Statement %r" % (values, expected, stmt)
-            )
-
-            is_true(ordered, msg)
 
 
-class ComparesTables:
-    def assert_tables_equal(
-        self,
-        table,
-        reflected_table,
-        strict_types=False,
-        strict_constraints=True,
-    ):
+class ComparesTables(object):
+    def assert_tables_equal(self, table, reflected_table, strict_types=False):
         assert len(table.c) == len(reflected_table.c)
         for c, reflected_c in zip(table.c, reflected_table.c):
             eq_(c.name, reflected_c.name)
             assert reflected_c is reflected_table.c[c.name]
-
-            if strict_constraints:
-                eq_(c.primary_key, reflected_c.primary_key)
-                eq_(c.nullable, reflected_c.nullable)
+            eq_(c.primary_key, reflected_c.primary_key)
+            eq_(c.nullable, reflected_c.nullable)
 
             if strict_types:
                 msg = "Type '%s' doesn't correspond to type '%s'"
@@ -790,20 +677,18 @@ class ComparesTables:
             if isinstance(c.type, sqltypes.String):
                 eq_(c.type.length, reflected_c.type.length)
 
-            if strict_constraints:
-                eq_(
-                    {f.column.name for f in c.foreign_keys},
-                    {f.column.name for f in reflected_c.foreign_keys},
-                )
+            eq_(
+                {f.column.name for f in c.foreign_keys},
+                {f.column.name for f in reflected_c.foreign_keys},
+            )
             if c.server_default:
                 assert isinstance(
                     reflected_c.server_default, schema.FetchedValue
                 )
 
-        if strict_constraints:
-            assert len(table.primary_key) == len(reflected_table.primary_key)
-            for c in table.primary_key:
-                assert reflected_table.primary_key.columns[c.name] is not None
+        assert len(table.primary_key) == len(reflected_table.primary_key)
+        for c in table.primary_key:
+            assert reflected_table.primary_key.columns[c.name] is not None
 
     def assert_types_base(self, c1, c2):
         assert c1.type._compare_type_affinity(
@@ -815,7 +700,7 @@ class ComparesTables:
         )
 
 
-class AssertsExecutionResults:
+class AssertsExecutionResults(object):
     def assert_result(self, result, class_, *objects):
         result = list(result)
         print(repr(result))
@@ -862,7 +747,9 @@ class AssertsExecutionResults:
         found = util.IdentitySet(result)
         expected = {immutabledict(e) for e in expected}
 
-        for wrong in filterfalse(lambda o: isinstance(o, cls), found):
+        for wrong in util.itertools_filterfalse(
+            lambda o: isinstance(o, cls), found
+        ):
             fail(
                 'Unexpected type "%s", expected "%s"'
                 % (type(wrong).__name__, cls.__name__)
@@ -915,6 +802,7 @@ class AssertsExecutionResults:
         return result
 
     def assert_sql(self, db, callable_, rules):
+
         newrules = []
         for rule in rules:
             if isinstance(rule, dict):
@@ -928,9 +816,24 @@ class AssertsExecutionResults:
         return self.assert_sql_execution(db, callable_, *newrules)
 
     def assert_sql_count(self, db, callable_, count):
-        return self.assert_sql_execution(
+        self.assert_sql_execution(
             db, callable_, assertsql.CountStatements(count)
         )
+
+    def assert_multiple_sql_count(self, dbs, callable_, counts):
+        recs = [
+            (self.sql_execution_asserter(db), db, count)
+            for (db, count) in zip(dbs, counts)
+        ]
+        asserters = []
+        for ctx, db, count in recs:
+            asserters.append(ctx.__enter__())
+        try:
+            return callable_()
+        finally:
+            for asserter, (ctx, db, count) in zip(asserters, recs):
+                ctx.__exit__(None, None, None)
+                asserter.assert_(assertsql.CountStatements(count))
 
     @contextlib.contextmanager
     def assert_execution(self, db, *rules):
@@ -940,50 +843,3 @@ class AssertsExecutionResults:
 
     def assert_statement_count(self, db, count):
         return self.assert_execution(db, assertsql.CountStatements(count))
-
-    @contextlib.contextmanager
-    def assert_statement_count_multi_db(self, dbs, counts):
-        recs = [
-            (self.sql_execution_asserter(db), db, count)
-            for (db, count) in zip(dbs, counts)
-        ]
-        asserters = []
-        for ctx, db, count in recs:
-            asserters.append(ctx.__enter__())
-        try:
-            yield
-        finally:
-            for asserter, (ctx, db, count) in zip(asserters, recs):
-                ctx.__exit__(None, None, None)
-                asserter.assert_(assertsql.CountStatements(count))
-
-
-class ComparesIndexes:
-    def compare_table_index_with_expected(
-        self, table: schema.Table, expected: list, dialect_name: str
-    ):
-        eq_(len(table.indexes), len(expected))
-        idx_dict = {idx.name: idx for idx in table.indexes}
-        for exp in expected:
-            idx = idx_dict[exp["name"]]
-            eq_(idx.unique, exp["unique"])
-            cols = [c for c in exp["column_names"] if c is not None]
-            eq_(len(idx.columns), len(cols))
-            for c in cols:
-                is_true(c in idx.columns)
-            exprs = exp.get("expressions")
-            if exprs:
-                eq_(len(idx.expressions), len(exprs))
-                for idx_exp, expr, col in zip(
-                    idx.expressions, exprs, exp["column_names"]
-                ):
-                    if col is None:
-                        eq_(idx_exp.text, expr)
-            if (
-                exp.get("dialect_options")
-                and f"{dialect_name}_include" in exp["dialect_options"]
-            ):
-                eq_(
-                    idx.dialect_options[dialect_name]["include"],
-                    exp["dialect_options"][f"{dialect_name}_include"],
-                )

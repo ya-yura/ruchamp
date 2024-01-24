@@ -1,11 +1,9 @@
 # testing/requirements.py
-# Copyright (C) 2005-2024 the SQLAlchemy authors and contributors
+# Copyright (C) 2005-2022 the SQLAlchemy authors and contributors
 # <see AUTHORS file>
 #
 # This module is part of SQLAlchemy and is released under
 # the MIT License: https://www.opensource.org/licenses/mit-license.php
-# mypy: ignore-errors
-
 
 """Global database feature support policy.
 
@@ -17,19 +15,16 @@ to provide specific inclusion/exclusions.
 
 """
 
-from __future__ import annotations
-
 import platform
+import sys
 
-from . import asyncio as _test_asyncio
 from . import exclusions
-from .exclusions import only_on
-from .. import create_engine
+from . import only_on
 from .. import util
 from ..pool import QueuePool
 
 
-class Requirements:
+class Requirements(object):
     pass
 
 
@@ -59,35 +54,10 @@ class SuiteRequirements(Requirements):
         return exclusions.closed()
 
     @property
-    def uuid_data_type(self):
-        """Return databases that support the UUID datatype."""
-
-        return exclusions.closed()
-
-    @property
     def foreign_keys(self):
         """Target database must support foreign keys."""
 
         return exclusions.open()
-
-    @property
-    def foreign_keys_reflect_as_index(self):
-        """Target database creates an index that's reflected for
-        foreign keys."""
-
-        return exclusions.closed()
-
-    @property
-    def unique_index_reflect_as_unique_constraints(self):
-        """Target database reflects unique indexes as unique constrains."""
-
-        return exclusions.closed()
-
-    @property
-    def unique_constraints_reflect_as_index(self):
-        """Target database reflects unique constraints as indexes."""
-
-        return exclusions.closed()
 
     @property
     def table_value_constructor(self):
@@ -182,17 +152,6 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def unusual_column_name_characters(self):
-        """target database allows column names that have unusual characters
-        in them, such as dots, spaces, slashes, or percent signs.
-
-        The column names are as always in such a case quoted, however the
-        DB still needs to support those characters in the name somehow.
-
-        """
-        return exclusions.open()
-
-    @property
     def subqueries(self):
         """Target database must support subqueries."""
 
@@ -272,7 +231,7 @@ class SuiteRequirements(Requirements):
         """target database/driver supports bound parameters as column
         expressions without being in the context of a typed column.
         """
-        return exclusions.open()
+        return exclusions.closed()
 
     @property
     def standalone_null_binds_whereclause(self):
@@ -400,30 +359,15 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def delete_returning(self):
-        """target platform supports DELETE ... RETURNING."""
+    def full_returning(self):
+        """target platform supports RETURNING completely, including
+        multiple rows returned.
+
+        """
 
         return exclusions.only_if(
-            lambda config: config.db.dialect.delete_returning,
-            "%(database)s %(does_support)s 'DELETE ... RETURNING'",
-        )
-
-    @property
-    def insert_returning(self):
-        """target platform supports INSERT ... RETURNING."""
-
-        return exclusions.only_if(
-            lambda config: config.db.dialect.insert_returning,
-            "%(database)s %(does_support)s 'INSERT ... RETURNING'",
-        )
-
-    @property
-    def update_returning(self):
-        """target platform supports UPDATE ... RETURNING."""
-
-        return exclusions.only_if(
-            lambda config: config.db.dialect.update_returning,
-            "%(database)s %(does_support)s 'UPDATE ... RETURNING'",
+            lambda config: config.db.dialect.full_returning,
+            "%(database)s %(does_support)s 'RETURNING of multiple rows'",
         )
 
     @property
@@ -441,12 +385,18 @@ class SuiteRequirements(Requirements):
         )
 
     @property
-    def insertmanyvalues(self):
+    def returning(self):
+        """target platform supports RETURNING for at least one row.
+
+        .. seealso::
+
+            :attr:`.Requirements.full_returning`
+
+        """
+
         return exclusions.only_if(
-            lambda config: config.db.dialect.supports_multivalues_insert
-            and config.db.dialect.insert_returning
-            and config.db.dialect.use_insertmanyvalues,
-            "%(database)s %(does_support)s 'insertmanyvalues functionality",
+            lambda config: config.db.dialect.implicit_returning,
+            "%(database)s %(does_support)s 'RETURNING of a single row'",
         )
 
     @property
@@ -495,13 +445,6 @@ class SuiteRequirements(Requirements):
         method without reliance on RETURNING.
 
         """
-        return exclusions.open()
-
-    @property
-    def arraysize(self):
-        """dialect includes the required pep-249 attribute
-        ``cursor.arraysize``"""
-
         return exclusions.open()
 
     @property
@@ -554,7 +497,7 @@ class SuiteRequirements(Requirements):
 
     @property
     def foreign_key_constraint_name_reflection(self):
-        """Target supports reflection of FOREIGN KEY constraints and
+        """Target supports refleciton of FOREIGN KEY constraints and
         will return the name of the constraint that was used in the
         "CONSTRAINT <name> FOREIGN KEY" DDL.
 
@@ -657,20 +600,6 @@ class SuiteRequirements(Requirements):
 
     @property
     def comment_reflection(self):
-        """Indicates if the database support table comment reflection"""
-        return exclusions.closed()
-
-    @property
-    def comment_reflection_full_unicode(self):
-        """Indicates if the database support table comment reflection in the
-        full unicode range, including emoji etc.
-        """
-        return exclusions.closed()
-
-    @property
-    def constraint_comment_reflection(self):
-        """indicates if the database support comments on constraints
-        and their reflection"""
         return exclusions.closed()
 
     @property
@@ -692,12 +621,6 @@ class SuiteRequirements(Requirements):
     @property
     def schema_reflection(self):
         return self.schemas
-
-    @property
-    def schema_create_delete(self):
-        """target database supports schema create and dropped with
-        'CREATE SCHEMA' and 'DROP SCHEMA'"""
-        return exclusions.closed()
 
     @property
     def primary_key_constraint_reflection(self):
@@ -741,11 +664,6 @@ class SuiteRequirements(Requirements):
         return exclusions.closed()
 
     @property
-    def has_temp_table(self):
-        """target dialect supports checking a single temp table name"""
-        return exclusions.closed()
-
-    @property
     def temporary_tables(self):
         """target database supports temporary tables"""
         return exclusions.open()
@@ -769,26 +687,8 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def reflect_indexes_with_ascdesc(self):
-        """target database supports reflecting INDEX with per-column
-        ASC/DESC."""
-        return exclusions.open()
-
-    @property
-    def reflect_indexes_with_ascdesc_as_expression(self):
-        """target database supports reflecting INDEX with per-column
-        ASC/DESC but reflects them as expressions (like oracle)."""
-        return exclusions.closed()
-
-    @property
     def indexes_with_expressions(self):
         """target database supports CREATE INDEX against SQL expressions."""
-        return exclusions.closed()
-
-    @property
-    def reflect_indexes_with_expressions(self):
-        """target database supports reflection of indexes with
-        SQL expressions."""
         return exclusions.closed()
 
     @property
@@ -816,15 +716,6 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def unicode_data_no_special_types(self):
-        """Target database/dialect can receive / deliver / compare data with
-        non-ASCII characters in plain VARCHAR, TEXT columns, without the need
-        for special "national" datatypes like NVARCHAR or similar.
-
-        """
-        return exclusions.open()
-
-    @property
     def unicode_data(self):
         """Target database/dialect must support Python unicode objects with
         non-ASCII characters represented, delivered as bound parameters
@@ -844,14 +735,6 @@ class SuiteRequirements(Requirements):
     def symbol_names_w_double_quote(self):
         """Target driver can create tables with a name like 'some " table'"""
         return exclusions.open()
-
-    @property
-    def datetime_interval(self):
-        """target dialect supports rendering of a datetime.timedelta as a
-        literal string, e.g. via the TypeEngine.literal_processor() method.
-
-        """
-        return exclusions.closed()
 
     @property
     def datetime_literals(self):
@@ -882,24 +765,6 @@ class SuiteRequirements(Requirements):
         datetime.time() with tzinfo with Time(timezone=True)."""
 
         return exclusions.closed()
-
-    @property
-    def date_implicit_bound(self):
-        """target dialect when given a date object will bind it such
-        that the database server knows the object is a date, and not
-        a plain string.
-
-        """
-        return exclusions.open()
-
-    @property
-    def time_implicit_bound(self):
-        """target dialect when given a time object will bind it such
-        that the database server knows the object is a time, and not
-        a plain string.
-
-        """
-        return exclusions.open()
 
     @property
     def datetime_implicit_bound(self):
@@ -1040,58 +905,6 @@ class SuiteRequirements(Requirements):
                 ]
             }
         """
-        with config.db.connect() as conn:
-            try:
-                supported = conn.dialect.get_isolation_level_values(
-                    conn.connection.dbapi_connection
-                )
-            except NotImplementedError:
-                return None
-            else:
-                return {
-                    "default": conn.dialect.default_isolation_level,
-                    "supported": supported,
-                }
-
-    @property
-    def get_isolation_level_values(self):
-        """target dialect supports the
-        :meth:`_engine.Dialect.get_isolation_level_values`
-        method added in SQLAlchemy 2.0.
-
-        """
-
-        def go(config):
-            with config.db.connect() as conn:
-                try:
-                    conn.dialect.get_isolation_level_values(
-                        conn.connection.dbapi_connection
-                    )
-                except NotImplementedError:
-                    return False
-                else:
-                    return True
-
-        return exclusions.only_if(go)
-
-    @property
-    def dialect_level_isolation_level_param(self):
-        """test that the dialect allows the 'isolation_level' argument
-        to be handled by DefaultDialect"""
-
-        def go(config):
-            try:
-                e = create_engine(
-                    config.db.url, isolation_level="READ COMMITTED"
-                )
-            except:
-                return False
-            else:
-                return (
-                    e.dialect._on_connect_isolation_level == "READ COMMITTED"
-                )
-
-        return exclusions.only_if(go)
 
     @property
     def json_type(self):
@@ -1136,7 +949,7 @@ class SuiteRequirements(Requirements):
     def precision_numerics_enotation_large(self):
         """target backend supports Decimal() objects using E notation
         to represent very large values."""
-        return exclusions.open()
+        return exclusions.closed()
 
     @property
     def precision_numerics_many_significant_digits(self):
@@ -1176,21 +989,6 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def numeric_received_as_decimal_untyped(self):
-        """target backend will return result columns that are explicitly
-        against NUMERIC or similar precision-numeric datatypes (not including
-        FLOAT or INT types) as Python Decimal objects, and not as floats
-        or ints, including when no SQLAlchemy-side typing information is
-        associated with the statement (e.g. such as a raw SQL string).
-
-        This should be enabled if either the DBAPI itself returns Decimal
-        objects, or if the dialect has set up DBAPI-specific return type
-        handlers such that Decimal objects come back automatically.
-
-        """
-        return exclusions.open()
-
-    @property
     def nested_aggregates(self):
         """target database can select an aggregate from a subquery that's
         also using an aggregate
@@ -1221,27 +1019,9 @@ class SuiteRequirements(Requirements):
         return exclusions.closed()
 
     @property
-    def float_or_double_precision_behaves_generically(self):
-        return exclusions.closed()
-
-    @property
     def precision_generic_float_type(self):
         """target backend will return native floating point numbers with at
         least seven decimal places when using the generic Float type.
-
-        """
-        return exclusions.open()
-
-    @property
-    def literal_float_coercion(self):
-        """target backend will return the exact float value 15.7563
-        with only four significant digits from this statement:
-
-        SELECT :param
-
-        where :param is the Python float 15.7563
-
-        i.e. it does not return 15.75629997253418
 
         """
         return exclusions.open()
@@ -1262,12 +1042,6 @@ class SuiteRequirements(Requirements):
 
         Added to support Pyodbc bug #351.
         """
-
-        return exclusions.open()
-
-    @property
-    def float_is_numeric(self):
-        """target backend uses Numeric for Float/Dual"""
 
         return exclusions.open()
 
@@ -1423,15 +1197,6 @@ class SuiteRequirements(Requirements):
         return exclusions.open()
 
     @property
-    def independent_readonly_connections(self):
-        """
-        Target must support simultaneous, independent database connections
-        that will be used in a readonly fashion.
-
-        """
-        return exclusions.open()
-
-    @property
     def skip_mysql_on_windows(self):
         """Catchall for a large variety of MySQL on Windows failures"""
         return exclusions.open()
@@ -1461,25 +1226,21 @@ class SuiteRequirements(Requirements):
 
     @property
     def timing_intensive(self):
-        from . import config
-
-        return config.add_to_marker.timing_intensive
+        return exclusions.requires_tag("timing_intensive")
 
     @property
     def memory_intensive(self):
-        from . import config
-
-        return config.add_to_marker.memory_intensive
+        return exclusions.requires_tag("memory_intensive")
 
     @property
     def threading_with_mock(self):
         """Mark tests that use threading and mock at the same time - stability
-        issues have been observed with coverage
+        issues have been observed with coverage + python 3.3
 
         """
         return exclusions.skip_if(
-            lambda config: config.options.has_coverage,
-            "Stability issues with coverage",
+            lambda config: util.py3k and config.options.has_coverage,
+            "Stability issues with coverage + py3k",
         )
 
     @property
@@ -1495,16 +1256,43 @@ class SuiteRequirements(Requirements):
         return exclusions.only_if(check)
 
     @property
-    def no_sqlalchemy2_stubs(self):
-        def check(config):
-            try:
-                __import__("sqlalchemy-stubs.ext.mypy")
-            except ImportError:
-                return False
-            else:
-                return True
+    def python2(self):
+        return exclusions.skip_if(
+            lambda: sys.version_info >= (3,),
+            "Python version 2.xx is required.",
+        )
 
-        return exclusions.skip_if(check)
+    @property
+    def python3(self):
+        return exclusions.skip_if(
+            lambda: sys.version_info < (3,), "Python version 3.xx is required."
+        )
+
+    @property
+    def pep520(self):
+        return self.python36
+
+    @property
+    def insert_order_dicts(self):
+        return self.python37
+
+    @property
+    def python36(self):
+        return exclusions.skip_if(
+            lambda: sys.version_info < (3, 6),
+            "Python version 3.6 or greater is required.",
+        )
+
+    @property
+    def python37(self):
+        return exclusions.skip_if(
+            lambda: sys.version_info < (3, 7),
+            "Python version 3.7 or greater is required.",
+        )
+
+    @property
+    def dataclasses(self):
+        return self.python37
 
     @property
     def python38(self):
@@ -1513,38 +1301,10 @@ class SuiteRequirements(Requirements):
         )
 
     @property
-    def python39(self):
-        return exclusions.only_if(
-            lambda: util.py39, "Python 3.9 or above required"
-        )
-
-    @property
-    def python310(self):
-        return exclusions.only_if(
-            lambda: util.py310, "Python 3.10 or above required"
-        )
-
-    @property
-    def python311(self):
-        return exclusions.only_if(
-            lambda: util.py311, "Python 3.11 or above required"
-        )
-
-    @property
-    def python312(self):
-        return exclusions.only_if(
-            lambda: util.py312, "Python 3.12 or above required"
-        )
-
-    @property
     def cpython(self):
         return exclusions.only_if(
             lambda: util.cpython, "cPython interpreter needed"
         )
-
-    @property
-    def is64bit(self):
-        return exclusions.only_if(lambda: util.is64bit, "64bit required")
 
     @property
     def patch_library(self):
@@ -1557,6 +1317,17 @@ class SuiteRequirements(Requirements):
                 return True
 
         return exclusions.only_if(check_lib, "patch library needed")
+
+    @property
+    def non_broken_pickle(self):
+        from sqlalchemy.util import pickle
+
+        return exclusions.only_if(
+            lambda: util.cpython
+            and pickle.__name__ == "cPickle"
+            or sys.version_info >= (3, 2),
+            "Needs cPickle+cPython or newer Python 3 pickle",
+        )
 
     @property
     def predictable_gc(self):
@@ -1592,8 +1363,7 @@ class SuiteRequirements(Requirements):
     @property
     def cextensions(self):
         return exclusions.skip_if(
-            lambda: not util.has_compiled_ext(),
-            "Cython extensions not installed",
+            lambda: not util.has_compiled_ext(), "C extensions not installed"
         )
 
     def _has_sqlite(self):
@@ -1616,23 +1386,8 @@ class SuiteRequirements(Requirements):
         return self.greenlet
 
     @property
-    def no_greenlet(self):
-        def go(config):
-            try:
-                import greenlet  # noqa: F401
-            except ImportError:
-                return True
-            else:
-                return False
-
-        return exclusions.only_if(go)
-
-    @property
     def greenlet(self):
         def go(config):
-            if not _test_asyncio.ENABLE_ASYNCIO:
-                return False
-
             try:
                 import greenlet  # noqa: F401
             except ImportError:
@@ -1760,24 +1515,4 @@ class SuiteRequirements(Requirements):
     @property
     def generic_classes(self):
         "If X[Y] can be implemented with ``__class_getitem__``. py3.7+"
-        return exclusions.open()
-
-    @property
-    def json_deserializer_binary(self):
-        "indicates if the json_deserializer function is called with bytes"
-        return exclusions.closed()
-
-    @property
-    def reflect_table_options(self):
-        """Target database must support reflecting table_options."""
-        return exclusions.closed()
-
-    @property
-    def materialized_views(self):
-        """Target database must support MATERIALIZED VIEWs."""
-        return exclusions.closed()
-
-    @property
-    def materialized_views_reflect_pk(self):
-        """Target database reflect MATERIALIZED VIEWs pks."""
-        return exclusions.closed()
+        return exclusions.only_if(lambda: util.py37)

@@ -291,14 +291,14 @@ class InternationalizationExtension(Extension):
 
         if hasattr(translations, "pgettext"):
             # Python < 3.8
-            pgettext = translations.pgettext
+            pgettext = translations.pgettext  # type: ignore
         else:
 
             def pgettext(c: str, s: str) -> str:
                 return s
 
         if hasattr(translations, "npgettext"):
-            npgettext = translations.npgettext
+            npgettext = translations.npgettext  # type: ignore
         else:
 
             def npgettext(c: str, s: str, p: str, n: int) -> str:
@@ -495,26 +495,16 @@ class InternationalizationExtension(Extension):
                 parser.stream.expect("variable_end")
             elif parser.stream.current.type == "block_begin":
                 next(parser.stream)
-                block_name = (
-                    parser.stream.current.value
-                    if parser.stream.current.type == "name"
-                    else None
-                )
-                if block_name == "endtrans":
+                if parser.stream.current.test("name:endtrans"):
                     break
-                elif block_name == "pluralize":
+                elif parser.stream.current.test("name:pluralize"):
                     if allow_pluralize:
                         break
                     parser.fail(
                         "a translatable section can have only one pluralize section"
                     )
-                elif block_name == "trans":
-                    parser.fail(
-                        "trans blocks can't be nested; did you mean `endtrans`?"
-                    )
                 parser.fail(
-                    f"control structures in translatable sections are not allowed; "
-                    f"saw `{block_name}`"
+                    "control structures in translatable sections are not allowed"
                 )
             elif parser.stream.eos:
                 parser.fail("unclosed translation block")

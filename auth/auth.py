@@ -3,7 +3,6 @@ from fastapi_users.authentication import JWTStrategy
 
 from config import SECRET
 
-SECRET = SECRET
 cookie_transport = CookieTransport(cookie_name="ruchamp", cookie_max_age=3600)
 
 

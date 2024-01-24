@@ -63,21 +63,20 @@ def print_help() -> None:
     )
     table.add_row(
         "--auth [cyan]<USER PASS>",
-        "Username and password to include in the request. Specify '-' for the password"
-        " to use a password prompt. Note that using --verbose/-v will expose"
-        " the Authorization header, including the password encoding"
-        " in a trivially reversible format.",
+        "Username and password to include in the request. Specify '-' for the password to use "
+        "a password prompt. Note that using --verbose/-v will expose the Authorization "
+        "header, including the password encoding in a trivially reversible format.",
     )
 
     table.add_row(
-        "--proxy [cyan]URL",
+        "--proxies [cyan]URL",
         "Send the request via a proxy. Should be the URL giving the proxy address.",
     )
 
     table.add_row(
         "--timeout [cyan]FLOAT",
-        "Timeout value to use for network operations, such as establishing the"
-        " connection, reading some data, etc... [Default: 5.0]",
+        "Timeout value to use for network operations, such as establishing the connection, "
+        "reading some data, etc... [Default: 5.0]",
     )
 
     table.add_row("--follow-redirects", "Automatically follow redirects.")
@@ -386,8 +385,8 @@ def handle_help(
     ),
 )
 @click.option(
-    "--proxy",
-    "proxy",
+    "--proxies",
+    "proxies",
     type=str,
     default=None,
     help="Send the request via a proxy. Should be the URL giving the proxy address.",
@@ -456,7 +455,7 @@ def main(
     headers: typing.List[typing.Tuple[str, str]],
     cookies: typing.List[typing.Tuple[str, str]],
     auth: typing.Optional[typing.Tuple[str, str]],
-    proxy: str,
+    proxies: str,
     timeout: float,
     follow_redirects: bool,
     verify: bool,
@@ -473,7 +472,7 @@ def main(
 
     try:
         with Client(
-            proxy=proxy,
+            proxies=proxies,
             timeout=timeout,
             verify=verify,
             http2=http2,

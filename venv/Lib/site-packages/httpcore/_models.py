@@ -6,7 +6,6 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    MutableMapping,
     Optional,
     Sequence,
     Tuple,
@@ -21,7 +20,7 @@ HeadersAsSequence = Sequence[Tuple[Union[bytes, str], Union[bytes, str]]]
 HeadersAsMapping = Mapping[Union[bytes, str], Union[bytes, str]]
 HeaderTypes = Union[HeadersAsSequence, HeadersAsMapping, None]
 
-Extensions = MutableMapping[str, Any]
+Extensions = Mapping[str, Any]
 
 
 def enforce_bytes(value: Union[bytes, str], *, name: str) -> bytes:

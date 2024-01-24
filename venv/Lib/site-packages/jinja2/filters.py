@@ -248,17 +248,13 @@ def do_items(value: t.Union[t.Mapping[K, V], Undefined]) -> t.Iterator[t.Tuple[K
     yield from value.items()
 
 
-_space_re = re.compile(r"\s", flags=re.ASCII)
-
-
 @pass_eval_context
 def do_xmlattr(
     eval_ctx: "EvalContext", d: t.Mapping[str, t.Any], autospace: bool = True
 ) -> str:
     """Create an SGML/XML attribute string based on the items in a dict.
-
-    If any key contains a space, this fails with a ``ValueError``. Values that
-    are neither ``none`` nor ``undefined`` are automatically escaped.
+    All values that are neither `none` nor `undefined` are automatically
+    escaped:
 
     .. sourcecode:: html+jinja
 
@@ -277,22 +273,12 @@ def do_xmlattr(
 
     As you can see it automatically prepends a space in front of the item
     if the filter returned something unless the second parameter is false.
-
-    .. versionchanged:: 3.1.3
-        Keys with spaces are not allowed.
     """
-    items = []
-
-    for key, value in d.items():
-        if value is None or isinstance(value, Undefined):
-            continue
-
-        if _space_re.search(key) is not None:
-            raise ValueError(f"Spaces are not allowed in attributes: '{key}'")
-
-        items.append(f'{escape(key)}="{escape(value)}"')
-
-    rv = " ".join(items)
+    rv = " ".join(
+        f'{escape(key)}="{escape(value)}"'
+        for key, value in d.items()
+        if value is not None and not isinstance(value, Undefined)
+    )
 
     if autospace and rv:
         rv = " " + rv

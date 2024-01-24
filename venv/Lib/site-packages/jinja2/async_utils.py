@@ -74,7 +74,7 @@ async def auto_aiter(
         async for item in t.cast("t.AsyncIterable[V]", iterable):
             yield item
     else:
-        for item in iterable:
+        for item in t.cast("t.Iterable[V]", iterable):
             yield item
 
 

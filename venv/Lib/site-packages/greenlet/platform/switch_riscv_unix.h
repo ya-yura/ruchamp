@@ -11,8 +11,8 @@
 static int
 slp_switch(void)
 {
-  int ret;
-  long *stackref, stsizediff;
+  register int ret;
+  register long *stackref, stsizediff;
   __asm__ volatile ("" : : : REGS_TO_SAVE);
   __asm__ volatile ("mv %0, sp" : "=r" (stackref) : );
   {
