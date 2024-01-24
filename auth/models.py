@@ -1,28 +1,71 @@
 from datetime import datetime
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, JSON
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean
+Base: DeclarativeMeta = declarative_base()
 
-metadata = MetaData()
+metadata = Base.metadata
 
-Role = Table(
-    "Role",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("name", String, nullable=False),
-    Column("permissions", JSON),
-)
+class Role(Base):
+    __tablename__ = "role"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    permissions = Column(JSON)
 
-User = Table(
-    "User",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("email", String, nullable=False),
-    Column("username", String, nullable=False),
-    Column("registered_at", TIMESTAMP, default=datetime.utcnow),
-    Column("role_id", Integer, ForeignKey(Role.c.id)),
-    Column("hashed_password", String, nullable=False),
-    Column("is_active", Boolean, default=True, nullable=False),
-    Column("is_superuser", Boolean, default=False, nullable=False),
-    Column("is_verified", Boolean, default=False, nullable=False),
-    Column("confirmation_token", String, nullable=True),
-)
+
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    registered_at = Column(TIMESTAMP, default=datetime.utcnow)
+    role_id = Column(Integer, ForeignKey(Role.id))
+    hashed_password = Column(String(length=1024), nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_superuser = Column(Boolean, default=False, nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
+    confirmation_token = Column(String, nullable=True)
+
+
+class Athlete(Base):
+    __tablename__ = "Athlete"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    weight_category = Column(String, nullable=True)
+    belt_rank = Column(String, nullable=True)
+    coach_name = Column(String, nullable=True)
+    birthdate = Column(TIMESTAMP, nullable=True)
+    height = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    photo_url = Column(String, nullable=True)
+
+
+class EventOrganizer(Base):
+    __tablename__ = "EventOrganizer"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    organization_name = Column(String, nullable=True)
+    website = Column(String, nullable=True)
+    contact_email = Column(String, nullable=True)
+    contact_phone = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    logo_url = Column(String, nullable=True)
+
+
+class Spectator(Base):
+    __tablename__ = "Spectator"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    full_name = Column(String, nullable=True)
+    birthdate = Column(TIMESTAMP, nullable=True)
+    gender = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    phone_number = Column(String, nullable=True)
+    photo_url = Column(String, nullable=True)
+
+
+class SystemAdministrator(Base):
+    __tablename__ = "SystemAdministrator"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
