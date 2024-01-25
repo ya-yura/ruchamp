@@ -26,7 +26,7 @@ exceptiongroup==1.1.0
 fastapi==0.89.1
 fastapi-admin==1.0.4
 fastapi-cache2==0.2.0
-fastapi-users==10.3.0
+fastapi-users==12.1.2
 fastapi-users-db-sqlalchemy==4.0.4
 fastapi_amis_admin==0.4.2
 fastapi_user_auth==0.4.2

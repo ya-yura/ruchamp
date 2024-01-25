@@ -1,10 +1,10 @@
 from fastapi_users import fastapi_users, FastAPIUsers
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 
 from auth.auth import auth_backend
 from auth.models import User
-from auth.manager import get_user_manager
-from auth.schemas import UserRead, UserCreate
+from auth.manager import get_user_manager, UserManager
+from auth.schemas import UserRead, UserCreate, AthleteUpdate
 
 app = FastAPI(
     title="Ruchamp"
@@ -29,11 +29,19 @@ app.include_router(
 
 current_user = fastapi_users.current_user()
 
-@app.get("/protected-route")
-def protected_route(user: User = Depends(current_user)):
-    return f"Hello, {user.username}"
+athlete_update = AthleteUpdate
 
+@app.put("/update-athlete-profile")
+async def update_athlete_profile(
+    athlete_data: athlete_update,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    if current_user.role_id != 2:  # это типа спортсмен
+        raise HTTPException(status_code=403, detail="Only athletes can update their profile")
 
-@app.get("/unprotected-route")
-def unprotected_route():
-    return f"Hello, anonym"
+    updated_athlete = await user_manager.update_athlete_profile(
+        current_user, athlete_data
+    )
+
+    return {"message": "Athlete profile updated successfully"}
