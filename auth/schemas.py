@@ -26,6 +26,23 @@ class UserCreate(schemas.BaseUserCreate):
     is_verified: Optional[bool] = False
 
 
+class UserUpdate(schemas.BaseUserUpdate):
+    pass
+
+
+class User(schemas.BaseUser):
+    pass
+
+
+class UserDB(User, schemas.BaseUser):
+    username: str
+    email: str
+    verification_token: str
+
+    class Config:
+        orm_mode = True
+
+
 class AthleteUpdate(BaseModel):
     weight_category: Optional[str]
     belt_rank: Optional[str]

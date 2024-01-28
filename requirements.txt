@@ -57,13 +57,13 @@ psycopg2-binary==2.9.5
 pycparser==2.21
 pydantic==1.10.4
 pyflakes==3.0.1
-PyJWT==2.6.0
+PyJWT==2.8.0
 pypika-tortoise==0.1.6
 pytest==7.2.1
 pytest-asyncio==0.20.3
 python-dateutil==2.8.2
 python-dotenv==0.21.0
-python-multipart==0.0.5
+python-multipart==0.0.6
 pytz==2022.7.1
 pytzdata==2020.1
 PyYAML==6.0
