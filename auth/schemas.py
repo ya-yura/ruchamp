@@ -35,3 +35,31 @@ class AthleteUpdate(BaseModel):
     gender: Optional[str]
     country: Optional[str]
     photo_url: Optional[str]
+
+
+class SpectatorUpdate(BaseModel):
+    full_name: Optional[str]
+    gender: Optional[str]
+    birthdate: Optional[str]
+    country: Optional[str]
+    phone_number: Optional[str]
+    photo_url: Optional[str]
+
+
+class SysAdminUpdate(BaseModel):
+    full_name: Optional[str]
+    gender: Optional[str]
+    birthdate: Optional[str]
+    country: Optional[str]
+    phone_number: Optional[str]
+    photo_url: Optional[str]
+
+
+class OrganizerUpdate(BaseModel):
+    organization_name: Optional[str]
+    website: Optional[str]
+    contact_email: Optional[str]
+    contact_phone: Optional[str]
+    description: Optional[str]
+    logo_url: Optional[str]
+
