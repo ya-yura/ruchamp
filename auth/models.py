@@ -1,10 +1,12 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, JSON
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey
+from sqlalchemy import JSON
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
 Base: DeclarativeMeta = declarative_base()
 
 metadata = Base.metadata
+
 
 class Role(Base):
     __tablename__ = "Role"
@@ -24,7 +26,7 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
-    confirmation_token = Column(String, nullable=True)
+    verification_token = Column(String, nullable=True)
 
 
 class Athlete(Base):

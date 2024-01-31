@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
@@ -6,15 +7,13 @@ from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
 
 from auth.schemas import AthleteUpdate, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate
 from auth.database import User, get_user_db
+from auth.mailer import send_verification_email
 from config import SECRET
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
-
-    async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has registered.")
 
     async def create(
         self,
@@ -36,12 +35,23 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
         user_dict["role_id"] = 1
+        user_dict["verification_token"] = str(uuid.uuid4())
 
         created_user = await self.user_db.create(user_dict)
 
         await self.on_after_register(created_user, request)
 
         return created_user
+
+    async def on_after_register(
+        self,
+        user: User,
+        request: Optional[Request] = None
+    ):
+        send_verification_email(
+            user.username, user.email, user.verification_token
+        )
+
 
     async def update_athlete_profile(
         self, user: User, athlete_data: AthleteUpdate, request: Optional[Request] = None

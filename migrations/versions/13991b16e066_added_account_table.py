@@ -1,8 +1,8 @@
-"""Добавлены таблицы ролей в БД
+"""Added account table
 
-Revision ID: 39ae4922d331
+Revision ID: 13991b16e066
 Revises: 
-Create Date: 2024-01-24 17:40:05.748300
+Create Date: 2024-01-27 01:01:17.789663
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '39ae4922d331'
+revision: str = '13991b16e066'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -36,7 +36,7 @@ def upgrade() -> None:
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('is_verified', sa.Boolean(), nullable=False),
-    sa.Column('confirmation_token', sa.String(), nullable=True),
+    sa.Column('verification_token', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['Role.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
