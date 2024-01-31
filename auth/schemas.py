@@ -52,7 +52,6 @@ class AthleteUpdate(BaseModel):
     gender: Optional[str]
     country: Optional[str]
     photo_url: Optional[str]
-<<<<<<< HEAD
 
 
 class SpectatorUpdate(BaseModel):
@@ -80,6 +79,3 @@ class OrganizerUpdate(BaseModel):
     contact_phone: Optional[str]
     description: Optional[str]
     logo_url: Optional[str]
-
-=======
->>>>>>> cc9b3843472ab98f9838affc7b2611e742a38e18
