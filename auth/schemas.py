@@ -5,8 +5,8 @@ from fastapi_users import schemas
 
 class UserRead(schemas.BaseUser[int]):
     id: int
-    email: str
     username: str
+    email: str
     role_id: int
     is_active: bool = True
     is_superuser: bool = False
@@ -27,13 +27,15 @@ class UserCreate(schemas.BaseUserCreate):
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    pass
+    username: Optional[str] = None
+    password: Optional[str] = None
+    email: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
+    is_verified: Optional[bool] = None
 
 
-class User(schemas.BaseUser):
-    pass
-
-
+'''
 class UserDB(User, schemas.BaseUser):
     username: str
     email: str
@@ -41,6 +43,12 @@ class UserDB(User, schemas.BaseUser):
 
     class Config:
         orm_mode = True
+
+
+class UserChangePassword(schemas.BaseUserUpdate):
+    current_password: str
+    new_password: str
+'''
 
 
 class AthleteUpdate(BaseModel):

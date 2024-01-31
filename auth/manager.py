@@ -1,9 +1,12 @@
 from typing import Optional
 import uuid
+import bcrypt
+import hashlib
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models
 from fastapi_users import schemas
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.database import User, get_user_db
 from auth.mailer import send_verification_email
@@ -54,3 +57,18 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
+
+
+# async def user_change_password(
+#     user_change_password: schemas.UserChangePassword,
+#     user: User = Depends(get_user_manager()),
+
+async def delete_user(db: AsyncSession, email: str):
+    user = await db.get(User, email)
+    await db.delete(user)
+    await db.commit()
+    return {"message": "User deleted"}
+
+
+def get_hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
