@@ -43,6 +43,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         return created_user
 
+
     async def update_athlete_profile(
         self, user: User, athlete_data: AthleteUpdate, request: Optional[Request] = None
     ) -> Athlete:
