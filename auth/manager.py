@@ -1,4 +1,6 @@
+from typing import Optional
 import uuid
+
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
 from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
@@ -7,7 +9,7 @@ from auth.schemas import AthleteUpdate, SpectatorUpdate, SysAdminUpdate, Organiz
 from auth.database import User, get_user_db
 from auth.mailer import send_verification_email
 from config import SECRET
-from typing import Optional, Type, Base
+
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
@@ -50,37 +52,61 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             user.username, user.email, user.verification_token
         )
 
-    async def update_profile(
-        self,
-        user: User,
-        data: schemas.BaseProfileUpdate,
-        model: Type[Base],
-    ) -> Base:
-        profile = await self.get_profile(user, model)
-        for field, value in data.dict().items():
-            setattr(profile, field, value)
-        await self.user_db.update(profile)
-        return profile
 
     async def update_athlete_profile(
         self, user: User, athlete_data: AthleteUpdate, request: Optional[Request] = None
     ) -> Athlete:
-        return await self.update_profile(user, athlete_data, Athlete)
+        athlete = await self.get_athlete_profile(user)
+        for field, value in athlete_data.dict().items():
+            setattr(athlete, field, value)
+        await self.user_db.update(athlete)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return athlete
+
 
     async def update_spectator_profile(
         self, user: User, spectator_data: SpectatorUpdate, request: Optional[Request] = None
     ) -> Spectator:
-        return await self.update_profile(user, spectator_data, Spectator)
+        spectator = await self.get_spectator_profile(user)
+        for field, value in spectator_data.dict().items():
+            setattr(spectator, field, value)
+        await self.user_db.update(spectator)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return spectator
+
 
     async def update_sysadmin_profile(
         self, user: User, sysadmin_data: SysAdminUpdate, request: Optional[Request] = None
     ) -> SystemAdministrator:
-        return await self.update_profile(user, sysadmin_data, SystemAdministrator)
+        sysadmin = await self.get_sysadmin_profile(user)
+        for field, value in sysadmin_data.dict().items():
+            setattr(sysadmin, field, value)
+        await self.user_db.update(sysadmin)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return sysadmin
+
 
     async def update_organizer_profile(
         self, user: User, organizer_data: OrganizerUpdate, request: Optional[Request] = None
     ) -> EventOrganizer:
-        return await self.update_profile(user, organizer_data, EventOrganizer)
+        organizer = await self.get_organizer_profile(user)
+        for field, value in organizer_data.dict().items():
+            setattr(organizer, field, value)
+        await self.user_db.update(organizer)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return organizer
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
