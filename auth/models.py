@@ -40,7 +40,7 @@ class Athlete(Base):
     height = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
-    photo_url = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 class EventOrganizer(Base):
@@ -52,7 +52,7 @@ class EventOrganizer(Base):
     contact_email = Column(String, nullable=True)
     contact_phone = Column(String, nullable=True)
     description = Column(String, nullable=True)
-    logo_url = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 class Spectator(Base):
@@ -64,7 +64,7 @@ class Spectator(Base):
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
     phone_number = Column(String, nullable=True)
-    photo_url = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 class SystemAdministrator(Base):
@@ -75,7 +75,7 @@ class SystemAdministrator(Base):
     birthdate = Column(TIMESTAMP, nullable=True)
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
-    photo_url = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 class Team(Base):
@@ -86,7 +86,7 @@ class Team(Base):
     invite_link = Column(String, nullable=True)
     description = Column(String, nullable=True)
     slug = Column(String, nullable=True)
-    logo_url = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 class TeamMember(Base):

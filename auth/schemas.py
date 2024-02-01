@@ -51,7 +51,7 @@ class AthleteUpdate(BaseModel):
     height: Optional[str]
     gender: Optional[str]
     country: Optional[str]
-    photo_url: Optional[str]
+    image_field: Optional[str]
 
 
 class SpectatorUpdate(BaseModel):
@@ -60,7 +60,7 @@ class SpectatorUpdate(BaseModel):
     birthdate: Optional[str]
     country: Optional[str]
     phone_number: Optional[str]
-    photo_url: Optional[str]
+    image_field: Optional[str]
 
 
 class SysAdminUpdate(BaseModel):
@@ -69,7 +69,7 @@ class SysAdminUpdate(BaseModel):
     birthdate: Optional[str]
     country: Optional[str]
     phone_number: Optional[str]
-    photo_url: Optional[str]
+    image_field: Optional[str]
 
 
 class OrganizerUpdate(BaseModel):
@@ -78,4 +78,4 @@ class OrganizerUpdate(BaseModel):
     contact_email: Optional[str]
     contact_phone: Optional[str]
     description: Optional[str]
-    logo_url: Optional[str]
+    image_field: Optional[str]
