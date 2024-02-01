@@ -79,3 +79,13 @@ class OrganizerUpdate(BaseModel):
     contact_phone: Optional[str]
     description: Optional[str]
     image_field: Optional[str]
+
+
+class TeamUpdate(BaseModel):
+    name: Optional[str]
+    website: Optional[str]
+    captain: Optional[str]
+    invite_link: Optional[str]
+    description: Optional[str]
+    slug: Optional[str]
+    image_field: Optional[str]

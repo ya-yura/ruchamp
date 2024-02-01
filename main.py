@@ -7,7 +7,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from auth.auth import auth_backend
 from auth.models import User, Athlete, EventOrganizer, Spectator, SystemAdministrator, Team
 from auth.manager import get_user_manager, UserManager
-from auth.schemas import UserRead, UserCreate, AthleteUpdate, UserDB, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate
+from auth.schemas import UserRead, UserCreate, AthleteUpdate, UserDB, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate, TeamUpdate
 from connection import get_db
 from typing import Type, Union
 
@@ -35,6 +35,7 @@ app.include_router(
 current_user = fastapi_users.current_user()
 
 athlete_update = AthleteUpdate
+team_update = TeamUpdate
 sysadmin_update = SysAdminUpdate
 organizer_update = OrganizerUpdate
 spectator_update = SpectatorUpdate
@@ -53,25 +54,48 @@ async def upload_image(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
-    db: AsyncSession = Depends(get_db),  # Используем зависимость для асинхронной сессии
+    db: AsyncSession = Depends(get_db),
 ):
-    if current_user.role_id != 3:  # Предположим, что 3 - это роль организатора
-        raise HTTPException(status_code=403, detail="Only organizer can update their avatar")
+    role_id = current_user.role_id
+    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
 
-    # Проверяем, что переданный атрибут модели является полем для изображения
+    if role_id not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
     if not is_model_field(model, image_field):
         raise HTTPException(status_code=400, detail="Invalid image field for the model")
 
-    # Пример сохранения файла в определенное место
     with open(f"images/{image.filename}", "wb") as f:
         f.write(image.file.read())
 
-    # Обновляем поле изображения в базе данных
     image_url = f"images/{image.filename}"
     db.execute(update(model).where(model.user_id == current_user.id).values({image_field: image_url}))
     await db.commit()
 
     return {"message": f"{image_field} uploaded successfully"}
+
+
+async def update_profile(
+    model: Type,
+    data: Type,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    role_id = current_user.role_id
+    allowed_roles = {
+        2: user_manager.update_athlete_profile,
+        3: user_manager.update_organizer_profile,
+        4: user_manager.update_spectator_profile,
+        5: user_manager.update_sysadmin_profile
+    }
+
+    if role_id not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    update_function = allowed_roles[role_id]
+    await update_function(current_user, data)
+
+    return {"message": f"{model.__name__} profile updated successfully"}
 
 
 '''  ATHLETE  '''
@@ -80,11 +104,9 @@ async def upload_image(
 async def upload_athlete_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(Athlete, "photo_url", image, current_user, user_manager, db)
-
+    return await upload_image(Athlete, "photo_url", image, current_user, db)
 
 @app.put("/update-athlete-profile")
 async def update_athlete_profile(
@@ -92,16 +114,7 @@ async def update_athlete_profile(
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    if current_user.role_id != 2:  # это типа спортсмен
-        raise HTTPException(status_code=403,
-                            detail="Only athletes can update their profile"
-                            )
-
-    await user_manager.update_athlete_profile(
-        current_user, athlete_data
-    )
-
-    return {"message": "Athlete profile updated successfully"}
+    return await update_profile(Athlete, athlete_data, current_user, user_manager)
 
 
 '''  SPECTATOR  '''
@@ -110,11 +123,9 @@ async def update_athlete_profile(
 async def upload_spectator_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(Spectator, "photo_url", image, current_user, user_manager, db)
-
+    return await upload_image(Spectator, "photo_url", image, current_user, db)
 
 @app.put("/update-spectator-profile")
 async def update_spectator_profile(
@@ -122,14 +133,7 @@ async def update_spectator_profile(
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    if current_user.role_id != 4:  # это типа зритель
-        raise HTTPException(status_code=403, detail="Only spectator can update their profile")
-
-    await user_manager.update_spectator_profile(
-        current_user, spectator_data
-    )
-
-    return {"message": "Spectator profile updated successfully"}
+    return await update_profile(Spectator, spectator_data, current_user, user_manager)
 
 
 '''  SYSADMIN  '''
@@ -138,11 +142,9 @@ async def update_spectator_profile(
 async def upload_sysadmin_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(SystemAdministrator, "photo_url", image, current_user, user_manager, db)
-
+    return await upload_image(SystemAdministrator, "photo_url", image, current_user, db)
 
 @app.put("/update-sysadmin-profile")
 async def update_sysadmin_profile(
@@ -150,14 +152,7 @@ async def update_sysadmin_profile(
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    if current_user.role_id != 5:  # это типа сисадмин
-        raise HTTPException(status_code=403, detail="Only sysadmin can update their profile")
-
-    updated_sysadmin = await user_manager.update_sysadmin_profile(
-        current_user, sysadmin_data
-    )
-
-    return {"message": "Sysadmin profile updated successfully"}
+    return await update_profile(SystemAdministrator, sysadmin_data, current_user, user_manager)
 
 
 '''  ORGANIZER  '''
@@ -166,11 +161,9 @@ async def update_sysadmin_profile(
 async def upload_organizer_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(EventOrganizer, "logo_url", image, current_user, user_manager, db)
-
+    return await upload_image(EventOrganizer, "logo_url", image, current_user, db)
 
 @app.put("/update-organizer-profile")
 async def update_organizer_profile(
@@ -178,18 +171,26 @@ async def update_organizer_profile(
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    if current_user.role_id != 3:  # это типа организатор
-        raise HTTPException(status_code=403, detail="Only organizer can update their profile")
-
-    await user_manager.update_organizer_profile(
-        current_user, organizer_data
-    )
-
-    return {"message": "Organizer profile updated successfully"}
+    return await update_profile(EventOrganizer, organizer_data, current_user, user_manager)
 
 
 '''  TEAM  '''
 
+@app.post("/upload-team-photo")
+async def upload_team_photo(
+    image: UploadFile = File(...),
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await upload_image(Team, "image_field", image, current_user, db)
+
+@app.put("/update-team-profile")
+async def update_team_profile(
+    team_data: team_update,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    return await update_profile(Team, team_data, current_user, user_manager)
 
 
 '''  ---  '''
