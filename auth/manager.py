@@ -6,7 +6,7 @@ from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, s
 from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
 
 from auth.schemas import AthleteUpdate, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate
-from auth.database import User, get_user_db
+from connection import User, get_user_db
 from auth.mailer import send_verification_email
 from config import SECRET
 

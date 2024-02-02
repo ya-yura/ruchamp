@@ -5,9 +5,28 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from auth.auth import auth_backend
-from auth.models import User, Athlete, EventOrganizer, Spectator, SystemAdministrator, Team
+from auth.models import (
+    User,
+    Athlete,
+    EventOrganizer,
+    Spectator,
+    SystemAdministrator,
+    Team,
+    TeamMember
+)
 from auth.manager import get_user_manager, UserManager
-from auth.schemas import UserRead, UserCreate, AthleteUpdate, UserDB, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate, TeamUpdate
+from auth.schemas import (
+    UserRead,
+    UserCreate,
+    AthleteUpdate,
+    UserDB,
+    SpectatorUpdate,
+    SysAdminUpdate,
+    OrganizerUpdate,
+    TeamUpdate,
+    TeamCreate,
+    TeamDB
+)
 from connection import get_db
 from typing import Type, Union
 
@@ -40,6 +59,7 @@ sysadmin_update = SysAdminUpdate
 organizer_update = OrganizerUpdate
 spectator_update = SpectatorUpdate
 user_db_verify = UserDB
+
 
 def is_model_field(model: Type, field_name: str) -> bool:
     """
@@ -191,6 +211,43 @@ async def update_team_profile(
     user_manager: UserManager = Depends(get_user_manager),
 ):
     return await update_profile(Team, team_data, current_user, user_manager)
+
+
+@app.post("/create-team")
+async def create_team(
+    team_data: TeamCreate,
+    current_user: UserDB = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db),
+):
+    role_id = current_user.role_id
+    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено создавать команды
+
+    if role_id not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    # Создаем команду
+    team_id = await create_team_and_members(db, team_data, current_user)
+
+    return {"message": "Team created successfully", "team_id": team_id}
+
+
+async def create_team_and_members(db: AsyncSession, team_data: TeamCreate, captain_user: UserDB) -> int:
+    # Создаем команду
+    team_dict = team_data.dict()
+    team_dict["captain"] = captain_user.id
+    team = await db.execute(Team.__table__.insert().values(team_dict))
+    team_id = team.scalars().first()
+
+    # Добавляем капитана в список членов команды
+    await db.execute(TeamMember.__table__.insert().values(team_id=team_id, member_id=captain_user.id))
+
+    # Добавляем остальных участников
+    for member in team_data.members:
+        await db.execute(TeamMember.__table__.insert().values(team_id=team_id, member_id=member.member_id))
+
+    await db.commit()
+    return team_id
 
 
 '''  ---  '''
