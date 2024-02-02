@@ -232,6 +232,24 @@ async def create_team(
     return {"message": "Team created successfully", "team_id": team_id}
 
 
+async def create_team_and_members(db: AsyncSession, team_data: TeamCreate, captain_user: UserDB) -> int:
+    # Создаем команду
+    team_dict = team_data.dict()
+    team_dict["captain"] = captain_user.id
+    team = await db.execute(Team.__table__.insert().values(team_dict))
+    team_id = team.scalars().first()
+
+    # Добавляем капитана в список членов команды
+    await db.execute(TeamMember.__table__.insert().values(team_id=team_id, member_id=captain_user.id))
+
+    # Добавляем остальных участников
+    for member in team_data.members:
+        await db.execute(TeamMember.__table__.insert().values(team_id=team_id, member_id=member.member_id))
+
+    await db.commit()
+    return team_id
+
+
 '''  ---  '''
 
 
