@@ -11,7 +11,7 @@ class BaseServices:
         async with async_session_maker() as session:
             query = select(cls.model)
             result = await session.execute(query)
-            return result.mappings().all()
+        return result.mappings().all()
 
     @classmethod
     async def find_one_or_none(cls, **filter_by):

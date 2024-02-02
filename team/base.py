@@ -1,6 +1,7 @@
 from auth.database import async_session_maker
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, insert
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 class BaseServicesTeam:
@@ -21,16 +22,17 @@ class BaseServicesTeam:
             return result.mappings().one_or_none()
 
     @classmethod
-    async def create_team(cls, team):
+    async def create_team(cls, **team):
         async with async_session_maker() as session:
-            session.add(team)
+            query = insert(cls.model).values(**team)
+            result = await session.execute(query)
             await session.commit()
-            return team
+            return result
 
     @classmethod
-    async def update_team(cls, team):
+    async def update_team(cls, id, **team):
         async with async_session_maker() as session:
-            update_query = update(cls.model).where(cls.model.id == team.id).values(**team.dict())
+            update_query = update(cls.model).filter_by(
+                id=id).values(**team)
             await session.execute(update_query)
             await session.commit()
-            return "team update"
