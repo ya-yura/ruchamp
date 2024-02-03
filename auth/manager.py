@@ -2,10 +2,12 @@ from typing import Optional
 import uuid
 
 from fastapi import Depends, Request
-from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
+from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions,
+                           models, schemas)
 from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
 
-from auth.schemas import AthleteUpdate, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate
+from auth.schemas import (AthleteUpdate, SpectatorUpdate,
+                          SysAdminUpdate, OrganizerUpdate)
 from connection import User, get_user_db
 from auth.mailer import send_verification_email
 from config import SECRET
@@ -53,7 +55,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
 
     async def update_athlete_profile(
-        self, user: User, athlete_data: AthleteUpdate, request: Optional[Request] = None
+        self,
+        user: User,
+        athlete_data: AthleteUpdate,
+        request: Optional[Request] = None
     ) -> Athlete:
         athlete = await self.get_athlete_profile(user)
         for field, value in athlete_data.dict().items():
@@ -65,9 +70,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         return athlete
 
-
     async def update_spectator_profile(
-        self, user: User, spectator_data: SpectatorUpdate, request: Optional[Request] = None
+        self,
+        user: User,
+        spectator_data: SpectatorUpdate,
+        request: Optional[Request] = None
     ) -> Spectator:
         spectator = await self.get_spectator_profile(user)
         for field, value in spectator_data.dict().items():
@@ -79,9 +86,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         return spectator
 
-
     async def update_sysadmin_profile(
-        self, user: User, sysadmin_data: SysAdminUpdate, request: Optional[Request] = None
+        self,
+        user: User,
+        sysadmin_data: SysAdminUpdate,
+        request: Optional[Request] = None
     ) -> SystemAdministrator:
         sysadmin = await self.get_sysadmin_profile(user)
         for field, value in sysadmin_data.dict().items():
@@ -93,9 +102,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         return sysadmin
 
-
     async def update_organizer_profile(
-        self, user: User, organizer_data: OrganizerUpdate, request: Optional[Request] = None
+        self,
+        user: User,
+        organizer_data: OrganizerUpdate,
+        request: Optional[Request] = None
     ) -> EventOrganizer:
         organizer = await self.get_organizer_profile(user)
         for field, value in organizer_data.dict().items():
