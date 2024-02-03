@@ -4,6 +4,9 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from fastapi_pagination import paginate, add_pagination, Params
+from fastapi_pagination.utils import disable_installed_extensions_check
+
 from auth.auth import auth_backend
 from auth.models import (
     User,
@@ -196,7 +199,7 @@ async def update_organizer_profile(
 
 '''  TEAM  '''
 
-@app.post("/upload-team-photo")
+@app.post("/upload-team-photo", tags=["teams"])
 async def upload_team_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
@@ -204,7 +207,7 @@ async def upload_team_photo(
 ):
     return await upload_image(Team, "image_field", image, current_user, db)
 
-@app.put("/update-team-profile")
+@app.put("/update-team-profile", tags=["teams"])
 async def update_team_profile(
     team_data: team_update,
     current_user: User = Depends(current_user),
@@ -213,7 +216,7 @@ async def update_team_profile(
     return await update_profile(Team, team_data, current_user, user_manager)
 
 
-@app.post("/create-team")
+@app.post("/create-team", tags=["teams"])
 async def create_team(
     team_data: TeamCreate,
     current_user: UserDB = Depends(current_user),
@@ -250,10 +253,64 @@ async def create_team_and_members(db: AsyncSession, team_data: TeamCreate, capta
     return team_id
 
 
+@app.get("/get-all-teams", tags=["teams"])
+async def get_all_teams(
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+    params: Params = Depends(),
+):
+    teams = await db.execute(select(Team))
+    return paginate(teams.mappings().all(), params)
+
+disable_installed_extensions_check()
+add_pagination(app)
+
+
+@app.get("/get-team/{team_id}", tags=["teams"])
+async def get_team(
+    team_id: int,
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    team = await db.execute(select(Team).where(Team.id == team_id))
+    return team.mappings().first()
+
+
+@app.get("/get-team-members/{team_id}", tags=["teams"])
+# Участники команды
+async def get_team_members(
+    team_id: int,
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+    params: Params = Depends(),
+):
+    team_members = await db.execute(select(TeamMember).where(TeamMember.team == team_id))
+    return paginate(team_members.mappings().all(), params)
+
+
+@app.post("/join-team/{team_uuid}", tags=["teams"])
+async def join_team(
+    team_uuid: str,
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    team = await db.execute(select(Team.id).where(Team.invite_link == team_uuid))
+    team_id = team.scalars().first()
+    team_members_db = await db.execute(select(TeamMember.member).where(TeamMember.team == team_id))
+    team_members = team_members_db.scalars().all()
+    if current_user.id in team_members:
+        raise HTTPException(status_code=400, detail="You are already a member of this team")
+    if team_id is None:
+        raise HTTPException(status_code=404, detail="Team not found")
+    await db.execute(TeamMember.__table__.insert().values(team=team_id, member=current_user.id))
+    await db.commit()
+    return {"message": "Team joined successfully"}
+
+
 '''  ---  '''
 
 
-@app.get("/verify/{token}")
+@app.get("/verify/{token}", tags=["users"])
 async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User.email).where(
         User.verification_token == token)
@@ -264,4 +321,3 @@ async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
     )
     await db.commit()
     return {"email": email}
-

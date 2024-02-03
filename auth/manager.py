@@ -52,7 +52,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             user.username, user.email, user.verification_token
         )
 
-
     async def update_athlete_profile(
         self, user: User, athlete_data: AthleteUpdate, request: Optional[Request] = None
     ) -> Athlete:

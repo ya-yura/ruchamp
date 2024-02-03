@@ -22,6 +22,7 @@ fake = Faker("ru_RU")
 
 session = SessionLocal()
 
+
 def generate_fake_data():
     # Генерация пользователей и связанных данных
     roles = session.execute(select(Role)).scalars().all()
@@ -132,5 +133,6 @@ def generate_fake_data():
             session.add(team_member)
 
     session.commit()
+
 
 generate_fake_data()
