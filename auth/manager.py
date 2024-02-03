@@ -50,9 +50,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user: User,
         request: Optional[Request] = None
     ):
-        send_verification_email(
-            user.username, user.email, user.verification_token
-        )
+        return f"User {user.email} has been created"
+        # send_verification_email(
+        #     user.username, user.email, user.verification_token
+        # )
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):

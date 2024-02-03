@@ -3,13 +3,13 @@ from pydantic import BaseModel
 
 
 class TeamSchemasBase(BaseModel):
-    id: Optional[int]
-    captain: Optional[int]
-    name: Optional[str]
-    description: Optional[str]
-    slug: Optional[str]
-    logo_url: Optional[str]
-    invite_link: Optional[str]
+    id: int
+    captain: int
+    name: str
+    description: str
+    slug: str
+    logo_url: str
+    invite_link: str
 
 
 class TeamSchemasCreate(TeamSchemasBase):
@@ -26,9 +26,13 @@ class TeamSchemasCreate(TeamSchemasBase):
 
 
 class Team(TeamSchemasBase):
-    id: Optional[int]
-    captain: Optional[int]
-    name: Optional[str]
+    id: int
+    captain: int
+    name: str
+    description: str
+    slug: str
+    logo_url: str
+    invite_link: str
 
     class Config:
         orm_mode = True

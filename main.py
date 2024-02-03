@@ -1,16 +1,17 @@
 from fastapi_users import FastAPIUsers
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.auth import auth_backend
-from auth.models import User
+from auth.models import User, TeamMember
 from auth.manager import get_user_manager, UserManager, get_hash_password
 from auth.schemas import UserRead, UserCreate, AthleteUpdate
 from auth.mailer import send_forgot_password_email
 from auth.router import router as router_users
 from team.router import router as router_teams
 from connection import get_db
+from team.services import TeamServices
 import uuid
 
 
@@ -78,7 +79,7 @@ async def forgot_password(email: str, db: AsyncSession = Depends(get_db)):
     )
     username = username_db.scalars().first()
     token = str(uuid.uuid4())
-    send_forgot_password_email(username, user_email, token)
+    # send_forgot_password_email(username, user_email, token)
     await db.execute(update(User).where(
         User.email == user_email).values(verification_token=token)
     )
@@ -96,27 +97,3 @@ async def change_password(token: str,
             hashed_password=get_hash_password(password)))  # при логировании под новым паролем ошибка
     await db.commit()
     return {"message": "Password changed"}
-
-
-'''
-При логировании под новым паролем ошибка
-@app.post("/change-password")
-async def change_password2(
-    new_password: str,
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(select(User.email).where(
-        User.verification_token == token)
-    )
-    email = result.scalars().first()
-    await db.execute(update(User).where(
-        User.email == email).values(verification_token="")
-    )
-    await db.execute(update(User).where(
-        User.email == email).values(hashed_password="abc"))
-    new_pwd = get_hash_password(new_password)
-    print(new_pwd)
-    await db.execute(update(User).values(hashed_password=new_pwd))
-    await db.commit()
-    return {"message": "Password changed"}
-'''

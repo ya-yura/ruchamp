@@ -1,7 +1,6 @@
 from auth.database import async_session_maker
 
 from sqlalchemy import select, update, insert
-from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 class BaseServicesTeam:
@@ -36,3 +35,12 @@ class BaseServicesTeam:
                 id=id).values(**team)
             await session.execute(update_query)
             await session.commit()
+
+    @classmethod
+    async def join_team(cls, id):
+        async with async_session_maker() as session:
+            query = update(cls.model).filter_by(
+                id=id).values(is_joined=True)
+            await session.execute(query)
+            await session.commit()
+            return True
