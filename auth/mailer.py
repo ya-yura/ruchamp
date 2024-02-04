@@ -50,7 +50,7 @@ def send_forgot_password_email(username: str, email: str, token: str):
     <div id="box">
       <h2> Привет {username}, </h2>
         <p> Для изменения перейдите по
-            <a href="http://localhost:8000/forgot-password/{token}">
+            <a href="http://localhost:8000/reset-forgot-password/{token}">
                 ссылке
             </a>. Ссылка действительна в течении 24 часов
         </p>

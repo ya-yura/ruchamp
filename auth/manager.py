@@ -4,8 +4,8 @@ import uuid
 from fastapi import Depends, Request
 from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions,
                            models, schemas)
-from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
 
+from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
 from auth.schemas import (AthleteUpdate, SpectatorUpdate,
                           SysAdminUpdate, OrganizerUpdate)
 from connection import User, get_user_db
@@ -117,6 +117,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return organizer
+
+    async def on_after_forgot_password(
+        self, user: User, token: str, request: Optional[Request] = None
+    ):
+        send_verification_email(user.username, user.email, token)
+        print(f"User {user.id} has forgot password. Reset token: {token}")
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):

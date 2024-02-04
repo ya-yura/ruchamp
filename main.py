@@ -1,7 +1,7 @@
 from fastapi_users import FastAPIUsers
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from fastapi_pagination import paginate, add_pagination, Params
@@ -35,14 +35,16 @@ from connection import get_db
 from typing import Type, Union
 import uuid
 
-app = FastAPI(
-    title="Ruchamp"
-)
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],
 )
+
+app = FastAPI(
+    title="Ruchamp"
+)
+
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -55,6 +57,13 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
 
 current_user = fastapi_users.current_user()
 
@@ -377,6 +386,39 @@ async def change_captain(
     return {"message": "Captain changed successfully"}
 
 
+@app.post("/delete-member-team", tags=["teams"])
+async def delete_member_team(
+    member_id: int,
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(TeamMember.team).where(
+        TeamMember.member == current_user.id))
+
+    team_id = query.scalars().one()
+
+    team_members_db = await db.execute(select(TeamMember.member).where(
+        TeamMember.team == team_id))
+
+    team_members = team_members_db.scalars().all()
+
+    team_cap = await db.execute(select(Team.captain).where(Team.id == team_id))
+    team_cap_id = team_cap.scalars().one()
+
+    if member_id not in team_members:
+        raise HTTPException(
+            status_code=400, detail="Member is not a member of this team")
+
+    if member_id == team_cap_id:
+        raise HTTPException(
+            status_code=400, detail="Captain can't leave the team")
+    else:
+        await db.execute(delete(TeamMember).where(
+            TeamMember.member == member_id))
+        await db.commit()
+        return {"message": "Member deleted successfully"}
+
+
 '''  USERS  '''
 
 
@@ -394,7 +436,11 @@ async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @app.post("/forgot-password/{email}", tags=["users"])
-async def forgot_password_email(email: str, db: AsyncSession = Depends(get_db)):
+async def forgot_password_email(
+    email: str,
+    db: AsyncSession = Depends(get_db),
+    user_manager: UserManager = Depends(get_user_manager),
+):
     user = await db.execute(select(User.username).where(User.email == email))
     user_name = user.scalars().first()
     if user_name is None:
@@ -403,23 +449,24 @@ async def forgot_password_email(email: str, db: AsyncSession = Depends(get_db)):
     await db.execute(update(User).where(
         User.email == email).values(verification_token=token))
 
-    send_forgot_password_email(username=user_name, email=email, token=token)
+    # send_forgot_password_email(username=user_name, email=email, token=token)
+    # await user_manager.on_after_forgot_password(user_name, token)
     await db.commit()
     return {"token": token}
 
 
-@app.post("/forgot-password/{token}", tags=["users"])
+@app.post("/reset-forgot-password/{token}", tags=["users"])
 async def forgot_password(
     token: str,
-    new_password: str,
-    current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db)
 ):
     user = await db.execute(select(User.email).where(
         User.verification_token == token))
+
     email = user.scalars().first()
     if email is None:
         raise HTTPException(status_code=404, detail="User not found")
+
 
     return {"email": email}
