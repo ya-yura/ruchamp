@@ -13,12 +13,12 @@ from auth.models import Base as AuthBase
 from event.models import Base as EventBase
 
 ''' Тут создаём таблицы. Вообще все. '''
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-
-AuthBase.metadata.create_all(bind=engine)
-EventBase.metadata.create_all(bind=engine)
-
-engine.dispose()
+# engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+# 
+# AuthBase.metadata.create_all(bind=engine)
+# EventBase.metadata.create_all(bind=engine)
+# 
+# engine.dispose()
 ''''''
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
