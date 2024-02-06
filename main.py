@@ -25,26 +25,20 @@ from auth.schemas import (
     UserCreate,
     AthleteUpdate,
     UserDB,
-    SpectatorUpdate,
-    SysAdminUpdate,
-    OrganizerUpdate,
     TeamUpdate,
     TeamCreate,
 )
 from auth.routes import router as auth_router
 
 
-app = FastAPI(title="Ruchamp")
 
-app.include_router(auth_router, prefix="/user", tags=["user"])
+app = FastAPI(
+    title="Ruchamp"
+)
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],
-)
-
-app = FastAPI(
-    title="Ruchamp"
 )
 
 app.include_router(
@@ -65,6 +59,8 @@ app.include_router(
     tags=["auth"],
 )
 
+app.include_router(auth_router, prefix="/user")
+
 
 current_user = fastapi_users.current_user()
 
@@ -78,6 +74,89 @@ def is_model_field(model: Type, field_name: str) -> bool:
     Проверяет, существует ли атрибут с указанным именем в модели.
     """
     return isinstance(getattr(model, field_name, None), InstrumentedAttribute)
+
+
+
+async def update_profile(
+    model: Type,
+    data: Type,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    role_id = current_user.role_id
+    allowed_roles = {
+        2: user_manager.update_athlete_profile,
+        3: user_manager.update_organizer_profile,
+        4: user_manager.update_spectator_profile,
+        5: user_manager.update_sysadmin_profile
+    }
+
+    if role_id not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    update_function = allowed_roles[role_id]
+    await update_function(current_user, data)
+
+    return {"message": f"{model.__name__} profile updated successfully"}
+
+
+async def upload_image(
+    model: Type,
+    image_field: str,
+    image: UploadFile = File(...),
+    current_user: UserDB = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db),
+):
+    role_id = current_user.role_id
+    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
+
+    if role_id not in allowed_roles:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    if not is_model_field(model, image_field):
+        raise HTTPException(
+            status_code=400, detail="Invalid image field for the model")
+
+    with open(f"images/{image.filename}", "wb") as f:
+        f.write(image.file.read())
+
+    image_url = f"images/{image.filename}"
+    db.execute(update(model).where(model.user_id == current_user.id).values(
+        {image_field: image_url}))
+
+    await db.commit()
+
+    return {"message": f"{image_field} uploaded successfully"}
+
+
+async def create_team_and_members(
+    db: AsyncSession,
+    team_data: TeamCreate,
+    captain_user: UserDB
+) -> int:
+
+    # Создаем команду
+    team_dict = team_data.dict()
+    team_dict["captain"] = captain_user.id
+    await db.execute(Team.__table__.insert().values(team_dict))
+    team_in_db = await db.execute(select(Team.id).where(
+        Team.captain == captain_user.id))
+
+    team_id = team_in_db.scalars().first()
+
+    # Добавляем капитана в список членов команды
+    await db.execute(TeamMember.__table__.insert().values(
+        team=team_id, member=captain_user.id))
+
+    # Добавляем остальных участников
+    # for member in team_data.members:
+    #     await db.execute(TeamMember.__table__.insert().values(
+    #         team=team_id, member=member.member_id))
+
+    await db.commit()
+    return team_id
+
 
 
 
