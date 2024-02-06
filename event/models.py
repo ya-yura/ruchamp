@@ -10,24 +10,12 @@ from auth.models import (
     Category,
     WeightClass,
     Team,
-    
+
 )
 
 Base: DeclarativeMeta = declarative_base()
 
 metadata = Base.metadata
-
-athlete_combat_type_association = Table(
-    'athlete_combat_type_association', Base.metadata,
-    Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('combat_type_id', Integer, ForeignKey('CombatType.combat_type_id'))
-)
-
-athlete_coach_association = Table(
-    'athlete_coach_association', Base.metadata,
-    Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('coach_id', Integer, ForeignKey('Coach.coach_id'))
-)
 
 class Event(Base):
     __tablename__ = "Event"

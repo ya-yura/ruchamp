@@ -1,13 +1,35 @@
 from typing import Optional
 import uuid
+from sqlalchemy import select
 
 from fastapi import Depends, Request
-from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions,
-                           models, schemas)
+from fastapi_users import (
+    BaseUserManager,
+    IntegerIDMixin,
+    exceptions,
+    models,
+    schemas
+)
 
-from auth.models import Athlete, Spectator, SystemAdministrator, EventOrganizer
-from auth.schemas import (AthleteUpdate, SpectatorUpdate,
-                          SysAdminUpdate, OrganizerUpdate)
+from auth.models import (
+    Athlete,
+    Spectator,
+    SystemAdministrator,
+    EventOrganizer,
+    Role,
+    CombatType,
+    Category,
+    WeightClass,
+    Referee,
+    Coach,
+
+)
+from auth.schemas import (
+    AthleteUpdate,
+    SpectatorUpdate,
+    SysAdminUpdate,
+    OrganizerUpdate
+)
 from connection import User, get_user_db
 from auth.mailer import send_verification_email
 from config import SECRET
@@ -17,6 +39,16 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
+    async def get_combat_types_by_names(self, names):
+        query = select(CombatType).where(CombatType.name.in_(names))
+        combat_types = await self.database.fetch_all(query)
+        return combat_types
+
+    async def get_coaches_by_names(self, names):
+        query = select(Coach).where(Coach.name.in_(names))
+        coaches = await self.database.fetch_all(query)
+        return coaches
+    
     async def create(
         self,
         user_create: schemas.UC,
@@ -62,13 +94,24 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ) -> Athlete:
         athlete = await self.get_athlete_profile(user)
         for field, value in athlete_data.dict().items():
-            setattr(athlete, field, value)
+            if field == 'combat_types':
+                # Обработка видов борьбы
+                combat_types = await self.user_db.get_combat_types_by_names(value)
+                athlete.combat_types = combat_types
+            elif field == 'coaches':
+                # Обработка тренеров
+                coaches = await self.user_db.get_coaches_by_names(value)
+                athlete.coaches = coaches
+            else:
+                setattr(athlete, field, value)
+        
         await self.user_db.update(athlete)
 
         # можно добавить дополнительной логики после обновления
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return athlete
+
 
     async def update_spectator_profile(
         self,
