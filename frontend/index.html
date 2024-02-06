@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Debugger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>FastAPI Debugger</h1>
+    <form id="requestForm">
+        <label for="method">HTTP Method:</label>
+        <select id="method" name="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <!-- Добавьте поддержку других методов, если необходимо -->
+        </select>
+        <br>
+        <label for="url">URL:</label>
+        <input type="text" id="url" name="url" style="width: 80%;">
+        <br>
+        <label for="json">JSON Payload:</label>
+        <textarea id="json" name="json" rows="4" style="width: 80%;"></textarea>
+        <br>
+        <button type="button" onclick="sendRequest()">Send Request</button>
+    </form>
+    <h2>Response:</h2>
+    <pre id="output"></pre>
+    <script>
+        function sendRequest() {
+            var form = document.getElementById("requestForm");
+            var method = form.elements.method.value;
+            var url = form.elements.url.value;
+            var jsonPayload = form.elements.json.value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    document.getElementById("output").innerText = xhr.responseText;
+                }
+            };
+
+            xhr.open(method, url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(jsonPayload);
+        }
+    </script>
+</body>
+</html>
+
+
+<!--
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from starlette.responses import FileResponse
+
+app = FastAPI()
+
+# Добавим CORS для разрешения запросов из любого источника (например, для работы с локальными файлами)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Рендеринг HTML-страницы
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    return FileResponse("index.html")
+
+-->
