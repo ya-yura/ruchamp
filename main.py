@@ -17,7 +17,10 @@ from auth.models import (
     Team,
     TeamMember
 )
-from auth.manager import get_user_manager, UserManager
+from auth.manager import (
+    get_user_manager,
+    UserManager,
+)
 from auth.mailer import send_forgot_password_email
 from auth.schemas import (
     UserRead,
@@ -267,34 +270,6 @@ async def create_team(
     team_id = await create_team_and_members(db, team_data, current_user)
 
     return {"message": "Team created successfully", "team_id": team_id}
-
-
-async def create_team_and_members(
-    db: AsyncSession,
-    team_data: TeamCreate,
-    captain_user: UserDB
-) -> int:
-
-    # Создаем команду
-    team_dict = team_data.dict()
-    team_dict["captain"] = captain_user.id
-    await db.execute(Team.__table__.insert().values(team_dict))
-    team_in_db = await db.execute(select(Team.id).where(
-        Team.captain == captain_user.id))
-
-    team_id = team_in_db.scalars().first()
-
-    # Добавляем капитана в список членов команды
-    await db.execute(TeamMember.__table__.insert().values(
-        team=team_id, member=captain_user.id))
-
-    # Добавляем остальных участников
-    # for member in team_data.members:
-    #     await db.execute(TeamMember.__table__.insert().values(
-    #         team=team_id, member=member.member_id))
-
-    await db.commit()
-    return team_id
 
 
 @app.get("/get-all-teams", tags=["teams"])

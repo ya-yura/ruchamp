@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 from fastapi_users import schemas
 
@@ -53,7 +53,11 @@ class AthleteUpdate(BaseModel):
     gender: Optional[str]
     country: Optional[str]
     image_field: Optional[str]
-
+    combat_types: Optional[List[str]]
+    coaches: Optional[List[str]]
+# Тренеры и типы используют List[str], им надо передавать списки строк,
+# представляющих имена видов борьбы и тренеров соответственно.
+    
 
 class SpectatorUpdate(BaseModel):
     full_name: Optional[str]
