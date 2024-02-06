@@ -9,6 +9,7 @@ from auth.models import (
     CombatType,
     WeightClass,
     Team,
+    Athlete,
 )
 from connection import Base
 
@@ -32,17 +33,10 @@ class Participant(Base):
     __tablename__ = "Participant"
     participant_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
+    # athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.combat_type_id, ondelete="CASCADE"))
-    category_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
-    name = Column(String, nullable=False)
-    birth_date = Column(TIMESTAMP, nullable=False)
     team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
-    
-    event = relationship("Event", back_populates="participants")
-    combat_type = relationship("CombatType", back_populates="participants")
-    category = relationship("Category", back_populates="participants")
-    weight_class = relationship("WeightClass", back_populates="participants")
 
 
 class Match(Base):
@@ -57,12 +51,6 @@ class Match(Base):
     end_datetime = Column(TIMESTAMP, nullable=False)
     winner_id = Column(Integer, ForeignKey(Participant.participant_id, ondelete="CASCADE"))
     
-    event = relationship("Event", back_populates="matches")
-    combat_type = relationship("CombatType", back_populates="matches")
-    category = relationship("Category", back_populates="matches")
-    weight_class = relationship("WeightClass", back_populates="matches")
-    winner = relationship("Participant", foreign_keys=[winner_id], back_populates="won_matches")
-
 
 class MatchResult(Base):
     __tablename__ = "MatchResult"
@@ -72,10 +60,6 @@ class MatchResult(Base):
     loser_id = Column(Integer, ForeignKey(Participant.participant_id, ondelete="CASCADE"))
     score = Column(String, nullable=False)
     
-    match = relationship("Match", back_populates="result")
-    winner = relationship("Participant", foreign_keys=[winner_id], back_populates="won_results")
-    loser = relationship("Participant", foreign_keys=[loser_id], back_populates="lost_results")
-
 
 class Prize(Base):
     __tablename__ = "Prize"
@@ -84,8 +68,6 @@ class Prize(Base):
     amount = Column(String, nullable=False)
     description = Column(String, nullable=False)
     
-    event = relationship("Event", back_populates="prizes")
-
 
 class Medal(Base):
     __tablename__ = "Medal"
@@ -93,6 +75,4 @@ class Medal(Base):
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
     recipient_id = Column(Integer, ForeignKey(Participant.participant_id, ondelete="CASCADE"))
     medal_type = Column(String, nullable=False)
-    
-    event = relationship("Event", back_populates="medals")
-    recipient = relationship("Participant", back_populates="awarded_medals")
+
