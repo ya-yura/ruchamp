@@ -7,11 +7,10 @@ from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from auth.models import (
     EventOrganizer,
     CombatType,
-    Category,
     WeightClass,
     Team,
-
 )
+from connection import Base
 
 Base: DeclarativeMeta = declarative_base()
 
@@ -34,11 +33,11 @@ class Participant(Base):
     participant_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.combat_type_id, ondelete="CASCADE"))
-    category_id = Column(Integer, ForeignKey(Category.category_id, ondelete="CASCADE"))
+    category_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
     name = Column(String, nullable=False)
     birth_date = Column(TIMESTAMP, nullable=False)
-    team_id = Column(Integer, ForeignKey(Team.team_id, ondelete="CASCADE"))
+    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
     
     event = relationship("Event", back_populates="participants")
     combat_type = relationship("CombatType", back_populates="participants")
@@ -51,7 +50,7 @@ class Match(Base):
     match_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.combat_type_id, ondelete="CASCADE"))
-    category_id = Column(Integer, ForeignKey(Category.category_id, ondelete="CASCADE"))
+    category_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
     start_datetime = Column(TIMESTAMP, nullable=False)

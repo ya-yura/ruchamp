@@ -1,29 +1,76 @@
-from faker import Faker
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-from connection import get_db, SessionLocal
-from auth.models import User, Athlete, EventOrganizer, Spectator, SystemAdministrator, Team, Role, TeamMember
 import random
-from sqlalchemy import create_engine
+from faker import Faker
+from connection import SessionLocal
+
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from fastapi_users.db import SQLAlchemyUserDatabase
+
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import Base, User, Role
+from auth.models import (
+    Athlete,
+    EventOrganizer,
+    Spectator,
+    SystemAdministrator,
+    Team,
+    TeamMember,
+    User,
+    Role,
+    CombatType, 
+    Category, 
+    WeightClass,
+    Referee, 
+    Coach, 
+    athlete_combat_type_association,
+    athlete_coach_association,
+)
+from event.models import (
+    Event, 
+    Participant, 
+    Match,
+    MatchResult, 
+    Prize, 
+    Medal,
+)
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
 engine = create_engine(DATABASE_URL)
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = SessionLocal()
 
 user_db = SQLAlchemyUserDatabase(User, SessionLocal())
 
 fake = Faker("ru_RU")
 
-session = SessionLocal()
+weights = [
+    "Наилегчайший", "Легчайший", "Полулёгкий", "Лёгкий", "Полусредний", 
+    "Первый средний", "Второй средний", "Средний", "Полутяжёлый", 
+    "Тяжёлый", "Сверхтяжёлый"]
+roles = [
+    "Пользователь", "Спортсмен", "Организатор", "Зритель", "Админ"
+    ]
+combat_types = [
+    "Айкидо", "Кайдо", "Каратэномичи", "Кендо", "Кикбоксинг",
+    "Киокусинкай", "Кобудо", "Комбат самооборона", "Комплексное единоборство",
+    "Каратэ", "Кудо", "Ориентал", "Панкратион", "Практическая стрельба",
+    "Рукопашный бой", "Русское боевое искусство", "Самбо", "Современный мечевой бой",
+    "Спортивное метание ножа", "Спортивный ножевой бой", "Сумо", "Тайский бокс",
+    "Тхэквондо", "Ушу", "Бокс", "Греко-римская борьба", "Вольная борьба",
+    "Самбо", "Дзюдо", "Джиу-джитсу"
+]
+
+
+def create_weight_class(name):
+    return WeightClass(name=name)
 
 
 def generate_fake_data():
+
+    weight_classes = [create_weight_class(name) for name in weights]
+    session.add_all(weight_classes)
+    session.commit()
+
+
     # Генерация пользователей и связанных данных
     roles = session.execute(select(Role)).scalars().all()
 
@@ -133,6 +180,26 @@ def generate_fake_data():
             session.add(team_member)
 
     session.commit()
+
+
+
+
+    def create_fake_combat_type():
+        return CombatType(name=fake.word())
+
+    def create_fake_category():
+        return Category(name=fake.word())
+
+    def create_fake_weight_class():
+        return WeightClass(name=fake.random_element(["Наилегчайший", "Легчайший", "Полулёгкий", "Лёгкий", "Полусредний", "Первый средний", "Второй средний", "Средний", "Полутяжёлый", "Тяжёлый", "Сверхтяжёлый"]))
+
+    def create_fake_referee():
+        return Referee(name=fake.name(), qualification_level=fake.word())
+
+    def create_fake_coach():
+        return Coach(name=fake.name(), qualification_level=fake.word())
+
+
 
 
 generate_fake_data()

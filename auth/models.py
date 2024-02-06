@@ -35,12 +35,6 @@ class CombatType(Base):
     name = Column(String, nullable=False)
 
 
-class Category(Base):
-    __tablename__ = "Category"
-    category_id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-
-
 class WeightClass(Base):
     __tablename__ = "WeightClass"
     weight_class_id = Column(Integer, primary_key=True)
@@ -81,15 +75,13 @@ class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
-    weight_category_id = Column(Integer, ForeignKey(Category.category_id, ondelete="SET NULL"))
-    belt_rank = Column(String, nullable=True)
+    weight_category = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="SET NULL"))
     birthdate = Column(TIMESTAMP, nullable=True)
     height = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
     
-    weight_category = relationship("Category", back_populates="athletes")
     combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
 

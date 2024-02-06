@@ -149,19 +149,12 @@ async def create_team_and_members(
     await db.execute(TeamMember.__table__.insert().values(
         team=team_id, member=captain_user.id))
 
-    # Добавляем остальных участников
-    # for member in team_data.members:
-    #     await db.execute(TeamMember.__table__.insert().values(
-    #         team=team_id, member=member.member_id))
-
     await db.commit()
     return team_id
 
 
 
-
 '''  TEAM  '''
-
 
 @app.post("/upload-team-photo", tags=["teams"])
 async def upload_team_photo(

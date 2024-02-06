@@ -2,13 +2,24 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import MetaData
 
 from alembic import context
 
 from sqlalchemy import create_engine
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import metadata
+# from auth.models import metadata
+from auth.models import Base as AuthBase
+from event.models import Base as EventBase
 
+''' Тут создаём таблицы. Вообще все. '''
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+
+AuthBase.metadata.create_all(bind=engine)
+EventBase.metadata.create_all(bind=engine)
+
+engine.dispose()
+''''''
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -29,7 +40,14 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+''' Тут склеиваем метадаты из моделей разных модулей. '''
+metadata = MetaData()
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=AuthBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 target_metadata = metadata
+''''''
+
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
