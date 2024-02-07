@@ -7,6 +7,7 @@ from auth.models import (
     CombatType,
     WeightClass,
     Team,
+    Athlete,
 )
 from connection import Base
 
@@ -68,14 +69,12 @@ class MatchResult(Base):
                                           ondelete="CASCADE"))
     score = Column(String, nullable=False)
 
-
 class Prize(Base):
     __tablename__ = "Prize"
     prize_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
     amount = Column(String, nullable=False)
     description = Column(String, nullable=False)
-
 
 class Medal(Base):
     __tablename__ = "Medal"
