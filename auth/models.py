@@ -74,22 +74,22 @@ class User(Base):
 class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     weight_category = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="SET NULL"))
     birthdate = Column(TIMESTAMP, nullable=True)
     height = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
-    
-    combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
-    coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
+
+    # combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
+    # coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
 
 
 class EventOrganizer(Base):
     __tablename__ = "EventOrganizer"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     organization_name = Column(String, nullable=True)
     website = Column(String, nullable=True)
     contact_email = Column(String, nullable=True)
@@ -101,7 +101,7 @@ class EventOrganizer(Base):
 class Spectator(Base):
     __tablename__ = "Spectator"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     full_name = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
     gender = Column(String, nullable=True)
@@ -113,7 +113,7 @@ class Spectator(Base):
 class SystemAdministrator(Base):
     __tablename__ = "SystemAdministrator"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     full_name = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
     gender = Column(String, nullable=True)
