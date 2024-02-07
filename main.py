@@ -29,7 +29,7 @@ from auth.schemas import (
     TeamCreate,
 )
 from auth.routes import router as auth_router
-
+from pages.router import router as pages_router
 
 
 app = FastAPI(
@@ -60,6 +60,7 @@ app.include_router(
 )
 
 app.include_router(auth_router, prefix="/user")
+app.include_router(pages_router)
 
 
 current_user = fastapi_users.current_user()
