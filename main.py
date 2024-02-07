@@ -29,7 +29,7 @@ from auth.schemas import (
     TeamCreate,
 )
 from auth.routes import router as auth_router
-
+from event.routers import router as event_router
 
 
 app = FastAPI(
@@ -59,7 +59,8 @@ app.include_router(
     tags=["auth"],
 )
 
-app.include_router(auth_router, prefix="/user")
+app.include_router(auth_router)
+app.include_router(event_router)
 
 
 current_user = fastapi_users.current_user()
@@ -74,7 +75,6 @@ def is_model_field(model: Type, field_name: str) -> bool:
     Проверяет, существует ли атрибут с указанным именем в модели.
     """
     return isinstance(getattr(model, field_name, None), InstrumentedAttribute)
-
 
 
 async def update_profile(
@@ -153,8 +153,8 @@ async def create_team_and_members(
     return team_id
 
 
-
 '''  TEAM  '''
+
 
 @app.post("/upload-team-photo", tags=["teams"])
 async def upload_team_photo(

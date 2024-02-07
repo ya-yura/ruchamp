@@ -2,19 +2,12 @@ import uuid
 from typing import Type
 from connection import get_db
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from fastapi_users import FastAPIUsers
-from fastapi_users import FastAPIUsers
-from fastapi import Depends, HTTPException, File, UploadFile
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
-from auth.auth import auth_backend
-from auth.models import User
-from auth.manager import get_user_manager
-from auth.schemas import AthleteUpdate, SpectatorUpdate, SysAdminUpdate, OrganizerUpdate
 from auth.auth import auth_backend
 from auth.models import (
     User,
@@ -37,7 +30,7 @@ from auth.schemas import (
 )
 
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["Users"])
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
 current_user = fastapi_users.current_user()
 athlete_update = AthleteUpdate

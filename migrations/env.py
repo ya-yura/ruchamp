@@ -13,12 +13,12 @@ from auth.models import Base as AuthBase
 from event.models import Base as EventBase
 
 ''' Тут создаём таблицы. Вообще все. '''
-# engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-# 
-# AuthBase.metadata.create_all(bind=engine)
-# EventBase.metadata.create_all(bind=engine)
-# 
-# engine.dispose()
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+
+AuthBase.metadata.create_all(bind=engine)
+EventBase.metadata.create_all(bind=engine)
+
+engine.dispose()
 ''''''
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -54,7 +54,7 @@ target_metadata = metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-target_metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+# target_metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
 
 
 def run_migrations_offline() -> None:
