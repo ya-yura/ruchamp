@@ -6,8 +6,10 @@ from auth.models import (
     EventOrganizer,
     CombatType,
     WeightClass,
-    Team,
     Athlete,
+)
+from teams.models import (
+    Team,
 )
 from connection import Base
 

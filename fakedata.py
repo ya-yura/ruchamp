@@ -63,11 +63,27 @@ combat_types = [
 def create_weight_class(name):
     return WeightClass(name=name)
 
+def create_roles(name):
+    return Role(name=name)
+
+def create_combat_types(name):
+    return CombatType(name=name)
+
 
 def generate_fake_data():
 
     weight_classes = [create_weight_class(name) for name in weights]
     session.add_all(weight_classes)
+    session.commit()
+
+    roles_data = [create_roles(name) for name in roles]
+    session.add_all(roles_data)
+    session.commit()
+
+    combat_types_data = [create_combat_types(name) for name in combat_types]
+    min_weight = 10
+    max_weight = 100
+    session.add_all(combat_types_data)
     session.commit()
 
 
@@ -182,22 +198,25 @@ def generate_fake_data():
     session.commit()
 
 
+    for _ in range(10):
+        referee = Referee(
+            qualification_level=fake.random_element(["Спортивный судья международной категории", "Спортивный судья всероссийской категории", "Спортивный судья первой категории", "Спортивный судья второй категории", "Спортивный судья третьей категории", "Юный спортивный судья"]),
+            name=fake.name(),
+        )
+        session.add(referee)
+
+    session.commit()
 
 
-    def create_fake_combat_type():
-        return CombatType(name=fake.word())
+    for _ in range(12):
+        сoach = Coach(
+            qualification_level=fake.random_element(["Тренер высшей квалификационной категории", "Тренер первой квалификационной категории", "Тренер второй квалификационной категории"]),
+            name=fake.name(),
+        )
+        session.add(сoach)
 
-    def create_fake_category():
-        return Category(name=fake.word())
+    session.commit()
 
-    def create_fake_weight_class():
-        return WeightClass(name=fake.random_element(["Наилегчайший", "Легчайший", "Полулёгкий", "Лёгкий", "Полусредний", "Первый средний", "Второй средний", "Средний", "Полутяжёлый", "Тяжёлый", "Сверхтяжёлый"]))
-
-    def create_fake_referee():
-        return Referee(name=fake.name(), qualification_level=fake.word())
-
-    def create_fake_coach():
-        return Coach(name=fake.name(), qualification_level=fake.word())
 
 
 

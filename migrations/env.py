@@ -11,6 +11,7 @@ from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 # from auth.models import metadata
 from auth.models import Base as AuthBase
 from event.models import Base as EventBase
+from team.models import Base as TeamBase
 
 ''' Тут создаём таблицы. Вообще все. '''
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
@@ -44,6 +45,7 @@ if config.config_file_name is not None:
 metadata = MetaData()
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=AuthBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=TeamBase.metadata.tables)
 target_metadata = metadata
 ''''''
 

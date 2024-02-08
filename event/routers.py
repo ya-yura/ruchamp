@@ -11,7 +11,7 @@ from auth.schemas import UserDB
 from auth.routes import current_user
 
 
-router = APIRouter(prefix="/api", tags=["Events"])
+router = APIRouter(prefix="/event", tags=["Events"])
 
 
 @router.get("/events")
@@ -23,7 +23,7 @@ async def get_events(
     return paginate(query.scalars().all(), params)
 
 
-@router.get("/events/{event_id}")
+@router.get("/{event_id}")
 async def get_events_id(
     event_id: int,
     db: AsyncSession = Depends(get_db),
@@ -36,7 +36,7 @@ async def get_events_id(
     return event
 
 
-@router.post("/events/create")
+@router.post("/create")
 async def create_event(
     event_data: EventCreate,
     db: AsyncSession = Depends(get_db),
@@ -60,7 +60,7 @@ async def create_event(
         raise HTTPException(status_code=400, detail="You are not an organizer")
 
 
-@router.put("/events/update/{event_id}")
+@router.put("/update/{event_id}")
 async def update_event(
     event_id: int,
     event_data: EventUpdate,
@@ -84,7 +84,7 @@ async def update_event(
     return {f"Event ID - {event_id} updated"}
 
 
-@router.post("/events/delete/{event_id}")
+@router.post("/delete/{event_id}")
 async def delete_event(
     event_id: int,
     db: AsyncSession = Depends(get_db),
