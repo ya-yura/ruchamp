@@ -61,7 +61,7 @@ class User(Base):
     name = Column(String, nullable=True)
     sirname = Column(String, nullable=True)
     fathername = Column(String, nullable=True)
-    gender = Column(String, nullable=True)
+    gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
 
