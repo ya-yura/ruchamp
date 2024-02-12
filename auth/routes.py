@@ -47,7 +47,6 @@ def is_model_field(model: Type, field_name: str) -> bool:
     return isinstance(getattr(model, field_name, None), InstrumentedAttribute)
 
 
-
 async def upload_image(
     model: Type,
     image_field: str,

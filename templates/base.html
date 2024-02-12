@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}Default Title{% endblock %}</title>
+</head>
+<body>
+  <header>
+    {% block header %}
+
+    {% endblock %}
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    {% block footer %}
+      <p>&copy; 2023 My Website</p>
+    {% endblock %}
+  </footer>
+</body>
+</html>

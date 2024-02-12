@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <li class="list-group-item">Мероприятие: {{ event.name }}</li><br>
+    <li class="list-group-item">Начало мероприятия: {{ event.start_datetime }}</li><br>
+    <li class="list-group-item">Конец мероприятия: {{ event.end_datetime }}</li><br>
+    <li class="list-group-item">Место провидения: {{ event.location }}</li><br>
+    <li class="list-group-item">Как добраться: </li><br>
+    <div id="map" style="width: 600px; height: 600px"></div>
+    <script src="https://api-maps.yandex.ru/2.1?apikey=11c54f3e-ebbf-4c1e-a9b8-87f216ba8d58&lang=ru_RU"></script>
+    <script type="text/javascript">
+        var myMap;
+        //ymaps.ready(init); // Ожидание загрузки API с сервера Яндекса
+        function init () {
+        myMap = new ymaps.Map("map", {
+            center: {{ event.geo }}, // Координаты центра карты
+            zoom: 16 // Zoom
+        });
+        myPlacemark = new ymaps.Placemark({{ event.geo }}, { // Координаты метки объекта
+			balloonContent: "<div class='ya_map'>{{ event.name }}<p> {{ event.location }}</div>" // Подсказка метки
+		}, {
+			preset: "twirl#redDotIcon" // Тип метки
+		});
+		
+		myMap.geoObjects.add(myPlacemark); // Добавление метки
+		myPlacemark.balloon.open(); // Открытие подсказки метки
+        }
+        ymaps.ready(init);
+    </script>
+</div>
+
+{% endblock %}

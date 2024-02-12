@@ -11,13 +11,14 @@ from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 # from auth.models import metadata
 from auth.models import Base as AuthBase
 from event.models import Base as EventBase
-from team.models import Base as TeamBase
+from teams.models import Base as TeamBase
 
 ''' Тут создаём таблицы. Вообще все. '''
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
 AuthBase.metadata.create_all(bind=engine)
 EventBase.metadata.create_all(bind=engine)
+TeamBase.metadata.create_all(bind=engine)
 
 engine.dispose()
 ''''''

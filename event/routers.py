@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from fastapi_pagination import paginate, Params
+from fastapi.templating import Jinja2Templates
 
 from connection import get_db
 from auth.models import SystemAdministrator
@@ -9,9 +10,11 @@ from event.models import Event, Match, EventOrganizer
 from event.shemas import EventCreate, MatchRead, MatchCreate, EventUpdate
 from auth.schemas import UserDB
 from auth.routes import current_user
+from geo.geo import get_geo
 
 
 router = APIRouter(prefix="/event", tags=["Events"])
+templates = Jinja2Templates(directory='templates')
 
 
 @router.get("/events")
@@ -20,14 +23,14 @@ async def get_events(
     params: Params = Depends()
 ):
     query = await db.execute(select(Event))
-    return paginate(query.scalars().all(), params)
+    return query.scalars().all()
 
 
 @router.get("/{event_id}")
 async def get_events_id(
+    request: Request,
     event_id: int,
-    db: AsyncSession = Depends(get_db),
-    params: Params = Depends()
+    db: AsyncSession = Depends(get_db)
 ):
     query = await db.execute(select(Event).where(Event.event_id == event_id))
     event = query.scalars().one_or_none()
@@ -49,15 +52,34 @@ async def create_event(
     query_admin = await db.execute(select(SystemAdministrator.user_id))
     all_admin_id = query_admin.scalars().all()
     all_organizer_id.extend(all_admin_id)
+    print(all_organizer_id)
+    print(current_user.id)
 
     try:
         if current_user.id in all_organizer_id:
             event = Event(**event_data.dict())
             db.add(event)
             await db.commit()
-            return {f"Event ID {event.event_id} - created"}
+            return {f"Event {event.event_id} created"}
     except Exception:
         raise HTTPException(status_code=400, detail="You are not an organizer")
+
+
+@router.post("/update_geo/{event_id}")
+async def update_geo_in_event(event_id: int,
+                              db: AsyncSession = Depends(get_db)):
+
+    query = await db.execute(select(Event.location).where(
+        Event.event_id == event_id))
+
+    location = query.scalars().one_or_none()
+    geo = str(get_geo(location))
+
+    await db.execute(update(Event).where(
+        Event.event_id == event_id).values(geo=geo))
+
+    await db.commit()
+    return {f"Events {event_id} updated"}
 
 
 @router.put("/update/{event_id}")
