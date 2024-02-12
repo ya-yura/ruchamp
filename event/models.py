@@ -37,7 +37,7 @@ class Participant(Base):
     __tablename__ = "Participant"
     participant_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
-    # athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.combat_type_id,
                                                 ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(WeightClass.weight_class_id,

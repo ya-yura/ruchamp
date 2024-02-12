@@ -43,13 +43,6 @@ class WeightClass(Base):
     max_weight = Column(String, nullable=False)
 
 
-class Referee(Base):
-    __tablename__ = "Referee"
-    referee_id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    qualification_level = Column(String, nullable=False)
-
-
 class Coach(Base):
     __tablename__ = "Coach"
     coach_id = Column(Integer, primary_key=True)
@@ -64,6 +57,14 @@ class User(Base):
     username = Column(String, nullable=False)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
     role_id = Column(Integer, ForeignKey(Role.id))
+
+    name = Column(String, nullable=True)
+    sirname = Column(String, nullable=True)
+    fathername = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    birthdate = Column(TIMESTAMP, nullable=True)
+
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
@@ -71,19 +72,23 @@ class User(Base):
     verification_token = Column(String, nullable=True)
 
 
+class Referee(Base):
+    __tablename__ = "Referee"
+    referee_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
+    qualification_level = Column(String, nullable=False)
+
+
 class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     weight_category = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="SET NULL"))
-    birthdate = Column(TIMESTAMP, nullable=True)
     height = Column(String, nullable=True)
-    gender = Column(String, nullable=True)
-    country = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
 
-    # combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
-    # coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
+    combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
+    coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
 
 
 class EventOrganizer(Base):
@@ -102,10 +107,6 @@ class Spectator(Base):
     __tablename__ = "Spectator"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    full_name = Column(String, nullable=True)
-    birthdate = Column(TIMESTAMP, nullable=True)
-    gender = Column(String, nullable=True)
-    country = Column(String, nullable=True)
     phone_number = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
 
@@ -114,8 +115,4 @@ class SystemAdministrator(Base):
     __tablename__ = "SystemAdministrator"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    full_name = Column(String, nullable=True)
-    birthdate = Column(TIMESTAMP, nullable=True)
-    gender = Column(String, nullable=True)
-    country = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
