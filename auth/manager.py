@@ -47,7 +47,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         query = select(Coach).where(Coach.name.in_(names))
         coaches = await self.database.fetch_all(query)
         return coaches
-    
+
     async def create(
         self,
         user_create: schemas.UC,
@@ -95,7 +95,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         for field, value in athlete_data.dict().items():
             if field == 'combat_types':
                 # Обработка видов борьбы
-                combat_types = await self.user_db.get_combat_types_by_names(value)
+                combat_types = await self.user_db.get_combat_types_by_names(
+                    value
+                )
                 athlete.combat_types = combat_types
             elif field == 'coaches':
                 # Обработка тренеров
@@ -103,14 +105,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
                 athlete.coaches = coaches
             else:
                 setattr(athlete, field, value)
-        
+
         await self.user_db.update(athlete)
 
         # можно добавить дополнительной логики после обновления
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return athlete
-
 
     async def update_spectator_profile(
         self,

@@ -1,17 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ручамп</title>
-</head>
-<body>
-    <div>
+{% extends "base.html" %}
+
+{% block content %}
+<div>
     {% for event in events %}
-        <div>
-            {{event}}
+    <div class="row">
+        <div class="card" style="width: 40rem;">
+            <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.name }}</h5>
+                    <p class="card-text"></p>
+                </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Начало мероприятия: {{ event.start_datetime }}</li><br>
+                <li class="list-group-item">Конец мероприятия: {{ event.end_datetime }}</li><br>
+                <li class="list-group-item">Место проведения: {{ event.location }}</li><br>
+            </ul>
+            <div class="card-body">
+                <a href="/event/{{ event.event_id }}" class="btn btn-primary">Подробнее</a>
+            </div>
         </div>
+    </div>
+    <hr>
     {% endfor %}
-    </divdiv>
-</body>
-</html>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+            ymaps.ready(function(){
+                var geolocation = ymaps.geolocation;
+                $('#country').html('Ваша страна: '+geolocation.country);
+                $('#town').html('Ваш город: '+geolocation.city);
+                $('#region').html('Ваш регион: '+geolocation.region);
+            });
+        });
+</script>
+{% endblock %}

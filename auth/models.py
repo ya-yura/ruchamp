@@ -119,4 +119,3 @@ class SystemAdministrator(Base):
     gender = Column(String, nullable=True)
     country = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
-

@@ -1,9 +1,5 @@
-from connection import get_db
-
 from fastapi import FastAPI
 from fastapi_users import FastAPIUsers
-from fastapi import FastAPI
-
 
 from auth.auth import auth_backend
 from auth.models import (
@@ -54,4 +50,3 @@ app.include_router(pages_router)
 app.include_router(auth_router)
 app.include_router(event_router)
 app.include_router(team_router)
-

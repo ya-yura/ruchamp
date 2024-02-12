@@ -9,6 +9,7 @@ class Event(BaseModel):
     start_datetime: datetime
     end_datetime: datetime
     location: str
+    geo: str
 
     class Config:
         orm_mode = True
@@ -22,6 +23,7 @@ class EventCreate(BaseModel):
     organizer_id: Optional[int]
     event_order: Optional[str] = None
     event_system: Optional[str] = None
+    geo: Optional[str] = None
 
 
 class EventUpdate(EventCreate):
