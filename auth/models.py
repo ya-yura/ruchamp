@@ -58,9 +58,9 @@ class User(Base):
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
     role_id = Column(Integer, ForeignKey(Role.id))
 
-    name = Column(String, nullable=True)
-    sirname = Column(String, nullable=True)
-    fathername = Column(String, nullable=True)
+    name = Column(String, nullable=True, nullable=True)
+    sirname = Column(String, nullable=True, nullable=True)
+    fathername = Column(String, nullable=True, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)

@@ -8,6 +8,12 @@ class UserRead(schemas.BaseUser[int]):
     id: int
     email: str
     username: str
+    name: str
+    sirname: str
+    fathername: str
+    gender: bool
+    country: str
+    birthdate: str
     role_id: int
     is_active: bool = True
     is_superuser: bool = False
@@ -20,6 +26,12 @@ class UserRead(schemas.BaseUser[int]):
 class UserCreate(schemas.BaseUserCreate):
     username: str
     email: str
+    name: str
+    sirname: str
+    fathername: str
+    gender: bool
+    country: str
+    birthdate: str
     password: str
     role_id: int
     is_active: Optional[bool] = True
@@ -48,10 +60,7 @@ class AthleteUpdate(BaseModel):
     weight_category: Optional[str]
     belt_rank: Optional[str]
     coach_name: Optional[str]
-    birthdate: Optional[str]
     height: Optional[str]
-    gender: Optional[str]
-    country: Optional[str]
     image_field: Optional[str]
     combat_types: Optional[List[str]]
     coaches: Optional[List[str]]
@@ -60,19 +69,11 @@ class AthleteUpdate(BaseModel):
     
 
 class SpectatorUpdate(BaseModel):
-    full_name: Optional[str]
-    gender: Optional[str]
-    birthdate: Optional[str]
-    country: Optional[str]
     phone_number: Optional[str]
     image_field: Optional[str]
 
 
 class SysAdminUpdate(BaseModel):
-    full_name: Optional[str]
-    gender: Optional[str]
-    birthdate: Optional[str]
-    country: Optional[str]
     phone_number: Optional[str]
     image_field: Optional[str]
 
