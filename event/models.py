@@ -26,7 +26,7 @@ class Event(Base):
     start_datetime = Column(TIMESTAMP, nullable=False)
     end_datetime = Column(TIMESTAMP, nullable=False)
     location = Column(String, nullable=False)
-    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
+    sport_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     organizer_id = Column(Integer, ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
     event_order = Column(String, nullable=True) # Это докуенты, которые будут прикладываться

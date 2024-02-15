@@ -12,8 +12,6 @@ from auth.models import (
     EventOrganizer,
     Spectator,
     SystemAdministrator,
-    Team,
-    TeamMember,
     User,
     Role,
     CombatType,
@@ -34,6 +32,10 @@ from event.models import (
     MatchResult, 
     Prize, 
     Medal,
+)
+from event.models import (
+    Team,
+    TeamMember,
 )
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -56,7 +58,8 @@ num_spectators = 20
 num_administrators = 5
 num_teams = 10
 num_team_members = 7
-
+num_medals = 50
+num_prizes = 50
 
 def generate_fake_roles():
     roles = ['Спортсмен', 'Организатор', 'Зритель', 'Сисадмин', 'Судья']
@@ -279,7 +282,7 @@ def generate_fake_weight_categories(session, num_weight_categories=num_weight_ca
         weight_categories_data.append(weight_category_data)
 
     for weight_category_data in weight_categories_data:
-        weight_category = WeightsCategory(**weight_category_data)
+        weight_category = WeightCategory(**weight_category_data)
         session.add(weight_category)
     session.commit()
 
@@ -392,10 +395,7 @@ def generate_fake_participants(session, num_participants=20):
     events = session.query(Event).all()
     teams = session.query(Team).all()
 
-    # Получаем ID существующих событий
     event_ids = [event.id for event in events]
-
-    # Получаем ID существующих команд
     team_ids = [team.id for team in teams]
 
     for _ in range(num_participants):
@@ -448,10 +448,7 @@ def generate_fake_participants(session, num_participants=20):
     events = session.query(Event).all()
     teams = session.query(Team).all()
 
-    # Получаем ID существующих событий
     event_ids = [event.id for event in events]
-
-    # Получаем ID существующих команд
     team_ids = [team.id for team in teams]
 
     for _ in range(num_participants):
@@ -472,18 +469,58 @@ def generate_fake_participants(session, num_participants=20):
 # Генерация данных для матчей
 def generate_fake_matches(session, num_matches=10):
     matches_data = []
+    events = session.query(Event).all()
+    participants = session.query(Participant).all()
+    teams = session.query(Team).all()
+    weight_classes = session.query(AllWeightClass).all()
+    sport_types = session.query(SportType).all()
+    category_types = session.query(CategoryType).all()
+
+    event_ids = [event.id for event in events]
+    participant_team_ids = [participant.team_id for participant in participants]
+    unique_team_ids = list(set(participant_team_ids))
+    sport_type_ids = [sport_type.id for sport_type in sport_types]
+    weight_class_ids = [weight_class.id for weight_class in weight_classes]
+    category_type_ids = [category_type.id for category_type in category_types]
+
+    # Убеждаемся, что существует достаточно команд для проведения матчей
+    if len(unique_team_ids) < 2 * num_matches:
+        raise ValueError("Insufficient teams to create matches. Increase the number of teams or decrease the number of matches.")
+
     for _ in range(num_matches):
         match_data = {
-            'event_id': fake.random_int(min=1, max=num_events),  # Assuming there are 'num_events' events
+            'event_id': fake.random_element(elements=event_ids),
+            'round': fake.random_int(min=1, max=5),
+            'sport_type_id': fake.random_element(elements=sport_type_ids),
+            'category_id': fake.random_element(elements=category_type_ids),
+            'weight_class_id': fake.random_element(elements=weight_class_ids),
+            'start_datetime': fake.date_time_between(start_date="-30d", end_date="+30d"),
+            'end_datetime': fake.date_time_between(start_date="+1h", end_date="+4h"),
+            'player_one': fake.random_element(elements=unique_team_ids),
+            'player_two': fake.random_element(elements=[team_id for team_id in unique_team_ids if team_id != match_data['team_one_id']]),
+            # Выбираем победителя случайным образом из команд, участвующих в матче
+            'winner_id': fake.random_element(elements=[match_data['team_one_id'], match_data['team_two_id']]),
+        }
+        matches_data.append(match_data)
+
+    for match_data in matches_data:
+        match = Match(**match_data)
+        session.add(match)
+    session.commit()
+
+
+
+
+
+
+# Генерация данных для матчей
+def generate_fake_matches(session, num_matches=10):
+    matches_data = []
+    for _ in range(num_matches):
+        match_data = {
             'combat_type_id': fake.random_int(min=1, max=num_combat_types),  # Assuming there are 'num_combat_types' combat types
             'category_id': fake.random_int(min=1, max=num_categories),  # Assuming there are 'num_categories' categories
             'weight_class_id': fake.random_int(min=1, max=num_weight_classes),  # Assuming there are 'num_weight_classes' weight classes
-            'round': fake.random_int(min=1, max=5),  # Assuming there are up to 5 rounds
-            'start_datetime': fake.date_time_between(start_date="-30d", end_date="+30d"),  # Matches within the last 30 days and the next 30 days
-            'end_datetime': fake.date_time_between(start_date="+1h", end_date="+4h"),  # Matches lasting between 1 and 4 hours
-            'player_one': fake.random_int(min=1, max=num_participants),  # Assuming there are 'num_participants' participants
-            'player_two': fake.random_int(min=1, max=num_participants),  # Assuming there are 'num_participants' participants
-            'winner_id': fake.random_int(min=1, max=num_participants),  # Assuming there are 'num_participants' participants
         }
         matches_data.append(match_data)
 
@@ -531,14 +568,21 @@ def generate_fake_match_results(session, num_results=5):
     session.commit()
 
 
-
 # Генерация данных для призов
-def generate_fake_prizes(session, num_prizes=5):
+def generate_fake_prizes(session, num_prizes=num_prizes):
     prizes_data = []
+    events = session.query(Event).all()
+    participants = session.query(Participant).all()
+
+    event_ids = [event.id for event in events]
+    participant_team_ids = [participant.team_id for participant in participants]
+    unique_team_ids = list(set(participant_team_ids))
+
     for _ in range(num_prizes):
         prize_data = {
-            'event_id': fake.random_int(min=1, max=num_events),  # Assuming there are 'num_events' events
-            'amount': fake.random_int(min=100, max=10000),  # Assuming prize amounts between 100 and 10,000
+            'event_id': fake.random_element(elements=event_ids),
+            'recipient_id': fake.random_element(elements=unique_team_ids),
+            'amount': fake.random_int(min=100, max=10000),
             'description': fake.sentence(),
         }
         prizes_data.append(prize_data)
@@ -549,15 +593,21 @@ def generate_fake_prizes(session, num_prizes=5):
     session.commit()
 
 
-
 # Генерация данных для медалей
-def generate_fake_medals(session, num_medals=5):
+def generate_fake_medals(session, num_medals=num_medals):
     medals_data = []
+    events = session.query(Event).all()
+    participants = session.query(Participant).all()
+
+    event_ids = [event.id for event in events]
+    participant_team_ids = [participant.team_id for participant in participants]
+    unique_team_ids = list(set(participant_team_ids))
+
     for _ in range(num_medals):
         medal_data = {
-            'event_id': fake.random_int(min=1, max=num_events),  # Assuming there are 'num_events' events
-            'recipient_id': fake.random_int(min=1, max=num_participants),  # Assuming there are 'num_participants' participants
-            'medal_type': fake.random_element(elements=('Gold', 'Silver', 'Bronze')),  # Assuming three types of medals
+            'event_id': fake.random_element(elements=event_ids),
+            'recipient_id': fake.random_element(elements=unique_team_ids),
+            'medal_type': fake.random_element(elements=('Золото', 'Серебро', 'Бронза')),
         }
         medals_data.append(medal_data)
 
