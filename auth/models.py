@@ -12,13 +12,13 @@ metadata = Base.metadata
 athlete_combat_type_association = Table(
     'athlete_combat_type_association', Base.metadata,
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('combat_type_id', Integer, ForeignKey('CombatType.combat_type_id'))
+    Column('combat_type_id', Integer, ForeignKey('CombatType.id'))
 )
 
 athlete_coach_association = Table(
     'athlete_coach_association', Base.metadata,
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('coach_id', Integer, ForeignKey('Coach.coach_id'))
+    Column('coach_id', Integer, ForeignKey('Coach.id'))
 )
 
 
@@ -30,7 +30,7 @@ class Role(Base):
     permissions = Column(JSON)
 
 
-# вид боя
+# тип заполнения турнирной сетки
 class CombatType(Base):
     __tablename__ = "CombatType"
     id = Column(Integer, primary_key=True)
@@ -52,8 +52,8 @@ class SportType(Base):
 
 
 # классы веса (супертяж, тяж и пр)
-class WeightClass(Base):
-    __tablename__ = "WeightClass"
+class AllWeightClass(Base):
+    __tablename__ = "AllWeightClass"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     min_weight = Column(String, nullable=False)
@@ -63,7 +63,7 @@ class WeightClass(Base):
 # тренер
 class Coach(Base):
     __tablename__ = "Coach"
-    coach_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
 
     name = Column(String, nullable=True)
     sirname = Column(String, nullable=True)
@@ -101,7 +101,7 @@ class User(Base):
 # судья
 class Referee(Base):
     __tablename__ = "Referee"
-    referee_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     qualification_level = Column(String, nullable=False)
 
@@ -117,26 +117,6 @@ class Athlete(Base):
 
     combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
-
-
-# Связка между спортсменом, и его возможными спортивными категориями
-class SportCategory(Base):
-    __tablename__ = "SportCategory"
-    category_id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
-    category_type = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
-
-
-# Связка между спортсменом, и его возможными весовыми категориями
-class WeightCategory(Base):
-    __tablename__ = "WeightCategory"
-    category_id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
-    weight_type = Column(Integer, ForeignKey(WeightClass.id, ondelete="CASCADE"))
 
 
 # организатор
@@ -167,3 +147,24 @@ class SystemAdministrator(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     image_field = Column(String, nullable=True)
+
+
+# Связка между спортсменом, и его возможными спортивными категориями
+class SportCategory(Base):
+    __tablename__ = "SportCategory"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    category_type = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
+
+
+# Связка между спортсменом, и его возможными весовыми категориями
+class WeightCategory(Base):
+    __tablename__ = "WeightCategory"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    weight_type = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
+

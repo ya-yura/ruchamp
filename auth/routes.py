@@ -56,7 +56,7 @@ async def upload_image(
     db: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
-    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
+    allowed_roles = [1, 2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -85,11 +85,11 @@ async def update_profile(
 ):
     role_id = current_user.role_id
     allowed_roles = {
-        2: user_manager.update_athlete_profile,
-        3: user_manager.update_organizer_profile,
-        4: user_manager.update_spectator_profile,
+        1: user_manager.update_athlete_profile,
+        2: user_manager.update_organizer_profile,
+        3: user_manager.update_spectator_profile,
         5: user_manager.update_sysadmin_profile
-    }
+    } # надо ещё судей добавить и их обработчики
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")

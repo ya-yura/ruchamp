@@ -18,7 +18,7 @@ from auth.models import (
     EventOrganizer,
     Role,
     CombatType,
-    WeightClass,
+    AllWeightClass,
     Referee,
     Coach,
 

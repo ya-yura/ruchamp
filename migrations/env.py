@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
 
 from alembic import context
 
@@ -50,6 +51,10 @@ metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}
 target_metadata = metadata
 ''''''
 
+# Здесь мы указываем зависимости между таблицами
+# dependencies = [
+#     ('WeightClass', 'WeightsCategory'),
+# ]
 
 
 # other values from the config, defined by the needs of env.py,
@@ -58,6 +63,9 @@ target_metadata = metadata
 # ... etc.
 
 # target_metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
 def run_migrations_offline() -> None:

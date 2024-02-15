@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from auth.models import (
     EventOrganizer,
     CombatType,
-    WeightClass,
+    AllWeightClass,
     Athlete,
     CategoryType,
 )
@@ -26,9 +26,11 @@ class Event(Base):
     start_datetime = Column(TIMESTAMP, nullable=False)
     end_datetime = Column(TIMESTAMP, nullable=False)
     location = Column(String, nullable=False)
+    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
+    weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     organizer_id = Column(Integer, ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
-    event_order = Column(String, nullable=True)
-    event_system = Column(String, nullable=True)
+    event_order = Column(String, nullable=True) # Это докуенты, которые будут прикладываться
+    event_system = Column(String, nullable=True) # и это
     geo = Column(String, nullable=True)
 
 
@@ -37,9 +39,6 @@ class Participant(Base):
     __tablename__ = "Participant"
     participant_id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
-    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
-    weight_class_id = Column(Integer, ForeignKey(WeightClass.id, ondelete="CASCADE"))
     team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
 
 
@@ -50,7 +49,7 @@ class Match(Base):
     event_id = Column(Integer, ForeignKey(Event.event_id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
     category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
-    weight_class_id = Column(Integer, ForeignKey(WeightClass.id, ondelete="CASCADE"))
+    weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
     start_datetime = Column(TIMESTAMP, nullable=False)
     end_datetime = Column(TIMESTAMP, nullable=False)
