@@ -22,6 +22,7 @@ athlete_coach_association = Table(
 )
 
 
+# Роли пользователей (спортсмен, зритель, судья, организатор, сисадмин)
 class Role(Base):
     __tablename__ = "Role"
     id = Column(Integer, primary_key=True)
@@ -29,27 +30,52 @@ class Role(Base):
     permissions = Column(JSON)
 
 
+# вид боя
 class CombatType(Base):
     __tablename__ = "CombatType"
-    combat_type_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
 
+# категории спортсмена (кмс, мс и пр)
+class CategoryType(Base):
+    __tablename__ = "CategoryType"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+# Виды спорта, которые фигурируют в системе
+class SportType(Base):
+    __tablename__ = "SportType"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+# классы веса (супертяж, тяж и пр)
 class WeightClass(Base):
     __tablename__ = "WeightClass"
-    weight_class_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     min_weight = Column(String, nullable=False)
     max_weight = Column(String, nullable=False)
 
 
+# тренер
 class Coach(Base):
     __tablename__ = "Coach"
     coach_id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+
+    name = Column(String, nullable=True)
+    sirname = Column(String, nullable=True)
+    fathername = Column(String, nullable=True)
+    gender = Column(Boolean, default=True, nullable=True)
+    country = Column(String, nullable=True)
+    birthdate = Column(TIMESTAMP, nullable=True)
+
     qualification_level = Column(String, nullable=False)
 
 
+# пользователь системы
 class User(Base):
     __tablename__ = "User"
     id = Column(Integer, primary_key=True)
@@ -58,9 +84,9 @@ class User(Base):
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
     role_id = Column(Integer, ForeignKey(Role.id))
 
-    name = Column(String, nullable=True, nullable=True)
-    sirname = Column(String, nullable=True, nullable=True)
-    fathername = Column(String, nullable=True, nullable=True)
+    name = Column(String, nullable=True)
+    sirname = Column(String, nullable=True)
+    fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
@@ -72,6 +98,7 @@ class User(Base):
     verification_token = Column(String, nullable=True)
 
 
+# судья
 class Referee(Base):
     __tablename__ = "Referee"
     referee_id = Column(Integer, primary_key=True)
@@ -79,11 +106,12 @@ class Referee(Base):
     qualification_level = Column(String, nullable=False)
 
 
+# спортсмен
 class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    weight_category = Column(Integer, ForeignKey(WeightClass.weight_class_id, ondelete="SET NULL"))
+    weight = Column(String, nullable=True)
     height = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
 
@@ -91,6 +119,27 @@ class Athlete(Base):
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
 
 
+# Связка между спортсменом, и его возможными спортивными категориями
+class SportCategory(Base):
+    __tablename__ = "SportCategory"
+    category_id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    category_type = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
+
+
+# Связка между спортсменом, и его возможными весовыми категориями
+class WeightCategory(Base):
+    __tablename__ = "WeightCategory"
+    category_id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    weight_type = Column(Integer, ForeignKey(WeightClass.id, ondelete="CASCADE"))
+
+
+# организатор
 class EventOrganizer(Base):
     __tablename__ = "EventOrganizer"
     id = Column(Integer, primary_key=True)
@@ -103,6 +152,7 @@ class EventOrganizer(Base):
     image_field = Column(String, nullable=True)
 
 
+# зритель
 class Spectator(Base):
     __tablename__ = "Spectator"
     id = Column(Integer, primary_key=True)
@@ -111,6 +161,7 @@ class Spectator(Base):
     image_field = Column(String, nullable=True)
 
 
+# сисадмин
 class SystemAdministrator(Base):
     __tablename__ = "SystemAdministrator"
     id = Column(Integer, primary_key=True)
