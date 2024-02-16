@@ -32,10 +32,10 @@ from event.models import (
     MatchResult, 
     Prize, 
     Medal,
+    MatchPeriod,
 )
 from event.models import (
     Team,
-    TeamMember,
 )
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -58,10 +58,14 @@ num_spectators = 20
 num_administrators = 5
 num_teams = 10
 num_team_members = 7
-num_medals = 50
+num_medals = 33
 num_prizes = 50
+num_matches = 10
+num_results = 5
+num_links = 20
 
-def generate_fake_roles():
+
+def generate_fake_roles(session):
     roles = ['Спортсмен', 'Организатор', 'Зритель', 'Сисадмин', 'Судья']
     for role_name in roles:
         role = Role(name=role_name)
@@ -69,7 +73,7 @@ def generate_fake_roles():
     session.commit()
 
 
-def generate_fake_combat_types():
+def generate_fake_combat_types(session):
     combat_types = [
         "Single elimination (Олимпийская система)",
         "Double elimination (Система с двойным выбыванием)",
@@ -86,7 +90,7 @@ def generate_fake_combat_types():
     session.commit()
 
 
-def generate_fake_category_types():
+def generate_fake_category_types(session):
     category_types = [
         'МС', 'КМС', 'ЗМС', 'МСМК',
         '1-й спортивный разряд', '2-й спортивный разряд', '3-й спортивный разряд',
@@ -97,7 +101,7 @@ def generate_fake_category_types():
     session.commit()
 
 
-def generate_fake_sport_types():
+def generate_fake_sport_types(session):
     sport_types = [
         "Айкидо", "Кайдо", "Каратэномичи", "Кендо", "Кикбоксинг",
         "Киокусинкай", "Кобудо", "Комбат самооборона", "Комплексное единоборство",
@@ -113,9 +117,9 @@ def generate_fake_sport_types():
     session.commit()
 
 
-def generate_fake_weight_classes():
+def generate_fake_weight_classes(session):
     weight_classes = [
-        {'name': 'Сверхтяжёлый', 'min_weight': '100 kg', 'max_weight': None},
+        {'name': 'Сверхтяжёлый', 'min_weight': '100 kg', 'max_weight': '150 kg'},
         {'name': 'Тяжёлый', 'min_weight': '90 kg', 'max_weight': '100 kg'},
         {'name': 'Средний', 'min_weight': '75 kg', 'max_weight': '90 kg'},
         {'name': 'Лёгкий', 'min_weight': '60 kg', 'max_weight': '75 kg'},
@@ -170,6 +174,11 @@ def generate_fake_users(session, num_users=num_users):
             'verification_token': fake.uuid4() if fake.boolean(chance_of_getting_true=20) else None,
         }
         users_data.append(user_data)
+
+    for user_data in users_data:
+        user = User(**user_data)
+        session.add(user)
+    session.commit()
 
 
 # Генерация данных для судей
@@ -447,16 +456,20 @@ def generate_fake_participants(session, num_participants=20):
     participants_data = []
     events = session.query(Event).all()
     teams = session.query(Team).all()
+    weight_classes = session.query(AllWeightClass).all()
+    combat_types = session.query(CombatType).all()
 
     event_ids = [event.id for event in events]
     team_ids = [team.id for team in teams]
+    weight_class_ids = [weight_class.id for weight_class in weight_classes]
+    combat_type_id = [combat_types.id for combat_type in combat_types]
 
     for _ in range(num_participants):
         participant_data = {
             'event_id': fake.random_element(elements=event_ids),
             'team_id': fake.random_element(elements=team_ids),
-            'combat_type_id':
-            'weight_class_id':
+            'combat_type_id': fake.random_element(elements=combat_type_id),
+            'weight_class_id': fake.random_element(elements=weight_class_ids),
         }
         participants_data.append(participant_data)
 
@@ -467,7 +480,7 @@ def generate_fake_participants(session, num_participants=20):
 
 
 # Генерация данных для матчей
-def generate_fake_matches(session, num_matches=10):
+def generate_fake_matches(session, num_matches=num_matches):
     matches_data = []
     events = session.query(Event).all()
     participants = session.query(Participant).all()
@@ -485,7 +498,7 @@ def generate_fake_matches(session, num_matches=10):
 
     # Убеждаемся, что существует достаточно команд для проведения матчей
     if len(unique_team_ids) < 2 * num_matches:
-        raise ValueError("Insufficient teams to create matches. Increase the number of teams or decrease the number of matches.")
+        raise ValueError("Не хватает команд.")
 
     for _ in range(num_matches):
         match_data = {
@@ -497,9 +510,9 @@ def generate_fake_matches(session, num_matches=10):
             'start_datetime': fake.date_time_between(start_date="-30d", end_date="+30d"),
             'end_datetime': fake.date_time_between(start_date="+1h", end_date="+4h"),
             'player_one': fake.random_element(elements=unique_team_ids),
-            'player_two': fake.random_element(elements=[team_id for team_id in unique_team_ids if team_id != match_data['team_one_id']]),
+            'player_two': fake.random_element(elements=[team_id for team_id in unique_team_ids if team_id != match_data['player_one']]),
             # Выбираем победителя случайным образом из команд, участвующих в матче
-            'winner_id': fake.random_element(elements=[match_data['team_one_id'], match_data['team_two_id']]),
+            'winner_id': fake.random_element(elements=[match_data['player_one'], match_data['player_two']]),
         }
         matches_data.append(match_data)
 
@@ -507,28 +520,6 @@ def generate_fake_matches(session, num_matches=10):
         match = Match(**match_data)
         session.add(match)
     session.commit()
-
-
-
-
-
-
-# Генерация данных для матчей
-def generate_fake_matches(session, num_matches=10):
-    matches_data = []
-    for _ in range(num_matches):
-        match_data = {
-            'combat_type_id': fake.random_int(min=1, max=num_combat_types),  # Assuming there are 'num_combat_types' combat types
-            'category_id': fake.random_int(min=1, max=num_categories),  # Assuming there are 'num_categories' categories
-            'weight_class_id': fake.random_int(min=1, max=num_weight_classes),  # Assuming there are 'num_weight_classes' weight classes
-        }
-        matches_data.append(match_data)
-
-    for match_data in matches_data:
-        match = Match(**match_data)
-        session.add(match)
-    session.commit()
-
 
 
 # Генерация данных для периодов матчей
@@ -536,11 +527,11 @@ def generate_fake_match_periods(session, num_periods=5):
     match_periods_data = []
     for _ in range(num_periods):
         match_period_data = {
-            'match_id': fake.random_int(min=1, max=num_matches),  # Assuming there are 'num_matches' matches
-            'start_datetime': fake.date_time_between(start_date="-1h", end_date="+1h"),  # Periods within the last hour and the next hour
-            'end_datetime': fake.date_time_between(start_date="+1min", end_date="+30min"),  # Periods lasting between 1 minute and 30 minutes
-            'winner_score': fake.random_int(min=1, max=10),  # Assuming scores between 1 and 10
-            'loser_score': fake.random_int(min=1, max=10),  # Assuming scores between 1 and 10
+            'match_id': fake.random_int(min=1, max=num_matches),  
+            'start_datetime': fake.date_time_between(start_date="-1h", end_date="+1h"), 
+            'end_datetime': fake.date_time_between(start_date="+1min", end_date="+30min"),  
+            'winner_score': fake.random_int(min=5, max=10),
+            'loser_score': fake.random_int(min=1, max=5),  
         }
         match_periods_data.append(match_period_data)
 
@@ -552,13 +543,13 @@ def generate_fake_match_periods(session, num_periods=5):
 
 
 # Генерация данных для результатов матчей
-def generate_fake_match_results(session, num_results=5):
+def generate_fake_match_results(session, num_results=num_results):
     match_results_data = []
     for _ in range(num_results):
         match_result_data = {
-            'match_id': fake.random_int(min=1, max=num_matches),  # Assuming there are 'num_matches' matches
-            'winner_score': fake.random_int(min=1, max=10),  # Assuming scores between 1 and 10
-            'loser_score': fake.random_int(min=1, max=10),  # Assuming scores between 1 and 10
+            'match_id': fake.random_int(min=1, max=num_matches),
+            'winner_score': fake.random_int(min=5, max=10),
+            'loser_score': fake.random_int(min=1, max=5),
         }
         match_results_data.append(match_result_data)
 
@@ -617,4 +608,65 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
+# Генерация данных для медалей
+def generate_fake_links(session, num_links=num_links):
+    athletes = session.query(Athlete).all()
+    combat_types = session.query(Athlete).all()
+    coaches = session.query(Athlete).all()
+    athlete_ids = [athlete.id for athlete in athletes]
+    combat_type_ids = [combat_type.id for combat_type in combat_types]
+    coach_ids = [coach.id for coach in coaches]
+
+    for _ in range(num_links): 
+        athlete_id = fake.random_element(elements=athlete_ids)
+        combat_type_id = fake.random_element(elements=combat_type_ids)
+
+        session.execute(athlete_combat_type_association.insert().values(
+            athlete_id=athlete_id,
+            combat_type_id=combat_type_id
+        ))
+
+
+    for _ in range(num_links):
+        athlete_id = fake.random_element(elements=athlete_ids)
+        coach_id = fake.random_element(elements=coach_ids)
+
+        session.execute(athlete_coach_association.insert().values(
+            athlete_id=athlete_id,
+            coach_id=coach_id
+        ))
+
+    # Завершите сессию
+    session.commit()
+
+
+# generate_fake_roles(session)
+
+# generate_fake_combat_types(session)
+# generate_fake_category_types(session)
+# generate_fake_sport_types(session)
+# generate_fake_weight_classes(session)
+
+generate_fake_users(session, num_users)
+# generate_fake_coaches(session)
+# generate_fake_referees(session)
+# generate_fake_athletes(session)
+# generate_fake_event_organizers(session)
+# generate_fake_spectators(session)
+# generate_fake_system_administrators(session)
+
+# generate_fake_sport_categories(session)
+# generate_fake_weight_categories(session)
+
+# generate_fake_teams(session)
+# generate_fake_participants(session)
+
+# generate_fake_events(session)
+# generate_fake_matches(session)
+# generate_fake_match_results(session)
+# generate_fake_match_periods(session)
+
+# generate_fake_prizes(session)
+# generate_fake_medals(session)
+# generate_fake_links(session)
 

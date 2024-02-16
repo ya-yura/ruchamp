@@ -9,6 +9,7 @@ Base: DeclarativeMeta = declarative_base()
 metadata = Base.metadata
 
 
+
 athlete_combat_type_association = Table(
     'athlete_combat_type_association', Base.metadata,
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
@@ -35,6 +36,8 @@ class CombatType(Base):
     __tablename__ = "CombatType"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+
+    athletes = relationship("Athlete", secondary=athlete_combat_type_association, back_populates="combat_types")
 
 
 # категории спортсмена (кмс, мс и пр)
@@ -71,8 +74,9 @@ class Coach(Base):
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
-
     qualification_level = Column(String, nullable=False)
+
+    athletes = relationship("Athlete", secondary=athlete_coach_association, back_populates="coaches")
 
 
 # пользователь системы
