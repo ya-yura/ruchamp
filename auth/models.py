@@ -4,10 +4,9 @@ from sqlalchemy import JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
+
 Base: DeclarativeMeta = declarative_base()
-
 metadata = Base.metadata
-
 
 
 athlete_combat_type_association = Table(
@@ -21,6 +20,7 @@ athlete_coach_association = Table(
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
     Column('coach_id', Integer, ForeignKey('Coach.id'))
 )
+
 
 
 # Роли пользователей (спортсмен, зритель, судья, организатор, сисадмин)

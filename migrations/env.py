@@ -6,8 +6,8 @@ from sqlalchemy import create_engine
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 # from auth.models import metadata
 from auth.models import Base as AuthBase
-from event.models import Base as EventBase
 from teams.models import Base as TeamBase
+from event.models import Base as EventBase
 from sqlalchemy import MetaData
 
 # this is the Alembic Config object, which provides
