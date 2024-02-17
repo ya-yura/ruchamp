@@ -16,6 +16,7 @@ from auth.routes import router as auth_router
 from pages.router import router as pages_router
 from event.routers import router as event_router
 from teams.routers import router as team_router
+from match.routers import router as match_router
 
 
 app = FastAPI(
@@ -50,3 +51,4 @@ app.include_router(pages_router)
 app.include_router(auth_router)
 app.include_router(event_router)
 app.include_router(team_router)
+app.include_router(match_router)

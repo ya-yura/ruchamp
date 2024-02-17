@@ -21,7 +21,6 @@ from connection import Base
 metadata = Base.metadata
 
 
-
 # Спортивное событие
 class Event(Base):
     __tablename__ = "Event"
@@ -71,9 +70,13 @@ class Match(Base):
     round = Column(Integer, nullable=False)
     start_datetime = Column(TIMESTAMP, nullable=False)
     end_datetime = Column(TIMESTAMP, nullable=False)
-    player_one = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
-    player_two = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
-    winner_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
+
+    # бойцы временно переделаны на Атлета а не участник команды
+    # возникли сложности с моделями
+    player_one = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    player_two = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    winner_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+
     periods = relationship("MatchPeriod", backref="match", cascade="all, delete-orphan")
     results = relationship("MatchResult", backref="match", cascade="all, delete-orphan")
 

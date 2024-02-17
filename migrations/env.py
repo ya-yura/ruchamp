@@ -8,6 +8,7 @@ from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from auth.models import Base as AuthBase
 from teams.models import Base as TeamBase
 from event.models import Base as EventBase
+from match.models import Base as MatchBase
 from sqlalchemy import MetaData
 
 # this is the Alembic Config object, which provides
@@ -35,6 +36,7 @@ metadata = MetaData()
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=AuthBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=TeamBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=MatchBase.metadata.tables)
 target_metadata = metadata
 ''''''
 

@@ -26,11 +26,11 @@ from auth.models import (
     athlete_coach_association,
 )
 from event.models import (
-    Event, 
-    Participant, 
+    Event,
+    Participant,
     Match,
-    MatchResult, 
-    Prize, 
+    MatchResult,
+    Prize,
     Medal,
     MatchPeriod,
 )
@@ -406,15 +406,15 @@ def generate_fake_teams(session, num_teams=num_teams):
 def generate_fake_participants(session, num_participants=20):
     participants_data = []
     events = session.query(Event).all()
-    teams = session.query(Team).all()
+    player_id = session.query(TeamMember).all()
 
     event_ids = [event.id for event in events]
-    team_ids = [team.id for team in teams]
+    player_ids = [member.id for member in player_id]
 
     for _ in range(num_participants):
         participant_data = {
             'event_id': fake.random_element(elements=event_ids),
-            'team_id': fake.random_element(elements=team_ids),
+            'player_id': fake.random_element(elements=player_ids),
         }
         participants_data.append(participant_data)
 
@@ -667,9 +667,9 @@ def generate_fake_links(session, num_links=num_links):
 
 # generate_fake_events(session)
 # generate_fake_participants(session)
-# generate_fake_matches(session)
-# generate_fake_match_results(session)
-# generate_fake_match_periods(session)
+generate_fake_matches(session)
+generate_fake_match_results(session)
+generate_fake_match_periods(session)
 
 # generate_fake_prizes(session)
 # generate_fake_medals(session)

@@ -22,7 +22,6 @@ athlete_coach_association = Table(
 )
 
 
-
 # Роли пользователей (спортсмен, зритель, судья, организатор, сисадмин)
 class Role(Base):
     __tablename__ = "Role"
@@ -171,4 +170,3 @@ class WeightCategory(Base):
     athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_type = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
-

@@ -10,8 +10,8 @@ from auth.models import (
     Base,
     Role,
     User,
-    Referee, 
-    Coach, 
+    Referee,
+    Coach,
     Athlete,
     EventOrganizer,
     Spectator,
@@ -36,14 +36,16 @@ from teams.models import (
 # и наконец тут так же. Этот блок таблиц создаём в последнюю очередь
 from event.models import (
     Base,
-    Event, 
-    Participant, 
+    Event,
+    Participant,
     Match,
     MatchPeriod,
-    MatchResult, 
-    Prize, 
+    MatchResult,
+    Prize,
     Medal,
 )
+
+from match.models import Base, AgeCategory, TempDrawParticipants
 
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
