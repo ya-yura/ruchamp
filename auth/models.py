@@ -75,6 +75,7 @@ class Coach(Base):
     country = Column(String, nullable=True)
     birthdate = Column(TIMESTAMP, nullable=True)
     qualification_level = Column(String, nullable=False)
+# сделать таблицу квалификации тренеров
 
     athletes = relationship("Athlete", secondary=athlete_coach_association, back_populates="coaches")
 
@@ -108,7 +109,9 @@ class Referee(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     qualification_level = Column(String, nullable=False)
+    image_field = Column(String, nullable=True)
 
+# сделать таблицу квалификации судей
 
 # спортсмен
 class Athlete(Base):
@@ -121,6 +124,7 @@ class Athlete(Base):
 
     combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
+#    grades = relationship("Grade", secondary=athlete_coach_association, back_populates="athletes")
 
 
 # организатор
@@ -153,7 +157,7 @@ class SystemAdministrator(Base):
     image_field = Column(String, nullable=True)
 
 
-# Связка между спортсменом, и его возможными спортивными категориями
+# Связка между спортсменом и его возможными спортивными категориями
 class SportCategory(Base):
     __tablename__ = "SportCategory"
     id = Column(Integer, primary_key=True)

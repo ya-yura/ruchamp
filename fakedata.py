@@ -1,3 +1,4 @@
+import datetime
 import random
 from faker import Faker
 from connection import SessionLocal
@@ -48,22 +49,29 @@ user_db = SQLAlchemyUserDatabase(User, SessionLocal())
 
 fake = Faker("ru_RU")
 
-num_users = 1000
-num_referees = 10
-num_coaches = 5
-num_athletes = 100
-num_sport_categories = int(num_athletes/2)
-num_weight_categories = num_athletes
-num_organizers = 10
-num_spectators = 20
-num_administrators = 5
-num_teams = 10
-num_team_members = 7
+num_users = 10_000
+
+num_referees = int(num_users * 0.05)
+num_coaches = int(num_users * 0.03)
+num_athletes = int(num_users * 0.7)
+num_organizers = int(num_users * 0.02)
+num_spectators = int(num_users * 0.2)
+num_administrators = int(num_users * 0.01)
+
+num_teams = int(num_athletes * 0.5)
+num_team_members = 20
+team_size = 200
+
+num_events = int(num_teams * 2)
+num_participants = int(num_athletes * num_events / 10)
+num_matches = int(num_events * 3)
+num_results = int(num_events * num_matches)
+num_links = 20
+
 num_medals = 33
 num_prizes = 50
-num_matches = 10
-num_results = 5
-num_links = 20
+num_sport_categories = int(num_athletes/2)
+num_weight_categories = num_athletes
 
 
 def generate_fake_roles(session):
@@ -402,66 +410,8 @@ def generate_fake_teams(session, num_teams=num_teams):
     session.commit()
 
 
-# Генерация данных для участников спортивных событий
-def generate_fake_participants(session, num_participants=20):
-    participants_data = []
-    events = session.query(Event).all()
-    teams = session.query(Team).all()
-
-    event_ids = [event.id for event in events]
-    team_ids = [team.id for team in teams]
-
-    for _ in range(num_participants):
-        participant_data = {
-            'event_id': fake.random_element(elements=event_ids),
-            'team_id': fake.random_element(elements=team_ids),
-        }
-        participants_data.append(participant_data)
-
-    for participant_data in participants_data:
-        participant = Participant(**participant_data)
-        session.add(participant)
-    session.commit()
-
-
-
-# Генерация данных для спортивных событий
-def generate_fake_events(session, num_events=10):
-    events_data = []
-    users = session.query(User).all()
-
-    # Filter users with role_id == 2 (assuming it represents organizers)
-    organizers = [user for user in users if user.role_id == 2]
-
-    if len(organizers) < num_events:
-        additional_users = random.sample(users, num_events - len(organizers))
-        organizers.extend(additional_users)
-
-    for organizer in organizers:
-        # Check if the organizer has an entry in EventOrganizer
-        event_organizer = session.query(EventOrganizer).filter_by(id=organizer.id).first()
-
-        if event_organizer:
-            event_data = {
-                'name': fake.sentence(),
-                'start_datetime': fake.future_datetime(),
-                'end_datetime': fake.future_datetime(),
-                'location': fake.address(),
-                'organizer_id': organizer.id,
-                'event_order': fake.text(),
-                'event_system': fake.word(),
-                'geo': str(fake.latitude()) + ',' + str(fake.longitude()),
-            }
-            events_data.append(event_data)
-
-    for event_data in events_data:
-        event = Event(**event_data)
-        session.add(event)
-    session.commit()
-
-
-# Генерация данных для участников спортивных событий
-def generate_fake_team_member(session, num_participants=20):
+# Генерация данных для участников команд
+def generate_fake_team_member(session, num_participants=team_size):
     participants_data = []
     athletes = session.query(Athlete).all()
     teams = session.query(Team).all()
@@ -478,6 +428,75 @@ def generate_fake_team_member(session, num_participants=20):
 
     for participant_data in participants_data:
         participant = TeamMember(**participant_data)
+        session.add(participant)
+    session.commit()
+
+
+# Генерация данных спортивных событий
+def generate_fake_events(session, num_events=num_events):
+    events_data = []
+    organizers = session.query(EventOrganizer).all()
+
+    if not organizers:
+        print("Нет зарегистрированных организаторов (EventOrganizer).")
+        return
+
+    for _ in range(num_events):
+        organizer = random.choice(organizers)
+        event_data = {
+            'name': fake.sentence(),
+            'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
+            'end_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
+            'location': fake.address(),
+            'organizer_id': organizer.id,
+            'event_order': fake.text(),
+            'event_system': fake.word(),
+            'geo': str(fake.latitude()) + ',' + str(fake.longitude()),
+        }
+        events_data.append(event_data)
+
+    for event_data in events_data:
+        event = Event(**event_data)
+        session.add(event)
+    session.commit()
+
+
+# Генерация данных для участников спортивных событий
+def generate_fake_participants(session, num_participants=20):
+    participants_data = []
+
+    events = session.query(Event).all()
+    teams = session.query(Team).all()
+
+    if not events or not teams:
+        print("Нет данных о мероприятиях или командах.")
+        return
+
+    for _ in range(num_participants):
+        event = random.choice(events)
+
+        num_teams = random.randint(1, len(teams))
+        selected_teams = random.sample(teams, num_teams)
+
+        for team in selected_teams:
+            team_members = session.query(TeamMember).filter_by(team=team.id).all()
+
+            if not team_members:
+                print(f"В команде {team.name} нет участников.")
+                continue
+
+            num_participants_in_team = random.randint(1, len(team_members))
+            selected_team_members = random.sample(team_members, num_participants_in_team)
+
+            for team_member in selected_team_members:
+                participant_data = {
+                    'event_id': event.id,
+                    'player_id': team_member.id,
+                }
+                participants_data.append(participant_data)
+
+    for participant_data in participants_data:
+        participant = Participant(**participant_data)
         session.add(participant)
     session.commit()
 
@@ -514,7 +533,7 @@ def generate_fake_matches(session, num_matches=num_matches):
             'start_datetime': fake.date_time_between(start_date="-30d", end_date="+30d"),
             'end_datetime': fake.date_time_between(start_date="+1h", end_date="+4h"),
             'player_one': fake.random_element(elements=unique_team_ids),
-            'player_two': fake.random_element(elements=[team_id for team_id in unique_team_ids if team_id != match_data['player_one']]),
+            'player_two': fake.random_element(elements=[team for team in unique_team_ids if team != match_data['player_one']]),
             # Выбираем победителя случайным образом из команд, участвующих в матче
             'winner_id': fake.random_element(elements=[match_data['player_one'], match_data['player_two']]),
         }
@@ -667,7 +686,7 @@ def generate_fake_links(session, num_links=num_links):
 
 # generate_fake_events(session)
 # generate_fake_participants(session)
-# generate_fake_matches(session)
+generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 

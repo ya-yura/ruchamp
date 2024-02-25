@@ -10,6 +10,7 @@ from auth.models import (
     Athlete,
     CategoryType,
     SportType,
+    Referee,
 )
 from teams.models import (
     Team,
@@ -19,7 +20,6 @@ from connection import Base
 
 
 metadata = Base.metadata
-
 
 
 # Спортивное событие
@@ -34,6 +34,7 @@ class Event(Base):
     event_order = Column(String, nullable=True) # Это документы, которые будут прикладываться
     event_system = Column(String, nullable=True) # и это
     geo = Column(String, nullable=True)
+    image_field = Column(String, nullable=True)
 
 
 # Весовые категории события
@@ -87,6 +88,19 @@ class MatchPeriod(Base):
     end_datetime = Column(TIMESTAMP, nullable=False)
     winner_score = Column(String, nullable=False)
     loser_score = Column(String, nullable=False)
+
+
+# Таблица счёта
+class MatchCounter(Base):
+    __tablename__ = "MatchCounter"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    player1 = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
+    player2 = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
+    player1_score = Column(String, nullable=False)
+    player2_score = Column(String, nullable=False)
+    set_datetime = Column(TIMESTAMP, nullable=False)
+    referee = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
 
 
 # Результаты матча

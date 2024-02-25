@@ -8,6 +8,7 @@ from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from auth.models import Base as AuthBase
 from teams.models import Base as TeamBase
 from event.models import Base as EventBase
+from shop.models import Base as ShopBase
 from sqlalchemy import MetaData
 
 # this is the Alembic Config object, which provides
@@ -26,6 +27,17 @@ config.set_section_option(section, "DB_PASS", DB_PASS)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+
+# ''' Тут создаём таблицы. Вообще все. '''
+# engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+
+# AuthBase.metadata.create_all(bind=engine)
+# EventBase.metadata.create_all(bind=engine)
+
+# engine.dispose()
+# ''''''
+
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # target_metadata = Base.metadata
@@ -35,8 +47,12 @@ metadata = MetaData()
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=AuthBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=TeamBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=ShopBase.metadata.tables)
 target_metadata = metadata
 ''''''
+
+
+
 
 
 # other values from the config, defined by the needs of env.py,
@@ -89,6 +105,7 @@ def run_migrations_online() -> None:
         AuthBase.metadata,
         EventBase.metadata,
         TeamBase.metadata,
+        ShopBase.metadata,
     ]
 
     with connectable.connect() as connection:
