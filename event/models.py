@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, TIMESTAMP, ForeignKey, Table
+from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Table
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
@@ -27,8 +27,8 @@ class Event(Base):
     __tablename__ = "Event"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    start_datetime = Column(TIMESTAMP, nullable=False)
-    end_datetime = Column(TIMESTAMP, nullable=False)
+    start_datetime = Column(DateTime, nullable=False)
+    end_datetime = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
     organizer_id = Column(Integer, ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
     event_order = Column(String, nullable=True) # Это документы, которые будут прикладываться
@@ -70,8 +70,8 @@ class Match(Base):
     category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
-    start_datetime = Column(TIMESTAMP, nullable=False)
-    end_datetime = Column(TIMESTAMP, nullable=False)
+    start_datetime = Column(DateTime, nullable=False)
+    end_datetime = Column(DateTime, nullable=False)
     player_one = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player_two = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     winner_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
@@ -84,8 +84,8 @@ class MatchPeriod(Base):
     __tablename__ = "MatchPeriod"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    start_datetime = Column(TIMESTAMP, nullable=False)
-    end_datetime = Column(TIMESTAMP, nullable=False)
+    start_datetime = Column(DateTime, nullable=False)
+    end_datetime = Column(DateTime, nullable=False)
     winner_score = Column(String, nullable=False)
     loser_score = Column(String, nullable=False)
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, Table
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, Table, DateTime
 from sqlalchemy import JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -73,7 +73,7 @@ class Coach(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(TIMESTAMP, nullable=True)
+    birthdate = Column(DateTime, nullable=True)
     qualification_level = Column(String, nullable=False)
 # сделать таблицу квалификации тренеров
 
@@ -94,7 +94,7 @@ class User(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(TIMESTAMP, nullable=True)
+    birthdate = Column(DateTime, nullable=True)
 
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
