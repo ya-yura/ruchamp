@@ -103,7 +103,7 @@ class MatchPeriod(Base):
 class MatchCounter(Base):
     __tablename__ = "MatchCounter"
     id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    match_id = Column(Integer, ForeignKey(MatchPeriod.id, ondelete="CASCADE"))
     player1_score = Column(String, nullable=False)
     player2_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
