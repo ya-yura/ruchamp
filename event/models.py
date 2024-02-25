@@ -107,6 +107,7 @@ class MatchCounter(Base):
     player1_score = Column(String, nullable=False)
     player2_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
+    referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
 
 
 # Результаты матча
