@@ -66,7 +66,7 @@ class AthleteUpdate(BaseModel):
     coaches: Optional[List[str]]
 # Тренеры и типы используют List[str], им надо передавать списки строк,
 # представляющих имена видов борьбы и тренеров соответственно.
-    
+
 
 class SpectatorUpdate(BaseModel):
     phone_number: Optional[str]
@@ -87,3 +87,36 @@ class OrganizerUpdate(BaseModel):
     image_field: Optional[str]
 
 
+class CategoryCreate(BaseModel):
+    name: str
+
+
+class WeightCategoryCreate(BaseModel):
+    name: str
+    min_weight: str
+    max_weight: str
+
+
+class Referee(BaseModel):
+    name: str
+    qualification_level: str
+    image_field: Optional[str]
+
+
+class RefereeCreate(Referee):
+    pass
+
+
+class Coach(BaseModel):
+    name: str
+    sirname: str
+    fathername: str
+    gender: bool
+    country: str
+    birthdate: str
+    qualification_level: str
+    image_field: Optional[str]
+
+
+class CoachCreate(Coach):
+    pass

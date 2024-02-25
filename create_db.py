@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 
 # Сначала комментим остальные модели, кроме этой и выполняем этот скрипт
-from auth.models import (
+'''from auth.models import (
     Base,
     Role,
     User,
@@ -43,9 +43,10 @@ from event.models import (
     MatchResult,
     Prize,
     Medal,
-)
+)'''
 
-from match.models import Base, AgeCategory, TempDrawParticipants
+from match.models import (Base, AgeCategory, TempDrawParticipants,
+                          TempAthlete, Score)
 
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")

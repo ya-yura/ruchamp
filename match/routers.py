@@ -5,10 +5,14 @@ from sqlalchemy import select, update, insert, delete
 
 from connection import get_db
 from event.models import Event, Match, MatchResult, Participant, MatchPeriod
-from auth.models import User, Athlete, AllWeightClass, CategoryType
+from auth.models import User, Athlete, AllWeightClass, CategoryType, Referee
+from auth.schemas import UserDB
+from auth.routes import current_user
 from teams.models import TeamMember
-from match.models import TempDrawParticipants, AgeCategory
+from match.models import TempDrawParticipants, AgeCategory, TempAthlete, Score
 from match.utils import split_pairs, pairs_generator
+from fastapi import HTTPException
+from match.schemas import MatchScore
 
 
 router = APIRouter(prefix="/api", tags=["Matchs"])
@@ -37,6 +41,7 @@ async def temp_participants(event_id: int, db: AsyncSession = Depends(get_db)):
     # Очищаем данные из таблицы
     await db.execute(delete(TempDrawParticipants))
     # Незабыть удалить
+    await db.execute(delete(TempAthlete))
     await db.execute(delete(Match))
     await db.commit()
 
@@ -44,47 +49,42 @@ async def temp_participants(event_id: int, db: AsyncSession = Depends(get_db)):
         Participant.event_id == event_id))
     participants = query.scalars().all()
 
+    query = await db.execute(select(
+        AllWeightClass.id,
+        AllWeightClass.min_weight,
+        AllWeightClass.max_weight
+    ))
+    weight_classes = query.mappings().all()
+
+    query = await db.execute(select(
+        AgeCategory.id,
+        AgeCategory.min_age,
+        AgeCategory.max_age
+    ))
+    age_classes = query.mappings().all()
+
     members = []
 
     for member in participants:
 
         query = await db.execute(select(TeamMember.member).where(
             TeamMember.id == member))
-        member = query.scalars().one()
+        athelete_id = query.scalars().one()
 
         await db.execute(insert(TempDrawParticipants).values(
-            athlete_id=member))
-        members.append(member)
+            athlete_id=athelete_id, member_id=member))
+        members.append(athelete_id)
 
         for member in members:
             query = await db.execute(select(Athlete.weight).where(
                 Athlete.id == member))
-            weight = int(query.scalars().one())
+            weight = float(query.scalars().one())
 
-            if weight >= 39 and weight <= 60:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        weight_category=1))
-
-            if weight >= 61 and weight <= 75:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        weight_category=2))
-
-            if weight >= 76 and weight <= 90:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        weight_category=3))
-
-            if weight >= 91 and weight <= 100:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        weight_category=4))
-
-            if weight >= 101 and weight <= 151:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        weight_category=5))
+            for item in weight_classes:
+                if float(item.min_weight) <= weight <= float(item.max_weight):
+                    await db.execute(update(TempDrawParticipants).where(
+                        TempDrawParticipants.athlete_id == member).values(
+                            weight_category=int(item.id)))
 
             query = await db.execute(select(Athlete.user_id).where(
                 Athlete.id == member))
@@ -97,40 +97,11 @@ async def temp_participants(event_id: int, db: AsyncSession = Depends(get_db)):
             user_year = user_year.year
             age_player = datetime.datetime.now().year - user_year
 
-            if age_player >= 10 and age_player <= 12:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=1))
-
-            if age_player >= 13 and age_player <= 14:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=2))
-
-            if age_player >= 15 and age_player <= 16:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=3))
-
-            if age_player >= 17 and age_player <= 18:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=4))
-
-            if age_player >= 19 and age_player <= 20:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=5))
-
-            if age_player >= 21 and age_player <= 34:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=6))
-
-            if age_player >= 35 and age_player <= 99:
-                await db.execute(update(TempDrawParticipants).where(
-                    TempDrawParticipants.athlete_id == member).values(
-                        age_category=7))
+            for item in age_classes:
+                if int(item.min_age) <= age_player <= int(item.max_age):
+                    await db.execute(update(TempDrawParticipants).where(
+                        TempDrawParticipants.athlete_id == member).values(
+                            age_category=int(item.id)))
 
     await db.execute(update(TempDrawParticipants).values(grade_category=10))
     await db.commit()
@@ -152,7 +123,7 @@ async def temp_participants(event_id: int, db: AsyncSession = Depends(get_db)):
             for age in range(1, ages + 1):
 
                 query = await db.execute(select(
-                    TempDrawParticipants.athlete_id).filter_by(
+                    TempDrawParticipants.member_id).filter_by(
                         weight_category=weight,
                         age_category=age,
                         grade_category=grade))
@@ -204,6 +175,213 @@ async def temp_participants(event_id: int, db: AsyncSession = Depends(get_db)):
                     player_one=pair[0],
                     player_two=pair[1]
                 ))
+                await db.execute(insert(Score).values(
+                    event_id=event_id,
+                    player_one=pair[0],
+                    player_two=pair[1]
+                ))
             await db.commit()
 
-    return {'Участники': pairs, 'Пары для спаринга': combat_pairs}
+    for participant in participants:
+        query = await db.execute(select(Match.id).where(
+            Match.player_one == participant)
+                                 )
+        match_id = query.scalars().first()
+
+        await db.execute(update(Score).where(
+            Score.player_one == participant).values(match_id=match_id))
+
+        await db.commit()
+
+    return {'Участники': participants, 'Пары для спаринга': combat_pairs}
+
+
+# Второй тур и последуюющие туры
+@router.get("/matchs/draw/{event_id}/{round}")
+async def match_round(event_id: int, round: int,
+                      db: AsyncSession = Depends(get_db)):
+
+    await db.execute(delete(TempDrawParticipants))
+    await db.commit()
+
+    query = await db.execute(select(
+        Match.winner_id,
+        Match.weight_class_id,
+        Match.category_id
+    ).where(
+        Match.event_id == event_id,
+        Match.round == round,
+        Match.winner_id.isnot(None)
+    ))
+    winners = query.mappings().all()
+
+    query = await db.execute(select(
+        AgeCategory.id,
+        AgeCategory.min_age,
+        AgeCategory.max_age
+    ))
+    age_classes = query.mappings().all()
+
+    athlete_id_list = []
+
+    for winner in winners:
+        await db.execute(insert(TempDrawParticipants).values(
+            member_id=winner['winner_id'],
+            weight_category=winner['weight_class_id'],
+            grade_category=winner['category_id']
+        ))
+        await db.commit()
+        query = await db.execute(select(TeamMember.member).where(
+            TeamMember.id == winner['winner_id']))
+        athlete_id = query.scalars().one()
+        athlete_id_list.append(athlete_id)
+
+        await db.execute(update(TempDrawParticipants).where(
+            TempDrawParticipants.member_id == winner['winner_id']).values(
+                athlete_id=athlete_id)
+            )
+        await db.commit()
+
+    for athlete_id in athlete_id_list:
+        query = await db.execute(select(Athlete.user_id).where(
+            Athlete.id == athlete_id))
+        user_id = query.scalars().one()
+
+        query = await db.execute(select(User.birthdate).where(
+                User.id == user_id))
+
+        user_year = query.scalars().one()
+        user_year = user_year.year
+        age_player = datetime.datetime.now().year - user_year
+
+        for item in age_classes:
+            if int(item.min_age) <= age_player <= int(item.max_age):
+                await db.execute(update(TempDrawParticipants).where(
+                    TempDrawParticipants.athlete_id == athlete_id).values(
+                        age_category=int(item.id)))
+
+        await db.commit()
+
+    query = await db.execute(select(AgeCategory))
+    age = query.scalars().all()
+    ages = len(age)
+    query = await db.execute(select(AllWeightClass))
+    weight = query.scalars().all()
+    weights = len(weight)
+    query = await db.execute(select(CategoryType))
+    grade = query.scalars().all()
+    grades = len(grade)
+
+    all_pairs = {}
+
+    for grade in range(1, grades + 1):
+        for weight in range(1, weights + 1):
+            for age in range(1, ages + 1):
+
+                query = await db.execute(select(
+                    TempDrawParticipants.member_id).filter_by(
+                        weight_category=weight,
+                        age_category=age,
+                        grade_category=grade))
+                athletes = query.scalars().all()
+
+                if len(athletes) == 0:
+                    continue
+                all_pairs.update({(weight, age, grade): athletes})
+
+    combat_pairs = []
+    pairs = list([*all_pairs.values()])
+
+    # В таблице Ивент надо поле CombatType сделать Integer, чтоб хранить ссылку ID CombatType
+    query = await db.execute(select(Event.event_system).where(
+        Event.id == event_id))
+    combat_type = query.scalars().one()
+
+    for pair in pairs:
+        # здесь поменять на ID CombatType
+        if combat_type in 'Single elimination (Олимпийская система)':
+            combat_pairs.append(split_pairs(list(pair)))
+        if combat_type in 'Round robin (Круговая система)':
+            combat_pairs.append(pairs_generator(pair))
+
+    for pairs in combat_pairs:
+        print(pairs)
+        for pair in pairs:
+            print(pair[0], pair[1])
+            if pair[1] == '':
+                await db.execute(insert(Match).values(
+                    event_id=event_id,
+                    combat_type_id=1,
+                    category_id=1,
+                    weight_class_id=1,
+                    round=int(round + 1),
+                    start_datetime=datetime.datetime.utcnow(),
+                    end_datetime=datetime.datetime.utcnow() + datetime.timedelta(minutes=10),
+                    player_one=pair[0],
+                    player_two=pair[0],
+                    winner_id=pair[0]
+                ))
+            else:
+                await db.execute(insert(Match).values(
+                    event_id=event_id,
+                    combat_type_id=1,
+                    category_id=1,
+                    weight_class_id=1,
+                    round=int(round + 1),
+                    start_datetime=datetime.datetime.utcnow(),
+                    end_datetime=datetime.datetime.utcnow() + datetime.timedelta(minutes=10),
+                    player_one=pair[0],
+                    player_two=pair[1]
+                ))
+
+            await db.commit()
+
+    return {'Участники': winners, 'Пары для спаринга': combat_pairs}
+
+
+@router.get("/match-score/{event_id}")
+async def get_match_score(
+    event_id: int,
+    db: AsyncSession = Depends(get_db),
+    # current_user: UserDB = Depends(current_user)
+):
+    # query = await db.execute(select(Referee.user_id))
+    # all_referee_id = query.scalars().all()
+    # print(all_referee_id)
+    query = await db.execute(select(Score).where(Score.event_id == event_id))
+    matches = query.scalars().all()
+
+    return {'Матчи': matches}
+
+
+@router.post("/match-score/{match_id}/{referee_id}")
+async def update_match_score(
+    match_id: int,
+    referee_id: int,
+    score: MatchScore,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(select(Score).where(Score.match_id == match_id))
+    current_match = query.scalars().first()
+    query = await db.execute(select(Referee.user_id))
+    referees_id = query.scalars().all()
+    if current_user.id not in referees_id:
+        raise HTTPException(status_code=400, detail="Вы не являетесь судьей")
+
+    query = await db.execute(select(Referee.id).where(
+            Referee.user_id == current_user.id))
+    referee = query.scalars().first()
+
+    await db.execute(insert(Score).values(
+        event_id=current_match.event_id,
+        match_id=match_id,
+        player_one=current_match.player_one,
+        score_player_one=score.score_player_one,
+        player_two=current_match.player_two,
+        score_player_two=score.score_player_two,
+        referee_id=referee,
+        ))
+    await db.commit()
+
+    return {'Матч': match_id, 'Судья': referee_id}

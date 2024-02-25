@@ -38,6 +38,8 @@ class MatchRead(BaseModel):
     category_id: Optional[int]
     weight_class_id: Optional[int]
     round: Optional[int]
+    player_one: Optional[int]
+    player_two: Optional[int]
     winner_id: Optional[int]
 
     class Config:
@@ -50,6 +52,8 @@ class MatchCreate(MatchRead):
     category_id: Optional[int] = 1
     weight_class_id: Optional[int] = 1
     round: Optional[int] = 1
+    player_one: Optional[int] = 1
+    player_two: Optional[int] = 1
     winner_id: Optional[int] = 1
 
     class Config:
