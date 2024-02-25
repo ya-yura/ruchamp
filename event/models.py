@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Table
+from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Boolean
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
@@ -79,6 +79,15 @@ class Match(Base):
     results = relationship("MatchResult", backref="match", cascade="all, delete-orphan")
 
 
+# Судьи матча
+class MatchReferee(Base):
+    __tablename__ = "EventWeights"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
+    chief = Column(Boolean, default=False, nullable=False)
+
+
 # Период матча
 class MatchPeriod(Base):
     __tablename__ = "MatchPeriod"
@@ -95,12 +104,9 @@ class MatchCounter(Base):
     __tablename__ = "MatchCounter"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    player1 = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
-    player2 = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player1_score = Column(String, nullable=False)
     player2_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
-    referee = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
 
 
 # Результаты матча
@@ -110,6 +116,7 @@ class MatchResult(Base):
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     winner_score = Column(String, nullable=False)
     loser_score = Column(String, nullable=False)
+    referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
 
 
 # Приз
