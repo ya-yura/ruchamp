@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import JSON
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, Integer, ForeignKey, Float, Enum, DateTime, Date
+from sqlalchemy import Column, String, Integer, ForeignKey, Float, Enum, DateTime, Date, TIMESTAMP
 
 from auth.models import Base, EventOrganizer, User
 from event.models import Event
@@ -79,6 +79,9 @@ class Courses(Base):
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
     image_field = Column(String, nullable=True)
+    date_from = Column(DateTime, default=datetime.utcnow)
+    date_till = Column(DateTime, default=datetime.utcnow)
+    times = Column(Integer, nullable=True)
     uu_key = Column(String, nullable=True)
 
 
@@ -88,7 +91,7 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     items = relationship("OrderItem", back_populates="order")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
     status = Column(Enum("pending", "completed", "canceled", name="order_status"), nullable=False, default="pending")
 
 
