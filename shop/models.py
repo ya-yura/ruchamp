@@ -66,16 +66,6 @@ class Courses(Base):
     uu_key = Column(String, nullable=True)
 
 
-class OrderItem(Base):
-    __tablename__ = "OrderItem"
-    id = Column(Integer, primary_key=True)
-    order_id = Column(Integer, ForeignKey("Order.id"), nullable=False)
-    product_type = Column(String, nullable=False)  # Может быть "merch", "courses" или "ticket"
-    product_id = Column(Integer, nullable=False)
-    quantity = Column(Integer, nullable=False)
-    total_price = Column(Float, nullable=False)
-
-
 class Order(Base):
     __tablename__ = "Order"
     id = Column(Integer, primary_key=True)
@@ -85,6 +75,16 @@ class Order(Base):
     total_price = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     status = Column(Enum("pending", "completed", "canceled", name="order_status"), nullable=False, default="pending")
+
+
+class OrderItem(Base):
+    __tablename__ = "OrderItem"
+    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, ForeignKey("Order.id"), nullable=False)
+    product_type = Column(String, nullable=False)  # Может быть "merch", "courses" или "ticket"
+    product_id = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    total_price = Column(Float, nullable=False)
 
 
 class Transaction(Base):
