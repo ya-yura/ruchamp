@@ -70,9 +70,7 @@ class Order(Base):
     __tablename__ = "Order"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id), nullable=False)
     items = relationship("OrderItem", back_populates="order")
-    total_price = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     status = Column(Enum("pending", "completed", "canceled", name="order_status"), nullable=False, default="pending")
 
