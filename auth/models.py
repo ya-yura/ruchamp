@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, Table, DateTime
+from sqlalchemy import Column, String, Date, Float, Boolean, Integer, TIMESTAMP, ForeignKey, Table, DateTime
 from sqlalchemy import JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -21,6 +21,11 @@ athlete_coach_association = Table(
     Column('coach_id', Integer, ForeignKey('Coach.id'))
 )
 
+athlete_grade_association = Table(
+    'athlete_grade_association', Base.metadata,
+    Column('athlete_id', Integer, ForeignKey('Athlete.id')),
+    Column('grade_id', Integer, ForeignKey('CategoryType.id'))
+)
 
 
 # Роли пользователей (спортсмен, зритель, судья, организатор, сисадмин)
@@ -38,6 +43,20 @@ class CombatType(Base):
     name = Column(String, nullable=False)
 
     athletes = relationship("Athlete", secondary=athlete_combat_type_association, back_populates="combat_types")
+
+
+# категории судей
+class RefereeType(Base):
+    __tablename__ = "RefereeType"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+# категории тренеров
+class CoachType(Base):
+    __tablename__ = "CoachType"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
 
 
 # категории спортсмена (кмс, мс и пр)
@@ -59,8 +78,8 @@ class AllWeightClass(Base):
     __tablename__ = "AllWeightClass"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    min_weight = Column(String, nullable=False)
-    max_weight = Column(String, nullable=False)
+    min_weight = Column(Float, nullable=False)
+    max_weight = Column(Float, nullable=False)
 
 
 # тренер
@@ -73,9 +92,8 @@ class Coach(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(DateTime, nullable=True)
-    qualification_level = Column(String, nullable=False)
-# сделать таблицу квалификации тренеров
+    birthdate = Column(Date, nullable=True)
+    qualification_level = Column(Integer, ForeignKey(CoachType.id, ondelete="CASCADE"))
 
     athletes = relationship("Athlete", secondary=athlete_coach_association, back_populates="coaches")
 
@@ -94,7 +112,7 @@ class User(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(DateTime, nullable=True)
+    birthdate = Column(Date, nullable=True)
 
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -108,23 +126,22 @@ class Referee(Base):
     __tablename__ = "Referee"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    qualification_level = Column(String, nullable=False)
+    qualification_level = Column(Integer, ForeignKey(RefereeType.id, ondelete="CASCADE"))
     image_field = Column(String, nullable=True)
 
-# сделать таблицу квалификации судей
 
 # спортсмен
 class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    weight = Column(String, nullable=True)
-    height = Column(String, nullable=True)
+    weight = Column(Float, nullable=True)
+    height = Column(Integer, nullable=True)
     image_field = Column(String, nullable=True)
 
     combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
-#    grades = relationship("Grade", secondary=athlete_coach_association, back_populates="athletes")
+    grades = relationship("Grade", secondary=athlete_coach_association, back_populates="athletes")
 
 
 # организатор
@@ -161,7 +178,6 @@ class SystemAdministrator(Base):
 class SportCategory(Base):
     __tablename__ = "SportCategory"
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
     athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     category_type = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
@@ -171,7 +187,6 @@ class SportCategory(Base):
 class WeightCategory(Base):
     __tablename__ = "WeightCategory"
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
     athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_type = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))

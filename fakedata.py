@@ -23,6 +23,8 @@ from auth.models import (
     WeightCategory,
     Referee, 
     Coach, 
+    CoachType,
+    RefereeType,
     athlete_combat_type_association,
     athlete_coach_association,
 )
@@ -96,6 +98,33 @@ def generate_fake_combat_types(session):
     for combat_type_name in combat_types:
         combat_type = CombatType(name=combat_type_name)
         session.add(combat_type)
+    session.commit()
+
+
+def generate_fake_coach_types(session):
+    coach_types = [
+        "тренер",
+        "начинающий тренер",
+        "детский тренер",
+        "крутой тренер",
+    ]
+    for coach_type_name in coach_types:
+        coach_type = CoachType(name=coach_type_name)
+        session.add(coach_type)
+    session.commit()
+
+
+def generate_fake_referee_types(session):
+    referee_types = [
+        "Мировой судья",
+        "Районный судья",
+        "Федеральный судья",
+        "Арбитражный судья",
+        "Конституционный судья",
+    ]
+    for referee_type_name in referee_types:
+        referee_type = RefereeType(name=referee_type_name)
+        session.add(referee_type)
     session.commit()
 
 
@@ -211,6 +240,7 @@ def generate_fake_referees(session, num_referees=num_referees):
                 'Спортивный судья первой категории',
                 'Спортивный судья всероссийской категории'
                 ]),
+            'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
         }
         referees_data.append(referee_data)
 
@@ -669,6 +699,8 @@ def generate_fake_links(session, num_links=num_links):
 # generate_fake_category_types(session)
 # generate_fake_sport_types(session)
 # generate_fake_weight_classes(session)
+# generate_fake_referee_types
+# generate_fake_coach_types
 
 # generate_fake_users(session, num_users)
 # generate_fake_coaches(session)
@@ -686,7 +718,7 @@ def generate_fake_links(session, num_links=num_links):
 
 # generate_fake_events(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+# generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 

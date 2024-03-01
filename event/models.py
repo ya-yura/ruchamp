@@ -81,7 +81,7 @@ class Match(Base):
 
 # Судьи матча
 class MatchReferee(Base):
-    __tablename__ = "EventWeights"
+    __tablename__ = "MatchReferee"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
