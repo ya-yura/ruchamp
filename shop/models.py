@@ -90,7 +90,6 @@ class Order(Base):
     __tablename__ = "Order"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    items = relationship("OrderItem", back_populates="order")
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     status = Column(Enum("pending", "completed", "canceled", name="order_status"), nullable=False, default="pending")
 

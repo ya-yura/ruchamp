@@ -59,6 +59,7 @@ class Participant(Base):
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
     player_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
+    sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
 
 
 # Матч
@@ -68,15 +69,21 @@ class Match(Base):
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
     combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
     category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
+    sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
     player_one = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player_two = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
-    winner_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
-    periods = relationship("MatchPeriod", backref="match", cascade="all, delete-orphan")
-    results = relationship("MatchResult", backref="match", cascade="all, delete-orphan")
+
+
+# Победители матчей
+class MatchWinner(Base):
+    __tablename__ = "MatchWinner"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    winner = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
 
 
 # Судьи матча

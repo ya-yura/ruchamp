@@ -8,11 +8,10 @@ from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 Base: DeclarativeMeta = declarative_base()
 metadata = Base.metadata
 
-
-athlete_combat_type_association = Table(
-    'athlete_combat_type_association', Base.metadata,
+athlete_sport_type_association = Table(
+    'athlete_sport_type_association', Base.metadata,
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('combat_type_id', Integer, ForeignKey('CombatType.id'))
+    Column('sport_type_id', Integer, ForeignKey('SportType.id'))
 )
 
 athlete_coach_association = Table(
@@ -24,7 +23,7 @@ athlete_coach_association = Table(
 athlete_grade_association = Table(
     'athlete_grade_association', Base.metadata,
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
-    Column('grade_id', Integer, ForeignKey('CategoryType.id'))
+    Column('category_type_id', Integer, ForeignKey('CategoryType.id'))
 )
 
 
@@ -39,10 +38,8 @@ class Role(Base):
 # тип заполнения турнирной сетки
 class CombatType(Base):
     __tablename__ = "CombatType"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-
-    athletes = relationship("Athlete", secondary=athlete_combat_type_association, back_populates="combat_types")
 
 
 # категории судей
@@ -65,12 +62,16 @@ class CategoryType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
+    athletes = relationship('Athlete', secondary=athlete_grade_association, back_populates='grades')
+
 
 # Виды спорта, которые фигурируют в системе
 class SportType(Base):
     __tablename__ = "SportType"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+
+    athletes = relationship('Athlete', secondary=athlete_sport_type_association, back_populates='sport_types')
 
 
 # классы веса (супертяж, тяж и пр)
@@ -93,7 +94,7 @@ class Coach(Base):
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(Date, nullable=True)
-    qualification_level = Column(Integer, ForeignKey(CoachType.id, ondelete="CASCADE"))
+    qualification_level = Column(Integer, ForeignKey(CoachType.id, ondelete="CASCADE"), nullable=True)
 
     athletes = relationship("Athlete", secondary=athlete_coach_association, back_populates="coaches")
 
@@ -134,14 +135,14 @@ class Referee(Base):
 class Athlete(Base):
     __tablename__ = "Athlete"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"))
     weight = Column(Float, nullable=True)
     height = Column(Integer, nullable=True)
     image_field = Column(String, nullable=True)
 
-    combat_types = relationship("CombatType", secondary=athlete_combat_type_association, back_populates="athletes")
+    sport_types = relationship('SportType', secondary=athlete_sport_type_association, back_populates='athletes')
     coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
-    grades = relationship("Grade", secondary=athlete_coach_association, back_populates="athletes")
+    grades = relationship('CategoryType', secondary=athlete_grade_association, back_populates='athletes')
 
 
 # организатор
@@ -172,22 +173,3 @@ class SystemAdministrator(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
     image_field = Column(String, nullable=True)
-
-
-# Связка между спортсменом и его возможными спортивными категориями
-class SportCategory(Base):
-    __tablename__ = "SportCategory"
-    id = Column(Integer, primary_key=True)
-    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
-    category_type = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
-
-
-# Связка между спортсменом, и его возможными весовыми категориями
-class WeightCategory(Base):
-    __tablename__ = "WeightCategory"
-    id = Column(Integer, primary_key=True)
-    athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
-    weight_type = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
-

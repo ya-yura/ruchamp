@@ -9,6 +9,7 @@ from auth.models import Base as AuthBase
 from teams.models import Base as TeamBase
 from event.models import Base as EventBase
 from shop.models import Base as ShopBase
+
 from sqlalchemy import MetaData
 
 # this is the Alembic Config object, which provides
@@ -44,13 +45,17 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # target_metadata = Base.metadata
 
+
+
 ''' Тут склеиваем метадаты из моделей разных модулей. '''
+
 metadata = MetaData()
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=AuthBase.metadata.tables)
-metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=TeamBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=ShopBase.metadata.tables)
 target_metadata = metadata
+
 ''''''
 
 
@@ -62,7 +67,7 @@ target_metadata = metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-target_metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+# target_metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
 
 
 def run_migrations_offline() -> None:
@@ -105,8 +110,8 @@ def run_migrations_online() -> None:
     # Указываем тут явный порядок обработки моделей
     models_in_order = [
         AuthBase.metadata,
-        EventBase.metadata,
         TeamBase.metadata,
+        EventBase.metadata,
         ShopBase.metadata,
     ]
 

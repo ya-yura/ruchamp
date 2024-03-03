@@ -3,9 +3,12 @@ import random
 from faker import Faker
 from connection import SessionLocal
 
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, func, select
+from sqlalchemy.orm import sessionmaker, aliased
 from fastapi_users.db import SQLAlchemyUserDatabase
+
+from sqlalchemy.dialects.postgresql import INTERVAL
+from sqlalchemy.types import TypeDecorator
 
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from auth.models import (
@@ -17,15 +20,13 @@ from auth.models import (
     Role,
     CombatType,
     SportType,
-    SportCategory,
     CategoryType, 
     AllWeightClass,
-    WeightCategory,
     Referee, 
     Coach, 
     CoachType,
     RefereeType,
-    athlete_combat_type_association,
+    athlete_sport_type_association,
     athlete_coach_association,
 )
 from event.models import (
@@ -36,14 +37,19 @@ from event.models import (
     Prize, 
     Medal,
     MatchPeriod,
+    EventWeights,
+    EventSports,
 )
 from event.models import (
     Team,
     TeamMember,
 )
 
+
+
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
 
@@ -51,7 +57,7 @@ user_db = SQLAlchemyUserDatabase(User, SessionLocal())
 
 fake = Faker("ru_RU")
 
-num_users = 10_000
+num_users = 1_000
 
 num_referees = int(num_users * 0.05)
 num_coaches = int(num_users * 0.03)
@@ -64,7 +70,7 @@ num_teams = int(num_athletes * 0.5)
 num_team_members = 20
 team_size = 200
 
-num_events = int(num_teams * 2)
+num_events = int(num_teams * 3)
 num_participants = int(num_athletes * num_events / 10)
 num_matches = int(num_events * 3)
 num_results = int(num_events * num_matches)
@@ -157,11 +163,11 @@ def generate_fake_sport_types(session):
 
 def generate_fake_weight_classes(session):
     weight_classes = [
-        {'name': 'Сверхтяжёлый', 'min_weight': '100 kg', 'max_weight': '150 kg'},
-        {'name': 'Тяжёлый', 'min_weight': '90 kg', 'max_weight': '100 kg'},
-        {'name': 'Средний', 'min_weight': '75 kg', 'max_weight': '90 kg'},
-        {'name': 'Лёгкий', 'min_weight': '60 kg', 'max_weight': '75 kg'},
-        {'name': 'Легчайший', 'min_weight': '45 kg', 'max_weight': '60 kg'},
+        {'name': 'Сверхтяжёлый', 'min_weight': 100, 'max_weight': 150},
+        {'name': 'Тяжёлый', 'min_weight': 90, 'max_weight': 100},
+        {'name': 'Средний', 'min_weight': 75, 'max_weight': 90},
+        {'name': 'Лёгкий', 'min_weight': 60, 'max_weight': 75},
+        {'name': 'Легчайший', 'min_weight': 45, 'max_weight': 60},
     ]
     for weight_class_data in weight_classes:
         weight_class = AllWeightClass(**weight_class_data)
@@ -171,6 +177,7 @@ def generate_fake_weight_classes(session):
 
 def generate_fake_coaches(session, num_coaches=num_coaches):
     coaches_data = []
+
     for _ in range(num_coaches):
         coach_data = {
             'name': fake.first_name(),
@@ -179,7 +186,7 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
             'gender': fake.boolean(),
             'country': fake.country(),
             'birthdate': fake.date_of_birth(minimum_age=30, maximum_age=60),
-            'qualification_level': fake.random_element(elements=('Beginner', 'Intermediate', 'Advanced', 'Master')),
+            'qualification_level': fake.random_element(elements=[coach_type.id for coach_type in session.query(CoachType).all()]),
         }
         coaches_data.append(coach_data)
 
@@ -187,6 +194,7 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
         coach = Coach(**coach_data)
         session.add(coach)
     session.commit()
+
 
 
 def generate_fake_users(session, num_users=num_users):
@@ -201,15 +209,15 @@ def generate_fake_users(session, num_users=num_users):
             'name': fake.first_name(),
             'sirname': fake.last_name(),
             'fathername': fake.first_name_male() if fake.boolean(chance_of_getting_true=50) else fake.first_name_female(),
-            'gender': fake.boolean(),
+            'gender': fake.boolean(chance_of_getting_true=75),
             'country': fake.country(),
-            'birthdate': fake.date_of_birth(minimum_age=18, maximum_age=80),
+            'birthdate': fake.date_of_birth(minimum_age=12, maximum_age=80),
 
             'hashed_password': fake.password(length=12),
             'is_active': fake.boolean(),
             'is_superuser': fake.boolean(),
             'is_verified': fake.boolean(),
-            'verification_token': fake.uuid4() if fake.boolean(chance_of_getting_true=20) else None,
+            'verification_token': str(fake.uuid4()),
         }
         users_data.append(user_data)
 
@@ -233,13 +241,7 @@ def generate_fake_referees(session, num_referees=num_referees):
     for user in referee_users:
         referee_data = {
             'user_id': user.id,
-            'qualification_level': fake.random_element(elements=[
-                'Юный спортивный судья',
-                'Спортивный судья третьей категории',
-                'Спортивный судья второй категории',
-                'Спортивный судья первой категории',
-                'Спортивный судья всероссийской категории'
-                ]),
+            'qualification_level': fake.random_element(elements=[coach_type.id for coach_type in session.query(RefereeType).all()]),
             'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
         }
         referees_data.append(referee_data)
@@ -266,7 +268,22 @@ def generate_fake_athletes(session, num_athletes=num_athletes):
             'user_id': user.id,
             'weight': fake.random_int(min=30, max=180),
             'height': fake.random_int(min=120, max=200),
-            'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=20) else None,
+            'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
+            'sport_types': fake.random_elements(
+                elements=session.query(SportType).all(),
+                length=fake.random_int(min=1, max=4),
+                unique=True
+            ),
+            'coaches': fake.random_elements(
+                elements=session.query(Coach).all(),
+                length=fake.random_int(min=1, max=4),
+                unique=True
+            ),
+            'grades': fake.random_elements(
+                elements=session.query(CategoryType).all(),
+                length=fake.random_int(min=1, max=3),
+                unique=True
+            ),
         }
         athletes_data.append(athlete_data)
 
@@ -285,57 +302,57 @@ def generate_fake_athletes(session, num_athletes=num_athletes):
     session.commit()
 
 
-# Генерация данных для спортивных категорий спортсменов
-def generate_fake_sport_categories(session, num_sport_categories=num_sport_categories):
-    sport_categories_data = []
-    athletes = session.query(Athlete).all()
-    sport_types = session.query(SportType).all()
-    category_types = session.query(CategoryType).all()
+# # Генерация данных для спортивных категорий спортсменов
+# def generate_fake_sport_categories(session, num_sport_categories=num_sport_categories):
+#     sport_categories_data = []
+#     athletes = session.query(Athlete).all()
+#     sport_types = session.query(SportType).all()
+#     category_types = session.query(CategoryType).all()
 
-    athlete_ids = [athlete.id for athlete in athletes]
-    sport_type_ids = [sport_type.id for sport_type in sport_types]
-    category_type_ids = [category_type.id for category_type in category_types]
+#     athlete_ids = [athlete.id for athlete in athletes]
+#     sport_type_ids = [sport_type.id for sport_type in sport_types]
+#     category_type_ids = [category_type.id for category_type in category_types]
 
-    for _ in range(num_sport_categories):
-        sport_category_data = {
-            'id': fake.random_int(min=1), 
-            'name': fake.word(), 
-            'athlete': fake.random_element(elements=athlete_ids),
-            'sport_type': fake.random_element(elements=sport_type_ids),
-            'category_type': fake.random_element(elements=category_type_ids),
-        }
-        sport_categories_data.append(sport_category_data)
+#     for _ in range(num_sport_categories):
+#         sport_category_data = {
+#             'id': fake.random_int(min=1), 
+#             'name': fake.word(), 
+#             'athlete': fake.random_element(elements=athlete_ids),
+#             'sport_type': fake.random_element(elements=sport_type_ids),
+#             'category_type': fake.random_element(elements=category_type_ids),
+#         }
+#         sport_categories_data.append(sport_category_data)
 
-    for sport_category_data in sport_categories_data:
-        sport_category = SportCategory(**sport_category_data)
-        session.add(sport_category)
-    session.commit()
+#     for sport_category_data in sport_categories_data:
+#         sport_category = SportCategory(**sport_category_data)
+#         session.add(sport_category)
+#     session.commit()
 
 
-# Генерация данных для весовых категорий спортсменов
-def generate_fake_weight_categories(session, num_weight_categories=num_weight_categories):
-    weight_categories_data = []
-    athletes = session.query(Athlete).all()
-    sport_types = session.query(SportType).all()
-    weight_classes = session.query(AllWeightClass).all()
+# # Генерация данных для весовых категорий спортсменов
+# def generate_fake_weight_categories(session, num_weight_categories=num_weight_categories):
+#     weight_categories_data = []
+#     athletes = session.query(Athlete).all()
+#     sport_types = session.query(SportType).all()
+#     weight_classes = session.query(AllWeightClass).all()
 
-    athlete_ids = [athlete.id for athlete in athletes]
-    sport_type_ids = [sport_type.id for sport_type in sport_types]
-    weight_class_ids = [weight_class.id for weight_class in weight_classes]
+#     athlete_ids = [athlete.id for athlete in athletes]
+#     sport_type_ids = [sport_type.id for sport_type in sport_types]
+#     weight_class_ids = [weight_class.id for weight_class in weight_classes]
 
-    for _ in range(num_weight_categories):
-        weight_category_data = {
-            'name': fake.word(), 
-            'athlete': fake.random_element(elements=athlete_ids),
-            'sport_type': fake.random_element(elements=sport_type_ids),
-            'weight_type': fake.random_element(elements=weight_class_ids),
-        }
-        weight_categories_data.append(weight_category_data)
+#     for _ in range(num_weight_categories):
+#         weight_category_data = {
+#             'name': fake.word(), 
+#             'athlete': fake.random_element(elements=athlete_ids),
+#             'sport_type': fake.random_element(elements=sport_type_ids),
+#             'weight_type': fake.random_element(elements=weight_class_ids),
+#         }
+#         weight_categories_data.append(weight_category_data)
 
-    for weight_category_data in weight_categories_data:
-        weight_category = WeightCategory(**weight_category_data)
-        session.add(weight_category)
-    session.commit()
+#     for weight_category_data in weight_categories_data:
+#         weight_category = WeightCategory(**weight_category_data)
+#         session.add(weight_category)
+#     session.commit()
 
 
 # Генерация данных для организаторов
@@ -418,26 +435,29 @@ def generate_fake_system_administrators(session, num_administrators=num_administ
 
 # Генерация данных для команд
 def generate_fake_teams(session, num_teams=num_teams):
-    teams_data = []
     athletes = session.query(Athlete).all()
-
-    athlete_ids = [athlete.id for athlete in athletes]
 
     for _ in range(num_teams):
         team_data = {
-            'captain': fake.random_element(elements=athlete_ids),
             'name': fake.company(),
-            'invite_link': fake.uuid4(),
+            'invite_link': str(fake.uuid4()),
             'description': fake.sentence(),
             'slug': fake.slug(),
             'image_field': fake.image_url(),
         }
-        teams_data.append(team_data)
 
-    for team_data in teams_data:
+        captain = fake.random_element(elements=athletes)
+
+        # Создаем команду
         team = Team(**team_data)
+        team.captain = captain.id
         session.add(team)
-    session.commit()
+        session.commit()
+
+        # Добавим капитана в таблицу TeamMember как члена команды
+        team_member = TeamMember(team=team.id, member=captain.id)
+        session.add(team_member)
+        session.commit()
 
 
 # Генерация данных для участников команд
@@ -482,6 +502,7 @@ def generate_fake_events(session, num_events=num_events):
             'event_order': fake.text(),
             'event_system': fake.word(),
             'geo': str(fake.latitude()) + ',' + str(fake.longitude()),
+            'image_field': fake.image_url(),
         }
         events_data.append(event_data)
 
@@ -491,87 +512,113 @@ def generate_fake_events(session, num_events=num_events):
     session.commit()
 
 
-# Генерация данных для участников спортивных событий
-def generate_fake_participants(session, num_participants=20):
-    participants_data = []
+def generate_event_weights_and_sports(event_id):
+    # Генерация случайного количества связей с таблицей EventWeights
+    for _ in range(random.randint(1, 5)):
+        weight_type = session.query(AllWeightClass).order_by(func.random()).first()
+        event_weight = EventWeights(
+            event_id=event_id,
+            weight_id=weight_type.id,
+        )
+        session.add(event_weight)
+        session.commit()
 
+    # Генерация случайного количества связей с таблицей EventSports
+    for _ in range(random.randint(1, 3)):
+        sport_type = session.query(SportType).order_by(func.random()).first()
+        event_sport = EventSports(
+            event_id=event_id,
+            sport_id=sport_type.id,
+        )
+        session.add(event_sport)
+        session.commit()
+
+
+# Привязки к возможным типам спортивного события
+def generate_event_w_s_for_each(session):
     events = session.query(Event).all()
-    teams = session.query(Team).all()
+    for event in events:
+        generate_event_weights_and_sports(event.id)
 
-    if not events or not teams:
-        print("Нет данных о мероприятиях или командах.")
-        return
 
-    for _ in range(num_participants):
-        event = random.choice(events)
+# Генерация данных для участников спортивных событий
+def generate_fake_participants(session):
+    events = session.query(Event).all()
 
-        num_teams = random.randint(1, len(teams))
-        selected_teams = random.sample(teams, num_teams)
+    for event in events:
+        # Получим случайное количество участников (от 1 до 20) для каждого события
+        num_participants = random.randint(1, 20)
 
-        for team in selected_teams:
-            team_members = session.query(TeamMember).filter_by(team=team.id).all()
+        for _ in range(num_participants):
+            team_member = session.query(TeamMember).order_by(func.random()).first()
 
-            if not team_members:
-                print(f"В команде {team.name} нет участников.")
-                continue
+            event_participant = Participant(event_id=event.id, player_id=team_member.id)
+            session.add(event_participant)
 
-            num_participants_in_team = random.randint(1, len(team_members))
-            selected_team_members = random.sample(team_members, num_participants_in_team)
-
-            for team_member in selected_team_members:
-                participant_data = {
-                    'event_id': event.id,
-                    'player_id': team_member.id,
-                }
-                participants_data.append(participant_data)
-
-    for participant_data in participants_data:
-        participant = Participant(**participant_data)
-        session.add(participant)
     session.commit()
 
 
-
 # Генерация данных для матчей
-def generate_fake_matches(session, num_matches=num_matches):
-    matches_data = []
+def generate_fake_matches(session):
     events = session.query(Event).all()
-    participants = session.query(Participant).all()
-    teams = session.query(Team).all()
-    weight_classes = session.query(AllWeightClass).all()
-    sport_types = session.query(SportType).all()
-    category_types = session.query(CategoryType).all()
 
-    event_ids = [event.id for event in events]
-    participant_team_ids = [participant.team_id for participant in participants]
-    unique_team_ids = list(set(participant_team_ids))
-    sport_type_ids = [sport_type.id for sport_type in sport_types]
-    weight_class_ids = [weight_class.id for weight_class in weight_classes]
-    category_type_ids = [category_type.id for category_type in category_types]
+    for event in events:
+        # Получим случайное количество матчей (от 1 до 10) для каждого мероприятия
+        num_matches = random.randint(1, 10)
 
-    # Убеждаемся, что существует достаточно команд для проведения матчей
-    if len(unique_team_ids) < 2 * num_matches:
-        raise ValueError("Не хватает команд.")
+        for _ in range(num_matches):
+            combat_type = session.query(CombatType).order_by(func.random()).first()
+            category = session.query(CategoryType).order_by(func.random()).first()
+            sport = session.query(SportType).order_by(func.random()).first()
+            weight_class = session.query(AllWeightClass).order_by(func.random()).first()
+            round_number = random.randint(1, 5)
+            start_datetime = fake.date_time_this_year(before_now=True, after_now=False, tzinfo=None)
+            end_datetime = start_datetime + datetime.timedelta(hours=2)
 
-    for _ in range(num_matches):
-        match_data = {
-            'event_id': fake.random_element(elements=event_ids),
-            'round': fake.random_int(min=1, max=5),
-            'sport_type_id': fake.random_element(elements=sport_type_ids),
-            'category_id': fake.random_element(elements=category_type_ids),
-            'weight_class_id': fake.random_element(elements=weight_class_ids),
-            'start_datetime': fake.date_time_between(start_date="-30d", end_date="+30d"),
-            'end_datetime': fake.date_time_between(start_date="+1h", end_date="+4h"),
-            'player_one': fake.random_element(elements=unique_team_ids),
-            'player_two': fake.random_element(elements=[team for team in unique_team_ids if team != match_data['player_one']]),
-            # Выбираем победителя случайным образом из команд, участвующих в матче
-            'winner_id': fake.random_element(elements=[match_data['player_one'], match_data['player_two']]),
-        }
-        matches_data.append(match_data)
+            match = Match(
+                event_id=event.id,
+                combat_type_id=combat_type.id,
+                category_id=category.id,
+                sport_id=sport.id,
+                weight_class_id=weight_class.id,
+                round=round_number,
+                start_datetime=start_datetime,
+                end_datetime=end_datetime,
+                player_one = (
+                    session.query(Participant)
+                    .order_by(func.random())
+                    .first()
+                ),
+                player_two = (
+                    session.query(Participant)
+                    .order_by(func.random())
+                    .first()
+                )
+            )
+            session.add(match)
 
-    for match_data in matches_data:
-        match = Match(**match_data)
-        session.add(match)
+    session.commit()
+
+
+# Генерация данных для судей матча
+def generate_fake_match_referees(session):
+    matches = session.query(Match).all()
+
+    for match in matches:
+        # Получим случайное количество судей (от 1 до 3) для каждого матча
+        num_referees = random.randint(1, 3)
+
+        for _ in range(num_referees):
+            # Получим случайного судью (Referee) для текущего матча
+            referee = session.query(Referee).order_by(func.random()).first()
+
+            # Определим, является ли судья главным судьей (50% вероятность)
+            is_chief = random.choice([True, False])
+
+            # Создадим запись о судье для текущего матча
+            match_referee = MatchReferee(match_id=match.id, referee_id=referee.id, chief=is_chief)
+            session.add(match_referee)
+
     session.commit()
 
 
@@ -661,46 +708,14 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# Генерация данных для медалей
-def generate_fake_links(session, num_links=num_links):
-    athletes = session.query(Athlete).all()
-    combat_types = session.query(Athlete).all()
-    coaches = session.query(Athlete).all()
-    athlete_ids = [athlete.id for athlete in athletes]
-    combat_type_ids = [combat_type.id for combat_type in combat_types]
-    coach_ids = [coach.id for coach in coaches]
-
-    for _ in range(num_links): 
-        athlete_id = fake.random_element(elements=athlete_ids)
-        combat_type_id = fake.random_element(elements=combat_type_ids)
-
-        session.execute(athlete_combat_type_association.insert().values(
-            athlete_id=athlete_id,
-            combat_type_id=combat_type_id
-        ))
-
-
-    for _ in range(num_links):
-        athlete_id = fake.random_element(elements=athlete_ids)
-        coach_id = fake.random_element(elements=coach_ids)
-
-        session.execute(athlete_coach_association.insert().values(
-            athlete_id=athlete_id,
-            coach_id=coach_id
-        ))
-
-    # Завершите сессию
-    session.commit()
-
-
 # generate_fake_roles(session)
 
 # generate_fake_combat_types(session)
 # generate_fake_category_types(session)
 # generate_fake_sport_types(session)
 # generate_fake_weight_classes(session)
-# generate_fake_referee_types
-# generate_fake_coach_types
+# generate_fake_referee_types(session)
+# generate_fake_coach_types(session)
 
 # generate_fake_users(session, num_users)
 # generate_fake_coaches(session)
@@ -710,15 +725,13 @@ def generate_fake_links(session, num_links=num_links):
 # generate_fake_spectators(session)
 # generate_fake_system_administrators(session)
 
-# generate_fake_sport_categories(session)
-# generate_fake_weight_categories(session)
-
 # generate_fake_teams(session)
 # generate_fake_team_member(session)
 
 # generate_fake_events(session)
+# generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
-# generate_fake_matches(session)
+generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
