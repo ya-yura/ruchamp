@@ -11,6 +11,8 @@ from event.shemas import EventCreate, MatchRead, MatchCreate, EventUpdate
 from auth.schemas import UserDB
 from auth.routes import current_user
 from geo.geo import get_geo
+from teams.models import Team, TeamMember
+from shop.models import Ticket
 
 
 router = APIRouter(prefix="/event", tags=["Events"])
@@ -32,7 +34,7 @@ async def get_events_id(
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Event).where(Event.event_id == event_id))
+    query = await db.execute(select(Event).where(Event.id == event_id))
     event = query.scalars().one_or_none()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -52,8 +54,6 @@ async def create_event(
     query_admin = await db.execute(select(SystemAdministrator.user_id))
     all_admin_id = query_admin.scalars().all()
     all_organizer_id.extend(all_admin_id)
-    print(all_organizer_id)
-    print(current_user.id)
 
     try:
         if current_user.id in all_organizer_id:

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, Table, DateTime
+from sqlalchemy import Column, String, Boolean, Integer, TIMESTAMP, ForeignKey, Table, Date
 from sqlalchemy import JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -20,7 +20,6 @@ athlete_coach_association = Table(
     Column('athlete_id', Integer, ForeignKey('Athlete.id')),
     Column('coach_id', Integer, ForeignKey('Coach.id'))
 )
-
 
 
 # Роли пользователей (спортсмен, зритель, судья, организатор, сисадмин)
@@ -73,7 +72,7 @@ class Coach(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(DateTime, nullable=True)
+    birthdate = Column(Date, nullable=True)
     qualification_level = Column(String, nullable=False)
 # сделать таблицу квалификации тренеров
 
@@ -94,7 +93,7 @@ class User(Base):
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
-    birthdate = Column(DateTime, nullable=True)
+    birthdate = Column(Date, nullable=True)
 
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -112,6 +111,7 @@ class Referee(Base):
     image_field = Column(String, nullable=True)
 
 # сделать таблицу квалификации судей
+
 
 # спортсмен
 class Athlete(Base):
@@ -175,4 +175,3 @@ class WeightCategory(Base):
     athlete = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     sport_type = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_type = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
-

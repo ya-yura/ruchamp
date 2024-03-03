@@ -18,20 +18,20 @@ from auth.models import (
     CombatType,
     SportType,
     SportCategory,
-    CategoryType, 
+    CategoryType,
     AllWeightClass,
     WeightCategory,
-    Referee, 
-    Coach, 
+    Referee,
+    Coach,
     athlete_combat_type_association,
     athlete_coach_association,
 )
 from event.models import (
-    Event, 
-    Participant, 
+    Event,
+    Participant,
     Match,
-    MatchResult, 
-    Prize, 
+    MatchResult,
+    Prize,
     Medal,
     MatchPeriod,
 )
@@ -686,11 +686,10 @@ def generate_fake_links(session, num_links=num_links):
 
 # generate_fake_events(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+# generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
 # generate_fake_prizes(session)
 # generate_fake_medals(session)
 # generate_fake_links(session)
-

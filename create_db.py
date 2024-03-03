@@ -6,12 +6,12 @@ from sqlalchemy import create_engine
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 
 # Сначала комментим остальные модели, кроме этой и выполняем этот скрипт
-from auth.models import (
+'''from auth.models import (
     Base,
     Role,
     User,
-    Referee, 
-    Coach, 
+    Referee,
+    Coach,
     Athlete,
     EventOrganizer,
     Spectator,
@@ -36,14 +36,17 @@ from teams.models import (
 # и наконец тут так же. Этот блок таблиц создаём в последнюю очередь
 from event.models import (
     Base,
-    Event, 
-    Participant, 
+    Event,
+    Participant,
     Match,
     MatchPeriod,
-    MatchResult, 
-    Prize, 
+    MatchResult,
+    Prize,
     Medal,
-)
+)'''
+
+from shop.models import (Base, Order, OrderItem, Sector, Row, Place, Ticket,
+                         Merch, Courses, Transaction, Engagement)
 
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")

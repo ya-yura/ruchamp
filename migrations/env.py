@@ -29,12 +29,12 @@ if config.config_file_name is not None:
 
 
 # ''' Тут создаём таблицы. Вообще все. '''
-# engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
-# AuthBase.metadata.create_all(bind=engine)
-# EventBase.metadata.create_all(bind=engine)
+AuthBase.metadata.create_all(bind=engine)
+EventBase.metadata.create_all(bind=engine)
 
-# engine.dispose()
+engine.dispose()
 # ''''''
 
 
@@ -123,6 +123,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
-
-
-

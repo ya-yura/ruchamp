@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Boolean
+from sqlalchemy import (DateTime, Column, String, Integer, TIMESTAMP,
+                        ForeignKey, Boolean)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
@@ -38,11 +39,11 @@ class Event(Base):
 
 
 # Весовые категории события
-class EventWeights(Base):
+'''class EventWeights(Base):
     __tablename__ = "EventWeights"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    weight_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
+    weight_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))'''
 
 
 # Виды спорта в событии
