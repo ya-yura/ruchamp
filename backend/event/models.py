@@ -37,20 +37,21 @@ class Event(Base):
     image_field = Column(String, nullable=True)
 
 
-# Весовые категории события
-class EventWeights(Base):
-    __tablename__ = "EventWeights"
-    id = Column(Integer, primary_key=True)
-    event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    weight_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
-
-
 # Виды спорта в событии
 class EventSports(Base):
     __tablename__ = "EventSports"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
     sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+
+
+# Весовые категории каждого спорта события
+class EventWeights(Base):
+    __tablename__ = "EventWeights"
+    id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
+    weight_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
+    sport_set_id = Column(Integer, ForeignKey(EventSports.id, ondelete="CASCADE"))
 
 
 # Участник спортивного события
