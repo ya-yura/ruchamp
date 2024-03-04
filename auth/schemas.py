@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel
 from fastapi_users import schemas
+from datetime import date
+from pydantic import BaseModel
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -13,7 +14,7 @@ class UserRead(schemas.BaseUser[int]):
     fathername: str
     gender: bool
     country: str
-    birthdate: str
+    birthdate: date
     role_id: int
     is_active: bool = True
     is_superuser: bool = False
@@ -26,12 +27,12 @@ class UserRead(schemas.BaseUser[int]):
 class UserCreate(schemas.BaseUserCreate):
     username: str
     email: str
-    name: str
-    sirname: str
-    fathername: str
-    gender: bool
-    country: str
-    birthdate: str
+    name: Optional[str] = None
+    sirname: Optional[str] = None
+    fathername: Optional[str] = None
+    gender: Optional[bool] = True
+    country: Optional[str] = None
+    birthdate: Optional[date] = None
     password: str
     role_id: int
     is_active: Optional[bool] = True
@@ -64,8 +65,6 @@ class AthleteUpdate(BaseModel):
     image_field: Optional[str]
     combat_types: Optional[List[str]]
     coaches: Optional[List[str]]
-# Тренеры и типы используют List[str], им надо передавать списки строк,
-# представляющих имена видов борьбы и тренеров соответственно.
     
 
 class SpectatorUpdate(BaseModel):
