@@ -123,6 +123,7 @@ class MatchResult(Base):
     __tablename__ = "MatchResult"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    winner_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     winner_score = Column(String, nullable=False)
     loser_score = Column(String, nullable=False)
     referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
