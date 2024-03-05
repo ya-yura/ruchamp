@@ -13,14 +13,14 @@ class UserRead(schemas.BaseUser[int]):
     fathername: str
     gender: bool
     country: str
-    birthdate: str
+    birthdate: datetime
     role_id: int
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -31,7 +31,7 @@ class UserCreate(schemas.BaseUserCreate):
     fathername: str
     gender: bool
     country: str
-    birthdate: str
+    birthdate: datetime
     password: str
     role_id: int
     is_active: Optional[bool] = True
@@ -53,7 +53,7 @@ class UserDB(User, schemas.BaseUser):
     verification_token: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AthleteUpdate(BaseModel):

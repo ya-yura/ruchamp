@@ -171,6 +171,7 @@ async def create_team(
 
     # Создаем команду
     team_id = await create_team_and_members(db, team_data, current_user)
+    
 
     return {"message": "Team created successfully", "team_id": team_id}
 

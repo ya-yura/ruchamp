@@ -106,7 +106,7 @@ async def update_event(
     return {f"Event ID - {event_id} updated"}
 
 
-@router.post("/delete/{event_id}")
+@router.delete("/delete/{event_id}")
 async def delete_event(
     event_id: int,
     db: AsyncSession = Depends(get_db),
@@ -148,23 +148,6 @@ async def get_matches_id(
         raise HTTPException(status_code=404, detail="Match not found")
     return match
 
-
-@router.post("/matches/create")
-async def create_match(
-    match_data: MatchCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserDB = Depends(current_user)
-):
-
-    query_org = await db.execute(select(EventOrganizer.user_id))
-    all_organizer_id = query_org.scalars().all()
-    if current_user.id not in all_organizer_id:
-        raise HTTPException(status_code=400, detail="You are not an organizer")
-
-    match = Match(**match_data.dict())
-    db.add(match)
-    await db.commit()
-    return {f"Match ID - {match.match_id} created"}
 
 
 @router.put("/matches/update/{match_id}")

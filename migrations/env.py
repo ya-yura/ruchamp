@@ -9,6 +9,7 @@ from auth.models import Base as AuthBase
 from teams.models import Base as TeamBase
 from event.models import Base as EventBase
 from shop.models import Base as ShopBase
+from match.models import Base as MatchBase
 
 from sqlalchemy import MetaData
 
@@ -29,15 +30,16 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-# ''' Тут создаём таблицы. Вообще все. '''
-# engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+''' Тут создаём таблицы. Вообще все. '''
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
-# AuthBase.metadata.create_all(bind=engine)
-# TeamBase.metadata.create_all(bind=engine)
-# EventBase.metadata.create_all(bind=engine)
-# ShopBase.metadata.create_all(bind=engine)
+AuthBase.metadata.create_all(bind=engine)
+TeamBase.metadata.create_all(bind=engine)
+EventBase.metadata.create_all(bind=engine)
+ShopBase.metadata.create_all(bind=engine)
+MatchBase.metadata.create_all(bind=engine)
 
-# engine.dispose()
+engine.dispose()
 # ''''''
 
 
@@ -54,6 +56,7 @@ metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=TeamBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=EventBase.metadata.tables)
 metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=ShopBase.metadata.tables)
+metadata.reflect(bind=create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"), only=MatchBase.metadata.tables)
 target_metadata = metadata
 
 ''''''

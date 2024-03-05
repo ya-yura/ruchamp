@@ -731,7 +731,7 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+# generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
