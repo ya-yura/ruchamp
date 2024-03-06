@@ -95,7 +95,7 @@ class MatchReferee(Base):
     chief = Column(Boolean, default=False, nullable=False)
 
 
-# Период матча
+'''# Период матча
 class MatchPeriod(Base):
     __tablename__ = "MatchPeriod"
     id = Column(Integer, primary_key=True)
@@ -103,7 +103,7 @@ class MatchPeriod(Base):
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
     winner_score = Column(String, nullable=False)
-    loser_score = Column(String, nullable=False)
+    loser_score = Column(String, nullable=False)'''
 
 
 # Таблица счёта
@@ -111,7 +111,9 @@ class MatchCounter(Base):
     __tablename__ = "MatchCounter"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    player_one = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player1_score = Column(String, nullable=False)
+    player_two = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player2_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
     referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
@@ -122,6 +124,7 @@ class MatchResult(Base):
     __tablename__ = "MatchResult"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    winner_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     winner_score = Column(String, nullable=False)
     loser_score = Column(String, nullable=False)
     referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))
