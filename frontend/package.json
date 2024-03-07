@@ -12,10 +12,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fluentui/react-components": "^9.46.7",
+    "fluentui-next-appdir-directive": "^0.1.5",
     "million": "^3.0.5",
     "next": "14.1.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sass": "^1.71.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
