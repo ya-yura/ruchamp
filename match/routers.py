@@ -90,7 +90,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
     await db.execute(delete(TempDrawParticipants))
     await db.commit()
     
-    # добавить сортировки и вставки в табоицыпо раундам
+    # добавить сортировки и вставки в табоицы по раундам
     if round == 1:
         query = await db.execute(select(Participant.player_id).where(
             Participant.event_id == event_id))
@@ -130,13 +130,13 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
             query = await db.execute(select(Athlete.weight).where(
                 Athlete.id == member))
             weight = query.scalars().one()
-            
+            # записываем весовую категорию
             for item in weight_classes:
                 if float(item.min_weight) <= weight <= float(item.max_weight):
                     await db.execute(update(TempDrawParticipants).where(
                         TempDrawParticipants.athlete_id == member).values(
                             weight_category=int(item.id)))
-            
+            # узнаем возраст атлета
             query = await db.execute(select(Athlete.user_id).where(
                 Athlete.id == member))
             user_id = query.scalars().one()
@@ -147,13 +147,13 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
 
             user_year = user_year.year
             age_player = datetime.datetime.now().year - user_year
-            
+            # записываем возрастную категорию
             for item in age_classes:
                 if int(item.min_age) <= age_player <= int(item.max_age):
                     await db.execute(update(TempDrawParticipants).where(
                         TempDrawParticipants.athlete_id == member).values(
                             age_category=int(item.id)))
-
+            # пол атлета
             query = await db.execute(select(User.gender).where(
                 User.id == user_id))
             user_gender = query.scalars().one()
@@ -164,7 +164,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
 
     await db.commit()
 
-    #
+    # пареаметры для сортировки
     query = await db.execute(select(AgeCategory))
     age = query.scalars().all()
     ages = len(age)
@@ -176,7 +176,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
     genders = len(gender)
     
     all_pairs = {}
-    
+    # сохраняем в словарь все совпадения по параметрам сортировки
     for gender in range(genders):
         for weight in range(1, weights + 1):
             for age in range(1, ages + 1):
@@ -236,10 +236,14 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
                 ))
             await db.commit()
     
-    query = await db.execute(select(Match.id, Match.player_one, Match.player_two, Match.start_datetime))
+    query = await db.execute(select(
+        Match.id,
+        Match.player_one,
+        Match.player_two,
+        Match.start_datetime).where(Match.round==round))
     matches = query.mappings().all()
     for match in matches:
-        if match.player_two == 999:
+        if match.player_two == 999:  # зарезервировать определенный ID атлета для определения победителя
             await db.execute(insert(MatchResult).values(
                 match_id=match.id,
                 winner_id=match.player_one,
