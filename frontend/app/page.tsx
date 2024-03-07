@@ -5,18 +5,18 @@ import { Text, Display, Title2 } from '@fluentui/react-components';
 export default function Home() {
   return (
     // <main className="flex min-h-screen flex-col items-center justify-start p-24">
-    <main className="">
+    <main className="min-h-screen">
       <section className="w-full h-[800px] relative">
         <Image
-          className="pos"
+          className=""
           src="/fighter-and-ring.avif"
           alt="Боец выходит на ринг"
           fill={true}
-          objectFit="cover"
+          style={{ objectFit: 'cover' }}
         />
         <div className="absolute top-0 px-9 bg-black/20 w-full h-full flex flex-col justify-center">
-          <div className='w-2/5 flex flex-col'>
-            <Display as="h1">РуЧамп</Display>
+          <div className="w-2/5 flex flex-col">
+            <Display as="h1" id='123'>РуЧамп</Display>
             <Text as="p" size={600} weight="semibold">
               Онлайн-платформа для организации, регистрации и участия в
               соревнованиях и мероприятиях в сфере боевых искусств.

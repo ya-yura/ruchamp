@@ -5,6 +5,7 @@ import '@/app/ui/global.css';
 // import of Fluent UI React v9 provider
 import { Providers } from './providers';
 import { Header } from './ui/header/header';
+import { Footer } from './ui/footer/footer';
 
 export const metadata: Metadata = {
   title: 'РуЧамп',
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

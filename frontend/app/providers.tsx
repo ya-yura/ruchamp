@@ -4,7 +4,7 @@ import * as React from 'react';
 import {
   FluentProvider,
   IdPrefixProvider,
-  webLightTheme,
+//   webLightTheme,
   SSRProvider,
   RendererProvider,
   createDOMRenderer,
