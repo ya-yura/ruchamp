@@ -1,4 +1,4 @@
-import million from 'million/compiler';
+// import million from 'million/compiler'; //It has some promlems with SSR
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -11,8 +11,9 @@ const nextConfig = {
   },
 };
 
-const millionConfig = {
-  auto: false, // unfortunately, it looks like million.js does not work with Fluent at least in automode
-};
+// const millionConfig = {
+//   auto: false, // unfortunately, it looks like million.js does not work with Fluent at least in automode
+// };
 
-export default million.next(nextConfig, millionConfig);
+// export default million.next(nextConfig, millionConfig);
+export default nextConfig;
