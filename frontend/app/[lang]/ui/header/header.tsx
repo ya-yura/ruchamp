@@ -1,7 +1,11 @@
 import Image from 'next/image';
 import { AuthButton, MenuItemLinkNavigation } from './buttons';
 import Link from 'next/link';
-import { TypeLinksDropdown } from '@/app/lib/definitions';
+import { TypeLinksDropdown } from '@/lib/definitions';
+import { Locale } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
+import { CustomLink } from '@/app/[lang]/ui/custom-link';
+import { LanguageSwitcher } from './lang-switcher';
 
 const aboutDropdown: TypeLinksDropdown[] = [
   {
@@ -29,45 +33,56 @@ const comunityDropdown: TypeLinksDropdown[] = [
   },
 ];
 
-export function Header() {
+export async function Header({ lang }: { lang: Locale }) {
+  const { header } = await getDictionary(lang);
+
   return (
     <header className="w-full h-14 px-4 bg-black flex flex-row items-center justify-between sticky top-0 left-0 z-10">
-      <Link href="/">
+      <CustomLink href={`/`} lang={lang}>
         <Image
-          src="/logo.svg"
+          src="/ru/logo.svg"
           alt="Логотип РуЧамп"
           // className="dark:invert"
           width={100}
           height={24}
-          priority
+          // priority
         />
-      </Link>
+      </CustomLink>
 
-      <nav className="flex items-center justify-center">
+      <nav className="flex items-center justify-center ml-auto mr-7">
         <ul className="flex flex-row items-center justify-start gap-2">
           <li>
-            <MenuItemLinkNavigation title="События" url="/events" />
+            <MenuItemLinkNavigation
+              lang={lang}
+              title={header.navigation.events}
+              url={`/events`}
+            />
           </li>
           <li>
             <MenuItemLinkNavigation
-              title="О нас"
+              lang={lang}
+              title={header.navigation.about}
               dropDownLinks={aboutDropdown}
             />
           </li>
           <li>
             <MenuItemLinkNavigation
-              title="Сообщество"
+              lang={lang}
+              title={header.navigation.community}
               dropDownLinks={comunityDropdown}
             />
           </li>
           <li>
-            <AuthButton type='login'/>
+            <AuthButton lang={lang} type="login" />
           </li>
           <li>
-            <AuthButton type='create account'/>
+            <AuthButton lang={lang} type="create account" />
           </li>
         </ul>
       </nav>
+      <div className="lang-switcher">
+        <LanguageSwitcher />
+      </div>
     </header>
   );
 }

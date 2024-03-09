@@ -1,0 +1,31 @@
+{
+  "logo": "RuChamp Logo",
+  "header": {
+    "navigation": {
+      "events": "Events",
+      "about": "About Us",
+      "community": "Community"
+    },
+    "buttons": {
+      "login": "Login",
+      "createAccount": "Create Account"
+    }
+  },
+  "page": {
+    "home": {
+      "hero": {
+        "title": "RuChamp",
+        "description": "An online platform for organizing, registering, and participating in competitions and events in the field of martial arts."
+      },
+      "sectionOne": {
+        "title": "This is the title of a new section",
+        "paragraphOne": "Everyday practice shows that strengthening and developing the structure largely determines the creation of directions for progressive development. Diverse and rich experience in consulting with a wide range of participants is an interesting experiment to check the conditions for activation. Comrades! Constant quantitative growth and the scope of our activities allow us to assess the importance of the positions taken by the participants regarding the tasks set. However, it should not be forgotten that constant information and propaganda support for our activities largely determines the creation of significant financial and administrative conditions. Diverse and rich experience in consulting with a wide range of participants allows us to assess the importance of personnel training, corresponding to urgent needs. Diverse and rich experience in further developing various forms of activity plays an important role in shaping the development model.",
+        "paragraphTwo": "On the other hand, the established structure of the organization contributes to the preparation and implementation of the corresponding conditions for activation. Diverse and rich experience in starting the daily work of forming a position ensures the participation of a wide circle of specialists in shaping the development model. Comrades! Constant information and propaganda support for our activities play an important role in shaping the positions taken by the participants regarding the tasks set."
+      }
+    },
+    "login": {
+      "title": "About Us",
+      "description": "Description"
+    }
+  }
+}

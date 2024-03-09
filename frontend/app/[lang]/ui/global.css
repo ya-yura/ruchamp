@@ -16,30 +16,18 @@
   }
 }
 
-body {
-  /* color: rgb(var(--foreground-rgb));
+/* body {
+  color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
-    rgb(var(--background-start-rgb)); */
-}
+    rgb(var(--background-start-rgb));
+} */
 
-@layer utilities {
+/* @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-}
-
-.hero__image {
-  background-image: url('/fighter-and-ring.avif');
-  width: 100%;
-  height: 700px;
-  object-fit: contain;
-  background-size: cover;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-}
+} */

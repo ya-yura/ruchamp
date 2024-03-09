@@ -1,8 +1,15 @@
 import Image from 'next/image';
-import styles from '@/app/page.module.scss';
 import { Text, Display, Title2 } from '@fluentui/react-components';
+import { Locale } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
 
-export default function Home() {
+export default async function Home({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
+  const { page } = await getDictionary(lang);
+
   return (
     // <main className="flex min-h-screen flex-col items-center justify-start p-24">
     <main className="min-h-screen">
@@ -16,7 +23,9 @@ export default function Home() {
         />
         <div className="absolute top-0 px-9 bg-black/20 w-full h-full flex flex-col justify-center">
           <div className="w-2/5 flex flex-col">
-            <Display as="h1" id='123'>РуЧамп</Display>
+            <Display as="h1" id="123">
+              РуЧамп
+            </Display>
             <Text as="p" size={600} weight="semibold">
               Онлайн-платформа для организации, регистрации и участия в
               соревнованиях и мероприятиях в сфере боевых искусств.

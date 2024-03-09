@@ -4,7 +4,7 @@ import { Button, Subtitle2Stronger, Title1 } from '@fluentui/react-components';
 import { InputField } from '../ui/auth/input-field';
 import { useState } from 'react';
 import { loginFields } from './constants';
-import { TypeLoginFields } from '../lib/definitions';
+import { TypeLoginFields } from '../../../lib/definitions';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('');
@@ -21,9 +21,6 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new URLSearchParams(values);
-    // formData.append('username', email);
-    // formData.append('password', password);
-    
 
     try {
       const response = await fetch('http://127.0.0.1:8000/auth/jwt/login', {
