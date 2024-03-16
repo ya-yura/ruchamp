@@ -5,13 +5,11 @@ import {
   Menu,
   MenuTrigger,
   MenuList,
-  MenuItemLink,
   MenuPopover,
 } from '@fluentui/react-components';
-import Link from 'next/link';
 import { TypeLinksDropdown } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
-import { CustomLink } from '../custom-link';
+import { ButtonWithLink } from '../custom-buttons';
 
 export const MenuItemLinkNavigation = ({
   lang,
@@ -35,36 +33,25 @@ export const MenuItemLinkNavigation = ({
       <MenuPopover>
         <MenuList>
           {dropDownLinks.map((item) => (
-            // <MenuItemLink href={`${item.url}`} key={item.name}>
-            //   {item.name}
-            // </MenuItemLink>
-            <Button key={item.name}  appearance="transparent" size="large">
-              <CustomLink href={`${item.url}`} lang={lang}>
-                {item.name}
-              </CustomLink>
-            </Button>
+            <ButtonWithLink
+              lang={lang}
+              href={`${item.url}`}
+              appearance="transparent"
+              size="large"
+            >
+              {item.name}
+            </ButtonWithLink>
           ))}
         </MenuList>
       </MenuPopover>
     </Menu>
   ) : (
-    <Button appearance="transparent" size="large">
-      <CustomLink href={`${url}`} lang={lang}>
-        {title}
-      </CustomLink>
-    </Button>
+    <ButtonWithLink
+      lang={lang}
+      href={`${url}`}
+      appearance="transparent"
+      size="large"
+    >
+      {title}
+    </ButtonWithLink>
   );
-
-export const AuthButton = ({
-  type,
-  lang,
-}: {
-  type: 'login' | 'create account';
-  lang: Locale;
-}) => (
-  <Button appearance={type === 'login' ? 'primary' : 'secondary'} size="medium">
-    <Link href={type === 'login' ? `/${lang}/login` : `/${lang}/register`}>
-      {type === 'login' ? 'Войти' : 'Создать аккаунт'}
-    </Link>
-  </Button>
-);

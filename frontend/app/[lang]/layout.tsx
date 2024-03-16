@@ -30,7 +30,7 @@ export default function RootLayout({
         suppressHydrationWarning={true} // To switch off warnings such as "Warning: Extra attributes from the server: data-tabster,style"
       >
         <Providers>
-          <Header lang={params.lang}/>
+          <Header lang={params.lang} />
           {children}
           <Footer />
         </Providers>

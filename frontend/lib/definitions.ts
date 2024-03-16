@@ -1,3 +1,5 @@
+import { ButtonProps } from '@fluentui/react-components';
+
 export type TypeLinksDropdown = {
   name: string;
   url: string;
@@ -8,9 +10,14 @@ export type TypeLoginFields = {
   password: string;
 };
 
-export type CustomLinkProps = {
-  href: string
-  lang: string
-  children: React.ReactNode
-  [key: string]: any
-}
+export type TypeCustomLinkProps = {
+  href: string;
+  lang: string;
+  children: React.ReactNode;
+} & React.RefAttributes<HTMLAnchorElement>;
+
+export type TypeButtonWithLinkProps = {
+  href: string;
+  lang: string;
+  children: string;
+} & ButtonProps;
