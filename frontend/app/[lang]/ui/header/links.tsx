@@ -34,6 +34,7 @@ export const MenuItemLinkNavigation = ({
         <MenuList>
           {dropDownLinks.map((item) => (
             <ButtonWithLink
+              key={item.url}
               lang={lang}
               href={`${item.url}`}
               appearance="transparent"

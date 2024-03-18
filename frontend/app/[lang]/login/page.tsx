@@ -5,10 +5,11 @@ import { InputField } from '../ui/auth/input-field';
 import { useState } from 'react';
 import { loginFields } from './constants';
 import { TypeLoginFields } from '../../../lib/definitions';
+import { getDictionary } from '@/lib/dictionary';
+import { Locale } from '@/i18n.config';
+import { useDictionary } from '../dictionary-provider';
 
-export default function Login() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+export default function Login({ lang }: { lang: Locale }) {
   const [values, setValues] = useState<TypeLoginFields>({
     username: '',
     password: '',
@@ -17,6 +18,9 @@ export default function Login() {
     'error' | 'success' | 'warning' | 'none'
   >('none');
   const [loginErrorMessage, setLoginErrorMessage] = useState<string>('');
+  const dictionary = useDictionary()
+
+  console.log('dictionary', dictionary)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,20 +61,20 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-112px)] flex flex-col justify-start items-center py-11">
-      <Title1 align="center">Это страница входа на сайт</Title1>
+    <main className="flex min-h-[calc(100vh-112px)] flex-col items-center justify-start py-11">
+      {/* <Title1 align="center">Это страница входа на сайт</Title1> */}
 
       <form
-        className="mt-8 px-24 py-6 w-1/2 max-w-[500px] bg-slate-500 rounded-md flex flex-col justify-evenly"
+        className="mt-8 flex w-1/2 max-w-[500px] flex-col justify-evenly rounded-md bg-slate-500 px-24 py-6"
         onSubmit={handleSubmit}
       >
-        <fieldset className="flex flex-col justify-start items-center gap-4 h-60 pt-6 w-full">
+        <fieldset className="flex h-60 w-full flex-col items-center justify-start gap-4 pt-6">
           <legend className="text-center">
             <Subtitle2Stronger>Введите данные для входа</Subtitle2Stronger>
           </legend>
           {loginFields.map((item, index) => {
             const { label, type, placeholder, name } = item;
-            console.log(values)
+            console.log(values);
             return (
               <InputField
                 key={index}

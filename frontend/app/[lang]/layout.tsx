@@ -5,6 +5,7 @@ import { Header } from './ui/header/header';
 import { Footer } from './ui/footer/footer';
 import { Providers } from './providers'; //Fluent UI React v9 provider
 import { Locale, i18n } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
 
 export const metadata: Metadata = {
   title: 'РуЧамп',
@@ -16,20 +17,22 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
   params: { lang: Locale };
 }) {
+  const dictionary = await getDictionary(params.lang);
+
   return (
     <html lang={params.lang}>
       <body
-        className={`${inter.className} antialiased bg-black`}
+        className={`${inter.className} bg-black antialiased`}
         suppressHydrationWarning={true} // To switch off warnings such as "Warning: Extra attributes from the server: data-tabster,style"
       >
-        <Providers>
+        <Providers dictionary={dictionary}>
           <Header lang={params.lang} />
           {children}
           <Footer />

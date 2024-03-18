@@ -1,10 +1,10 @@
 import Image from 'next/image';
-import { MenuItemLinkNavigation } from './buttons';
+import { MenuItemLinkNavigation } from './links';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { CustomLink } from '@/app/[lang]/ui/custom-link';
 import { LanguageSwitcher } from './lang-switcher';
-import { aboutDropdown, comunityDropdown } from '@/lib/constants';
+import { aboutDropdown, comunityDropdown } from '@/app/[lang]/ui/header/constants';
 import { ButtonWithLink } from '../custom-buttons';
 
 export async function Header({ lang }: { lang: Locale }) {

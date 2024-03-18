@@ -27,8 +27,16 @@
       }
     },
     "login": {
-      "title": "О нас",
-      "description": "Описание"
+      "emailInput": {
+        "name": "username",
+        "type": "email",
+        "placeholder": "Введите вашу почту"
+      },
+      "passwordInput": {
+        "name": "username",
+        "type": "password",
+        "placeholder": "Введите ваш пароль"
+      }
     }
   }
 }
