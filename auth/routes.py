@@ -27,6 +27,7 @@ from auth.schemas import (
     SpectatorUpdate,
     SysAdminUpdate,
     OrganizerUpdate,
+    UserRead,
 )
 
 
@@ -98,8 +99,6 @@ async def update_profile(
     await update_function(current_user, data)
 
     return {"message": f"{model.__name__} profile updated successfully"}
-
-
 
 
 '''  ATHLETE  '''
@@ -245,5 +244,15 @@ async def forgot_password(
     if email is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-
     return {"email": email}
+
+
+@router.get("/users/me", tags=["users"], response_model=UserRead)
+async def get_current_user(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(User).where(User.id == current_user.id))
+    user = query.scalars().first()
+
+    return user

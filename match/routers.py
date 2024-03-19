@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, insert, delete
 
 from connection import get_db
-from event.models import (Event, Match, EventOrganizer, Participant, MatchReferee,
-                          MatchCounter, MatchResult, MatchWinner)
+from event.models import (Event, Match, EventOrganizer, Participant,
+                          MatchReferee, MatchCounter, MatchResult, MatchWinner)
 from auth.models import User, Athlete, AllWeightClass, CategoryType, Referee
 from match.schemas import MatchDB
 from match.models import TempAthlete, TempDrawParticipants, AgeCategory
@@ -13,7 +13,6 @@ from auth.schemas import UserDB
 from auth.routes import current_user
 from teams.models import TeamMember
 from match.utils import split_pairs, pairs_generator
-from re import match
 
 
 router = APIRouter(prefix="/api", tags=["Matchs"])
@@ -48,22 +47,22 @@ async def update_match(
     match = query.scalars().one_or_none()
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
-    match.combat_type_id=match_data.combat_type_id,
-    match.category_id=match_data.category_id,
-    match.sport_id=match_data.sport_id,
-    match.weight_class_id=match_data.weight_class_id,
-    match.round=match_data.round,
-    match.start_datetime=match_data.start_datetime,
-    match.end_datetime=match_data.end_datetime,
-    match.player_one=match_data.player_one,
-    match.player_two=match_data.player_two
+    match.combat_type_id = match_data.combat_type_id,
+    match.category_id = match_data.category_id,
+    match.sport_id = match_data.sport_id,
+    match.weight_class_id = match_data.weight_class_id,
+    match.round = match_data.round,
+    match.start_datetime = match_data.start_datetime,
+    match.end_datetime = match_data.end_datetime,
+    match.player_one = match_data.player_one,
+    match.player_two = match_data.player_two
     await db.commit()
     return {f"Match ID - {match_id} updated"}
 
 
 @router.delete("/matchs/delete/{match_id}")
 async def delete_match(
-    match_id:int,
+    match_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
@@ -71,7 +70,7 @@ async def delete_match(
     all_organizer_id = query_org.scalars().all()
     if current_user.id not in all_organizer_id:
         raise HTTPException(status_code=400, detail="You are not an organizer")
-    
+
     query = await db.execute(select(Match).where(Match.match_id == match_id))
     match = query.scalars().one_or_none()
     if match is None:
@@ -84,13 +83,16 @@ async def delete_match(
 
 
 @router.get("/matchs/draw/{event_id}/{round}")
-async def temp_participants(event_id: int, round: int, db: AsyncSession = Depends(get_db)):
+async def temp_participants(
+    event_id: int, round: int,
+    db: AsyncSession = Depends(get_db)
+):
 
     # Очищаем данные из таблицы
     await db.execute(delete(TempDrawParticipants))
     await db.commit()
-    
-    # добавить сортировки и вставки в табоицы по раундам
+
+    # добавить сортировки и вставки в таблицы по раундам
     if round == 1:
         query = await db.execute(select(Participant.player_id).where(
             Participant.event_id == event_id))
@@ -114,7 +116,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
     age_classes = query.mappings().all()
 
     members = []  # сохраням все id атлетов
-    
+
     for participant in participants:
 
         query = await db.execute(select(TeamMember.member).where(
@@ -125,7 +127,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
             athlete_id=athelete_id, member_id=participant))
 
         members.append(athelete_id)
-        
+
         for member in members:
             query = await db.execute(select(Athlete.weight).where(
                 Athlete.id == member))
@@ -160,7 +162,6 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
             await db.execute(update(TempDrawParticipants).where(
                 TempDrawParticipants.athlete_id == member).values(
                     gender=user_gender))
-                
 
     await db.commit()
 
@@ -174,7 +175,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
     query = await db.execute(select(TempDrawParticipants.gender).distinct())
     gender = query.scalars().all()
     genders = len(gender)
-    
+
     all_pairs = {}
     # сохраняем в словарь все совпадения по параметрам сортировки
     for gender in range(genders):
@@ -235,12 +236,12 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
                     player_two=pair[1]
                 ))
             await db.commit()
-    
+
     query = await db.execute(select(
         Match.id,
         Match.player_one,
         Match.player_two,
-        Match.start_datetime).where(Match.round==round))
+        Match.start_datetime).where(Match.round == round))
     matches = query.mappings().all()
     for match in matches:
         if match.player_two == 999:  # зарезервировать определенный ID атлета для определения победителя
@@ -260,7 +261,7 @@ async def temp_participants(event_id: int, round: int, db: AsyncSession = Depend
                 player2_score=str(0),
                 set_datetime=match.start_datetime,
             ))
-    
+
     return {"ok": True}
 
 
@@ -277,12 +278,14 @@ async def start_match(
     match = query.scalars().one_or_none()
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
-    
-    query = await db.execute(select(Referee.user_id).where(Referee.user_id == current_user.id))
+
+    query = await db.execute(select(Referee.user_id).where(
+        Referee.user_id == current_user.id
+    ))
     referee = query.scalars().one_or_none()
     if referee is None:
         raise HTTPException(status_code=400, detail="You are not a referee")
-    
+
     # Подумать как записать в таблицу несколько судей
     await db.execute(insert(MatchReferee).values(
         match_id=match_id,
@@ -290,17 +293,18 @@ async def start_match(
         chief=True
     ))
     await db.commit()
-    query = await db.execute(select(MatchCounter.player_one, MatchCounter.player_two).where(match_id == match_id))
+    query = await db.execute(select(
+        MatchCounter.player_one,
+        MatchCounter.player_two).where(match_id == match_id))
     players = query.mappings().all()
     player_1 = players[0]['player_one']
     player_2 = players[0]['player_two']
-    
-    '''Возможно здесь правитьльно вытащить Фамилию Имя Отчество из таблицы Users
-        И вывести его вместо ID на фронт. 
+
+    '''Возможно здесь правитьльно вытащить Фамилию Имя Отчество из таблицы
+        Users И вывести его вместо ID на фронт.
         С Фамилией Именем Отчеством судьи аналогичная ситуация'''
-    
-    return {"Участник 1": player_1, "Участник 2": player_2,"Судья": referee}
-    
+
+    return {"Участник 1": player_1, "Участник 2": player_2, "Судья": referee}
 
 
 @router.post("/matchs/{match_id}/counter")
@@ -326,8 +330,7 @@ async def counter_match(
         referee_id=current_user.id
     ))
     await db.commit()
-    
-    
+
     return {"ok": True}
 
 
@@ -336,27 +339,29 @@ async def result_match(
     match_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(MatchCounter.match_id).where(match_id == match_id))
+    query = await db.execute(select(
+        MatchCounter.match_id).where(match_id == match_id))
     match = query.scalars().all()
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
 
-    query = await db.execute(select(MatchCounter.referee_id).where(match_id == match_id))
+    query = await db.execute(select(
+        MatchCounter.referee_id).where(match_id == match_id))
     referee = query.scalars().first()
-    
+
     query = await db.execute(select(
         MatchCounter.player_one,
         MatchCounter.player1_score,
         MatchCounter.player_two,
         MatchCounter.player2_score).where(MatchCounter.match_id == match_id))
     match_all = query.mappings().all()
-    
+
     player1_score = 0
     player2_score = 0
     for match in match_all:
         player1_score += int(match.player1_score)
         player2_score += int(match.player2_score)
-    
+
     if player1_score > player2_score:
         await db.execute(insert(MatchResult).values(
             match_id=match_id,
@@ -372,7 +377,8 @@ async def result_match(
             winner_id=match_all[0]['player_two'],
             winner_score=str(player2_score),
             loser_score=str(player1_score),
-            referee_id=referee))
+            referee_id=referee
+        ))
         await db.commit()
 
     return {"Результаты записаны": match_id}
