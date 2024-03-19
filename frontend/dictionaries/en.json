@@ -10,7 +10,8 @@
     },
     "buttons": {
       "login": "Log In",
-      "createAccount": "Create Account"
+      "createAccount": "Create Account",
+      "logout": "Log Out"
     }
   },
   "page": {
@@ -22,13 +23,23 @@
       },
       "sectionOne": {
         "title": "This is the title of a new section",
-        "paragraphOne": "Everyday practice shows that strengthening and developing the structure to a significant extent determines the creation of directions for progressive development. Diverse and rich experience in consultation with a wide asset represents an interesting experiment to check the conditions for activation. Comrades! constant quantitative growth and the scope of our activities allow assessing the value of positions taken by participants regarding the tasks set. However, it should not be forgotten that constant information and propaganda support of our activities to a significant extent determines the creation of substantial financial and administrative conditions. Diverse and rich experience in consultation with a wide asset allows assessing the value of personnel training system, meeting urgent needs. Diverse and rich experience in further development of various forms of activity plays an important role in shaping the development model.",
-        "paragraphTwo": "On the other hand, the established structure of the organization contributes to the preparation and implementation of the corresponding conditions for activation. Diverse and rich experience in starting daily work on forming a position ensures the participation of a wide range of (specialists) in shaping the development model. Comrades! constant information and propaganda support of our activities play an important role in shaping the positions taken by participants regarding the tasks set."
+        "paragraphOne": "Everyday practice shows that strengthening and developing the structure largely determines the creation of directions for progressive development. Diverse and rich experience in consulting with a wide asset base is an interesting experiment in testing the relevant conditions for activation. Comrades! The constant quantitative growth and the scope of our activities allow us to assess the importance of the positions taken by the participants regarding the tasks set. However, it should be remembered that constant information and propaganda support for our activities largely determines the creation of significant financial and administrative conditions. Diverse and rich experience in consulting with a wide asset base allows us to assess the importance of personnel training systems that meet urgent needs. Diverse and rich experience in further developing various forms of activities plays an important role in shaping the development model.",
+        "paragraphTwo": "On the other hand, the established structure of the organization contributes to the preparation and implementation of the relevant conditions for activation. Diverse and rich experience in starting daily work on shaping a position ensures the participation of a wide circle of specialists in shaping the development model. Comrades! Constant information and propaganda support for our activities play an important role in shaping the positions taken by the participants regarding the tasks set."
       }
     },
     "login": {
-      "title": "About Us",
-      "description": "Description"
+      "subtitle": "Enter your login details",
+      "emailInput": {
+        "name": "username",
+        "type": "email",
+        "placeholder": "Enter your email"
+      },
+      "passwordInput": {
+        "name": "password",
+        "type": "password",
+        "placeholder": "Enter your password"
+      },
+      "enter": "Вход"
     }
   }
 }

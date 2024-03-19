@@ -11,6 +11,7 @@ import {
 } from '@fluentui/react-components';
 import { useServerInsertedHTML } from 'next/navigation';
 import DictionaryProvider, { Dictionary } from './dictionary-provider';
+import { SessionProvider } from 'next-auth/react';
 
 export function Providers({
   dictionary,
@@ -32,13 +33,15 @@ export function Providers({
 
   return (
     <RendererProvider renderer={renderer}>
-      <SSRProvider>
-        <FluentProvider theme={webDarkTheme}>
-          <DictionaryProvider dictionary={dictionary}>
-            {children}
-          </DictionaryProvider>
-        </FluentProvider>
-      </SSRProvider>
+      <SessionProvider>
+        <SSRProvider>
+          <FluentProvider theme={webDarkTheme}>
+            <DictionaryProvider dictionary={dictionary}>
+              {children}
+            </DictionaryProvider>
+          </FluentProvider>
+        </SSRProvider>
+      </SessionProvider>
     </RendererProvider>
   );
 }

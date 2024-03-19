@@ -10,7 +10,8 @@
     },
     "buttons": {
       "login": "Войти",
-      "createAccount": "Создать аккаунт"
+      "createAccount": "Создать аккаунт",
+      "logout": "Выйти"
     }
   },
   "page": {
@@ -27,6 +28,7 @@
       }
     },
     "login": {
+      "subtitle": "Введите данные для входа",
       "emailInput": {
         "name": "username",
         "type": "email",
@@ -36,7 +38,8 @@
         "name": "username",
         "type": "password",
         "placeholder": "Введите ваш пароль"
-      }
+      },
+      "enter": "Вход"
     }
   }
 }

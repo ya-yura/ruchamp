@@ -4,8 +4,11 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { CustomLink } from '@/app/[lang]/ui/custom-link';
 import { LanguageSwitcher } from './lang-switcher';
-import { aboutDropdown, comunityDropdown } from '@/app/[lang]/ui/header/constants';
-import { ButtonWithLink } from '../custom-buttons';
+import {
+  aboutDropdown,
+  comunityDropdown,
+} from '@/app/[lang]/ui/header/constants';
+import { AuthButtons } from './auth-buttons';
 
 export async function Header({ lang }: { lang: Locale }) {
   const { header } = await getDictionary(lang);
@@ -40,26 +43,7 @@ export async function Header({ lang }: { lang: Locale }) {
               dropDownLinks={comunityDropdown} //temporary mock data
             />
           </li>
-          <li>
-            <ButtonWithLink
-              lang={lang}
-              href="/login"
-              appearance="primary"
-              size="medium"
-            >
-              {header.buttons.login}
-            </ButtonWithLink>
-          </li>
-          <li>
-            <ButtonWithLink
-              lang={lang}
-              href="/register"
-              appearance="secondary"
-              size="medium"
-            >
-              {header.buttons.createAccount}
-            </ButtonWithLink>
-          </li>
+          <AuthButtons lang={lang} />
         </ul>
       </nav>
       <div className="lang-switcher">

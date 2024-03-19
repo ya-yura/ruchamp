@@ -3,8 +3,8 @@ import { TypeLinksDropdown } from '@/lib/definitions';
 
 export const aboutDropdown: TypeLinksDropdown[] = [
     {
-      name: 'Link 1',
-      url: '/bla1',
+      name: 'Dashboard',
+      url: '/dashboard',
     },
     {
       name: 'Link 2',
