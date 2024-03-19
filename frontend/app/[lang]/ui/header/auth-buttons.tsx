@@ -4,13 +4,16 @@ import { signOut, useSession } from 'next-auth/react';
 import { ButtonWithLink } from '../custom-buttons';
 import { Locale } from '@/i18n.config';
 import { useDictionary } from '../../dictionary-provider';
-import { Button } from '@fluentui/react-components';
+import { Button, Spinner } from '@fluentui/react-components';
+import { useState } from 'react';
 
 export function AuthButtons({ lang }: { lang: Locale }) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: session } = useSession();
   const { header } = useDictionary();
 
   async function handleLogout() {
+    setIsLoading(true);
     signOut({
       callbackUrl: '/',
     });
@@ -22,16 +25,26 @@ export function AuthButtons({ lang }: { lang: Locale }) {
 
     const res = await fetch('http://127.0.0.1:8000/auth/jwt/logout', {
       method: 'POST',
-      headers: headers, 
+      headers: headers,
     });
     localStorage.clear();
+    setIsLoading(false);
   }
 
   if (session) {
     return (
       <li>
-        <Button onClick={handleLogout} appearance="primary" size="medium">
-          {header.buttons.logout}
+        <Button
+          onClick={handleLogout}
+          appearance="primary"
+          size="medium"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Spinner size="extra-tiny" label="" />
+          ) : (
+            header.buttons.logout
+          )}
         </Button>
       </li>
     );
