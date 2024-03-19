@@ -29,6 +29,8 @@ from auth.schemas import (
     OrganizerUpdate,
     UserRead,
 )
+from teams.models import TeamMember
+from event.models import Participant, Match
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -247,7 +249,7 @@ async def forgot_password(
     return {"email": email}
 
 
-@router.get("/users/me", tags=["users"], response_model=UserRead)
+@router.get("/me", tags=["users"], response_model=UserRead)
 async def get_current_user(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -256,3 +258,56 @@ async def get_current_user(
     user = query.scalars().first()
 
     return user
+
+
+@router.get("/me/events", tags=["users"])
+async def get_current_user_events(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id))
+    athlete_id = query.scalars().first()
+
+    query = await db.execute(select(
+        TeamMember.id).where(TeamMember.member == athlete_id))
+    member_id = query.scalars().first()
+
+    query = await db.execute(select(
+        Participant.event_id).where(Participant.player_id == member_id))
+    events = query.scalars().all()
+
+    return {"events": events}
+
+
+@router.get("/me/matches", tags=["users"])
+async def get_current_user_matches(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id))
+    athlete_id = query.scalars().first()
+
+    query = await db.execute(select(
+        TeamMember.id).where(TeamMember.member == athlete_id))
+    member_id = query.scalars().first()
+
+    query = await db.execute(select(
+        Match.id).where(
+            Match.player_one == member_id and Match.player_two == member_id))
+    matches = query.scalars().all()
+
+    return {"matches": matches}
+
+
+@router.get("/me/athlete", tags=["users"])
+async def get_current_user_athlete(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(
+        Athlete).where(Athlete.user_id == current_user.id))
+    athlete = query.scalars().first()
+
+    return athlete
