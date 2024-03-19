@@ -6,6 +6,7 @@ import {
   Spinner,
   Subtitle2Stronger,
 } from '@fluentui/react-components';
+import { ErrorCircle20Regular } from '@fluentui/react-icons';
 import { InputField } from '../ui/auth/input-field';
 import { useState } from 'react';
 import { loginFields } from './constants';
@@ -15,20 +16,17 @@ import { useDictionary } from '../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useForm } from '@/lib/hooks/useForm';
 
 export default function Login({ lang }: { lang: Locale }) {
-  const [values, setValues] = useState<TypeLoginFields>({
-    username: '',
-    password: '',
-  });
-  const [loginError, setLoginError] =
-    useState<FieldProps['validationState']>('none');
-  const [loginErrorMessage, setLoginErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { page } = useDictionary();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const router = useRouter();
+
+  const { values, handleChange } = useForm();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,27 +39,13 @@ export default function Login({ lang }: { lang: Locale }) {
     });
     if (res && !res.error) {
       router.push('/dashboard');
-      setLoginError('none');
-      setLoginErrorMessage('');
+      setErrorMessage('');
       setIsLoading(false);
     } else {
       console.error('Error during fetch');
-      setLoginError('error');
-      setLoginErrorMessage('Не верный e-mail и/или пароль');
+      setErrorMessage(page.login.loginError);
       setIsLoading(false);
     }
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    const name = e.target.name as keyof TypeLoginFields;
-    const value = e.target.value;
-
-    setValues((prevValues) => ({
-      ...prevValues,
-      [name as keyof TypeLoginFields]: value,
-    }));
-    setLoginError('none');
-    setLoginErrorMessage('');
   }
 
   return (
@@ -84,19 +68,30 @@ export default function Login({ lang }: { lang: Locale }) {
                 key={index}
                 fieldProps={{
                   label,
-                  validationState: loginError,
-                  validationMessage: loginErrorMessage,
+                  // validationState: errors[name as keyof TypeLoginFields]
+                  //   ? 'error'
+                  //   : 'none',
+                  // validationMessage: errors[name as keyof TypeLoginFields],
                 }}
                 inputProps={{
                   type,
                   placeholder,
                   onChange: handleChange,
-                  value: values[`${name}` as keyof TypeLoginFields],
+                  value: values[name as keyof TypeLoginFields] || '',
                   name,
                 }}
               />
             );
           })}
+          {errorMessage && (
+            <p>
+              <ErrorCircle20Regular
+                aria-label={errorMessage}
+                primaryFill="rgb(248 113 113)"
+              />{' '}
+              <span className="text-red-400">{errorMessage}</span>
+            </p>
+          )}
         </fieldset>
         <Button
           appearance="primary"
@@ -104,11 +99,7 @@ export default function Login({ lang }: { lang: Locale }) {
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? (
-            <Spinner size="extra-tiny" label="" />
-          ) : (
-            page.login.enter
-          )}
+          {isLoading && <Spinner size="tiny" label="" />} {page.login.enter}
         </Button>
       </form>
     </main>

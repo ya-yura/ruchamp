@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fluentui/react-components": "^9.46.7",
+    "@fluentui/react-icons": "^2.0.232",
     "@formatjs/intl-localematcher": "^0.5.4",
     "fluentui-next-appdir-directive": "^0.1.5",
     "million": "^3.0.5",

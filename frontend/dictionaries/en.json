@@ -39,7 +39,9 @@
         "type": "password",
         "placeholder": "Enter your password"
       },
-      "enter": "Вход"
+      "enter": "Вход",
+      "loginError": "Incorrect email and/or password",
+      "registerError": "Incorrect data or server error"
     }
   }
 }
