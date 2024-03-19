@@ -39,8 +39,22 @@
         "type": "password",
         "placeholder": "Enter your password"
       },
-      "enter": "Вход",
-      "loginError": "Incorrect email and/or password",
+      "enter": "Log In",
+      "loginError": "Incorrect email and/or password"
+    },
+    "register": {
+      "subtitle": "Enter your registration details",
+      "emailInput": {
+        "name": "username",
+        "type": "email",
+        "placeholder": "Enter your email"
+      },
+      "passwordInput": {
+        "name": "password",
+        "type": "password",
+        "placeholder": "Enter your password"
+      },
+      "register": "Register",
       "registerError": "Incorrect data or server error"
     }
   }

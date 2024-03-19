@@ -40,7 +40,21 @@
         "placeholder": "Введите ваш пароль"
       },
       "enter": "Вход",
-      "loginError": "Не верный e-mail и/или пароль",
+      "loginError": "Не верный e-mail и/или пароль"
+    },
+    "register": {
+      "subtitle": "Введите данные для регистрации",
+      "emailInput": {
+        "name": "username",
+        "type": "email",
+        "placeholder": "Введите вашу почту"
+      },
+      "passwordInput": {
+        "name": "username",
+        "type": "password",
+        "placeholder": "Введите ваш пароль"
+      },
+      "register": "Зарегистрироваться",
       "registerError": "Некорректные данные или ошибка сервера"
     }
   }

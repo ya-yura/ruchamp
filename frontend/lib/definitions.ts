@@ -10,6 +10,22 @@ export type TypeLoginFields = {
   password: string;
 };
 
+export type TypeRegisterFields = {
+  email: string;
+  password: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  is_verified: boolean;
+  username: string;
+  name: string;
+  sirname: string;
+  fathername: string;
+  gender: boolean;
+  country: string;
+  birthdate: Date; // Тут нужно бы уточнить
+  role_id: 1 | 2 | 3 | 4 | 5;
+};
+
 export type TypeCustomLinkProps = {
   href: string;
   lang: string;

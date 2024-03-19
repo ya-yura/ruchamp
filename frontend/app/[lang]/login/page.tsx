@@ -1,24 +1,18 @@
 'use client';
 
-import {
-  Button,
-  FieldProps,
-  Spinner,
-  Subtitle2Stronger,
-} from '@fluentui/react-components';
+import { Button, Spinner, Subtitle2Stronger } from '@fluentui/react-components';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 import { InputField } from '../ui/auth/input-field';
 import { useState } from 'react';
 import { loginFields } from './constants';
 import { TypeLoginFields } from '../../../lib/definitions';
-import { Locale } from '@/i18n.config';
 import { useDictionary } from '../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
 
-export default function Login({ lang }: { lang: Locale }) {
+export default function Login() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { page } = useDictionary();
@@ -51,11 +45,11 @@ export default function Login({ lang }: { lang: Locale }) {
   return (
     <main className="flex min-h-[calc(100vh-112px)] flex-col items-center justify-start py-11">
       <form
-        className="mt-8 flex w-1/2 max-w-[500px] flex-col justify-evenly rounded-md bg-slate-500 px-24 py-6"
+        className="mt-8 flex w-1/2 max-w-[500px] flex-col justify-evenly rounded-md bg-slate-500 px-20 py-6"
         onSubmit={handleSubmit}
       >
         <fieldset
-          className="flex h-64 w-full flex-col items-center justify-start gap-4 pt-6"
+          className="relative mb-6 flex h-auto w-full flex-col items-center justify-start gap-4 pb-8 pt-6"
           disabled={isLoading}
         >
           <legend className="text-center">
@@ -84,7 +78,7 @@ export default function Login({ lang }: { lang: Locale }) {
             );
           })}
           {errorMessage && (
-            <p>
+            <p className="absolute bottom-0">
               <ErrorCircle20Regular
                 aria-label={errorMessage}
                 primaryFill="rgb(248 113 113)"
@@ -93,14 +87,16 @@ export default function Login({ lang }: { lang: Locale }) {
             </p>
           )}
         </fieldset>
-        <Button
-          appearance="primary"
-          size="large"
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading && <Spinner size="tiny" label="" />} {page.login.enter}
-        </Button>
+        <div className="ml-auto mr-auto">
+          <Button
+            appearance="primary"
+            size="large"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading && <Spinner size="tiny" label="" />} {page.login.enter}
+          </Button>
+        </div>
       </form>
     </main>
   );

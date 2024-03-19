@@ -1,9 +1,6 @@
 import { getDictionary } from '@/lib/dictionary';
 import { FieldProps, InputProps } from '@fluentui/react-components';
 
-// const { header } = await getDictionary(lang);
-
-
 export const loginFields: Array<Partial<FieldProps> & Partial<InputProps>> = [
   {
     label: 'Почта',
