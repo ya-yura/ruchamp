@@ -11,7 +11,8 @@
     "buttons": {
       "login": "Log In",
       "createAccount": "Create Account",
-      "logout": "Log Out"
+      "logout": "Log Out",
+      "profile": "Profile"
     }
   },
   "page": {

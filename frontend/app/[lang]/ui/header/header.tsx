@@ -8,7 +8,7 @@ import {
   aboutDropdown,
   comunityDropdown,
 } from '@/app/[lang]/ui/header/constants';
-import { AuthButtons } from './auth-buttons';
+import { AuthButtons } from './buttons';
 
 export async function Header({ lang }: { lang: Locale }) {
   const { header } = await getDictionary(lang);
@@ -46,6 +46,7 @@ export async function Header({ lang }: { lang: Locale }) {
           <AuthButtons lang={lang} />
         </ul>
       </nav>
+
       <div className="lang-switcher">
         <LanguageSwitcher />
       </div>

@@ -22,8 +22,12 @@ export type TypeRegisterFields = {
   fathername: string;
   gender: boolean;
   country: string;
-  birthdate: Date; // Тут нужно бы уточнить
+  birthdate: Date;
   role_id: 1 | 2 | 3 | 4 | 5;
+};
+
+export type TypeUser = Omit<TypeRegisterFields, 'password'> & {
+  id: number;
 };
 
 export type TypeCustomLinkProps = {

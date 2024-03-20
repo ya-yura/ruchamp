@@ -33,20 +33,32 @@ export function AuthButtons({ lang }: { lang: Locale }) {
 
   if (session) {
     return (
-      <li>
-        <Button
-          onClick={handleLogout}
-          appearance="primary"
-          size="medium"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Spinner size="extra-tiny" label="" />
-          ) : (
-            header.buttons.logout
-          )}
-        </Button>
-      </li>
+      <>
+        <li>
+          <ButtonWithLink
+            lang={lang}
+            href="/profile"
+            appearance="primary"
+            size="medium"
+          >
+            {header.buttons.profile}
+          </ButtonWithLink>
+        </li>
+        <li>
+          <Button
+            onClick={handleLogout}
+            appearance="secondary"
+            size="medium"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Spinner size="extra-tiny" label="" />
+            ) : (
+              header.buttons.logout
+            )}
+          </Button>
+        </li>
+      </>
     );
   }
 
@@ -75,3 +87,20 @@ export function AuthButtons({ lang }: { lang: Locale }) {
     </>
   );
 }
+
+// export function ProfileButton({ lang }: { lang: Locale }) {
+//   const { header } = useDictionary();
+
+//   return (
+//     <li>
+//       <ButtonWithLink
+//         lang={lang}
+//         href="/profile"
+//         appearance="primary"
+//         size="medium"
+//       >
+//         {header.buttons.profile}
+//       </ButtonWithLink>
+//     </li>
+//   );
+// }

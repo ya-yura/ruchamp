@@ -15,7 +15,7 @@ import { useSearchParams } from 'next/navigation';
 // import { useRouter } from 'next/router';
 import { useForm } from '@/lib/hooks/useForm';
 import { registerFields } from './constants';
-import { TypeRegisterFields } from '@/lib/definitions';
+import type { TypeRegisterFields } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 
 export default function Register() {
