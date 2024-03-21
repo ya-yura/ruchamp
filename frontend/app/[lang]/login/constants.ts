@@ -1,4 +1,3 @@
-import { getDictionary } from '@/lib/dictionary';
 import { FieldProps, InputProps } from '@fluentui/react-components';
 
 export const loginFields: Array<Partial<FieldProps> & Partial<InputProps>> = [

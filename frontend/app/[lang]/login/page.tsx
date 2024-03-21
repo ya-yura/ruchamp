@@ -71,7 +71,8 @@ export default function Login() {
                   type,
                   placeholder,
                   onChange: handleChange,
-                  value: values[name as keyof TypeLoginFields] || '',
+                  value:
+                    (values[name as keyof TypeLoginFields] as string) || '',
                   name,
                 }}
               />

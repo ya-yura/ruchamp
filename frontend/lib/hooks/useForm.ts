@@ -1,7 +1,10 @@
 import { useCallback, useState } from 'react';
 
 export function useForm() {
-  const [values, setValues] = useState<{ [key: string]: string }>({});
+  const [values, setValues] = useState<{
+    [key: string]: string | number | Date | boolean;
+    // [key: string]: string;
+  }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isValid, setIsValid] = useState<boolean>(false);
 

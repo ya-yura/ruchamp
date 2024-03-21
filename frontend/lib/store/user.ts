@@ -20,7 +20,6 @@ export const useUserStore = create<TypeState & TypeActions>()(
           'Content-Type': 'application/x-www-form-urlencoded',
           authorization: `Bearer ${token}`,
         };
-        console.log(process.env.BASE_URL);
         try {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}/users/me`,

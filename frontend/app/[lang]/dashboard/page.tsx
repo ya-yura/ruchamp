@@ -9,6 +9,10 @@ export default function Dashboard() {
   const getUser = useUserStore((state) => state.getUser);
 
   useEffect(() => {
+    useUserStore.persist.rehydrate();
+  }, []);
+
+  useEffect(() => {
     if (session?.user?.name && status === 'authenticated') {
       const token = session.user?.name;
       localStorage.setItem('jwt', token);

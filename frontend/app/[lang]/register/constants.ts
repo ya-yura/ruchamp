@@ -1,6 +1,4 @@
-import { getDictionary } from '@/lib/dictionary';
 import { FieldProps, InputProps } from '@fluentui/react-components';
-import { useDictionary } from '../dictionary-provider';
 
 export const registerFields: Array<Partial<FieldProps> & Partial<InputProps>> =
   [

@@ -1,6 +1,13 @@
 {
   "common": {
-    "logo": "RuChamp Logo"
+    "logo": "RuChamp Logo",
+    "roles": {
+      "1": "Athlete",
+      "2": "Organizer",
+      "3": "Spectator",
+      "4": "System Administrator",
+      "5": "Judge"
+    }
   },
   "header": {
     "navigation": {
@@ -45,18 +52,16 @@
     },
     "register": {
       "subtitle": "Enter your registration details",
-      "emailInput": {
-        "name": "username",
-        "type": "email",
-        "placeholder": "Enter your email"
-      },
-      "passwordInput": {
-        "name": "password",
-        "type": "password",
-        "placeholder": "Enter your password"
-      },
       "register": "Register",
-      "registerError": "Incorrect data or server error"
+      "registerError": "Incorrect data or server error",
+      "chooseRole": "Choose your role"
+    },
+    "profile": {
+      "subtitle": "Profile Data",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "updateError": "Incorrect data or server error"
     }
   }
 }

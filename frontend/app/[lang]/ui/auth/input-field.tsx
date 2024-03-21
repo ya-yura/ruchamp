@@ -8,7 +8,7 @@ export const InputField = ({
   fieldProps?: Partial<FieldProps>;
   inputProps?: Partial<InputProps>;
 }) => (
-  <Field {...fieldProps} as='div' size='large' required>
+  <Field {...fieldProps} as="div" size="large" required>
     <Input {...inputProps} as="input" />
   </Field>
 );
