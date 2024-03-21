@@ -40,7 +40,7 @@ export function withAuthMiddleware(middleware: CustomMiddleware) {
     ]);
 
     if (!token && protectedPathsWithLocale.includes(pathname)) {
-      const signInUrl = new URL('/api/auth/signin', request.url);
+      const signInUrl = new URL('/login', request.url);
       signInUrl.searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(signInUrl);
     }

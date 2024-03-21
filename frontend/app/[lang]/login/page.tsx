@@ -16,30 +16,37 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { page } = useDictionary();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const router = useRouter();
-
   const { values, handleChange } = useForm();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSignIn(): Promise<void> {
     setIsLoading(true);
-    const res = await signIn('credentials', {
-      username: values.username,
-      password: values.password,
-      redirect: false,
-      callbackUrl,
-    });
-    if (res && !res.error) {
-      router.push('/dashboard');
-      setErrorMessage('');
-      setIsLoading(false);
-    } else {
-      console.error('Error during fetch');
-      setErrorMessage(page.login.loginError);
+    try {
+      const res = await signIn('credentials', {
+        username: values.username,
+        password: values.password,
+        redirect: false,
+        callbackUrl,
+      });
+      if (res && !res.error) {
+        router.push('/dashboard');
+        setErrorMessage('');
+      } else {
+        throw new Error(page.login.loginError);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('Failed to login');
+    } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    handleSignIn();
   }
 
   return (
@@ -62,10 +69,6 @@ export default function Login() {
                 key={index}
                 fieldProps={{
                   label,
-                  // validationState: errors[name as keyof TypeLoginFields]
-                  //   ? 'error'
-                  //   : 'none',
-                  // validationMessage: errors[name as keyof TypeLoginFields],
                 }}
                 inputProps={{
                   type,

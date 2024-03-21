@@ -16,12 +16,10 @@ import {
 import { InputField } from '../ui/auth/input-field';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useDictionary } from '../dictionary-provider';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
 import { registerFields } from './constants';
 import type {
-  TypeBooleanUserFields,
   TypeRegisterFields,
   TypeStringUserFields,
 } from '@/lib/definitions';
@@ -30,12 +28,9 @@ import { ErrorCircle20Regular } from '@fluentui/react-icons';
 export default function Register() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { page } = useDictionary();
-  const { common } = useDictionary();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const router = useRouter();
   const { values, handleChange, setValues } = useForm();
+  const { page, common } = useDictionary();
+  const router = useRouter();
   const selectId = useId();
 
   const roles: Record<string, string> = {
@@ -46,8 +41,7 @@ export default function Register() {
     [common.roles[5]]: '5',
   };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleRegister(): Promise<void> {
     setIsLoading(true);
     try {
       // Take a look on this values later
@@ -56,16 +50,16 @@ export default function Register() {
         is_superuser: false,
         is_verified: false,
       };
-
-      const res = await fetch('http://127.0.0.1:8000/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ ...values, ...otherValues }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ ...values, ...otherValues }),
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
       if (res.ok) {
-        const data = await res.json();
-        console.log('Successful registration:', data);
+        router.push('/login');
       } else {
         console.error('Failed to register:', res.statusText);
         setErrorMessage(page.register.registerError);
@@ -76,6 +70,11 @@ export default function Register() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    handleRegister();
   }
 
   function handleRadioChange(
