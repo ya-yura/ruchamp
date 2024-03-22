@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { TypeUser } from '../definitions';
 import { persist } from 'zustand/middleware';
+import { auth } from '../client-api/auth';
 
 export type TypeState = {
   user: TypeUser | null;
@@ -16,26 +17,16 @@ export const useUserStore = create<TypeState & TypeActions>()(
     (set) => ({
       user: null,
       getUser: async (token: string) => {
-        const headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          authorization: `Bearer ${token}`,
-        };
-        try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/users/me`,
-            {
-              headers: headers,
-            },
-          );
-          if (res.ok) {
-            const data = await res.json();
+        auth
+          .getCurrentUser(token)
+          .then((res) => {
             set((state) => ({
-              user: (state.user = data),
+              user: (state.user = res),
             }));
-          }
-        } catch (error) {
-          console.error('Error occured while fetching user:', error);
-        }
+          })
+          .catch((err) =>
+            console.error('Error occured while fetching user:', err),
+          );
       },
       updateUser: (data: Partial<TypeUser>) =>
         set((state) => ({

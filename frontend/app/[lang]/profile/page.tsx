@@ -3,23 +3,31 @@
 import { useUserStore } from '@/lib/store/user';
 import {
   Button,
-  Field,
-  Radio,
-  RadioGroup,
-  Subtitle2Stronger,
+  RadioGroupOnChangeData,
+  SelectOnChangeData,
+  useId,
 } from '@fluentui/react-components';
-import { useEffect, useState } from 'react';
-import { InputField } from '../ui/auth/input-field';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useDictionary } from '../dictionary-provider';
 import { useForm } from '@/lib/hooks/useForm';
-import { TypeUser } from '@/lib/definitions';
 import { profileFields } from './constants';
+import { UserFieldset } from '../ui/forms/user-fieldset';
 
 export default function Profile() {
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const user = useUserStore((store) => store.user);
-  const { page } = useDictionary();
+  const { page, common } = useDictionary();
   const { values, handleChange, setValues } = useForm();
+  const selectId = useId();
+
+  const roles: Record<string, string> = {
+    [common.roles[1]]: '1',
+    [common.roles[2]]: '2',
+    [common.roles[3]]: '3',
+    [common.roles[4]]: '4',
+    [common.roles[5]]: '5',
+  };
 
   useEffect(() => {
     useUserStore.persist.rehydrate();
@@ -35,6 +43,8 @@ export default function Profile() {
         fathername: user.fathername,
         country: user.country,
         birthdate: user.birthdate,
+        gender: user.gender === true ? 'male' : 'female',
+        role_id: user.role_id,
       });
     }
   }, [user]);
@@ -55,7 +65,34 @@ export default function Profile() {
         fathername: user.fathername,
         country: user.country,
         birthdate: user.birthdate,
+        gender: user.gender === true ? 'male' : 'female',
+        role_id: user.role_id,
       });
+    }
+  }
+
+  function handleRadioChange(
+    ev: FormEvent<HTMLDivElement>,
+    data: RadioGroupOnChangeData,
+  ): void {
+    if (data.value === 'male' || data.value === 'female') {
+      setValues((prevValues) => ({
+        ...prevValues,
+        gender: data.value === 'male' ? true : false,
+      }));
+    }
+  }
+
+  function handleSelectChange(
+    ev: ChangeEvent<HTMLSelectElement>,
+    data: SelectOnChangeData,
+  ): void {
+    const roleId = parseInt(data.value);
+    if (!isNaN(roleId)) {
+      setValues((prevValues) => ({
+        ...prevValues,
+        role_id: roleId,
+      }));
     }
   }
 
@@ -65,7 +102,24 @@ export default function Profile() {
         className="mt-8 flex w-2/3 max-w-[800px] flex-col justify-evenly rounded-md bg-slate-500 px-20 py-6"
         onSubmit={handleSubmit}
       >
-        <fieldset
+        <UserFieldset
+          user={user}
+          isDisabled={!isEditMode}
+          subtitle={page.profile.subtitle}
+          fields={profileFields}
+          handleChange={handleChange}
+          handleRadioChange={handleRadioChange}
+          handleSelectChange={handleSelectChange}
+          values={values}
+          chooseOption={page.register.chooseRole}
+          roles={roles}
+          errorMessage={errorMessage}
+          otherInputProps={{
+            appearance: 'underline',
+          }}
+        />
+
+        {/* <fieldset
           className="relative mb-6 grid h-auto w-full grid-cols-2 gap-x-11 gap-y-5 pb-8 pt-6"
           disabled={!isEditMode}
         >
@@ -94,13 +148,35 @@ export default function Profile() {
           <Field label="Пол" required size="large">
             <RadioGroup
               layout="horizontal"
-              defaultValue={user?.gender ? 'male' : 'female'} // тут нужно разобраться
+              name="gender"
+              onChange={handleRadioChange}
             >
               <Radio value="male" label="Мужской" />
               <Radio value="female" label="Женский" />
             </RadioGroup>
           </Field>
-        </fieldset>
+          <Field size="large">
+            <Label htmlFor={selectId} required size="large">
+              Роль
+            </Label>
+            <Select
+              name="role_id"
+              id={selectId}
+              appearance="outline"
+              onChange={handleSelectChange}
+              defaultValue=""
+            >
+              <option value="" disabled>
+                {page.register.chooseRole}
+              </option>
+              {Object.entries(roles).map(([key, value]) => (
+                <option key={value} value={value}>
+                  {key}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </fieldset> */}
         <div className="ml-auto mr-auto">
           {isEditMode ? (
             <div className="flex gap-4">

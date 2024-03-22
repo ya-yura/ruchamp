@@ -24,6 +24,9 @@ import type {
   TypeStringUserFields,
 } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
+import { UserFieldset } from '../ui/forms/user-fieldset';
+import { useUserStore } from '@/lib/store/user';
+import { auth } from '@/lib/client-api/auth';
 
 export default function Register() {
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -41,40 +44,20 @@ export default function Register() {
     [common.roles[5]]: '5',
   };
 
-  async function handleRegister(): Promise<void> {
+  function handleRegister(values: Partial<TypeRegisterFields>): void {
     setIsLoading(true);
-    try {
-      // Take a look on this values later
-      const otherValues: Partial<TypeRegisterFields> = {
-        is_active: false,
-        is_superuser: false,
-        is_verified: false,
-      };
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ ...values, ...otherValues }),
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
-      if (res.ok) {
-        router.push('/login');
-      } else {
-        console.error('Failed to register:', res.statusText);
+    auth
+      .register(values)
+      .then(() => router.push('/login'))
+      .catch((err) => {
         setErrorMessage(page.register.registerError);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setErrorMessage(page.register.registerError + JSON.stringify(error));
-    } finally {
-      setIsLoading(false);
-    }
+      })
+      .finally(() => setIsLoading(false));
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
-    handleRegister();
+    handleRegister(values);
   }
 
   function handleRadioChange(
@@ -108,7 +91,19 @@ export default function Register() {
         className="mt-8 flex w-2/3 max-w-[800px] flex-col justify-evenly rounded-md bg-slate-500 px-20 py-6"
         onSubmit={handleSubmit}
       >
-        <fieldset
+        <UserFieldset
+          isDisabled={isLoading}
+          subtitle={page.profile.subtitle}
+          fields={registerFields}
+          handleChange={handleChange}
+          handleRadioChange={handleRadioChange}
+          handleSelectChange={handleSelectChange}
+          values={values}
+          chooseOption={page.register.chooseRole}
+          roles={roles}
+          errorMessage={errorMessage}
+        />
+        {/* <fieldset
           className="relative  mb-6 grid h-auto w-full grid-cols-2 gap-x-11 gap-y-5 pb-8 pt-6"
           disabled={isLoading}
         >
@@ -175,7 +170,7 @@ export default function Register() {
               <span className="text-red-400">{errorMessage}</span>
             </p>
           )}
-        </fieldset>
+        </fieldset> */}
         <div className="ml-auto mr-auto">
           <Button
             appearance="primary"

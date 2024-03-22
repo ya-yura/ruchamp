@@ -11,6 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
+import { auth } from '@/lib/client-api/auth';
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -23,25 +24,36 @@ export default function Login() {
 
   async function handleSignIn(): Promise<void> {
     setIsLoading(true);
-    try {
-      const res = await signIn('credentials', {
-        username: values.username,
-        password: values.password,
-        redirect: false,
+    setErrorMessage('');
+    auth
+      .login(
+        values.username as keyof TypeLoginFields,
+        values.password as keyof TypeLoginFields,
+        false,
         callbackUrl,
-      });
-      if (res && !res.error) {
-        router.push('/dashboard');
-        setErrorMessage('');
-      } else {
-        throw new Error(page.login.loginError);
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      setErrorMessage('Failed to login');
-    } finally {
-      setIsLoading(false);
-    }
+      )
+      .then(() => router.push('/dashboard'))
+      .catch((err) => setErrorMessage(err.message))
+      .finally(() => setIsLoading(false));
+    // try {
+    //   const res = await signIn('credentials', {
+    //     username: values.username,
+    //     password: values.password,
+    //     redirect: false,
+    //     callbackUrl,
+    //   });
+    //   if (res && !res.error) {
+    //     router.push('/dashboard');
+    //     setErrorMessage('');
+    //   } else {
+    //     throw new Error(page.login.loginError);
+    //   }
+    // } catch (error) {
+    //   console.error('Error during login:', error);
+    //   setErrorMessage('Failed to login');
+    // } finally {
+    //   setIsLoading(false);
+    // }
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {

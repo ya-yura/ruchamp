@@ -1,5 +1,19 @@
 import { ButtonProps } from '@fluentui/react-components';
 
+// export type TypeHttpHeaders = {
+//   'Content-Type': string;
+//   Authorization: string;
+// };
+
+// export type TypeHttpRequest = TypeHttpHeaders & {
+//   baseUrl: string;
+// };
+
+export type TypeHttpRequest = {
+  baseUrl: string;
+  headers: { 'Content-Type': string; Authorization: string };
+};
+
 export type TypeLinksDropdown = {
   name: string;
   url: string;
@@ -20,6 +34,7 @@ export type TypeStringUserFields = {
   country: string;
   birthdate: string;
 };
+
 export type TypeBooleanUserFields = {
   is_active: boolean;
   is_superuser: boolean;

@@ -22,7 +22,6 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        console.log('authorize');
         const formData = new URLSearchParams(credentials);
         const res = await fetch('http://127.0.0.1:8000/auth/jwt/login', {
           method: 'POST',
