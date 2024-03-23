@@ -8,6 +8,7 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
   const getUser = useUserStore((state) => state.getUser);
 
+  // Still don't know if it's needed
   useEffect(() => {
     useUserStore.persist.rehydrate();
   }, []);

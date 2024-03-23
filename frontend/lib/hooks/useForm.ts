@@ -5,6 +5,7 @@ export function useForm() {
     [key: string]: string | number | Date | boolean;
     // [key: string]: string;
   }>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isValid, setIsValid] = useState<boolean>(false);
 
@@ -13,19 +14,9 @@ export function useForm() {
     const name = target.name;
     const value = target.value;
     setValues({ ...values, [name]: value });
+    setTouched({ ...touched, [name]: true });
     setErrors({ ...errors, [name]: target.validationMessage });
     setIsValid(target.closest('form')!.checkValidity());
-
-    // Подставляю свой текст ошибки при валидации имени, чтобы пользователь
-    // понимал что не так
-    // if (name === 'name') {
-    //   if (target.validationMessage === 'Please match the requested format.') {
-    //     setErrors({
-    //       ...errors,
-    //       name: 'Name must contain olny Latin or Cyrillic characters, spaces or symbol "-" and must not start with space',
-    //     });
-    //   }
-    // }
   };
 
   const resetForm = useCallback(
@@ -37,5 +28,5 @@ export function useForm() {
     [setValues, setErrors, setIsValid],
   );
 
-  return { values, errors, isValid, handleChange, resetForm, setValues };
+  return { values, touched, errors, isValid, handleChange, resetForm, setValues, setTouched };
 }

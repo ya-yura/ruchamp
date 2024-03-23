@@ -1,6 +1,5 @@
 'use client';
 
-// Undone
 import {
   Field,
   FieldProps,
@@ -87,15 +86,15 @@ export function UserFieldset({
           layout="horizontal"
           name="gender"
           onChange={handleRadioChange}
-          value={
-            (values['gender' as keyof TypeStringUserFields] as string) || ''
-          }
+          // value={
+          //   (values['gender' as keyof TypeStringUserFields] as string) || ''
+          // }
         >
           <Radio value="male" label="Мужской" />
           <Radio value="female" label="Женский" />
         </RadioGroup>
       </Field>
-      <Field size="large">
+      {/* <Field size="large">
         <Label htmlFor={selectId} required size="large">
           Роль
         </Label>
@@ -108,17 +107,14 @@ export function UserFieldset({
             (values['role_id' as keyof TypeStringUserFields] as string) || ''
           }
         >
-          {/* <option value="" disabled>
-            {chooseOption}
-          </option> */}
           {Object.entries(roles).map(([key, value]) => (
             <option key={value} value={value}>
               {key}
             </option>
           ))}
         </Select>
-      </Field>
-      {errorMessage && (
+      </Field> */}
+      {/* {errorMessage && (
         <p className="absolute bottom-0 left-[25%]">
           <ErrorCircle20Regular
             aria-label={errorMessage}
@@ -126,7 +122,7 @@ export function UserFieldset({
           />{' '}
           <span className="text-red-400">{errorMessage}</span>
         </p>
-      )}
+      )} */}
     </fieldset>
   );
 }

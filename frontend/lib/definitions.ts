@@ -1,14 +1,5 @@
 import { ButtonProps } from '@fluentui/react-components';
 
-// export type TypeHttpHeaders = {
-//   'Content-Type': string;
-//   Authorization: string;
-// };
-
-// export type TypeHttpRequest = TypeHttpHeaders & {
-//   baseUrl: string;
-// };
-
 export type TypeHttpRequest = {
   baseUrl: string;
   headers: { 'Content-Type': string; Authorization: string };
@@ -27,6 +18,7 @@ export type TypeLoginFields = {
 export type TypeStringUserFields = {
   email: string;
   password: string;
+  repeatPassword: string;
   username: string;
   name: string;
   sirname: string;

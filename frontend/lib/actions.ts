@@ -1,29 +1,8 @@
 'use server';
-// Yet it does not work in a proper way
 
-import { signIn } from 'next-auth/react';
+import { auth } from "./client-api/auth";
 
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  const rawFormData = {
-    username: formData.get('username'),
-    password: formData.get('password'),
-  };
-  try {
-    await signIn('credentials', rawFormData);
-  } catch (error) {
-    console.log('Invalid credentials or something went wrong');
-    // if (error instanceof AuthError) {
-    //   switch (error.type) {
-    //     case 'CredentialsSignin':
-    //       return 'Invalid credentials.';
-    //     default:
-    //       return 'Something went wrong.';
-    //   }
-    // }
-    return 'Something went wrong.';
-    // throw error;
-  }
+// Get user data from client side
+export async function getUserData(token: string) {
+  auth.getCurrentUser(token).then((res) => console.log('res', res));
 }

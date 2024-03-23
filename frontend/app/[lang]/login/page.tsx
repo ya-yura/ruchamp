@@ -8,7 +8,6 @@ import { loginFields } from './constants';
 import { TypeLoginFields } from '../../../lib/definitions';
 import { useDictionary } from '../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
 import { auth } from '@/lib/client-api/auth';
@@ -35,25 +34,6 @@ export default function Login() {
       .then(() => router.push('/dashboard'))
       .catch((err) => setErrorMessage(err.message))
       .finally(() => setIsLoading(false));
-    // try {
-    //   const res = await signIn('credentials', {
-    //     username: values.username,
-    //     password: values.password,
-    //     redirect: false,
-    //     callbackUrl,
-    //   });
-    //   if (res && !res.error) {
-    //     router.push('/dashboard');
-    //     setErrorMessage('');
-    //   } else {
-    //     throw new Error(page.login.loginError);
-    //   }
-    // } catch (error) {
-    //   console.error('Error during login:', error);
-    //   setErrorMessage('Failed to login');
-    // } finally {
-    //   setIsLoading(false);
-    // }
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {

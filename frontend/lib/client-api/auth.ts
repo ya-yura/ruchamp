@@ -8,7 +8,9 @@ import {
 
 // Проверяю ответ сервера
 function checkResponse(res: any) {
-  return res.ok ? res.json() : Promise.reject(res.status);
+  return res.ok
+    ? res.json()
+    : Promise.reject(`Request error. Status: ${res.status}`);
 }
 
 class Auth {
