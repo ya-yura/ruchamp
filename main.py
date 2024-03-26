@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi_users import FastAPIUsers
+from fastapi.staticfiles import StaticFiles
 
 from auth.auth import auth_backend
 from auth.models import (
@@ -11,17 +12,20 @@ from auth.manager import (
 from auth.schemas import (
     UserRead,
     UserCreate,
+
 )
 from auth.routes import router as auth_router
 from pages.router import router as pages_router
 from event.routers import router as event_router
 from teams.routers import router as team_router
 from match.routers import router as match_router
+from shop.routers import router as shop_router
 
 
 app = FastAPI(
     title="Ruchamp"
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -52,3 +56,4 @@ app.include_router(auth_router)
 app.include_router(event_router)
 app.include_router(team_router)
 app.include_router(match_router)
+app.include_router(shop_router)

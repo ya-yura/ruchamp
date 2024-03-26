@@ -21,13 +21,14 @@ from auth.models import (
     AllWeightClass,
     Referee,
     Coach,
-
 )
 from auth.schemas import (
     AthleteUpdate,
     SpectatorUpdate,
     SysAdminUpdate,
-    OrganizerUpdate
+    OrganizerUpdate,
+    RefereeUpdate,
+    UserCreate
 )
 from connection import User, get_user_db
 from auth.mailer import send_verification_email
@@ -47,10 +48,35 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         query = select(Coach).where(Coach.name.in_(names))
         coaches = await self.database.fetch_all(query)
         return coaches
+    
+    async def get_referee_profile(
+        self,
+        referee_data: RefereeUpdate,
+    ) -> Referee:
+        
+        referee = Referee(**referee_data)
+        await self.user_db.create(referee)
+        return referee
+    
+    async def update_referee_profile(
+        self,
+        user: User,
+        referee_data: RefereeUpdate,
+        request: Optional[Request] = None
+    ) -> Referee:
+        referee = await self.get_referee_profile(user)
+        for field, value in referee_data.dict().items():
+            setattr(referee, field, value)
+        await self.user_db.update(referee)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return referee
 
     async def create(
         self,
-        user_create: schemas.UC,
+        user_create: UserCreate,
         safe: bool = False,
         request: Optional[Request] = None,
     ) -> models.UP:
@@ -67,7 +93,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        user_dict["role_id"] = 1
         user_dict["verification_token"] = str(uuid.uuid4())
 
         created_user = await self.user_db.create(user_dict)

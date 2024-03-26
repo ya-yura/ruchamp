@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Boolean
-# from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy import (DateTime, Column, String, Integer, TIMESTAMP,
+                        ForeignKey, Boolean)
 from sqlalchemy.orm import relationship
 
 from auth.models import (
@@ -12,10 +12,7 @@ from auth.models import (
     SportType,
     Referee,
 )
-from teams.models import (
-    Team,
-    TeamMember,
-)
+from teams.models import Team, TeamMember
 from connection import Base
 
 
@@ -30,9 +27,10 @@ class Event(Base):
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
-    event_order = Column(String, nullable=True) # Это документы, которые будут прикладываться
-    event_system = Column(String, nullable=True) # и это
+    organizer_id = Column(Integer,
+                          ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
+    event_order = Column(String, nullable=True)  # Это документы, которые будут прикладываться
+    event_system = Column(String, nullable=True)  # и это
     geo = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
 
@@ -42,7 +40,8 @@ class EventWeights(Base):
     __tablename__ = "EventWeights"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    weight_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
+    weight_id = Column(Integer,
+                       ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
 
 
 # Виды спорта в событии
@@ -67,10 +66,15 @@ class Match(Base):
     __tablename__ = "Match"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))  # тип заполнения турнирной сетки
-    category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))  # категории спортсмена (кмс, мс и пр)
+    combat_type_id = Column(Integer,
+                            ForeignKey(CombatType.id, ondelete="CASCADE")
+                            )  # тип заполнения турнирной сетки
+    category_id = Column(Integer,
+                         ForeignKey(CategoryType.id, ondelete="CASCADE")
+                         )  # категории спортсмена (кмс, мс и пр)
     sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
-    weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
+    weight_class_id = Column(Integer,
+                             ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
@@ -144,5 +148,6 @@ class Medal(Base):
     __tablename__ = "Medal"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    recipient_id = Column(Integer, ForeignKey(Participant.id, ondelete="CASCADE"))
+    recipient_id = Column(Integer,
+                          ForeignKey(Participant.id, ondelete="CASCADE"))
     medal_type = Column(String, nullable=False)

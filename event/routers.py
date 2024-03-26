@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+import os
+import uuid
+
+from fastapi import (APIRouter, Depends, HTTPException, Request, File,
+                     UploadFile)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from fastapi_pagination import paginate, Params
@@ -11,6 +15,7 @@ from event.shemas import EventCreate, MatchRead, MatchCreate, EventUpdate
 from auth.schemas import UserDB
 from auth.routes import current_user
 from geo.geo import get_geo
+from aiofiles import open as async_open
 
 
 router = APIRouter(prefix="/event", tags=["Events"])
@@ -32,7 +37,7 @@ async def get_events_id(
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Event).where(Event.event_id == event_id))
+    query = await db.execute(select(Event).where(Event.id == event_id))
     event = query.scalars().one_or_none()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -52,8 +57,6 @@ async def create_event(
     query_admin = await db.execute(select(SystemAdministrator.user_id))
     all_admin_id = query_admin.scalars().all()
     all_organizer_id.extend(all_admin_id)
-    print(all_organizer_id)
-    print(current_user.id)
 
     try:
         if current_user.id in all_organizer_id:
@@ -63,6 +66,42 @@ async def create_event(
             return {f"Event {event.event_id} created"}
     except Exception:
         raise HTTPException(status_code=400, detail="You are not an organizer")
+
+
+@router.post("/update_image/{event_id}")
+async def update_image_in_event(
+    event_id: int,
+    image: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query_org = await db.execute(select(EventOrganizer.user_id))
+    all_organizer_id = query_org.scalars().all()
+    if current_user.id not in all_organizer_id:
+        raise HTTPException(status_code=400, detail="You are not an organizer")
+
+    query = await db.execute(select(Event).where(
+        Event.id == event_id))
+
+    event = query.scalars().one_or_none()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Validate the file type
+    if image.content_type not in ['image/jpeg', 'image/png']:
+        raise HTTPException(status_code=406,
+                            detail="Only .jpeg or .png files allowed"
+                            )
+
+    image_name = f"{uuid.uuid4().hex}.{image.filename.split('.')[-1]}"
+    image_path = os.path.join("static/event/", image_name)
+
+    async with async_open(image_path, 'wb') as f:
+        await f.write(await image.read())
+
+    event.image_field = f"/static/event/{image_name}"
+    await db.commit()
+    return {f"Event {event_id} updated"}
 
 
 @router.post("/update_geo/{event_id}")

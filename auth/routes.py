@@ -4,7 +4,7 @@ from connection import get_db
 
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from fastapi_users import FastAPIUsers
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
@@ -15,6 +15,7 @@ from auth.models import (
     EventOrganizer,
     Spectator,
     SystemAdministrator,
+    Referee,
 )
 from auth.manager import (
     get_user_manager,
@@ -28,6 +29,9 @@ from auth.schemas import (
     SysAdminUpdate,
     OrganizerUpdate,
     UserRead,
+    RefereeUpdate,
+    UserCreate,
+    NewUser,
 )
 from teams.models import TeamMember
 from event.models import Participant, Match
@@ -40,6 +44,7 @@ athlete_update = AthleteUpdate
 sysadmin_update = SysAdminUpdate
 organizer_update = OrganizerUpdate
 spectator_update = SpectatorUpdate
+referee_update = RefereeUpdate
 user_db_verify = UserDB
 
 
@@ -91,8 +96,9 @@ async def update_profile(
         1: user_manager.update_athlete_profile,
         2: user_manager.update_organizer_profile,
         3: user_manager.update_spectator_profile,
-        5: user_manager.update_sysadmin_profile
-    } # надо ещё судей добавить и их обработчики
+        4: user_manager.update_sysadmin_profile,
+        5: user_manager.update_referee_profile
+    }  # надо ещё судей добавить и их обработчики
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -166,8 +172,12 @@ async def update_sysadmin_profile(
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    return await update_profile(SystemAdministrator, sysadmin_data,
-                                current_user, user_manager)
+    return await update_profile(
+        SystemAdministrator,
+        sysadmin_data,
+        current_user,
+        user_manager
+    )
 
 
 '''  ORGANIZER  '''
@@ -197,10 +207,37 @@ async def update_organizer_profile(
     )
 
 
+'''REFEREES'''
+
+
+@router.post("/upload-referee-photo")
+async def upload_referee_photo(
+    image: UploadFile = File(...),
+    current_user: UserDB = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await upload_image(Referee, "logo_url", image,
+                              current_user, db)
+
+
+@router.put("/update-referee-profile")
+async def update_referee_profile(
+    referee_data: referee_update,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    return await update_profile(
+        SystemAdministrator,
+        referee_data,
+        current_user,
+        user_manager
+    )
+
+
 '''  USERS  '''
 
 
-@router.get("/verify/{token}", tags=["users"])
+@router.get("/verify/{token}")
 async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User.email).where(
         User.verification_token == token)
@@ -213,7 +250,7 @@ async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
     return {"email": email}
 
 
-@router.post("/forgot-password/{email}", tags=["users"])
+@router.post("/forgot-password/{email}")
 async def forgot_password_email(
     email: str,
     db: AsyncSession = Depends(get_db),
@@ -233,7 +270,7 @@ async def forgot_password_email(
     return {"token": token}
 
 
-@router.post("/reset-forgot-password/{token}", tags=["users"])
+@router.post("/reset-forgot-password/{token}")
 async def forgot_password(
     token: str,
     user_manager: UserManager = Depends(get_user_manager),
@@ -249,7 +286,7 @@ async def forgot_password(
     return {"email": email}
 
 
-@router.get("/me", tags=["users"], response_model=UserRead)
+@router.get("/me", response_model=UserRead)
 async def get_current_user(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -260,7 +297,7 @@ async def get_current_user(
     return user
 
 
-@router.get("/me/events", tags=["users"])
+@router.get("/me/events")
 async def get_current_user_events(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -280,7 +317,7 @@ async def get_current_user_events(
     return {"events": events}
 
 
-@router.get("/me/matches", tags=["users"])
+@router.get("/me/matches")
 async def get_current_user_matches(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -301,7 +338,7 @@ async def get_current_user_matches(
     return {"matches": matches}
 
 
-@router.get("/me/athlete", tags=["users"])
+@router.get("/me/athlete")
 async def get_current_user_athlete(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -311,3 +348,68 @@ async def get_current_user_athlete(
     athlete = query.scalars().first()
 
     return athlete
+
+
+@router.post("/me/referee")
+async def get_current_user_referee(
+    referee_data: referee_update,
+    current_user: User = Depends(current_user),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    return await update_profile(
+        Referee,
+        referee_data,
+        current_user,
+        user_manager
+    )
+
+
+@router.post("/create")
+async def create_user(
+    user_create: UserCreate,
+    user_data: NewUser,
+    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db)
+):
+    user = await user_manager.create(user_create)
+    user_role = user.role_id
+
+    if user_role == 1:
+        await db.execute(insert(Athlete).values(
+            user_id=user.id,
+            weight=float(user_data.info['athlete_weight']),
+            height=int(user_data.info['athlete_height']),
+        ))
+        await db.commit()
+
+    if user_role == 2:
+        await db.execute(insert(EventOrganizer).values(
+            user_id=user.id,
+            organization_name=user_data.info['event_organizer_organization_name'],
+            website=user_data.info['event_organizer_organization_website'],
+            contact_email=user_data.info['event_organizer_organization_contact_email'],
+            contact_phone=user_data.info['event_organizer_organization_contact_phone'],
+        ))
+        await db.commit()
+
+    if user_role == 3:
+        await db.execute(insert(Spectator).values(
+            user_id=user.id,
+            phone_number=user_data.info['spectator_phone_number'],
+        ))
+        await db.commit()
+
+    if user_role == 4:
+        await db.execute(insert(SystemAdministrator).values(
+            user_id=user.id
+        ))
+        await db.commit()
+
+    if user_role == 5:
+        await db.execute(insert(Referee).values(
+            user_id=user.id,
+            qualification_level=int(user_data.info['referee_qualification_level']),
+        ))
+        await db.commit()
+
+    return user

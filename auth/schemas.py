@@ -2,18 +2,19 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
 from fastapi_users import schemas
+import json
 
 
 class UserRead(schemas.BaseUser[int]):
     id: int
     email: str
-    username: str
-    name: str
-    sirname: str
-    fathername: str
-    gender: bool
-    country: str
-    birthdate: datetime
+    username: Optional[str] = None
+    name: Optional[str] = None
+    sirname: Optional[str] = None
+    fathername: Optional[str] = None
+    gender: Optional[bool] = None
+    country: Optional[str] = None
+    birthdate: Optional[datetime] = None
     role_id: int
     is_active: bool = True
     is_superuser: bool = False
@@ -21,22 +22,6 @@ class UserRead(schemas.BaseUser[int]):
 
     class Config:
         from_attributes = True
-
-
-class UserCreate(schemas.BaseUserCreate):
-    username: str
-    email: str
-    name: str
-    sirname: str
-    fathername: str
-    gender: bool
-    country: str
-    birthdate: datetime
-    password: str
-    role_id: int
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
-    is_verified: Optional[bool] = False
 
 
 class UserUpdate(schemas.BaseUserUpdate):
@@ -66,7 +51,7 @@ class AthleteUpdate(BaseModel):
     coaches: Optional[List[str]]
 # Тренеры и типы используют List[str], им надо передавать списки строк,
 # представляющих имена видов борьбы и тренеров соответственно.
-    
+
 
 class SpectatorUpdate(BaseModel):
     phone_number: Optional[str]
@@ -87,3 +72,26 @@ class OrganizerUpdate(BaseModel):
     image_field: Optional[str]
 
 
+class RefereeUpdate(BaseModel):
+    qualification_level: Optional[str] = None
+    image_field: Optional[str] = None
+
+
+class UserCreate(schemas.BaseUserCreate):
+    username: str
+    email: str
+    name: str
+    sirname: str
+    fathername: str
+    gender: bool
+    country: str
+    birthdate: datetime
+    password: str
+    role_id: int
+    is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
+    is_verified: Optional[bool] = False
+
+
+class NewUser(BaseModel):
+    info: Optional[dict] = None
