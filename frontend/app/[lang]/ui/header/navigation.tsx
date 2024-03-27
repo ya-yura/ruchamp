@@ -1,38 +1,19 @@
 'use client';
 
 import {
-  Avatar,
   Button,
   Menu,
-  MenuButton,
-  MenuItem,
   MenuItemLink,
   MenuList,
   MenuPopover,
   MenuTrigger,
 } from '@fluentui/react-components';
-import { ButtonWithLink } from '../custom-buttons';
-import { Locale } from '@/i18n.config';
-import { makeStyles } from '@fluentui/react-components';
 
-const useOverrides = makeStyles({
-  menuItem: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: '0',
-    paddingBottom: '0',
-    paddingLeft: '0',
-    paddingRight: '0',
-  },
-});
-
-export default function HeaderNavigation({ lang }: { lang: Locale }) {
-  const overrides = useOverrides();
+export default function HeaderNavigation() {
   return (
     <Menu>
       <MenuTrigger disableButtonEnhancement>
-        <Button iconPosition="after" icon={<Arrow />}>
+        <Button size="medium" iconPosition="after" icon={<Arrow />}>
           События
         </Button>
       </MenuTrigger>
