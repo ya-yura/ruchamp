@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
           <li key={locale}>
             <Link
               href={redirectedPathName(locale)}
-              className="rounded-md border bg-black px-2 py-1 text-white"
+              className="rounded-md border bg-transparent px-2 py-1 text-white"
             >
               {locale}
             </Link>

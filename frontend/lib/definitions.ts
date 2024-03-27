@@ -52,8 +52,3 @@ export type TypeCustomLinkProps = {
   children: React.ReactNode;
 } & React.RefAttributes<HTMLAnchorElement>;
 
-export type TypeButtonWithLinkProps = {
-  href: string;
-  lang: string;
-  children: string;
-} & ButtonProps;

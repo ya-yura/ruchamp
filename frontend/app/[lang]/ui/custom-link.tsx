@@ -11,7 +11,7 @@ export function CustomLink({
   const isDefaultLang = lang === i18n.defaultLocale;
   const path = isDefaultLang ? href : `/${lang}${href}`;
   return (
-    <Link href={path} {...props}>
+    <Link href={path} {...props} >
       {children}
     </Link>
   );

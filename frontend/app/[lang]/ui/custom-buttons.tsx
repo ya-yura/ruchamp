@@ -2,17 +2,46 @@
 
 import { Button, ButtonProps } from '@fluentui/react-components';
 import { CustomLink } from './custom-link';
-import { TypeButtonWithLinkProps } from '@/lib/definitions';
+import { makeStyles, mergeClasses } from '@fluentui/react-components';
 
-export const ButtonWithLink = ({
+type ButtonWithLinkProps = {
+  href: string;
+  lang: string;
+  textPosition: 'right' | 'left';
+  children: string;
+} & ButtonProps;
+
+const useOverrides = makeStyles({
+  button: {
+    display: 'flex',
+  },
+  textLeft: {
+    justifyContent: 'flex-start',
+  },
+  textRight: {
+    justifyContent: 'flex-end',
+  },
+});
+
+export function ButtonWithLink({
   lang,
   href,
+  textPosition,
   children,
   ...props
-}: TypeButtonWithLinkProps) => (
-  <Button {...props}>
-    <CustomLink href={href} lang={lang}>
-      {children}
-    </CustomLink>
-  </Button>
-);
+}: ButtonWithLinkProps) {
+  const overrides = useOverrides();
+  return (
+    <Button
+      className={mergeClasses(
+        overrides.button,
+        textPosition === 'left' ? overrides.textLeft : overrides.textRight,
+      )}
+      {...(props as ButtonProps)}
+    >
+      <CustomLink href={href} lang={lang}>
+        {children}
+      </CustomLink>
+    </Button>
+  );
+}

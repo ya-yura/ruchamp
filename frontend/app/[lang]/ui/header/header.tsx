@@ -10,7 +10,8 @@ import {
 } from '@/app/[lang]/ui/header/constants';
 import { AuthButtons } from './buttons';
 import Logo from '../logo';
-import { UserMenuButton } from '../user-menu-button';
+import { UserMenuButton } from './user-menu-button';
+import HeaderNavigation from './navigation';
 
 export async function Header({ lang }: { lang: Locale }) {
   const { header } = await getDictionary(lang);
@@ -18,11 +19,15 @@ export async function Header({ lang }: { lang: Locale }) {
 
   return (
     <header className="flex items-center justify-between bg-transparent px-[72px] py-3">
-      <div className="flex items-center justify-start">
+      <div className="flex w-full items-center justify-start">
         <div className="flex h-14 items-center justify-start border-r-2 border-neutral-600 pr-12">
           <Logo lang={lang} />
         </div>
-        <nav className="ml-auto flex items-center justify-center">
+
+        <div className="ml-4">
+          <HeaderNavigation lang={lang} />
+        </div>
+        {/* <nav className="ml-auto flex items-center justify-center">
           <ul className="flex flex-row items-center justify-start gap-2">
             <li>
               <MenuItemLinkNavigation
@@ -47,12 +52,12 @@ export async function Header({ lang }: { lang: Locale }) {
             </li>
             <AuthButtons lang={lang} />
           </ul>
-        </nav>
-        <div className="lang-switcher">
-          <LanguageSwitcher />
+        </nav> */}
+        <div className="ml-auto flex items-center justify-end gap-5">
+          {/* <LanguageSwitcher /> */}
+          <UserMenuButton />
         </div>
       </div>
-      <UserMenuButton lang={lang} />
     </header>
   );
 }

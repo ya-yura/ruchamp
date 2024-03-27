@@ -2,31 +2,15 @@
 
 import {
   Avatar,
-  Button,
   Menu,
   MenuButton,
-  MenuItem,
+  MenuItemLink,
   MenuList,
   MenuPopover,
   MenuTrigger,
 } from '@fluentui/react-components';
-import { ButtonWithLink } from './custom-buttons';
-import { Locale } from '@/i18n.config';
-import { signOut } from 'next-auth/react';
-import { makeStyles } from '@fluentui/react-components';
 
-const useOverrides = makeStyles({
-  item: {
-    paddingTop: '0',
-    paddingBottom: '0',
-    paddingLeft: '0',
-    paddingRight: '0',
-  },
-});
-
-export function UserMenuButton({ lang }: { lang: Locale }) {
-  const overrides = useOverrides();
-
+export function UserMenuButton() {
   return (
     <Menu positioning="below-end">
       <MenuTrigger disableButtonEnhancement>
@@ -50,25 +34,8 @@ export function UserMenuButton({ lang }: { lang: Locale }) {
 
       <MenuPopover>
         <MenuList>
-          <MenuItem className={overrides.item}>
-            <ButtonWithLink
-              lang={lang}
-              href={`/profile`}
-              appearance="transparent"
-              size="large"
-            >
-              Профиль
-            </ButtonWithLink>
-          </MenuItem>
-          <MenuItem className={overrides.item}>
-            <Button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              appearance="transparent"
-              size="large"
-            >
-              Выйти
-            </Button>
-          </MenuItem>
+          <MenuItemLink href="/profile">Профиль</MenuItemLink>
+          <MenuItemLink href="/logout">Выйти</MenuItemLink>
         </MenuList>
       </MenuPopover>
     </Menu>
