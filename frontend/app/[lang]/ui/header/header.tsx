@@ -10,7 +10,7 @@ export async function Header({ lang }: { lang: Locale }) {
   // const { common } = await getDictionary(lang);
 
   return (
-    <header className="flex items-center justify-between bg-transparent px-[72px] py-3">
+    <header className="flex items-center justify-between bg-transparent px-[72px] py-3 relative z-10">
       <div className="flex w-full items-center justify-start">
         <div className="flex h-14 items-center justify-start border-r-2 border-neutral-600 pr-12">
           <Logo lang={lang} />

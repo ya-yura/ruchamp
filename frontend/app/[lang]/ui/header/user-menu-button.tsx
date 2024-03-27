@@ -9,12 +9,20 @@ import {
   MenuPopover,
   MenuTrigger,
 } from '@fluentui/react-components';
+import { makeStyles, tokens, shorthands } from '@fluentui/react-components';
+
+const useOverrides = makeStyles({
+  text: { color: tokens.colorNeutralForeground2 },
+});
 
 export function UserMenuButton() {
+  const overriders = useOverrides();
+
   return (
     <Menu positioning="below-end">
       <MenuTrigger disableButtonEnhancement>
         <MenuButton
+          className={overriders.text}
           as="button"
           menuIcon={<Arrow />}
           appearance="transparent"
