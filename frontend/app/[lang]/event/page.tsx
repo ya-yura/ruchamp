@@ -1,126 +1,61 @@
 'use client';
 
-import { Badge } from '@fluentui/react-components';
-import Image from 'next/image';
-import { makeStyles, tokens, shorthands } from '@fluentui/react-components';
-
-const useOverrides = makeStyles({
-  badge: {
-    backgroundColor: tokens.colorNeutralForegroundInverted,
-    fontSize: '16px',
-    letterSpacing: '-0.5px',
-    ...shorthands.padding('6px', '16px'),
-  },
-});
+import React, { useState } from 'react';
+import { EventHero } from './event-hero';
+import {
+  SelectTabData,
+  SelectTabEvent,
+  TabValue,
+  Text,
+} from '@fluentui/react-components';
 
 export default function Event() {
-  const overrides = useOverrides();
+  const [selectedValue, setSelectedValue] = useState<TabValue>('info');
+
+  const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
+    setSelectedValue(data.value);
+  };
+
+  const Info = React.memo(() => (
+    <div role="tabpanel" aria-labelledby="info">
+      <Text>Информация</Text>
+    </div>
+  ));
+
+  const Athletes = React.memo(() => (
+    <div role="tabpanel" aria-labelledby="athletes">
+      <Text>Спортсмены</Text>
+    </div>
+  ));
+
+  const Matches = React.memo(() => (
+    <div role="tabpanel" aria-labelledby="matches">
+      <Text>Матчи</Text>
+    </div>
+  ));
+
+  const Grid = React.memo(() => (
+    <div role="tabpanel" aria-labelledby="grid">
+      <Text>Турнирная сетка</Text>
+    </div>
+  ));
+
+  const Results = React.memo(() => (
+    <div role="tabpanel" aria-labelledby="results">
+      <Text>Результаты</Text>
+    </div>
+  ));
+
   return (
     <main className="flex min-h-[calc(100vh-137px)] flex-col items-center justify-start py-3">
-      <section className="relative flex h-[720px] w-full flex-col items-center justify-start px-[72px]">
-        <Image
-          className="absolute top-[-93px] opacity-50"
-          src="/ru/images/event-hero-bg.jpeg"
-          alt={'ДОБАВИТЬ ОПИСАНИЕ'}
-          width={1280}
-          height={720}
-          // fill={true}
-          style={{ objectFit: 'cover' }}
-        />
-        <div className="flex flex-wrap gap-3 max-w-5xl self-start">
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Главное
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Айкидо
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Вольная борьба
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Греко-римская борьба
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Джиу-джитсу
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Дзюдо
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Карате
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Кикбоксинг
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Рукопашный бой
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Самбо
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Сумо
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Тхэквондо
-          </Badge>
-          <Badge
-            className={overrides.badge}
-            size="extra-large"
-            appearance="filled"
-          >
-            Ушу
-          </Badge>
-        </div>
-      </section>
+      <EventHero selectedValue={selectedValue} onTabSelect={onTabSelect} />
+      <div className="">
+        {selectedValue === 'info' && <Info />}
+        {selectedValue === 'athletes' && <Athletes />}
+        {selectedValue === 'matches' && <Matches />}
+        {selectedValue === 'grid' && <Grid />}
+        {selectedValue === 'results' && <Results />}
+      </div>
     </main>
   );
 }

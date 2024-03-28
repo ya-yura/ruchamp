@@ -13,7 +13,7 @@ export default function HeaderNavigation() {
   return (
     <Menu>
       <MenuTrigger disableButtonEnhancement>
-        <Button size="medium" iconPosition="after" icon={<Arrow />}>
+        <Button size="medium" iconPosition="after" appearance='outline' icon={<Arrow />}>
           События
         </Button>
       </MenuTrigger>
