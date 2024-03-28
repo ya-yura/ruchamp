@@ -27,7 +27,9 @@ from auth.schemas import (
     AthleteUpdate,
     SpectatorUpdate,
     SysAdminUpdate,
-    OrganizerUpdate
+    OrganizerUpdate,
+    RefereeUpdate
+    
 )
 from connection import User, get_user_db
 from auth.mailer import send_verification_email
@@ -67,7 +69,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        user_dict["role_id"] = 1
         user_dict["verification_token"] = str(uuid.uuid4())
 
         created_user = await self.user_db.create(user_dict)
@@ -161,6 +162,22 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return organizer
+    
+    async def update_referee_profile(
+        self,
+        user: User,
+        referee_data: RefereeUpdate,
+        request: Optional[Request] = None
+    ) -> Referee:
+        referee = await self.get_referee_profile(user)
+        for field, value in referee_data.dict().items():
+            setattr(referee, field, value)
+        await self.user_db.update(referee)
+
+        # можно добавить дополнительной логики после обновления
+        # например, сохранить это в логах или отправить что-нибудь пользователю
+
+        return referee
 
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
