@@ -7,7 +7,9 @@ import {
   SelectTabEvent,
   TabValue,
 } from '@fluentui/react-components';
-import { InfoBlock } from './info-block';
+import { InfoSection } from './info-section';
+import { AddressSection } from './address-section';
+import { Container } from '../ui/container';
 
 export default function Event() {
   const [selectedValue, setSelectedValue] = useState<TabValue>('info');
@@ -17,9 +19,10 @@ export default function Event() {
   };
 
   return (
-    <main className="flex min-h-[calc(100vh-137px)] flex-col items-center justify-start pt-3">
+    <Container>
       <EventHero selectedValue={selectedValue} onTabSelect={onTabSelect} />
-      <InfoBlock selectedValue={selectedValue} />
-    </main>
+      <InfoSection selectedValue={selectedValue} />
+      <AddressSection />
+    </Container>
   );
 }

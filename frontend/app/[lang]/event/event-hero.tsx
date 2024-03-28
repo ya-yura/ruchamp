@@ -24,7 +24,7 @@ export function EventHero({
   const overrides = useOverrides();
 
   return (
-    <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between px-[72px] pt-[92px]">
+    <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
       <Image
         className="opacity-50"
         src="/ru/images/event-hero-bg.jpeg"

@@ -15,11 +15,11 @@ const useStyles = makeStyles({
   },
 });
 
-export function InfoBlock({ selectedValue }: any) {
+export function InfoSection({ selectedValue }: any) {
   const styles = useStyles();
 
   return (
-    <section className={styles.section}>
+    <section className="flex w-full flex-col px-[72px] py-[54px]">
       {selectedValue === 'info' && <Info />}
       {selectedValue === 'athletes' && <Athletes />}
       {selectedValue === 'matches' && <Matches />}
