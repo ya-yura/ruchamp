@@ -10,6 +10,7 @@ import {
 import { InfoSection } from './info-section';
 import { AddressSection } from './address-section';
 import { Container } from '../ui/container';
+import { ExpectedEvents } from './expected-events';
 
 export default function Event() {
   const [selectedValue, setSelectedValue] = useState<TabValue>('info');
@@ -23,6 +24,7 @@ export default function Event() {
       <EventHero selectedValue={selectedValue} onTabSelect={onTabSelect} />
       <InfoSection selectedValue={selectedValue} />
       <AddressSection />
+      <ExpectedEvents />
     </Container>
   );
 }

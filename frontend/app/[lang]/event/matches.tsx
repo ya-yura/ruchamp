@@ -1,4 +1,4 @@
-import { CustomCard } from './custom-card';
+import { TextCard } from './text-card';
 
 type TypeMockData = {
   title?: string;
@@ -32,12 +32,12 @@ export function Matches() {
     <div className="flex gap-4" role="tabpanel" aria-labelledby="matches">
       <div className="flex w-2/3 flex-col gap-[18px]">
         {mockData1.map((item) => (
-          <CustomCard key={item.title} title={item.title} text={item.text} />
+          <TextCard key={item.title} title={item.title} text={item.text} />
         ))}
       </div>
       <div className="flex w-1/3 flex-col gap-[18px]">
         {mockData2.map((item) => (
-          <CustomCard key={item.title} title={item.title} text={item.text} />
+          <TextCard key={item.title} title={item.title} text={item.text} />
         ))}
       </div>
     </div>

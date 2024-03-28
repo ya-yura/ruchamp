@@ -20,7 +20,7 @@ const useOverrides = makeStyles({
   },
 });
 
-export function CustomCard({ title, text }: TypeCustomCardProps) {
+export function TextCard({ title, text }: TypeCustomCardProps) {
   const overrides = useOverrides();
 
   return (
