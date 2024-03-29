@@ -1,5 +1,4 @@
-import { makeStyles, tokens, shorthands } from '@fluentui/react-components';
-import { CallEndRegular } from '@fluentui/react-icons';
+import { makeStyles, tokens } from '@fluentui/react-components';
 
 const useStyles = makeStyles({
   main: {

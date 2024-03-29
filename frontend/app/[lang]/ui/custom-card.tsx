@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { makeStyles, tokens } from '@fluentui/react-components';
 
 const useOverrides = makeStyles({
+  card: { cursor: 'pointer' },
   title: { color: tokens.colorNeutralForeground4, fontWeight: '700' },
   text: { color: tokens.colorNeutralForeground4 },
   footer: {
@@ -16,7 +17,7 @@ const useOverrides = makeStyles({
         maxWidth: '200px',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
       },
     },
   },
@@ -26,7 +27,7 @@ export default function CustomCard({ title, date }: any) {
   const overrides = useOverrides();
 
   return (
-    <Card>
+    <Card className={overrides.card}>
       <Image
         src="/ru/images/event-image-example.png"
         alt={'ДОБАВИТЬ ОПИСАНИЕ'}

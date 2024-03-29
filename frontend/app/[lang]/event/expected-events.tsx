@@ -31,7 +31,7 @@ export function ExpectedEvents() {
   const overrides = useOverrides();
 
   return (
-    <section className="flex w-full flex-col gap-6 px-[72px] py-7">
+    <section className="flex w-full flex-col gap-6 px-[72px] pb-7 pt-12">
       <Title1 className={overrides.title}>Самые ожидаемые события</Title1>
       <div className="grid grid-cols-4 gap-[18px]">
         {cardMockData.map((item) => (

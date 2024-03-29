@@ -13,18 +13,25 @@ export default function HeaderNavigation() {
   return (
     <Menu>
       <MenuTrigger disableButtonEnhancement>
-        <Button size="medium" iconPosition="after" appearance='outline' icon={<Arrow />}>
+        <Button
+          size="medium"
+          iconPosition="after"
+          appearance="outline"
+          icon={<Arrow />}
+        >
           События
         </Button>
       </MenuTrigger>
 
       <MenuPopover>
-        <MenuList>
-          <MenuItemLink href="/event">Событие</MenuItemLink>
-          <MenuItemLink href="/events">События</MenuItemLink>
-          <MenuItemLink href="/login">Войти</MenuItemLink>
-          <MenuItemLink href="/register">Регистрация</MenuItemLink>
-        </MenuList>
+        <nav>
+          <MenuList>
+            <MenuItemLink href="/event">Событие</MenuItemLink>
+            <MenuItemLink href="/events">События</MenuItemLink>
+            <MenuItemLink href="/login">Войти</MenuItemLink>
+            <MenuItemLink href="/register">Регистрация</MenuItemLink>
+          </MenuList>
+        </nav>
       </MenuPopover>
     </Menu>
   );

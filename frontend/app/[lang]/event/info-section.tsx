@@ -19,7 +19,7 @@ export function InfoSection({ selectedValue }: any) {
   const styles = useStyles();
 
   return (
-    <section className="flex w-full flex-col px-[72px] py-[54px]">
+    <section className="flex w-full flex-col px-[72px] pb-[38px] pt-[54px]">
       {selectedValue === 'info' && <Info />}
       {selectedValue === 'athletes' && <Athletes />}
       {selectedValue === 'matches' && <Matches />}
