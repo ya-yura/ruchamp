@@ -1,5 +1,6 @@
 'use client';
 
+import { getUserData } from '@/lib/actions';
 import { useUserStore } from '@/lib/store/user';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
@@ -18,6 +19,7 @@ export default function Dashboard() {
       const token = session.user?.name;
       localStorage.setItem('jwt', token);
       getUser(token);
+      getUserData(token);
     }
   }, [session, status]);
 
