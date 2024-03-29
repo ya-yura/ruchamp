@@ -2,7 +2,6 @@
 
 import { Locale } from '@/i18n.config';
 import { CustomLink } from './custom-link';
-import Image from 'next/image';
 import {
   Subtitle1,
 } from '@fluentui/react-components';

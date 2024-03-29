@@ -1,19 +1,7 @@
-import { makeStyles, tokens } from '@fluentui/react-components';
-
-const useStyles = makeStyles({
-  main: {
-    backgroundColor: tokens.colorNeutralBackground4,
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: 'calc(100vh-137px)',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: '12px',
-  },
-});
-
 export function Container({ children }: { children: React.ReactNode }) {
-  const styles = useStyles();
-
-  return <main className={styles.main}>{children}</main>;
+  return (
+    <main className="flex min-h-[calc(100vh-137px)] flex-col items-center justify-start bg-[#0a0a0a] pt-3">
+      {children}
+    </main>
+  );
 }
