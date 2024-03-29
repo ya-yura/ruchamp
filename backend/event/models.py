@@ -68,8 +68,8 @@ class Match(Base):
     __tablename__ = "Match"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))
-    category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
+    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE")) # тип заполнения турнирной сетки
+    category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE")) # категории спортсмена (кмс, мс и пр)
     sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)
@@ -112,7 +112,9 @@ class MatchCounter(Base):
     __tablename__ = "MatchCounter"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(MatchPeriod.id, ondelete="CASCADE"))
+    player_one = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player1_score = Column(String, nullable=False)
+    player_two = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
     player2_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
     referee_id = Column(Integer, ForeignKey(Referee.id, ondelete="CASCADE"))

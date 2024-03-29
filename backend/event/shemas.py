@@ -12,7 +12,7 @@ class Event(BaseModel):
     geo: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class EventCreate(BaseModel):
@@ -41,7 +41,7 @@ class MatchRead(BaseModel):
     winner_id: Optional[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MatchCreate(MatchRead):
@@ -53,4 +53,4 @@ class MatchCreate(MatchRead):
     winner_id: Optional[int] = 1
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -1,8 +1,7 @@
-from datetime import datetime
-from typing import Optional, List
-from fastapi_users import schemas
 from datetime import date
+from typing import Optional, List
 from pydantic import BaseModel
+from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -21,7 +20,7 @@ class UserRead(schemas.BaseUser[int]):
     is_verified: bool = False
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -40,6 +39,10 @@ class UserCreate(schemas.BaseUserCreate):
     is_verified: Optional[bool] = False
 
 
+class UserData(BaseModel):
+    info: Optional[dict] = None
+
+
 class UserUpdate(schemas.BaseUserUpdate):
     pass
 
@@ -54,7 +57,7 @@ class UserDB(User, schemas.BaseUser):
     verification_token: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AthleteUpdate(BaseModel):
@@ -65,7 +68,7 @@ class AthleteUpdate(BaseModel):
     image_field: Optional[str]
     combat_types: Optional[List[str]]
     coaches: Optional[List[str]]
-    
+
 
 class SpectatorUpdate(BaseModel):
     phone_number: Optional[str]
@@ -86,3 +89,6 @@ class OrganizerUpdate(BaseModel):
     image_field: Optional[str]
 
 
+class RefereeUpdate(BaseModel):
+    qualification_level: Optional[str]
+    image_field: Optional[str]
