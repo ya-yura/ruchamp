@@ -1,8 +1,5 @@
 import * as React from 'react';
 import {
-  makeStyles,
-  shorthands,
-  tokens,
   Tab,
   TabList,
 } from '@fluentui/react-components';

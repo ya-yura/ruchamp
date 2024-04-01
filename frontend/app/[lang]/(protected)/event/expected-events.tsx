@@ -2,7 +2,7 @@
 
 import { Title1 } from '@fluentui/react-components';
 import { makeStyles, tokens } from '@fluentui/react-components';
-import CustomCard from '../ui/custom-card';
+import CustomCard from '../../ui/custom-card';
 
 const useOverrides = makeStyles({
   title: { color: tokens.colorNeutralForeground4, fontWeight: '700' },

@@ -13,10 +13,10 @@ export function comparePasswords(
 ): void {
   if (
     touched.password &&
-    touched.repeatPassword &&
-    (values.password || values.repeatPassword)
+    touched.repeat_password &&
+    (values.password || values.repeat_password)
   ) {
-    if (values.password === values.repeatPassword) {
+    if (values.password === values.repeat_password) {
       setPasswordState({
         state: 'success',
         message: 'Пароли совпадают',

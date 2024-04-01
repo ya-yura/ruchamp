@@ -12,7 +12,10 @@ import {
   KeyMultiple20Regular,
   PersonBoard20Regular,
 } from '@fluentui/react-icons';
-import { Divider, makeStyles, tokens } from '@fluentui/react-components';
+import { makeStyles, tokens } from '@fluentui/react-components';
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
+import { getUserData } from '@/lib/actions';
 
 const useOverrides = makeStyles({
   button: {
@@ -26,6 +29,11 @@ export function Header({ lang }: { lang: Locale }) {
   // const { common } = await getDictionary(lang);
   const user = useUserStore((store) => store.user);
   const overrides = useOverrides();
+
+  // Still don't know if it's needed
+  useEffect(() => {
+    useUserStore.persist.rehydrate();
+  }, []);
 
   return (
     <header className="relative z-10 flex items-center justify-between bg-transparent px-[72px] py-3">
@@ -54,7 +62,7 @@ export function Header({ lang }: { lang: Locale }) {
               appearance="primary"
               icon={<PersonBoard20Regular />}
             >
-              Регистрироваться
+              Зарегистрироваться
             </ButtonWithLink>
             <ButtonWithLink
               className={overrides.button}

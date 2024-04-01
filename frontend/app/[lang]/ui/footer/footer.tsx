@@ -114,7 +114,7 @@ export function Footer() {
           <ul className="flex flex-col gap-2">
             {LinkData1.map((item) => (
               <li key={item.text}>
-                <Link
+                <Link // check this liks later!!! This is links from Fluent, but should be from Next
                   as="a"
                   className={styles.linkText}
                   appearance="subtle"

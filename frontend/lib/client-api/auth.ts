@@ -37,20 +37,51 @@ class Auth {
     });
     if (res && !res.error) {
     } else {
-      throw new Error('Введённые не верные данные');
+      throw new Error('Введены не верные данные');
     }
   }
 
   // Регистрация пользователя
   register(user: Partial<TypeRegisterFields>): Promise<void> {
-    const otherValues: Partial<TypeRegisterFields> = {
-      is_active: false,
-      is_superuser: false,
-      is_verified: false,
+    const {
+      repeat_password,
+      athlete_weight,
+      athlete_height,
+      athlete_sport_type,
+      spectator_phone_number,
+      event_organizer_organization_name,
+      event_organizer_organization_website,
+      event_organizer_organization_contact_email,
+      event_organizer_organization_contact_phone,
+      referee_qualification_level,
+      ...userCreate
+    } = user;
+
+    const userInfo = {
+      athlete_weight,
+      athlete_height,
+      athlete_sport_type,
+      spectator_phone_number,
+      event_organizer_organization_name,
+      event_organizer_organization_website,
+      event_organizer_organization_contact_email,
+      event_organizer_organization_contact_phone,
+      referee_qualification_level,
     };
-    return fetch(`${this.baseUrl}/auth/register`, {
+
+    // Remove undefined or null values from userInfo
+    const filteredUserInfo = Object.fromEntries(
+      Object.entries(userInfo).filter(
+        ([_, value]) => value !== undefined && value !== null,
+      ),
+    );
+
+    const user_data = {
+      info: filteredUserInfo,
+    };
+    return fetch(`${this.baseUrl}/users/create`, {
       method: 'POST',
-      body: JSON.stringify({ ...user, ...otherValues }),
+      body: JSON.stringify({ user_create: userCreate, user_data }),
       headers: this.headers,
     }).then(checkResponse);
   }

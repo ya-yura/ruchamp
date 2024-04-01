@@ -8,10 +8,12 @@ import {
   createDOMRenderer,
   renderToStyleElements,
   webDarkTheme,
+  webLightTheme,
 } from '@fluentui/react-components';
 import { useServerInsertedHTML } from 'next/navigation';
 import DictionaryProvider, { Dictionary } from './dictionary-provider';
 import { SessionProvider } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 
 export function Providers({
   dictionary,
@@ -22,6 +24,16 @@ export function Providers({
 }) {
   const [renderer] = React.useState(() => createDOMRenderer());
   const didRenderRef = React.useRef(false);
+  const pathname = usePathname();
+  const lightThemeRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+  ];
+  const isLightTheme = lightThemeRoutes.some((route) =>
+    pathname.includes(route),
+  );
 
   useServerInsertedHTML(() => {
     if (didRenderRef.current) {
@@ -35,7 +47,7 @@ export function Providers({
     <RendererProvider renderer={renderer}>
       <SessionProvider>
         <SSRProvider>
-          <FluentProvider theme={webDarkTheme}>
+          <FluentProvider theme={isLightTheme ? webLightTheme : webDarkTheme}>
             <DictionaryProvider dictionary={dictionary}>
               {children}
             </DictionaryProvider>

@@ -29,7 +29,6 @@ export const authOptions: NextAuthOptions = {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
         const user = await res.json();
-
         if (res.ok && user) {
           const { access_token } = user;
           return { name: access_token } as User;

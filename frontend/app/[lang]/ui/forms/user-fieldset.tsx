@@ -1,5 +1,6 @@
 'use client';
 
+// ------------------------!!!!!!
 import {
   Field,
   FieldProps,
@@ -14,7 +15,7 @@ import {
   useId,
 } from '@fluentui/react-components';
 import { InputField } from '../auth/input-field';
-import { TypeStringUserFields, TypeUser } from '@/lib/definitions';
+import { TypeRegisterFields, TypeUser } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 import { ChangeEvent, FormEvent } from 'react';
 
@@ -74,7 +75,7 @@ export function UserFieldset({
               placeholder,
               onChange: handleChange,
               value:
-                (values[name as keyof TypeStringUserFields] as string) || '',
+                (values[name as keyof TypeRegisterFields] as string) || '',
               name,
               ...otherInputProps,
             }}

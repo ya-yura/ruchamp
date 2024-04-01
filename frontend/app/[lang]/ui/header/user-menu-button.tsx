@@ -1,5 +1,6 @@
 'use client';
 
+import { useUserStore } from '@/lib/store/user';
 import {
   Avatar,
   Menu,
@@ -9,13 +10,14 @@ import {
   MenuPopover,
   MenuTrigger,
 } from '@fluentui/react-components';
-import { makeStyles, tokens, shorthands } from '@fluentui/react-components';
+import { makeStyles, tokens } from '@fluentui/react-components';
 
 const useOverrides = makeStyles({
   text: { color: tokens.colorNeutralForeground2 },
 });
 
 export function UserMenuButton() {
+  const user = useUserStore((store) => store.user);
   const overriders = useOverrides();
 
   return (
@@ -36,7 +38,7 @@ export function UserMenuButton() {
             />
           }
         >
-          user@mail.com
+          {user?.email}
         </MenuButton>
       </MenuTrigger>
 

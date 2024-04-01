@@ -1,15 +1,23 @@
-import { useCallback, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
+import {
+  TypeBasicUserFields,
+  TypeRegisterFields,
+  TypeUserRole,
+} from '../definitions';
+import {
+  RadioGroupOnChangeData,
+  SelectOnChangeData,
+} from '@fluentui/react-components';
+
+type TypeValues = TypeRegisterFields; // add more types here
 
 export function useForm() {
-  const [values, setValues] = useState<{
-    [key: string]: string | number | Date | boolean;
-    // [key: string]: string;
-  }>({});
+  const [values, setValues] = useState<TypeValues>({} as TypeValues);
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isValid, setIsValid] = useState<boolean>(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const target = event.target as HTMLInputElement;
     const name = target.name;
     const value = target.value;
@@ -17,16 +25,62 @@ export function useForm() {
     setTouched({ ...touched, [name]: true });
     setErrors({ ...errors, [name]: target.validationMessage });
     setIsValid(target.closest('form')!.checkValidity());
-  };
+  }
+
+  function handleRadioChange(
+    ev: FormEvent<HTMLDivElement>,
+    data: RadioGroupOnChangeData,
+  ): void {
+    const target = ev.target as HTMLInputElement;
+    const name = target.name as keyof TypeRegisterFields;
+    if (name === 'role_id') {
+      setValues((prevValues) => ({
+        ...prevValues,
+        [name]: +data.value as TypeUserRole,
+      }));
+    }
+    if (name === 'gender') {
+      setValues((prevValues) => ({
+        ...prevValues,
+        [name]: (data.value === 'male'
+          ? true
+          : false) as TypeBasicUserFields['gender'],
+      }));
+    }
+  }
+
+  function handleSelectChange(
+    ev: ChangeEvent<HTMLSelectElement>,
+    data: SelectOnChangeData,
+  ): void {
+    const qualificaion = parseInt(data.value);
+    if (!isNaN(qualificaion)) {
+      setValues((prevValues) => ({
+        ...prevValues,
+        referee_qualification_level: qualificaion,
+      }));
+    }
+  }
 
   const resetForm = useCallback(
     (newValues = {}, newErrors = {}, newIsValid = false) => {
-      setValues(newValues);
+      setValues(newValues as TypeValues);
       setErrors(newErrors);
       setIsValid(newIsValid);
     },
     [setValues, setErrors, setIsValid],
   );
 
-  return { values, touched, errors, isValid, handleChange, resetForm, setValues, setTouched };
+  return {
+    values,
+    touched,
+    errors,
+    isValid,
+    handleChange,
+    handleRadioChange,
+    handleSelectChange,
+    resetForm,
+    setValues,
+    setTouched,
+  };
 }

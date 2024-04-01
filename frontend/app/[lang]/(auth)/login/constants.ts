@@ -2,7 +2,7 @@ import { FieldProps, InputProps } from '@fluentui/react-components';
 
 export const loginFields: Array<Partial<FieldProps> & Partial<InputProps>> = [
   {
-    label: 'Почта',
+    label: 'Электронная почта',
     type: 'email',
     placeholder: 'Введите вашу почту',
     name: 'username',

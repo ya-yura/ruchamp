@@ -8,10 +8,10 @@ import {
   useId,
 } from '@fluentui/react-components';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useDictionary } from '../dictionary-provider';
+import { useDictionary } from '../../dictionary-provider';
 import { useForm } from '@/lib/hooks/useForm';
 import { profileFields } from './constants';
-import { UserFieldset } from '../ui/forms/user-fieldset';
+import { UserFieldset } from '../../ui/forms/user-fieldset';
 
 export default function Profile() {
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -44,7 +44,7 @@ export default function Profile() {
         country: user.country,
         birthdate: user.birthdate,
         gender: user.gender === true ? 'male' : 'female',
-        role_id: user.role_id,
+        // role_id: user.role_id,
       });
     }
   }, [user]);
@@ -66,7 +66,7 @@ export default function Profile() {
         country: user.country,
         birthdate: user.birthdate,
         gender: user.gender === true ? 'male' : 'female',
-        role_id: user.role_id,
+        // role_id: user.role_id,
       });
     }
   }
