@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from sqlalchemy import select
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, HTTPException
 from fastapi_users import (
     BaseUserManager,
     IntegerIDMixin,
@@ -60,7 +60,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         existing_user = await self.user_db.get_by_email(user_create.email)
         if existing_user is not None:
-            raise exceptions.UserAlreadyExists()
+            raise HTTPException(status_code=400, detail="User already exists")
 
         user_dict = (
             user_create.create_update_dict()
@@ -85,7 +85,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         send_verification_email(
             user.username, user.email, user.verification_token
         )
-
 
     async def update_athlete_profile(
         self,
