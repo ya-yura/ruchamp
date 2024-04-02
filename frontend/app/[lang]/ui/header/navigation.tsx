@@ -29,8 +29,7 @@ export default function HeaderNavigation() {
           <MenuList>
             <MenuItemLink href="/event">Событие</MenuItemLink>
             <MenuItemLink href="/events">События</MenuItemLink>
-            <MenuItemLink href="/login">Войти</MenuItemLink>
-            <MenuItemLink href="/register">Регистрация</MenuItemLink>
+            <MenuItemLink href="/dashboard">Dashboard</MenuItemLink>
           </MenuList>
         </nav>
       </MenuPopover>

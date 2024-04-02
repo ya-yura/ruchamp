@@ -70,6 +70,12 @@ export type TypeRefereeFields = {
   referee_qualification_level: number;
 };
 
+export type TypeOtherUserFields = {
+  is_active: boolean;
+  is_superuser: boolean;
+  is_verified: boolean;
+};
+
 export type TypeSpecialUserFields = TypeSpectatorFields &
   TypeAthleteFields &
   TypeOrganizerFields &
@@ -80,9 +86,12 @@ export type TypeRegisterFields = TypeFirstUserFields &
   TypeSpecialUserFields;
 
 //Check this type
-export type TypeUser = Omit<TypeRegisterFields, 'password'> & {
-  id: number;
-};
+export type TypeUser =
+  | (Omit<TypeRegisterFields, 'password'> &
+      TypeOtherUserFields & {
+        id: number;
+      })
+  | null;
 
 export type TypeLoginFields = Omit<
   TypeFirstUserFields,
