@@ -13,6 +13,6 @@ export const resetPasswordFields: Array<
     label: 'Введите новый пароль ещё раз',
     type: 'password',
     placeholder: 'Повторите новый пароль пароль',
-    name: 'repeatedPassword',
+    name: 'repeat_password',
   },
 ];
