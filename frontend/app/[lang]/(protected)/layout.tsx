@@ -4,7 +4,7 @@ import { Header } from '../ui/header/header';
 import { Footer } from '../ui/footer/footer';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import { auth } from '@/lib/client-api/auth';
+import { auth } from '@/lib/api/auth';
 
 export default async function ProtectedLayout({
   children,
@@ -21,7 +21,7 @@ export default async function ProtectedLayout({
     <div>
       <Header lang={params.lang} user={user} />
       {children}
-      <Footer />
+      <Footer lang={params.lang} />
     </div>
   );
 }

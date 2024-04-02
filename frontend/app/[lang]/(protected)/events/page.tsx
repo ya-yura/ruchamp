@@ -1,5 +1,4 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import { getUserData } from '@/lib/actions';
 import { getServerSession } from 'next-auth';
 
 export default async function Events() {

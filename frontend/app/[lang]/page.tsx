@@ -14,7 +14,7 @@ export default async function Home({
 
   return (
     <>
-      <Header lang={lang} />
+      <Header lang={lang}  />
       <Container>
         <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
           <Image

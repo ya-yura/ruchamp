@@ -1,146 +1,45 @@
-'use client';
+import { Divider } from '@fluentui/react-components';
+import { LinkData1, LinkData2, LinkData3 } from './constants';
+import { CustomLink } from '../custom-link';
+import { Locale } from '@/i18n.config';
 
-import {
-  Divider,
-  Subtitle1,
-  Link,
-  Text,
-  Body2,
-  Caption1,
-} from '@fluentui/react-components';
-import { makeStyles, tokens, shorthands } from '@fluentui/react-components';
-
-type TypeLinkData = {
-  text: string;
-  url: string;
-};
-
-const useStyles = makeStyles({
-  footer: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: tokens.colorNeutralBackground4,
-    width: '100%',
-    ...shorthands.padding('0px', '72px', '24px', '72px'),
-  },
-  divider: {
-    marginBottom: '30px',
-  },
-  title: {
-    color: tokens.colorNeutralForeground4,
-    fontWeight: '700',
-  },
-  linkText: {
-    color: tokens.colorNeutralStrokeDisabled,
-    ...shorthands.transition('all', '0.4s'),
-    '&:hover': {
-      color: tokens.colorNeutralForeground4,
-      textDecorationLine: 'none',
-    },
-  },
-  copyRight: {
-    color: tokens.colorNeutralStrokeDisabled,
-  },
-});
-
-const LinkData1: TypeLinkData[] = [
-  {
-    text: 'Справка',
-    url: '/',
-  },
-  {
-    text: 'Пользовательское соглашение',
-    url: '/',
-  },
-  {
-    text: 'Подарочные сертифиакаты',
-    url: '/',
-  },
-  {
-    text: 'Возврат билетов',
-    url: '/',
-  },
-  {
-    text: 'Участие в исследованиях',
-    url: '/',
-  },
-  {
-    text: 'Правила рекомендаций',
-    url: '/',
-  },
-];
-
-const LinkData2: TypeLinkData[] = [
-  {
-    text: 'Партнёрам и организаторам мероприятий',
-    url: '/',
-  },
-  {
-    text: 'Билетная система РуЧамп',
-    url: '/',
-  },
-  {
-    text: 'Корпоративным клиентам',
-    url: '/',
-  },
-];
-
-const LinkData3: TypeLinkData[] = [
-  {
-    text: 'Согласие на обработку персональных данных',
-    url: '/',
-  },
-  {
-    text: 'Статистика',
-    url: '/',
-  },
-  {
-    text: 'Реклама',
-    url: '/',
-  },
-];
-
-export function Footer() {
-  const styles = useStyles();
-
+export function Footer({ lang }: { lang: Locale }) {
   return (
-    <footer className={styles.footer}>
-      <Divider className={styles.divider} />
+    <footer className="flex w-full flex-col bg-[#0a0a0a] px-[72px] pb-6">
+      <div className="mb-8">
+        <Divider />
+      </div>
       <nav className="flex items-start justify-start gap-36">
         <div className="mb-11 flex flex-col gap-5">
-          <Subtitle1 as="h4" className={styles.title}>
-            РуЧамп
-          </Subtitle1>
+          <h4 className="text-xl font-bold text-[#616161]">РуЧамп</h4>
           <ul className="flex flex-col gap-2">
             {LinkData1.map((item) => (
               <li key={item.text}>
-                <Link // check this liks later!!! This is links from Fluent, but should be from Next
-                  as="a"
-                  className={styles.linkText}
-                  appearance="subtle"
+                <CustomLink
+                  className="text-base font-normal text-[#424242] transition-colors hover:text-neutral-400"
                   href={item.url}
+                  lang={lang}
                 >
-                  <Body2 as="p">{item.text}</Body2>
-                </Link>
+                  {item.text}
+                </CustomLink>
               </li>
             ))}
           </ul>
         </div>
         <div className="flex flex-col gap-5">
-          <Subtitle1 as="h4" className={styles.title}>
+          <h4 className="text-xl font-bold text-[#616161]">
             Партнёрам и организаторам
-          </Subtitle1>
+          </h4>
           <ul className="flex flex-col gap-2">
             {LinkData2.map((item) => (
               <li key={item.text}>
-                <Link
-                  as="a"
-                  className={styles.linkText}
-                  appearance="subtle"
+                <CustomLink
+                  className="text-base font-normal text-[#424242] transition-colors hover:text-neutral-400"
                   href={item.url}
+                  lang={lang}
                 >
-                  <Body2 as="p">{item.text}</Body2>
-                </Link>
+                  {item.text}
+                </CustomLink>
               </li>
             ))}
           </ul>
@@ -150,20 +49,17 @@ export function Footer() {
         <ul className="flex gap-9">
           {LinkData3.map((item) => (
             <li key={item.text}>
-              <Link
-                as="a"
-                className={styles.linkText}
-                appearance="subtle"
+              <CustomLink
+                className="text-xs font-normal text-[#424242] transition-colors hover:text-neutral-400"
                 href={item.url}
+                lang={lang}
               >
-                <Caption1 as="p">{item.text}</Caption1>
-              </Link>
+                {item.text}
+              </CustomLink>
             </li>
           ))}
         </ul>
-        <Text as="p" className={styles.copyRight}>
-          © 2024 — «РуЧамп»
-        </Text>
+        <p className="text-xs font-normal text-[#424242]">© 2024 — «РуЧамп»</p>
       </div>
     </footer>
   );

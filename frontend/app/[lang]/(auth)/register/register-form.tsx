@@ -30,7 +30,7 @@ import {
   TypeRegisterFields,
   TypeUserRole,
 } from '@/lib/definitions';
-import { auth } from '@/lib/client-api/auth';
+import { auth } from '@/lib/api/auth';
 import { comparePasswords } from '@/lib/utils';
 
 export function RegisterForm({ lang }: { lang: Locale }) {

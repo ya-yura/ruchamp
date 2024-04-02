@@ -22,7 +22,6 @@ class Auth {
     this.headers = headers;
   }
 
-  // Вход на сайт
   async login(
     username: keyof TypeLoginFields,
     password: keyof TypeLoginFields,
@@ -41,7 +40,6 @@ class Auth {
     }
   }
 
-  // Регистрация пользователя
   register(user: Partial<TypeRegisterFields>): Promise<void> {
     const {
       repeat_password,
@@ -86,12 +84,21 @@ class Auth {
     }).then(checkResponse);
   }
 
-  // Получение информации о текущем пользователе
   getCurrentUser(token: string): Promise<TypeUser> {
     return fetch(`${this.baseUrl}/users/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(checkResponse);
+  }
+
+  logOut(token: string): Promise<void> {
+    return fetch(`${this.baseUrl}/auth/jwt/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`,
       },
     }).then(checkResponse);

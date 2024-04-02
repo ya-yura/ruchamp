@@ -14,7 +14,7 @@ import { useDictionary } from '../../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
-import { auth } from '@/lib/client-api/auth';
+import { auth } from '@/lib/api/auth';
 import { AuthSwitcher } from '../../ui/auth/auth-switcher';
 import { CustomLink } from '../../ui/custom-link';
 import { Locale } from '@/i18n.config';

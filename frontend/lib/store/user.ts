@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { TypeUser } from '../definitions';
 import { persist } from 'zustand/middleware';
-import { auth } from '../client-api/auth';
+import { auth } from '../api/auth';
 
 export type TypeState = {
   user: TypeUser | null;
