@@ -79,6 +79,7 @@ export type TypeRegisterFields = TypeFirstUserFields &
   TypeBasicUserFields &
   TypeSpecialUserFields;
 
+//Check this type
 export type TypeUser = Omit<TypeRegisterFields, 'password'> & {
   id: number;
 };
