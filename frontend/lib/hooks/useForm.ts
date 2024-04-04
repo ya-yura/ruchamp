@@ -53,13 +53,14 @@ export function useForm() {
     ev: ChangeEvent<HTMLSelectElement>,
     data: SelectOnChangeData,
   ): void {
-    const qualificaion = parseInt(data.value);
-    if (!isNaN(qualificaion)) {
-      setValues((prevValues) => ({
-        ...prevValues,
-        referee_qualification_level: qualificaion,
-      }));
-    }
+    const target = ev.target;
+    const name = target.name as keyof TypeRegisterFields;
+    const isNumberData = !isNaN(parseInt(data.value));
+
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: isNumberData ? parseInt(data.value) : data.value,
+    }));
   }
 
   const resetForm = useCallback(

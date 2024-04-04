@@ -27,7 +27,7 @@ export default async function RootLayout({
   return (
     <html lang={params.lang}>
       <body
-        className={`${inter.className} relative mx-auto max-w-7xl bg-[#0A0A0A] antialiased`}
+        className={`${inter.className} relative mx-auto w-full bg-[#0A0A0A] antialiased`}
         suppressHydrationWarning={true} // To switch off warnings such as "Warning: Extra attributes from the server: data-tabster,style"
       >
         <Providers dictionary={dictionary}>{children}</Providers>

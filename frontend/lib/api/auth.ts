@@ -26,7 +26,7 @@ class Auth {
     username: keyof TypeLoginFields,
     password: keyof TypeLoginFields,
     redirect: boolean,
-    callbackUrl: string,
+    callbackUrl?: string,
   ): Promise<void> {
     const res = await signIn('credentials', {
       username,

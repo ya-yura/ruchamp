@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Badges } from './badges';
 import { makeStyles, LargeTitle, Button } from '@fluentui/react-components';
 import { InfoSwitcher } from './info-switcher';
+import { ContentWraper } from '../../ui/content-wraper';
 
 const useOverrides = makeStyles({
   title: {
@@ -32,23 +33,28 @@ export function EventHero({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <Badges />
-      <div className="relative mt-[262px] self-start">
-        <LargeTitle as="h1" className={overrides.title}>
-          Кубок Ивана Ярыгина
-        </LargeTitle>
-      </div>
-      <div className="relative flex gap-6 self-start">
-        <Button size="large" appearance="primary">
-          Участвовать
-        </Button>
-        <Button size="large" appearance="outline">
-          Купить билеты
-        </Button>
-      </div>
-      <div className="relative">
-        <InfoSwitcher selectedValue={selectedValue} onTabSelect={onTabSelect} />
-      </div>
+      <ContentWraper className="h-[720px]">
+        <Badges />
+        <div className="relative mt-[262px] self-start">
+          <LargeTitle as="h1" className={overrides.title}>
+            Кубок Ивана Ярыгина
+          </LargeTitle>
+        </div>
+        <div className="relative flex gap-6 self-start">
+          <Button size="large" appearance="primary">
+            Участвовать
+          </Button>
+          <Button size="large" appearance="outline">
+            Купить билеты
+          </Button>
+        </div>
+        <div className="relative">
+          <InfoSwitcher
+            selectedValue={selectedValue}
+            onTabSelect={onTabSelect}
+          />
+        </div>
+      </ContentWraper>
     </section>
   );
 }

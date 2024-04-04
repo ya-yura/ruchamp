@@ -6,13 +6,11 @@ import {
   TypeCustomFieldsetProps,
   TypeFirstUserFields,
 } from '@/lib/definitions';
-import { Locale } from '@/i18n.config';
 import { MultiselectWithTags } from '../../ui/forms/custom-multiselect';
 import { CustomSelect } from '../../ui/forms/custom-select';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 
 type TypeRegisterStepFourProps = {
-  lang: Locale;
   userRoleId: TypeFirstUserFields['role_id'];
   refereeSelectId: string;
   multiselectId: keyof TypeAthleteFields;
@@ -37,7 +35,6 @@ export function RegisterStepFour({
   setValues,
   userRoleId,
   multiselectId,
-  lang,
   refereeSelectId,
   refereeOptions,
   refereeLabel,

@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from 'react';
 import {
   basicRegisterFields,
+  countries,
   otherRegisterFields,
   refereeLevels,
   specialRegisterFields,
@@ -27,6 +28,7 @@ import { RegisterStepFour } from './register-step-four';
 import {
   TypeAthleteFields,
   TypeFirstUserFields,
+  TypeLoginFields,
   TypeRegisterFields,
   TypeUserRole,
 } from '@/lib/definitions';
@@ -79,7 +81,16 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     setErrorMessage('');
     auth
       .register(values)
-      .then(() => router.push('/login'))
+      // .then(() => router.push('/login'))
+      .then(() => {
+        auth.login(
+          values.email as keyof TypeLoginFields,
+          values.password as keyof TypeLoginFields,
+          false,
+        );
+        // router.push('/event');
+      })
+      .then(() => router.push('/event'))
       .catch((err) => {
         console.log('Register error:', err);
         setErrorMessage('Произошла ошибка регистрации');
@@ -148,6 +159,10 @@ export function RegisterForm({ lang }: { lang: Locale }) {
             switchStep={switchStep}
             genderSelectId={'gender' as keyof TypeFirstUserFields}
             buttonText={'Продолжить'}
+            countrySelectLabel={'Страна'}
+            defaultCountrySelectLabel={'Выберите вашу страну'}
+            idCoutrySelect={'country'}
+            countrySelectOptions={countries}
             isDisabled={
               !(
                 values.name &&
@@ -173,7 +188,6 @@ export function RegisterForm({ lang }: { lang: Locale }) {
             userRoleId={values.role_id}
             multiselectId={'athlete_sport_type' as keyof TypeAthleteFields}
             errorMessage={errorMessage}
-            lang={lang}
             refereeSelectId={'referee_qualification_level'}
             refereeOptions={refereeLevels}
             refereeLabel={'Укажите свою категорию'}

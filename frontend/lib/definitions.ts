@@ -1,5 +1,10 @@
-import { FieldProps, InputProps, SelectOnChangeData } from '@fluentui/react-components';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import {
+  FieldProps,
+  InputProps,
+  RadioGroupOnChangeData,
+  SelectOnChangeData,
+} from '@fluentui/react-components';
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
 
 export type TypeHttpRequest = {
   baseUrl: string;
@@ -18,6 +23,10 @@ export type TypeCustomFieldsetProps = {
   onSelect?: (
     ev: ChangeEvent<HTMLSelectElement>,
     data: SelectOnChangeData,
+  ) => void;
+  onRadioChange?: (
+    ev: FormEvent<HTMLDivElement>,
+    data: RadioGroupOnChangeData,
   ) => void;
   onBlur?: () => void;
   values: TypeRegisterFields;

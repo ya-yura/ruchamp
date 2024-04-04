@@ -1,4 +1,5 @@
 // import million from 'million/compiler'; //It has some promlems with SSR
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,4 +17,9 @@ const nextConfig = {
 // };
 
 // export default million.next(nextConfig, millionConfig);
-export default nextConfig;
+
+// export default nextConfig;
+
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);
