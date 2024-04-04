@@ -1,5 +1,5 @@
-import { FieldProps, InputProps } from '@fluentui/react-components';
-import { Dispatch, SetStateAction } from 'react';
+import { FieldProps, InputProps, SelectOnChangeData } from '@fluentui/react-components';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 export type TypeHttpRequest = {
   baseUrl: string;
@@ -15,6 +15,10 @@ export type TypeCustomFieldsetProps = {
   isLoading?: boolean;
   fields: Array<Partial<FieldProps> & Partial<InputProps>>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelect?: (
+    ev: ChangeEvent<HTMLSelectElement>,
+    data: SelectOnChangeData,
+  ) => void;
   onBlur?: () => void;
   values: TypeRegisterFields;
   errors?: { [key: string]: string };

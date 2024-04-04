@@ -1,8 +1,4 @@
-import {
-  Button,
-  SelectOnChangeData,
-  Spinner,
-} from '@fluentui/react-components';
+import { Button, Spinner } from '@fluentui/react-components';
 import { CustomFieldset } from '../../ui/forms/custom-fieldset';
 import {
   EnumUserRole,
@@ -11,17 +7,12 @@ import {
   TypeFirstUserFields,
 } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
-import { ChangeEvent } from 'react';
 import { MultiselectWithTags } from '../../ui/forms/custom-multiselect';
 import { CustomSelect } from '../../ui/forms/custom-select';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 
 type TypeRegisterStepFourProps = {
   lang: Locale;
-  onSelect: (
-    ev: ChangeEvent<HTMLSelectElement>,
-    data: SelectOnChangeData,
-  ) => void;
   userRoleId: TypeFirstUserFields['role_id'];
   refereeSelectId: string;
   multiselectId: keyof TypeAthleteFields;

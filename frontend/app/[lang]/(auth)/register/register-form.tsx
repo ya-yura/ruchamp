@@ -142,6 +142,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
             fields={otherRegisterFields}
             onChange={handleChange}
             onRadioChange={handleRadioChange}
+            onSelect={handleSelectChange}
             values={values}
             lang={lang}
             switchStep={switchStep}

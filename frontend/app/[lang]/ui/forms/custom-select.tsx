@@ -6,7 +6,7 @@ type TypeCustomSelectProps = {
   defaultOption: string;
   id: string;
   name: string;
-  onSelect: (
+  onSelect?: (
     ev: ChangeEvent<HTMLSelectElement>,
     data: SelectOnChangeData,
   ) => void;
@@ -23,7 +23,13 @@ export function CustomSelect({
 }: TypeCustomSelectProps) {
   return (
     <Field as="div" size="medium" required label={label}>
-      <Select id={id} name={name} onChange={onSelect} defaultValue="">
+      <Select
+        id={id}
+        name={name}
+        onChange={onSelect}
+        size="large"
+        defaultValue=""
+      >
         <option value="" disabled>
           {defaultOption}
         </option>

@@ -63,12 +63,6 @@ export const otherRegisterFields: Array<
     name: 'username',
   },
   {
-    label: 'Страна',
-    type: 'text',
-    placeholder: 'Из какой вы страны',
-    name: 'country',
-  },
-  {
     label: 'Дата рождения',
     type: 'date',
     placeholder: 'Из какой вы страны',

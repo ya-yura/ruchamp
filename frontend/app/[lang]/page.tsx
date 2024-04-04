@@ -15,11 +15,18 @@ export default async function Home({
 }) {
   const { page } = await getDictionary(lang);
   const session = await getServerSession(authOptions);
+
   let token = null;
   let user = null;
   if (session) {
     token = session?.user?.name as string;
-    user = await auth.getCurrentUser(token);
+    auth
+      .getCurrentUser(token)
+      .then((res) => (user = res))
+      .catch((err) => {
+        user = null;
+        console.log('getCurrentUser error: ', err);
+      });
   }
 
   return (

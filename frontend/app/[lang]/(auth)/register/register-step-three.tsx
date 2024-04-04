@@ -12,6 +12,7 @@ import {
 } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 import { FormEvent, useEffect } from 'react';
+import { CustomSelect } from '../../ui/forms/custom-select';
 
 type TypeRegisterStepThreeProps = {
   lang: Locale;
@@ -39,7 +40,15 @@ export function RegisterStepThree({
   return (
     <>
       <CustomFieldset fields={fields} onChange={onChange} values={values} />
-      <fieldset className="w-[400px]">
+      <fieldset className="flex w-[400px] flex-col gap-4">
+        <CustomSelect
+          label={'Страна'}
+          defaultOption={'Выберите вашу страну'}
+          id={'country'}
+          name={'country'}
+          onSelect={() => console.log('123')}
+          options={{ Россиия: 'Россия', Беларусь: 'Беларусь' }}
+        />
         <Field label="Пол" required>
           <RadioGroup
             layout="horizontal"
