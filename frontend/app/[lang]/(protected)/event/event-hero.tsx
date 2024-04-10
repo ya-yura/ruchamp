@@ -33,26 +33,26 @@ export function EventHero({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <ContentWraper className="h-[720px]">
+      <ContentWraper className="h-[720px] justify-between">
         <Badges />
-        <div className="relative mt-[262px] self-start">
+        <div className="relative flex flex-col gap-10">
           <LargeTitle as="h1" className={overrides.title}>
             Кубок Ивана Ярыгина
           </LargeTitle>
-        </div>
-        <div className="relative flex gap-6 self-start">
-          <Button size="large" appearance="primary">
-            Участвовать
-          </Button>
-          <Button size="large" appearance="outline">
-            Купить билеты
-          </Button>
-        </div>
-        <div className="relative">
-          <InfoSwitcher
-            selectedValue={selectedValue}
-            onTabSelect={onTabSelect}
-          />
+          <div className="relative flex gap-6">
+            <Button size="large" appearance="primary">
+              Участвовать
+            </Button>
+            <Button size="large" appearance="outline">
+              Купить билеты
+            </Button>
+          </div>
+          <div className="relative flex items-center justify-center">
+            <InfoSwitcher
+              selectedValue={selectedValue}
+              onTabSelect={onTabSelect}
+            />
+          </div>
         </div>
       </ContentWraper>
     </section>

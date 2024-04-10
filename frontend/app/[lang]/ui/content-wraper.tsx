@@ -7,7 +7,7 @@ export function ContentWraper({
 }) {
   return (
     <div
-      className={`flex w-full max-w-7xl flex-col justify-between mx-auto ${className}`}
+      className={`flex w-full max-w-7xl flex-col mx-auto ${className}`}
     >
       {children}
     </div>

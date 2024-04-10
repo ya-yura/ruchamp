@@ -12,7 +12,6 @@ import {
   otherRegisterFields,
   refereeLevels,
   specialRegisterFields,
-  sportsTypes,
   switchTitle,
   userRoles,
 } from './constants';
@@ -34,6 +33,7 @@ import {
 } from '@/lib/definitions';
 import { auth } from '@/lib/api/auth';
 import { comparePasswords } from '@/lib/utils';
+import { sportsTypes } from '@/lib/constants';
 
 export function RegisterForm({ lang }: { lang: Locale }) {
   const [errorMessage, setErrorMessage] = useState<string>('');

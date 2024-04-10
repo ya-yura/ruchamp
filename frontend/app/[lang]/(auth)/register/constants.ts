@@ -164,15 +164,6 @@ export const countries: TypeCountries = {
   kz: 'Казахстан',
 };
 
-export const sportsTypes = [
-  'Самбо',
-  'Дзюдо',
-  'Рукопашный бой',
-  'Вольная борьба',
-  'Кикбоксинг',
-  'Бокс',
-];
-
 export function switchTitle(
   step: 1 | 2 | 3 | 4,
   setter: Dispatch<SetStateAction<{ title: string; subtitle: string }>>,

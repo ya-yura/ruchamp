@@ -8,6 +8,7 @@ import {
   tokens,
   shorthands,
 } from '@fluentui/react-components';
+import { sportsTypes } from '@/lib/constants';
 
 const useOverrides = makeStyles({
   badge: {
@@ -27,49 +28,19 @@ export function Badges() {
 
   return (
     <div className="flex max-w-5xl flex-wrap gap-3 self-start">
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Главное
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Айкидо
-      </Badge>
-      <Badge
-        className={mergeClasses(overrides.badge, overrides.selected)}
-        size="extra-large"
-        appearance="filled"
-      >
-        Вольная борьба
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Греко-римская борьба
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Джиу-джитсу
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Дзюдо
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Карате
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Кикбоксинг
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Рукопашный бой
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Самбо
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Сумо
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Тхэквондо
-      </Badge>
-      <Badge className={overrides.badge} size="extra-large" appearance="filled">
-        Ушу
-      </Badge>
+      {sportsTypes.map((type) => (
+        <Badge
+          className={
+            type === 'Вольная борьба'
+              ? mergeClasses(overrides.badge, overrides.selected)
+              : overrides.badge
+          }
+          size="extra-large"
+          appearance="filled"
+        >
+          {type}
+        </Badge>
+      ))}
     </div>
   );
 }
