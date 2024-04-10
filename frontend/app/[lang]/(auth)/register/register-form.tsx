@@ -83,14 +83,17 @@ export function RegisterForm({ lang }: { lang: Locale }) {
       .register(values)
       // .then(() => router.push('/login'))
       .then(() => {
-        auth.login(
-          values.email as keyof TypeLoginFields,
-          values.password as keyof TypeLoginFields,
-          false,
-        );
-        // router.push('/event');
+        auth
+          .login(
+            values.email as keyof TypeLoginFields,
+            values.password as keyof TypeLoginFields,
+            false,
+          )
+          .then(() => router.push('/event'))
+          .catch((err) =>
+            console.log('Произошла ошибка входа после регистрации: ', err),
+          );
       })
-      .then(() => router.push('/event'))
       .catch((err) => {
         console.log('Register error:', err);
         setErrorMessage('Произошла ошибка регистрации');

@@ -59,8 +59,8 @@ export function RegisterStepFour({
           errors={errors}
         />
       )}
-      <fieldset className="mb-6 w-[400px]">
-        {userRoleId === EnumUserRole.athlete && (
+      {userRoleId === EnumUserRole.athlete && (
+        <fieldset className="mb-6 w-[400px]">
           <MultiselectWithTags
             multiselectId={multiselectId}
             options={sportsOptions}
@@ -68,8 +68,10 @@ export function RegisterStepFour({
             placeholder={sportsTypePlaceholder}
             setValues={setValues}
           />
-        )}
-        {userRoleId === EnumUserRole.referee && (
+        </fieldset>
+      )}
+      {userRoleId === EnumUserRole.referee && (
+        <fieldset className="mb-6 w-[400px]">
           <CustomSelect
             label={refereeLabel}
             defaultOption={refereeDefaultOption}
@@ -78,10 +80,10 @@ export function RegisterStepFour({
             onSelect={onSelect}
             options={refereeOptions}
           />
-        )}
-      </fieldset>
+        </fieldset>
+      )}
       {errorMessage && (
-        <p className="">
+        <p className="mb-3">
           <ErrorCircle20Regular
             aria-label={errorMessage}
             primaryFill="rgb(248 113 113)"
