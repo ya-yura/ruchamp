@@ -70,7 +70,7 @@ num_teams = int(num_athletes * 0.5)
 num_team_members = 20
 team_size = 200
 
-num_events = int(num_teams * 3)
+num_events = int(10)
 num_participants = int(num_athletes * num_events / 10)
 num_matches = int(num_events * 3)
 num_results = int(num_events * num_matches)
@@ -654,14 +654,14 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# generate_fake_roles(session)
+generate_fake_roles(session)
 
-# generate_fake_combat_types(session)
-# generate_fake_category_types(session)
-# generate_fake_sport_types(session)
-# generate_fake_weight_classes(session)
-# generate_fake_referee_types(session)
-# generate_fake_coach_types(session)
+generate_fake_combat_types(session)
+generate_fake_category_types(session)
+generate_fake_sport_types(session)
+generate_fake_weight_classes(session)
+generate_fake_referee_types(session)
+generate_fake_coach_types(session)
 
 # generate_fake_users(session, num_users)
 # generate_fake_coaches(session)
@@ -674,10 +674,10 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_teams(session)
 # generate_fake_team_member(session)
 
-# generate_fake_events(session)
+generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+#generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
