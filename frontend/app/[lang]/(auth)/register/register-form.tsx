@@ -8,7 +8,6 @@ import {
 import { useEffect, useState } from 'react';
 import {
   basicRegisterFields,
-  countries,
   otherRegisterFields,
   refereeLevels,
   specialRegisterFields,
@@ -165,7 +164,6 @@ export function RegisterForm({ lang }: { lang: Locale }) {
             countrySelectLabel={'Страна'}
             defaultCountrySelectLabel={'Выберите вашу страну'}
             idCoutrySelect={'country'}
-            countrySelectOptions={countries}
             isDisabled={
               !(
                 values.name &&

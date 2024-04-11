@@ -6,7 +6,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { auth } from '@/lib/api/auth';
 import { redirect } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 
 export default async function ProtectedLayout({
   children,

@@ -7,7 +7,7 @@ import { TypeUser } from '@/lib/definitions';
 import { AuthButtons } from './buttons';
 import { ContentWraper } from '../content-wraper';
 
-export function Header({ lang, user }: { lang: Locale; user: TypeUser }) {
+export function Header({ lang, user }: { lang: Locale; user: TypeUser | null }) {
   return (
     <header className="relative z-10 flex items-center justify-between bg-transparent px-[72px] py-3">
       <ContentWraper>
