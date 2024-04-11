@@ -1,0 +1,46 @@
+version: '3.7'
+services:
+  web:
+    container_name: backend
+    build: ./backend/
+    env_file:
+      - .env-non-dev
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+  
+  frontend:
+    container_name: frontend
+    build: ./frontend/
+    ports:
+      - 3000:3000
+    depends_on:
+      - web
+
+
+  db:
+    container_name: db
+    image: postgres:15
+    env_file:
+      - .env-non-dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  
+  
+  
+  # nginx:
+  #   build: ./gateway/
+  #   ports:
+  #     - 8001:80
+  #   depends_on:
+  #     - web
+  #     - frontend
+
+
+volumes:
+  postgres_data:
+
+  

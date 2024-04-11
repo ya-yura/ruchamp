@@ -283,15 +283,30 @@ async def forgot_password(
     return {"email": email}
 
 
-@router.get("/me", response_model=UserRead)
+@router.get("/me")
 async def get_current_user(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
     query = await db.execute(select(User).where(User.id == current_user.id))
     user = query.scalars().first()
+    if user.role_id == 1:
+        query = await db.execute(select(Athlete).where(Athlete.user_id == current_user.id))
+        result = query.mappings().all()
+    elif user.role_id == 2:
+        query = await db.execute(select(EventOrganizer).where(EventOrganizer.user_id == current_user.id))
+        result = query.mappings().all()
+    elif user.role_id == 3:
+        query = await db.execute(select(Spectator).where(Spectator.user_id == current_user.id))
+        result = query.mappings().all()
+    elif user.role_id == 4:
+        query = await db.execute(select(SystemAdministrator).where(SystemAdministrator.user_id == current_user.id))
+        result = query.mappings().all()
+    elif user.role_id == 5:
+        query = await db.execute(select(Referee).where(Referee.user_id == current_user.id))
+        result = query.mappings().all()
 
-    return user
+    return result
 
 
 @router.get("/me/events")
