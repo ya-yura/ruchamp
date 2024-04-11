@@ -8,7 +8,7 @@ export default async function LogoutPage() {
   const token = session?.user?.name as string;
 
   return (
-    <main className="mx-auto flex min-h-[50vh] w-80 flex-col items-center justify-center gap-12">
+    <main className="relative mx-auto flex min-h-[50vh] w-80 flex-col items-center justify-center gap-12">
       <Title1 align="center">Уверены, что хотите выйти?</Title1>
       <LogoutButtons token={token} />
     </main>

@@ -1,4 +1,4 @@
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import {
   TypeHttpRequest,
   TypeLoginFields,
@@ -91,7 +91,11 @@ class Auth {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-    }).then(checkResponse);
+    })
+      .then(checkResponse)
+      .catch((err) => {
+        console.log('getCurrentUser error', err);
+      });
   }
 
   logOut(token: string): Promise<void> {

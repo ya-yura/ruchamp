@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import {
   TypeBasicUserFields,
   TypeRegisterFields,
+  TypeUser,
   TypeUserRole,
 } from '../definitions';
 import {

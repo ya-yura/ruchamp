@@ -30,6 +30,7 @@ export function Badges() {
     <div className="flex max-w-5xl flex-wrap gap-3 self-start">
       {sportsTypes.map((type) => (
         <Badge
+          key={type}
           className={
             type === 'Вольная борьба'
               ? mergeClasses(overrides.badge, overrides.selected)

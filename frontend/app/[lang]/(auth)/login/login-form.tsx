@@ -77,7 +77,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
         values={values}
       />
       {errorMessage && (
-        <p className="">
+        <p className="mb-3">
           <ErrorCircle20Regular
             aria-label={errorMessage}
             primaryFill="rgb(248 113 113)"

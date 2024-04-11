@@ -5,6 +5,8 @@ import { Footer } from '../ui/footer/footer';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { auth } from '@/lib/api/auth';
+import { redirect } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 export default async function ProtectedLayout({
   children,
@@ -16,6 +18,10 @@ export default async function ProtectedLayout({
   const session = await getServerSession(authOptions);
   const token = session?.user?.name as string;
   const user = await auth.getCurrentUser(token);
+
+  if (!user) {
+    redirect('/');
+  }
 
   return (
     <div>

@@ -99,12 +99,10 @@ export type TypeRegisterFields = TypeFirstUserFields &
   TypeSpecialUserFields;
 
 //Check this type
-export type TypeUser =
-  | (Omit<TypeRegisterFields, 'password'> &
-      TypeOtherUserFields & {
-        id: number;
-      })
-  | null;
+export type TypeUser = Omit<TypeRegisterFields, 'password'> &
+  TypeOtherUserFields & {
+    id: number;
+  };
 
 export type TypeLoginFields = Omit<
   TypeFirstUserFields,
@@ -115,7 +113,7 @@ export enum EnumUserRole {
   'athlete' = 1,
   'organizer' = 2,
   'spectator' = 3,
-  // 'admin' = 4,
+  'admin' = 4,
   'referee' = 5,
 }
 

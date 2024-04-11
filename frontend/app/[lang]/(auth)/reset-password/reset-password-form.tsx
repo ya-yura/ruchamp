@@ -58,7 +58,7 @@ export function ResetPasswordForm({ lang }: { lang: Locale }) {
           <Caption1 as="p">Я вспомнил пароль</Caption1>
         </CustomLink>
         {errorMessage && (
-          <p className="">
+          <p className="mb-3">
             <ErrorCircle20Regular
               aria-label={errorMessage}
               primaryFill="rgb(248 113 113)"
