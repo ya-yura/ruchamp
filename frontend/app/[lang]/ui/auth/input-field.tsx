@@ -6,9 +6,14 @@ import type {
   InputProps,
 } from '@fluentui/react-components';
 import { Button, Field, Input } from '@fluentui/react-components';
-import { makeStyles } from '@fluentui/react-components';
+import { makeStyles, mergeClasses } from '@fluentui/react-components';
 import { EyeOffRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
+
+type TypeInputFieldProps = {
+  fieldProps?: Partial<FieldProps>;
+  inputProps?: Partial<InputProps>;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 type TypeEyeOffButtonProps = {
   setIsShown: (isShown: boolean) => void;
@@ -28,10 +33,8 @@ const useOverrides = makeStyles({
 export function InputField({
   fieldProps,
   inputProps,
-}: {
-  fieldProps?: Partial<FieldProps>;
-  inputProps?: Partial<InputProps>;
-}) {
+  className,
+}: TypeInputFieldProps) {
   const [isShownPassword, setIsShownPassword] = useState<boolean>(false);
   const overrides = useOverrides();
 
@@ -39,7 +42,7 @@ export function InputField({
     <Field
       {...fieldProps}
       as="div"
-      className={overrides.label}
+      className={mergeClasses(overrides.label, className)}
       size="large"
       required
     >
