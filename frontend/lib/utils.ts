@@ -1,5 +1,11 @@
 import { FieldProps } from '@fluentui/react-components';
 import { TypeRegisterFields } from './definitions';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export function comparePasswords(
   values: Partial<TypeRegisterFields>,
@@ -13,10 +19,10 @@ export function comparePasswords(
 ): void {
   if (
     touched.password &&
-    touched.repeatPassword &&
-    (values.password || values.repeatPassword)
+    touched.repeat_password &&
+    (values.password || values.repeat_password)
   ) {
-    if (values.password === values.repeatPassword) {
+    if (values.password === values.repeat_password) {
       setPasswordState({
         state: 'success',
         message: 'Пароли совпадают',

@@ -29,7 +29,6 @@ export const authOptions: NextAuthOptions = {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
         const user = await res.json();
-
         if (res.ok && user) {
           const { access_token } = user;
           return { name: access_token } as User;
@@ -38,10 +37,11 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
+    // GoogleProvider disabled because only credentials is used to login
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID as string,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    // }),
   ],
   pages: {
     signIn: '/login',

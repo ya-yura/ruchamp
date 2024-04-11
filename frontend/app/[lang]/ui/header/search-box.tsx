@@ -19,7 +19,7 @@ export default function SearchBar() {
 
   return (
     <div className="mx-auto">
-      <SearchBox className={overrides.searchBox} placeholder="Найти" />
+      <SearchBox className={overrides.searchBox} placeholder="Найти" role='search'/>
     </div>
   );
 }

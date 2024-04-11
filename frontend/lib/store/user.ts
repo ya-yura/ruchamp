@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { TypeUser } from '../definitions';
 import { persist } from 'zustand/middleware';
-import { auth } from '../client-api/auth';
+import { auth } from '../api/auth';
 
 export type TypeState = {
   user: TypeUser | null;
@@ -9,7 +9,7 @@ export type TypeState = {
 
 export type TypeActions = {
   getUser: (token: string) => Promise<void>;
-  updateUser: (data: Partial<TypeUser>) => void;
+  // updateUser: (data: TypeUser) => void;
 };
 
 export const useUserStore = create<TypeState & TypeActions>()(
@@ -28,10 +28,10 @@ export const useUserStore = create<TypeState & TypeActions>()(
             console.error('Error occured while fetching user:', err),
           );
       },
-      updateUser: (data: Partial<TypeUser>) =>
-        set((state) => ({
-          user: Object.assign(state.user as TypeUser, data),
-        })),
+      // updateUser: (data: TypeUser) =>
+      //   set((state) => ({
+      //     user: Object.assign(state.user as TypeUser, data),
+      //   })),
     }),
     { name: 'user-store', skipHydration: true },
   ),

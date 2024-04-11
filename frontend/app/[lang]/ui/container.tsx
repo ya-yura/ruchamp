@@ -1,19 +1,18 @@
-import { makeStyles, tokens } from '@fluentui/react-components';
+import { cn } from '@/lib/utils';
 
-const useStyles = makeStyles({
-  main: {
-    backgroundColor: tokens.colorNeutralBackground4,
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: 'calc(100vh-137px)',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: '12px',
-  },
-});
+type TypeContainerProps = {
+  children: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export function Container({ children }: { children: React.ReactNode }) {
-  const styles = useStyles();
-
-  return <main className={styles.main}>{children}</main>;
+export function Container({ children, className }: TypeContainerProps) {
+  return (
+    <main
+      className={cn(
+        'flex min-h-[calc(100vh-137px)] flex-col items-center justify-start bg-[#0a0a0a] pt-3',
+        className,
+      )}
+    >
+      {children}
+    </main>
+  );
 }
