@@ -31,7 +31,8 @@ from auth.schemas import (
     UserRead,
     RefereeUpdate,
     UserCreate,
-    UserData
+    UserData,
+    UserUpdate
 )
 from teams.models import TeamMember
 from event.models import Participant, Match
@@ -425,3 +426,24 @@ async def create_user(
         await db.commit()
 
     return user
+
+@router.put("/update")
+async def update_user(
+    user_data: UserUpdate,
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    query = await db.execute(select(User).where(User.id == current_user.id))
+    user = query.scalars().one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # user.role_id = user_data.role_id
+    user.username = user_data.username
+    user.name = user_data.name
+    user.sirname = user_data.sirname
+    user.fathername = user_data.fathername
+    await db.commit()
+    return {f"User ID - {current_user.id} updated"}
+    

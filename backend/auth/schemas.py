@@ -43,12 +43,16 @@ class UserData(BaseModel):
     info: Optional[dict] = None
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
-
-
 class User(schemas.BaseUser):
     pass
+
+
+class UserUpdate(BaseModel):
+    username: str
+    name: str
+    sirname: str
+    fathername: str
+    country: str
 
 
 class UserDB(User, schemas.BaseUser):
