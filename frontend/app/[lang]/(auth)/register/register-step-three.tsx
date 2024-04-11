@@ -1,12 +1,12 @@
 import { Button, Field, Radio, RadioGroup } from '@fluentui/react-components';
 import { CustomFieldset } from '../../ui/forms/custom-fieldset';
 import {
+  EnumCountries,
   TypeCustomFieldsetProps,
   TypeFirstUserFields,
 } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 import { CustomSelect } from '../../ui/forms/custom-select';
-import { TypeCountries } from './constants';
 
 type TypeRegisterStepThreeProps = {
   lang: Locale;
@@ -17,7 +17,6 @@ type TypeRegisterStepThreeProps = {
   countrySelectLabel: string;
   defaultCountrySelectLabel: string;
   idCoutrySelect: string;
-  countrySelectOptions: TypeCountries;
 } & TypeCustomFieldsetProps;
 
 export function RegisterStepThree({
@@ -33,7 +32,6 @@ export function RegisterStepThree({
   countrySelectLabel,
   defaultCountrySelectLabel,
   idCoutrySelect,
-  countrySelectOptions,
 }: TypeRegisterStepThreeProps) {
   return (
     <>
@@ -43,9 +41,8 @@ export function RegisterStepThree({
           label={countrySelectLabel}
           defaultOption={defaultCountrySelectLabel}
           id={idCoutrySelect}
-          name={idCoutrySelect}
           onSelect={onSelect}
-          options={countrySelectOptions}
+          options={EnumCountries}
         />
         <Field label="Пол" required>
           <RadioGroup

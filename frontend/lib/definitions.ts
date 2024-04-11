@@ -58,7 +58,7 @@ export type TypeBasicUserFields = {
   fathername: string;
   username: string;
   gender: boolean;
-  country: string;
+  country: 'ru' | 'by' | 'kz';
   birthdate: string;
 };
 
@@ -120,3 +120,9 @@ export enum EnumUserRole {
 export type TypeUserRoles = {
   [key in keyof typeof EnumUserRole]: (typeof EnumUserRole)[key];
 };
+
+export enum EnumCountries {
+  ru = 'Россия',
+  by = 'Беларусь',
+  kz = 'Казахстан',
+}

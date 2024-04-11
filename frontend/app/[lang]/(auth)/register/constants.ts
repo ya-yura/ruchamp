@@ -10,12 +10,6 @@ import {
 import { FieldProps, InputProps } from '@fluentui/react-components';
 import { Dispatch, SetStateAction } from 'react';
 
-export type TypeCountries = {
-  ru: string;
-  by: string;
-  kz: string;
-};
-
 export const basicRegisterFields: Array<
   Partial<FieldProps> &
     Partial<InputProps> & { name: keyof TypeFirstUserFields }
@@ -156,12 +150,6 @@ export const refereeLevels = {
   '1': 'Вторая категория',
   '2': 'Первая категория',
   '3': 'Международная категория',
-};
-
-export const countries: TypeCountries = {
-  ru: 'Россия',
-  by: 'Беларусь',
-  kz: 'Казахстан',
 };
 
 export function switchTitle(

@@ -40,7 +40,7 @@ export const profileFields: Array<Partial<FieldProps> & Partial<InputProps>> = [
   {
     label: 'Дата рождения',
     type: 'date',
-    placeholder: 'Из какой вы страны',
+    placeholder: 'День рождения',
     name: 'birthdate',
   },
 ];

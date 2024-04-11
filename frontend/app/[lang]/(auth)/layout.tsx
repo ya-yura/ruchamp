@@ -19,7 +19,7 @@ export default async function AuthLayout({
   // }
 
   return (
-    <main className="absolute left-0 top-0 h-screen w-full bg-[#0A0A0A]">
+    <main className="left-0 top-0 h-[100vh] w-full bg-[#0A0A0A]">
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"

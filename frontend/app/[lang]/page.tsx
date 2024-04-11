@@ -8,7 +8,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { auth } from '@/lib/api/auth';
 import { ContentWraper } from './ui/content-wraper';
-import { signOut } from 'next-auth/react';
 
 export default async function Home({
   params: { lang },
