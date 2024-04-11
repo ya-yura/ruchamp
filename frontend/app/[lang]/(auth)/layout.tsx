@@ -11,11 +11,12 @@ export default async function AuthLayout({
 }) {
   const session = await getServerSession(authOptions);
   const headersList = headers();
-  const fullUrl = headersList.get('referer') || '';
+  const domain = headersList.get('host') || "";
+  const fullUrl = headersList.get('referer') || "";
 
-  if (session && !fullUrl.includes('logout')) {
-    redirect('/event');
-  }
+  // if (session && !fullUrl.includes('logout')) {
+  //   redirect('/event');
+  // }
 
   return (
     <main className="absolute left-0 top-0 h-screen w-full bg-[#0A0A0A]">
