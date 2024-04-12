@@ -12,7 +12,7 @@ import {
 } from '@fluentui/react-components';
 import { useServerInsertedHTML } from 'next/navigation';
 import DictionaryProvider, { Dictionary } from './dictionary-provider';
-import { SessionProvider } from 'next-auth/react';
+// import { SessionProvider } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
 export function Providers({
@@ -45,7 +45,7 @@ export function Providers({
 
   return (
     <RendererProvider renderer={renderer}>
-      <SessionProvider>
+      {/* <SessionProvider> */}
         <SSRProvider>
           <FluentProvider theme={isLightTheme ? webLightTheme : webDarkTheme}>
             <DictionaryProvider dictionary={dictionary}>
@@ -53,7 +53,7 @@ export function Providers({
             </DictionaryProvider>
           </FluentProvider>
         </SSRProvider>
-      </SessionProvider>
+      {/* </SessionProvider> */}
     </RendererProvider>
   );
 }

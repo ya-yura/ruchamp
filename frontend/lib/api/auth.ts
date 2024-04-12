@@ -1,4 +1,4 @@
-import { signIn, signOut } from 'next-auth/react';
+// import { signIn, signOut } from 'next-auth/react';
 import {
   TypeHttpRequest,
   TypeLoginFields,
@@ -27,17 +27,39 @@ class Auth {
     password: keyof TypeLoginFields,
     redirect: boolean,
     callbackUrl?: string,
-  ): Promise<void> {
-    const res = await signIn('credentials', {
-      username,
-      password,
-      redirect,
-      callbackUrl,
-    });
-    if (res && !res.error) {
-    } else {
-      throw new Error('Введены не верные данные');
+  ): Promise<string | void> {
+    const formData = new URLSearchParams({ username, password });
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/jwt/login`,
+        {
+          method: 'POST',
+          body: formData.toString(),
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
+      );
+      const user = await res.json();
+      if (res.ok && user) {
+        const { access_token } = user;
+        return access_token;
+      } else {
+        console.log('Invalid credentials');
+      }
+    } catch (err) {
+      console.log('Login error', err);
     }
+
+    // Логин через Next Auth
+    // const res = await signIn('credentials', {
+    //   username,
+    //   password,
+    //   redirect,
+    //   callbackUrl,
+    // });
+    // if (res && !res.error) {
+    // } else {
+    //   throw new Error('Введены не верные данные');
+    // }
   }
 
   register(user: Partial<TypeRegisterFields>): Promise<void> {

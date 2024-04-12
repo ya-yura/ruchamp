@@ -1,5 +1,5 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import { getServerSession } from 'next-auth';
+// import { authOptions } from '@/app/api/auth/[...nextauth]/options';
+// import { getServerSession } from 'next-auth';
 import { redirect, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { headers } from 'next/headers';
@@ -9,7 +9,7 @@ export default async function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
   const headersList = headers();
   const domain = headersList.get('host') || "";
   const fullUrl = headersList.get('referer') || "";
@@ -19,7 +19,7 @@ export default async function AuthLayout({
   // }
 
   return (
-    <main className="left-0 top-0 h-[100vh] w-full bg-[#0A0A0A]">
+    <main className="absolute left-0 top-0 h-[100vh] w-full bg-[#0A0A0A]">
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"

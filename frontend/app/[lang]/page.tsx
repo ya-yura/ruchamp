@@ -4,8 +4,8 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { Container } from './ui/container';
 import { Header } from './ui/header/header';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/options';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '../api/auth/[...nextauth]/options';
 import { auth } from '@/lib/api/auth';
 import { ContentWraper } from './ui/content-wraper';
 
@@ -15,24 +15,24 @@ export default async function Home({
   params: { lang: Locale };
 }) {
   const { page } = await getDictionary(lang);
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
-  let token = null;
-  let user = null;
-  if (session) {
-    token = session?.user?.name as string;
-    try {
-      const res = await auth.getCurrentUser(token);
-      user = res;
-    } catch (err) {
-      user = null;
-      console.log('getCurrentUser error: ', err);
-    }
-  }
+  // let token = null;
+  // let user = null;
+  // if (session) {
+  //   token = session?.user?.name as string;
+  //   try {
+  //     const res = await auth.getCurrentUser(token);
+  //     user = res;
+  //   } catch (err) {
+  //     user = null;
+  //     console.log('getCurrentUser error: ', err);
+  //   }
+  // }
 
   return (
     <>
-      <Header lang={lang} user={user} />
+      <Header lang={lang} user={null} />
       <Container>
         <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
           <ContentWraper>
