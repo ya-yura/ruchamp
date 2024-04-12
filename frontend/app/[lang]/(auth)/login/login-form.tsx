@@ -8,7 +8,7 @@ import {
   Spinner,
   TabValue,
 } from '@fluentui/react-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { loginFields } from './constants';
 import { useDictionary } from '../../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
@@ -22,6 +22,7 @@ import { CustomForm } from '../../ui/forms/custom-form';
 import { CustomFieldset } from '../../ui/forms/custom-fieldset';
 import { TypeLoginFields } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
+import { useUserStore } from '@/lib/store/user';
 
 export function LoginForm({ lang }: { lang: Locale }) {
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -33,6 +34,8 @@ export function LoginForm({ lang }: { lang: Locale }) {
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const [selectedValue, setSelectedValue] = useState<TabValue>('login');
 
+  const getUser = useUserStore((state) => state.getUser);
+
   useEffect(() => {
     if (selectedValue === 'login') {
       router.push('/login');
@@ -40,6 +43,36 @@ export function LoginForm({ lang }: { lang: Locale }) {
       router.push('/register');
     }
   }, [selectedValue]);
+
+  const handleCheckToken = useCallback(() => {
+    if (localStorage.getItem('jwt')) {
+      let jwt = localStorage.getItem('jwt');
+      // setSearchError('');
+      if (typeof jwt === 'string') {
+        getUser(jwt);
+        router.push('/event');
+        // .then(() => router.push('/event'))
+        // .catch((err) => console.log(err));
+        // auth
+        //   .getCurrentUser(jwt)
+        //   .then((res) => {
+        //     // const { _id, name, email } = res;
+        //     console.log('get user res ', res);
+        //     // setIsLoggedIn(true);
+        //     // setCurrentUser({ _id, name, email });
+        //   })
+        //   .catch((err) => {
+        //     console.log(`Get current user error: ${err}`);
+        //     // if (err === 401) {
+        //     //   handleLogOut();
+        //     // }
+        //   });
+      }
+    }
+    // else {
+    //   handleLogOut();
+    // }
+  }, []);
 
   async function handleSignIn(): Promise<void> {
     setIsLoading(true);
@@ -51,7 +84,14 @@ export function LoginForm({ lang }: { lang: Locale }) {
         false,
         callbackUrl,
       )
-      .then(() => router.push('/event'))
+      // .then(() => router.push('/event'))
+      .then((res: string | null | void) => {
+        if (res !== null && typeof res === 'string') {
+          localStorage.setItem('jwt', res);
+          handleCheckToken();
+        }
+      })
+      // .then(() => router.push('/event'))
       .catch((err) => setErrorMessage(err.message))
       .finally(() => setIsLoading(false));
   }
