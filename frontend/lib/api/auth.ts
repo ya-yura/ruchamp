@@ -1,4 +1,4 @@
-import { signIn, signOut } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import {
   TypeHttpRequest,
   TypeLoginFields,
@@ -6,8 +6,7 @@ import {
   TypeUser,
 } from '../definitions';
 
-// Проверяю ответ сервера
-function checkResponse(res: any) {
+export function checkResponse(res: any) {
   return res.ok
     ? res.json()
     : Promise.reject(`Request error. Status: ${res.status}`);

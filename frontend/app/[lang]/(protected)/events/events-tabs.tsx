@@ -1,3 +1,5 @@
+'use client';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
 import { ContentWraper } from '../../ui/content-wraper';
@@ -5,8 +7,20 @@ import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
+import { TypeSportsTypes } from '@/lib/constants';
+import { useEffect, useState } from 'react';
+import { eventsApi } from '@/lib/api/eventsApi';
 
-export function EventsTabs() {
+export function EventsTabs({ token }: { token: string }) {
+  const [selectedSportTypes, setSelectedSportTypes] = useState<
+    Array<TypeSportsTypes>
+  >([]);
+  const [events, setEvents] = useState<Array<object>>([]);
+
+  useEffect(() => {
+    eventsApi.getEvents(token).then((res) => console.log(res));
+  }, []);
+
   return (
     <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
       <Image
@@ -18,19 +32,21 @@ export function EventsTabs() {
       />
       <ContentWraper className="h-fit justify-between">
         <Tabs defaultValue="futureEvents" className="relative mx-auto w-full">
-          <div className='w-full'>
-            <TabsList className="flex justify-between w-[500px] bg-transparent text-[#D6D6D6] mx-auto mb-5">
+          <div className="w-full">
+            <TabsList className="mx-auto mb-5 flex w-[500px] justify-between bg-transparent text-[#D6D6D6]">
               <TabsTrigger value="futureEvents">Будущие события</TabsTrigger>
               <TabsTrigger value="pastEvents">Прошедшие события</TabsTrigger>
               <TabsTrigger value="usersEvents">Ваши события</TabsTrigger>
             </TabsList>
-            <div className="absolute top-2 right-0 flex items-center space-x-2">
+            <div className="absolute right-0 top-2 flex items-center space-x-2">
               <Switch id="showMap" />
-              <Label className='text-sm font-normal' htmlFor="showMap">На карте</Label>
+              <Label className="text-sm font-normal" htmlFor="showMap">
+                На карте
+              </Label>
             </div>
           </div>
-          <DatePicker className="flex justify-center mb-4" />
-          <FilterByType />
+          <DatePicker className="mb-4 flex justify-center" />
+          <FilterByType setSelected={setSelectedSportTypes} />
           <TabsContent value="futureEvents">
             <p>Будущие события</p>
           </TabsContent>
