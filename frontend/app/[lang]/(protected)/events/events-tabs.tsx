@@ -1,10 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
 import { ContentWraper } from '../../ui/content-wraper';
-import { Badges } from '../event/badges';
 import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { FilterByType } from './filter-by-type';
 
 export function EventsTabs() {
   return (
@@ -19,7 +19,7 @@ export function EventsTabs() {
       <ContentWraper className="h-fit justify-between">
         <Tabs defaultValue="futureEvents" className="relative mx-auto w-full">
           <div className='w-full'>
-            <TabsList className="flex w-full bg-transparent text-[#D6D6D6]">
+            <TabsList className="flex justify-between w-[500px] bg-transparent text-[#D6D6D6] mx-auto mb-5">
               <TabsTrigger value="futureEvents">Будущие события</TabsTrigger>
               <TabsTrigger value="pastEvents">Прошедшие события</TabsTrigger>
               <TabsTrigger value="usersEvents">Ваши события</TabsTrigger>
@@ -29,8 +29,8 @@ export function EventsTabs() {
               <Label className='text-sm font-normal' htmlFor="showMap">На карте</Label>
             </div>
           </div>
-          <DatePicker className="flex justify-center" />
-          <Badges />
+          <DatePicker className="flex justify-center mb-4" />
+          <FilterByType />
           <TabsContent value="futureEvents">
             <p>Будущие события</p>
           </TabsContent>
