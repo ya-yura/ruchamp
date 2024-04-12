@@ -1,4 +1,4 @@
-// import { signIn, signOut } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import {
   TypeHttpRequest,
   TypeLoginFields,
@@ -27,39 +27,17 @@ class Auth {
     password: keyof TypeLoginFields,
     redirect: boolean,
     callbackUrl?: string,
-  ): Promise<string | void> {
-    const formData = new URLSearchParams({ username, password });
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/jwt/login`,
-        {
-          method: 'POST',
-          body: formData.toString(),
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        },
-      );
-      const user = await res.json();
-      if (res.ok && user) {
-        const { access_token } = user;
-        return access_token;
-      } else {
-        console.log('Invalid credentials');
-      }
-    } catch (err) {
-      console.log('Login error', err);
+  ): Promise<void> {
+    const res = await signIn('credentials', {
+      username,
+      password,
+      redirect,
+      callbackUrl,
+    });
+    if (res && !res.error) {
+    } else {
+      throw new Error('Введены не верные данные');
     }
-
-    // Логин через Next Auth
-    // const res = await signIn('credentials', {
-    //   username,
-    //   password,
-    //   redirect,
-    //   callbackUrl,
-    // });
-    // if (res && !res.error) {
-    // } else {
-    //   throw new Error('Введены не верные данные');
-    // }
   }
 
   register(user: Partial<TypeRegisterFields>): Promise<void> {
@@ -119,6 +97,34 @@ class Auth {
         console.log('getCurrentUser error', err);
       });
   }
+
+  getAthlete(token: string): Promise<any> { // fix any
+    return fetch(`${this.baseUrl}/users/me/athlete`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(checkResponse)
+      .catch((err) => {
+        console.log('getAthlete error: ', err);
+      });
+  }
+
+  // getOrganizer(token: string): Promise<void> {
+  //   return fetch(`${this.baseUrl}/users/me/athlete`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   })
+  //     .then(checkResponse)
+  //     .catch((err) => {
+  //       console.log('getOrganizer error: ', err);
+  //     });
+  // }
 
   logOut(token: string): Promise<void> {
     return fetch(`${this.baseUrl}/auth/jwt/logout`, {

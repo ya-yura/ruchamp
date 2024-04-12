@@ -80,7 +80,6 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     setErrorMessage('');
     auth
       .register(values)
-      // .then(() => router.push('/login'))
       .then(() => {
         auth
           .login(
