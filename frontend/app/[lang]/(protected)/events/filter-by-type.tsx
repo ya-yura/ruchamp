@@ -10,7 +10,7 @@ type TypeFilterByTypeProps = {
 
 export function FilterByType({ setSelected }: TypeFilterByTypeProps) {
   return (
-    <div className="flex max-w-5xl flex-wrap gap-1 self-start">
+    <div className="flex max-w-5xl flex-wrap gap-1 self-start mb-8">
       {sportsTypes.map((type) => (
         <BadgeButton key={type} type={type} setSelected={setSelected} />
       ))}
