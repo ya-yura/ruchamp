@@ -291,6 +291,8 @@ async def get_current_user(
 ):
     query = await db.execute(select(User).where(User.id == current_user.id))
     user = query.scalars().first()
+    user_data = {"User": user}
+
     if user.role_id == 1:
         query = await db.execute(select(Athlete).where(Athlete.user_id == current_user.id))
         result = query.mappings().all()
@@ -306,6 +308,8 @@ async def get_current_user(
     elif user.role_id == 5:
         query = await db.execute(select(Referee).where(Referee.user_id == current_user.id))
         result = query.mappings().all()
+
+    result.append(user_data)
 
     return result
 

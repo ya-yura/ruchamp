@@ -109,3 +109,5 @@ wcwidth
 websockets
 WTForms
 zipp
+fpdf
+qrcode

@@ -52,18 +52,17 @@ async def create_event(
     all_organizer_id = query_org.scalars().all()
 
     # Подумать: почему админ не добавляется в организаторы
-    query_admin = await db.execute(select(SystemAdministrator.user_id))
-    all_admin_id = query_admin.scalars().all()
-    all_organizer_id.extend(all_admin_id)
+    # query_admin = await db.execute(select(SystemAdministrator.user_id))
+    # all_admin_id = query_admin.scalars().all()
+    # all_organizer_id.extend(all_admin_id)
 
-    try:
-        if current_user.id in all_organizer_id:
-            event = Event(**event_data.dict())
-            db.add(event)
-            await db.commit()
-            return {f"Event {event.event_id} created"}
-    except Exception:
+    if current_user.id not in all_organizer_id:
         raise HTTPException(status_code=400, detail="You are not an organizer")
+    new_event = Event(**event_data.dict())
+    db.add(new_event)
+    await db.commit()
+
+    return {f"Event {new_event.name} - created"}
 
 
 @router.post("/update_image/{event_id}")
@@ -163,12 +162,13 @@ async def delete_event(
     return {f"Event ID - {event_id} deleted"}
 
 
-@router.get("/matches")
+@router.get("/{event_id}/matches")
 async def get_participants(
+    event_id: int,
     db: AsyncSession = Depends(get_db),
     params: Params = Depends()
 ):
-    query = await db.execute(select(Match))
+    query = await db.execute(select(Match).where(Match.event_id == event_id))
     return paginate(query.scalars().all(), params)
 
 

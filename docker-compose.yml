@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  web:
+  backend:
     container_name: backend
     build: ./backend/
     env_file:
@@ -16,7 +16,7 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - web
+      - backend
 
 
   db:
@@ -31,13 +31,15 @@ services:
   
   
   
-  # nginx:
-  #   build: ./gateway/
-  #   ports:
-  #     - 8001:80
-  #   depends_on:
-  #     - web
-  #     - frontend
+  nginx:
+    container_name: nginx
+    build: ./gateway/
+    command: [nginx-debug, '-g', 'daemon off;']
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+      - frontend
 
 
 volumes:
