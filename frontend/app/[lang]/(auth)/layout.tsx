@@ -1,22 +1,16 @@
-// import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-// import { getServerSession } from 'next-auth';
-import { redirect, usePathname } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import Image from 'next/image';
-import { headers } from 'next/headers';
+import { getSession } from '@/lib/actions';
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const session = await getServerSession(authOptions);
-  const headersList = headers();
-  const domain = headersList.get('host') || "";
-  const fullUrl = headersList.get('referer') || "";
-
-  // if (session && !fullUrl.includes('logout')) {
-  //   redirect('/event');
-  // }
+  const session = await getSession();
+  if (session) {
+    redirect('/ru/events');
+  }
 
   return (
     <main className="absolute left-0 top-0 h-[100vh] w-full bg-[#0A0A0A]">

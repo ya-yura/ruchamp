@@ -9,8 +9,9 @@ import {
   MenuTrigger,
 } from '@fluentui/react-components';
 import { IconArrow } from '../icons';
+import { Locale } from '@/i18n.config';
 
-export default function HeaderNavigation() {
+export default function HeaderNavigation({ lang }: { lang: Locale }) {
   return (
     <Menu>
       <MenuTrigger disableButtonEnhancement>
@@ -27,9 +28,9 @@ export default function HeaderNavigation() {
       <MenuPopover>
         <nav>
           <MenuList>
-            <MenuItemLink href="/event">Событие</MenuItemLink>
-            <MenuItemLink href="/events">События</MenuItemLink>
-            <MenuItemLink href="/dashboard">Dashboard</MenuItemLink>
+            <MenuItemLink href={`/${lang}/event`}>Событие</MenuItemLink>
+            <MenuItemLink href={`/${lang}/events`}>События</MenuItemLink>
+            <MenuItemLink href={`/${lang}/dashboard`}>Dashboard</MenuItemLink>
           </MenuList>
         </nav>
       </MenuPopover>

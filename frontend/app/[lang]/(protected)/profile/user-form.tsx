@@ -79,6 +79,7 @@ export function UserForm({ user }: { user: TypeUser }) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="bg-foreground relative rounded-xl p-9"
       >
+        <h2 className="mb-5 text-xl font-bold">Общая информация</h2>
         <fieldset className="mb-5 flex flex-col gap-3">
           <FormField
             control={form.control}

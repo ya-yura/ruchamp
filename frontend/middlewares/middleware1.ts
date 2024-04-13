@@ -1,3 +1,5 @@
+// // Next-auth middleware
+
 // import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 // import { getToken } from 'next-auth/jwt';
@@ -6,10 +8,10 @@
 
 // const protectedPaths = [
 //   '/dashboard',
-//   // '/profile',
-//   // '/event',
-//   // '/events',
-//   // '/logout',
+//   '/profile',
+//   '/event',
+//   '/events',
+//   '/logout',
 // ];
 
 // function getProtectedRoutes(protectedPaths: string[], locales: Locale[]) {

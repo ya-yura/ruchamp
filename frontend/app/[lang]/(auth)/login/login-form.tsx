@@ -8,25 +8,23 @@ import {
   Spinner,
   TabValue,
 } from '@fluentui/react-components';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginFields } from './constants';
 import { useDictionary } from '../../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useForm } from '@/lib/hooks/useForm';
-import { auth } from '@/lib/api/auth';
 import { AuthSwitcher } from '../../ui/auth/auth-switcher';
 import { CustomLink } from '../../ui/custom-link';
 import { Locale } from '@/i18n.config';
-import { CustomForm } from '../../ui/forms/custom-form';
 import { CustomFieldset } from '../../ui/forms/custom-fieldset';
-import { TypeLoginFields } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
-import { useUserStore } from '@/lib/store/user';
+import { useFormState } from 'react-dom';
+import { authenticate } from '@/lib/actions';
+import { useForm } from '@/lib/hooks/useForm';
 
 export function LoginForm({ lang }: { lang: Locale }) {
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
   const { page } = useDictionary();
   const { values, handleChange } = useForm();
   const searchParams = useSearchParams();
@@ -34,79 +32,23 @@ export function LoginForm({ lang }: { lang: Locale }) {
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const [selectedValue, setSelectedValue] = useState<TabValue>('login');
 
-  const getUser = useUserStore((state) => state.getUser);
-
   useEffect(() => {
     if (selectedValue === 'login') {
-      router.push('/login');
+      router.push(`/${lang}/login`);
     } else {
-      router.push('/register');
+      router.push(`/${lang}/register`);
     }
   }, [selectedValue]);
-
-  const handleCheckToken = useCallback(() => {
-    if (localStorage.getItem('jwt')) {
-      let jwt = localStorage.getItem('jwt');
-      // setSearchError('');
-      if (typeof jwt === 'string') {
-        getUser(jwt);
-        router.push('/event');
-        // .then(() => router.push('/event'))
-        // .catch((err) => console.log(err));
-        // auth
-        //   .getCurrentUser(jwt)
-        //   .then((res) => {
-        //     // const { _id, name, email } = res;
-        //     console.log('get user res ', res);
-        //     // setIsLoggedIn(true);
-        //     // setCurrentUser({ _id, name, email });
-        //   })
-        //   .catch((err) => {
-        //     console.log(`Get current user error: ${err}`);
-        //     // if (err === 401) {
-        //     //   handleLogOut();
-        //     // }
-        //   });
-      }
-    }
-    // else {
-    //   handleLogOut();
-    // }
-  }, []);
-
-  async function handleSignIn(): Promise<void> {
-    setIsLoading(true);
-    setErrorMessage('');
-    auth
-      .login(
-        values.username as keyof TypeLoginFields,
-        values.password as keyof TypeLoginFields,
-        false,
-        callbackUrl,
-      )
-      // .then(() => router.push('/event'))
-      .then((res: string | null | void) => {
-        if (res !== null && typeof res === 'string') {
-          localStorage.setItem('jwt', res);
-          handleCheckToken();
-        }
-      })
-      // .then(() => router.push('/event'))
-      .catch((err) => setErrorMessage(err.message))
-      .finally(() => setIsLoading(false));
-  }
 
   function onTabSelect(event: SelectTabEvent, data: SelectTabData) {
     setSelectedValue(data.value);
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    handleSignIn();
-  }
-
   return (
-    <CustomForm onSubmit={handleSubmit}>
+    <form
+      className="relative my-auto flex h-fit w-auto flex-col justify-evenly rounded-md bg-white px-9 py-7"
+      action={dispatch}
+    >
       <div className="mb-6 flex w-auto items-center justify-center">
         <AuthSwitcher selectedValue={selectedValue} onTabSelect={onTabSelect} />
       </div>
@@ -142,6 +84,6 @@ export function LoginForm({ lang }: { lang: Locale }) {
           {isLoading && <Spinner size="tiny" label="" />} {page.login.enter}
         </Button>
       </div>
-    </CustomForm>
+    </form>
   );
 }

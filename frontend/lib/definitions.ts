@@ -126,3 +126,17 @@ export enum EnumCountries {
   by = 'Беларусь',
   kz = 'Казахстан',
 }
+
+// *** Events ***
+export type TypeEvent = {
+  name: string;
+  start_datetime: string;
+  location: string;
+  event_order: string;
+  geo: string;
+  end_datetime: string;
+  id: number;
+  organizer_id: number;
+  event_system: string;
+  image_field: string;
+};

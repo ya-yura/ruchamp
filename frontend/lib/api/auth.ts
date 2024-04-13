@@ -1,13 +1,6 @@
-// import { signIn, signOut } from 'next-auth/react';
-import {
-  TypeHttpRequest,
-  TypeLoginFields,
-  TypeRegisterFields,
-  TypeUser,
-} from '../definitions';
+import { TypeHttpRequest, TypeRegisterFields, TypeUser } from '../definitions';
 
-// Проверяю ответ сервера
-function checkResponse(res: any) {
+export function checkResponse(res: any) {
   return res.ok
     ? res.json()
     : Promise.reject(`Request error. Status: ${res.status}`);
@@ -22,12 +15,7 @@ class Auth {
     this.headers = headers;
   }
 
-  async login(
-    username: keyof TypeLoginFields,
-    password: keyof TypeLoginFields,
-    redirect: boolean,
-    callbackUrl?: string,
-  ): Promise<string | void> {
+  async login(username: string, password: string): Promise<string | void> {
     const formData = new URLSearchParams({ username, password });
     try {
       const res = await fetch(
@@ -44,22 +32,11 @@ class Auth {
         return access_token;
       } else {
         console.log('Invalid credentials');
+        throw new Error();
       }
     } catch (err) {
       console.log('Login error', err);
     }
-
-    // Логин через Next Auth
-    // const res = await signIn('credentials', {
-    //   username,
-    //   password,
-    //   redirect,
-    //   callbackUrl,
-    // });
-    // if (res && !res.error) {
-    // } else {
-    //   throw new Error('Введены не верные данные');
-    // }
   }
 
   register(user: Partial<TypeRegisterFields>): Promise<void> {
@@ -117,6 +94,21 @@ class Auth {
       .then(checkResponse)
       .catch((err) => {
         console.log('getCurrentUser error', err);
+      });
+  }
+
+  getAthlete(token: string): Promise<any> {
+    // fix any
+    return fetch(`${this.baseUrl}/users/me/athlete`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(checkResponse)
+      .catch((err) => {
+        console.log('getAthlete error: ', err);
       });
   }
 
