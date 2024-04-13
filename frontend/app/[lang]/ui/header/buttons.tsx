@@ -22,7 +22,7 @@ export function AuthButtons({ lang }: { lang: Locale }) {
     <div className="flex gap-4">
       <ButtonWithLink
         lang={lang}
-        href="/register"
+        href={`/${lang}/register`}
         size="medium"
         appearance="primary"
         icon={<PersonBoard20Regular />}
@@ -32,7 +32,7 @@ export function AuthButtons({ lang }: { lang: Locale }) {
       <ButtonWithLink
         className={overrides.button}
         lang={lang}
-        href="/login"
+        href={`/${lang}/login`}
         size="medium"
         appearance="secondary"
         icon={<KeyMultiple20Regular />}

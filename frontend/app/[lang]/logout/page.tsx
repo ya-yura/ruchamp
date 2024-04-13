@@ -1,11 +1,18 @@
 import { Title1 } from '@fluentui/react-components';
 import { LogoutButtons } from './buttons';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/options';
+import { getSession } from '@/lib/actions';
+import { redirect } from 'next/navigation';
 
 export default async function LogoutPage() {
-  const session = await getServerSession(authOptions);
-  const token = session?.user?.name as string;
+  const session = await getSession();
+  let token;
+  if (!session) {
+    token = null;
+  } else token = session.token;
+
+  if (!session) {
+    redirect('/ru');
+  }
 
   return (
     <div className="relative flex h-[100vh] w-full flex-col items-center justify-center gap-12">

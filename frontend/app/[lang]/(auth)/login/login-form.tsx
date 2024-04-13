@@ -13,19 +13,18 @@ import { loginFields } from './constants';
 import { useDictionary } from '../../dictionary-provider';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useForm } from '@/lib/hooks/useForm';
-import { auth } from '@/lib/api/auth';
 import { AuthSwitcher } from '../../ui/auth/auth-switcher';
 import { CustomLink } from '../../ui/custom-link';
 import { Locale } from '@/i18n.config';
-import { CustomForm } from '../../ui/forms/custom-form';
 import { CustomFieldset } from '../../ui/forms/custom-fieldset';
-import { TypeLoginFields } from '@/lib/definitions';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
+import { useFormState } from 'react-dom';
+import { authenticate } from '@/lib/actions';
+import { useForm } from '@/lib/hooks/useForm';
 
 export function LoginForm({ lang }: { lang: Locale }) {
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
   const { page } = useDictionary();
   const { values, handleChange } = useForm();
   const searchParams = useSearchParams();
@@ -35,38 +34,21 @@ export function LoginForm({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     if (selectedValue === 'login') {
-      router.push('/login');
+      router.push(`/${lang}/login`);
     } else {
-      router.push('/register');
+      router.push(`/${lang}/register`);
     }
   }, [selectedValue]);
-
-  async function handleSignIn(): Promise<void> {
-    setIsLoading(true);
-    setErrorMessage('');
-    auth
-      .login(
-        values.username as keyof TypeLoginFields,
-        values.password as keyof TypeLoginFields,
-        false,
-        callbackUrl,
-      )
-      .then(() => router.push('/event'))
-      .catch((err) => setErrorMessage(err.message))
-      .finally(() => setIsLoading(false));
-  }
 
   function onTabSelect(event: SelectTabEvent, data: SelectTabData) {
     setSelectedValue(data.value);
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    handleSignIn();
-  }
-
   return (
-    <CustomForm onSubmit={handleSubmit}>
+    <form
+      className="relative my-auto flex h-fit w-auto flex-col justify-evenly rounded-md bg-white px-9 py-7"
+      action={dispatch}
+    >
       <div className="mb-6 flex w-auto items-center justify-center">
         <AuthSwitcher selectedValue={selectedValue} onTabSelect={onTabSelect} />
       </div>
@@ -102,6 +84,6 @@ export function LoginForm({ lang }: { lang: Locale }) {
           {isLoading && <Spinner size="tiny" label="" />} {page.login.enter}
         </Button>
       </div>
-    </CustomForm>
+    </form>
   );
 }

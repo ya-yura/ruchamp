@@ -1,20 +1,17 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/options';
-import { getServerSession } from 'next-auth';
-
+import { getSession } from '@/lib/actions';
 import { Container } from '../../ui/container';
 import { EventsTabs } from './events-tabs';
-import { eventsApi } from '@/lib/api/eventsApi';
-import { TypeEvent } from '@/lib/definitions';
 
 export default async function Events() {
-  const session = await getServerSession(authOptions);
-  const token = session?.user?.name as string;
-
-  const serverEvents: Array<TypeEvent> = await eventsApi.getEvents(token)
+  const session = await getSession();
+  let token;
+  if (!session) {
+    token = null;
+  } else token = session.token;
 
   return (
     <Container>
-      <EventsTabs token={token} serverEvents={serverEvents}/>
+      <EventsTabs token={token} />
     </Container>
   );
 }

@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import { Container } from '../../ui/container';
 import { UserForm } from './user-form';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { auth } from '@/lib/api/auth';
 import { UserFormAthlete } from './user-form-athlete';
 import { UserFormOrganizer } from './user-form-organizer';
@@ -10,11 +8,11 @@ import { EnumUserRole } from '@/lib/definitions';
 import { UserFormSpectator } from './user-form-spectator';
 import { UserFormSysadmin } from './user-form-sysadmin';
 import { UserFormReferee } from './user-form-referee';
+import { getSession } from '@/lib/actions';
 
 export default async function Profile() {
-  const session = await getServerSession(authOptions);
-  const token = session?.user?.name as string;
-  const user = await auth.getCurrentUser(token);
+  const session = await getSession();
+
   let athlete = null;
   const organizer = {
     organization_name: 'Организация организатора',
@@ -41,9 +39,9 @@ export default async function Profile() {
       'https://images.unsplash.com/photo-1711950901044-fa6215a9c59b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   };
 
-  if (user.role_id === EnumUserRole['athlete']) {
-    athlete = await auth.getAthlete(token);
-  }
+  // if (user.role_id === EnumUserRole['athlete']) {
+  //   athlete = await auth.getAthlete(token);
+  // }
 
   return (
     <Container className="min-h-fit">
@@ -55,7 +53,7 @@ export default async function Profile() {
           fill={true}
           style={{ objectFit: 'cover' }}
         />
-        <UserForm user={user} />
+        {/* <UserForm user={user} />
         {true &&  <UserFormSysadmin sysadmin={sysadmin} />}
         {user.role_id === EnumUserRole['athlete'] && (
           <UserFormAthlete athlete={athlete} />
@@ -71,7 +69,7 @@ export default async function Profile() {
         )}
         {user.role_id === EnumUserRole['referee'] && (
           <UserFormReferee referee={referee} />
-        )}
+        )} */}
       </section>
     </Container>
   );

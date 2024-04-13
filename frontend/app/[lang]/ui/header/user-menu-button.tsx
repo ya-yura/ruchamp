@@ -44,8 +44,8 @@ export function UserMenuButton({ user }: { user: TypeUser }) {
 
       <MenuPopover>
         <MenuList>
-          <MenuItemLink href="/profile">Профиль</MenuItemLink>
-          <MenuItemLink href="/logout">Выйти</MenuItemLink>
+          <MenuItemLink href="/ru/profile">Профиль</MenuItemLink>
+          <MenuItemLink href="/ru/logout">Выйти</MenuItemLink>
         </MenuList>
       </MenuPopover>
     </Menu>

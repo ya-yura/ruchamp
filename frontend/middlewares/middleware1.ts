@@ -1,56 +1,58 @@
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+// // Next-auth middleware
 
-import { getToken } from 'next-auth/jwt';
-import { Locale, i18n } from '@/i18n.config';
-import { CustomMiddleware } from './chain';
+// import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-const protectedPaths = [
-  '/dashboard',
-  '/profile',
-  '/event',
-  '/events',
-  '/logout',
-];
+// import { getToken } from 'next-auth/jwt';
+// import { Locale, i18n } from '@/i18n.config';
+// import { CustomMiddleware } from './chain';
 
-function getProtectedRoutes(protectedPaths: string[], locales: Locale[]) {
-  let protectedPathsWithLocale = [...protectedPaths];
+// const protectedPaths = [
+//   '/dashboard',
+//   '/profile',
+//   '/event',
+//   '/events',
+//   '/logout',
+// ];
 
-  protectedPaths.forEach((route) => {
-    locales.forEach(
-      (locale) =>
-        (protectedPathsWithLocale = [
-          ...protectedPathsWithLocale,
-          `/${locale}${route}`,
-        ]),
-    );
-  });
+// function getProtectedRoutes(protectedPaths: string[], locales: Locale[]) {
+//   let protectedPathsWithLocale = [...protectedPaths];
 
-  return protectedPathsWithLocale;
-}
+//   protectedPaths.forEach((route) => {
+//     locales.forEach(
+//       (locale) =>
+//         (protectedPathsWithLocale = [
+//           ...protectedPathsWithLocale,
+//           `/${locale}${route}`,
+//         ]),
+//     );
+//   });
 
-export function withAuthMiddleware(middleware: CustomMiddleware) {
-  return async (request: NextRequest, event: NextFetchEvent) => {
-    // Create a response object to pass down the chain
-    const response = NextResponse.next();
+//   return protectedPathsWithLocale;
+// }
 
-    const token = await getToken({ req: request });
+// export function withAuthMiddleware(middleware: CustomMiddleware) {
+//   return async (request: NextRequest, event: NextFetchEvent) => {
+//     // Create a response object to pass down the chain
+//     const response = NextResponse.next();
 
-    // @ts-ignore
-    request.nextauth = request.nextauth || {};
-    // @ts-ignore
-    request.nextauth.token = token;
-    const pathname = request.nextUrl.pathname;
+//     const token = await getToken({ req: request });
 
-    const protectedPathsWithLocale = getProtectedRoutes(protectedPaths, [
-      ...i18n.locales,
-    ]);
+//     // @ts-ignore
+//     request.nextauth = request.nextauth || {};
+//     // @ts-ignore
+//     request.nextauth.token = token;
+//     const pathname = request.nextUrl.pathname;
 
-    if (!token && protectedPathsWithLocale.includes(pathname)) {
-      const signInUrl = new URL('/login', request.url);
-      signInUrl.searchParams.set('callbackUrl', pathname);
-      return NextResponse.redirect(signInUrl);
-    }
+//     const protectedPathsWithLocale = getProtectedRoutes(protectedPaths, [
+//       ...i18n.locales,
+//     ]);
 
-    return middleware(request, event, response);
-  };
-}
+//     if (!token && protectedPathsWithLocale.includes(pathname)) {
+//       const signInUrl = new URL('/login', request.url);
+//       signInUrl.searchParams.set('callbackUrl', pathname);
+//       return NextResponse.redirect(signInUrl);
+//     }
+
+//     return middleware(request, event, response);
+//   };
+// }

@@ -186,19 +186,19 @@ const mockEvents: TypeEvent[] = [
 
 export function EventsTabs({
   token,
-  serverEvents,
+  // serverEvents,
 }: {
   token: string;
-  serverEvents: Array<TypeEvent>;
+  // serverEvents: Array<TypeEvent>;
 }) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<
     Array<TypeSportsTypes>
   >([]);
   const [events, setEvents] = useState<Array<TypeEvent>>([]);
 
-  // useEffect(() => {
-  //   eventsApi.getEvents(token).then((res) => setEvents(res));
-  // }, []);
+  useEffect(() => {
+    eventsApi.getEvents(token).then((res) => setEvents(res));
+  }, []);
 
   return (
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
@@ -229,7 +229,7 @@ export function EventsTabs({
           <DatePicker className="mb-4 flex justify-center" />
           <FilterByType setSelected={setSelectedSportTypes} />
           <TabsContent className="grid grid-cols-3 gap-6" value="futureEvents">
-            {serverEvents.slice(0, 10).map((event) => (
+            {events.slice(0, 10).map((event) => (
               <CardEvent key={event.id} event={event} />
             ))}
           </TabsContent>

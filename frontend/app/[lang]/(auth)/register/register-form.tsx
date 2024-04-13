@@ -65,9 +65,9 @@ export function RegisterForm({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     if (selectedValue === 'login') {
-      router.push('/login');
+      router.push(`/${lang}/login`);
     } else {
-      router.push('/register');
+      router.push(`/${lang}/register`);
     }
   }, [selectedValue]);
 
@@ -85,7 +85,6 @@ export function RegisterForm({ lang }: { lang: Locale }) {
           .login(
             values.email as keyof TypeLoginFields,
             values.password as keyof TypeLoginFields,
-            false,
           )
           .then(() => router.push('/event'))
           .catch((err) =>
