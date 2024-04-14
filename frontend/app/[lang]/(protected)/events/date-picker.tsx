@@ -43,7 +43,7 @@ export function DatePicker({
                   {format(date.to, 'dd LLL y', { locale: ru })}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(date.from, 'dd LLL y', { locale: ru })
               )
             ) : (
               <span>Выберите дату</span>

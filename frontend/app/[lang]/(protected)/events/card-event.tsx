@@ -2,13 +2,15 @@ import { Button } from '@/components/ui/button';
 import { TypeEvent } from '@/lib/definitions';
 import { formatDate } from '@/lib/utils';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 export function CardEvent({ event }: { event: TypeEvent }) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const router = useRouter();
 
   return (
-    <div className="flex h-[450px] w-full flex-col overflow-hidden rounded-xl bg-[#292929] hover:shadow-[0px_5px_30px_0px_rgba(0,0,0,0.5)] transition-shadow cursor-default">
+    <li className="flex h-[450px] w-full cursor-default flex-col overflow-hidden rounded-xl bg-[#292929] transition-shadow hover:shadow-[0px_5px_30px_0px_rgba(0,0,0,0.5)]">
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-50"
@@ -63,8 +65,13 @@ export function CardEvent({ event }: { event: TypeEvent }) {
             />
           </svg>
         </Button>
-        <Button variant="ruchampDefault">Подробнее</Button>
+        <Button
+          variant="ruchampDefault"
+          onClick={() => router.push('/ru/event')}
+        >
+          Подробнее
+        </Button>
       </div>
-    </div>
+    </li>
   );
 }
