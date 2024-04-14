@@ -18,8 +18,8 @@ const useOverrides = makeStyles({
 export default function Logo({ lang }: { lang: Locale }) {
   const overrides = useOverrides();
   return (
-    <CustomLink href={`/`} lang={lang}>
-      <div className='flex justify-start items-center gap-3'>
+    <CustomLink href={`/${lang}`} lang={lang}>
+      <div className="flex items-center justify-start gap-3">
         <svg
           version="1.1"
           id="Слой_1"
