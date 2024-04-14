@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Container } from '../../ui/container';
 import { UserForm } from './user-form';
-import { auth } from '@/lib/api/auth';
 import { UserFormAthlete } from './user-form-athlete';
 import { UserFormOrganizer } from './user-form-organizer';
 import { EnumUserRole } from '@/lib/definitions';
@@ -12,36 +11,50 @@ import { getSession } from '@/lib/actions';
 
 export default async function Profile() {
   const session = await getSession();
-
-  let athlete = null;
-  const organizer = {
-    organization_name: 'Организация организатора',
-    website: 'https://...',
-    contact_email: '123@123.com',
-    contact_phone: '123',
-    description: 'Описание',
-    image_field:
-      'https://images.unsplash.com/photo-1711950901044-fa6215a9c59b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  const userCommonData =
+    session &&
+    session.user.find((item: object) => Object.keys(item).includes('User'))[
+      'User'
+    ];
+  const userSpecialData = () => {
+    switch (userCommonData.role_id) {
+      case 1:
+        return (
+          session &&
+          session.user.find((item: object) =>
+            Object.keys(item).includes('Athlete'),
+          )?.['Athlete']
+        );
+      case 2:
+        return (
+          session &&
+          session.user.find((item: object) =>
+            Object.keys(item).includes('EventOrganizer'),
+          )?.['EventOrganizer']
+        );
+      case 3:
+        return (
+          session &&
+          session.user.find((item: object) =>
+            Object.keys(item).includes('Spectator'),
+          )?.['Spectator']
+        );
+      case 4:
+        return (
+          session &&
+          session.user.find((item: object) =>
+            Object.keys(item).includes('Sysadmin'),
+          )?.['Sysadmin']
+        );
+      case 5:
+        return (
+          session &&
+          session.user.find((item: object) =>
+            Object.keys(item).includes('Referee'),
+          )?.['Referee']
+        );
+    }
   };
-  const spectator = {
-    phone_number: '+7-900-555-11-33',
-    image_field:
-      'https://images.unsplash.com/photo-1711950901044-fa6215a9c59b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  };
-  const sysadmin = {
-    phone_number: '+7-900-555-11-22',
-    image_field:
-      'https://images.unsplash.com/photo-1711950901044-fa6215a9c59b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  };
-  const referee = {
-    qualification_level: 'Первая категория',
-    image_field:
-      'https://images.unsplash.com/photo-1711950901044-fa6215a9c59b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  };
-
-  // if (user.role_id === EnumUserRole['athlete']) {
-  //   athlete = await auth.getAthlete(token);
-  // }
 
   return (
     <Container className="min-h-fit">
@@ -53,23 +66,22 @@ export default async function Profile() {
           fill={true}
           style={{ objectFit: 'cover' }}
         />
-        {/* <UserForm user={user} />
-        {true &&  <UserFormSysadmin sysadmin={sysadmin} />}
-        {user.role_id === EnumUserRole['athlete'] && (
-          <UserFormAthlete athlete={athlete} />
+        <UserForm user={userCommonData} />
+        {userCommonData?.role_id === EnumUserRole['athlete'] && (
+          <UserFormAthlete athlete={userSpecialData()} />
         )}
-        {user.role_id === EnumUserRole['organizer'] && (
-          <UserFormOrganizer organizer={organizer} />
+        {userCommonData?.role_id === EnumUserRole['organizer'] && (
+          <UserFormOrganizer organizer={userSpecialData()} />
         )}
-        {user.role_id === EnumUserRole['spectator'] && (
-          <UserFormSpectator spectator={spectator} />
+        {userCommonData?.role_id === EnumUserRole['spectator'] && (
+          <UserFormSpectator spectator={userSpecialData()} />
         )}
-        {user.role_id === EnumUserRole['admin'] && (
-          <UserFormSysadmin sysadmin={sysadmin} />
+        {userCommonData?.role_id === EnumUserRole['admin'] && (
+          <UserFormSysadmin sysadmin={userSpecialData()} />
         )}
-        {user.role_id === EnumUserRole['referee'] && (
-          <UserFormReferee referee={referee} />
-        )} */}
+        {userCommonData?.role_id === EnumUserRole['referee'] && (
+          <UserFormReferee referee={userSpecialData()} />
+        )}
       </section>
     </Container>
   );

@@ -13,6 +13,7 @@ export default async function ProtectedLayout({
   params: { lang: Locale };
 }) {
   const session = await getSession();
+
   if (!session) {
     redirect('/ru');
   }

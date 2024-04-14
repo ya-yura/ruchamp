@@ -36,7 +36,7 @@ export function UserFormAthlete({ athlete }: TypeUserFormAthleteProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      weight_category: 0,
+      weight_category: athlete?.weight,
       weight: athlete?.weight,
       height: athlete?.height,
       belt_rank: '',
