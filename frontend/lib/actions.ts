@@ -4,6 +4,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from './api/auth';
+import { TypeRegisterFields } from './definitions';
 
 const secretKey = 'secret'; // replace later
 const key = new TextEncoder().encode(secretKey);
@@ -21,6 +22,24 @@ export async function decrypt(input: string): Promise<any> {
     algorithms: ['HS256'],
   });
   return payload;
+}
+
+export async function registerUser(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+
+  console.log('form data', formData)
+  try {
+    await auth.register(formData);
+    await auth.login(
+      formData.get('email') as string,
+      formData.get('password') as string,
+    );
+  } catch (err) {
+    console.log('registerUser', err);
+    return 'Ошибка регстрации. Данные введены неверно';
+  }
 }
 
 export async function authenticate(

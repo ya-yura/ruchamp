@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
+import type { GetServerSidePropsContext, Metadata } from 'next';
 import { inter } from '@/app/[lang]/ui/fonts';
 import '@/app/[lang]/ui/global.css';
 import { Providers } from './providers'; //Fluent UI React v9 provider
 import { Locale, i18n } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'РуЧамп',
