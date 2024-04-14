@@ -39,7 +39,7 @@ class Auth {
     }
   }
 
-  register(user: Partial<TypeRegisterFields>): Promise<void> {
+  register(user: any): Promise<void> {
     const {
       repeat_password,
       athlete_weight,

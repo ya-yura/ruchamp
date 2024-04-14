@@ -21,7 +21,7 @@ type TypeRegisterStepFourProps = {
   sportsTypePlaceholder: string;
   sportsOptions: string[];
   buttonText: string;
-  errorMessage: string;
+  errorMessage: string | undefined;
   isDisabled: boolean;
 } & TypeCustomFieldsetProps;
 
