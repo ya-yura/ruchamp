@@ -433,7 +433,8 @@ async def create_user(
 
 @router.put("/update")
 async def update_user(
-    user_data: UserUpdate,
+    user_update: UserUpdate,
+    user_data: UserData,
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db),
     user_manager: UserManager = Depends(get_user_manager),
@@ -443,11 +444,31 @@ async def update_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # user.role_id = user_data.role_id
-    user.username = user_data.username
-    user.name = user_data.name
-    user.sirname = user_data.sirname
-    user.fathername = user_data.fathername
+    user.username = user_update.username
+    user.name = user_update.name
+    user.sirname = user_update.sirname
+    user.fathername = user_update.fathername
+
+    if user.role_id == 1:
+        await db.execute(update(Athlete).where(Athlete.user_id == current_user.id).values(
+            weight=float(user_data.info['athlete_weight']),
+            height=int(user_data.info['athlete_height']),
+        ))
+    if user.role_id == 2:
+        await db.execute(update(EventOrganizer).where(EventOrganizer.user_id == current_user.id).values(
+            organization_name=user_data.info['event_organizer_organization_name'],
+            website=user_data.info['event_organizer_organization_website'],
+            contact_email=user_data.info['event_organizer_organization_contact_email'],
+            contact_phone=user_data.info['event_organizer_organization_contact_phone'],
+        ))
+    if user.role_id == 3:
+        await db.execute(update(Spectator).where(Spectator.user_id == current_user.id).values(
+            phone_number=user_data.info['spectator_phone_number'],
+        ))
+    if user.role_id == 5:
+        await db.execute(update(Referee).where(Referee.user_id == current_user.id).values(
+            qualification_level=int(user_data.info['referee_qualification_level']),
+        ))
     await db.commit()
     return {f"User ID - {current_user.id} updated"}
     
