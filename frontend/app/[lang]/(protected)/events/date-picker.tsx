@@ -46,7 +46,7 @@ export function DatePicker({
                 <>
                   {format(
                     date.from,
-                    `dd LLL ${isCurrentYear(date.from) ? '' : 'y'}`,
+                    `dd LLL ${isCurrentYear(date.from) ? '' : 'y '}`,
                     {
                       locale: ru,
                     },
