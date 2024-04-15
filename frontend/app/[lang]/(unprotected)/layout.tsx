@@ -2,10 +2,9 @@ import '@/app/[lang]/ui/global.css';
 import { Locale, i18n } from '@/i18n.config';
 import { Header } from '../ui/header/header';
 import { Footer } from '../ui/footer/footer';
-import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/actions';
 
-export default async function ProtectedLayout({
+export default async function UnprotectedLayout({
   children,
   params,
 }: {
@@ -17,10 +16,6 @@ export default async function ProtectedLayout({
   if (!session || session.user.length === 0) {
     user === null;
   } else user = session.user;
-
-  if (!session) {
-    redirect('/ru');
-  }
 
   return (
     <div>

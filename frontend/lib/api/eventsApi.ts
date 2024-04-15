@@ -10,11 +10,11 @@ class EventsApi {
     this.headers = headers;
   }
 
-  getEvents(token: string): Promise<Array<TypeEvent>> {
+  getEvents(): Promise<Array<TypeEvent>> {
     return fetch(`${this.baseUrl}/event/events`, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       },
     }).then(checkResponse);
   }

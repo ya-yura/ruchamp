@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   return (
     <main className="flex min-h-[calc(100vh-112px)] flex-col items-center justify-start py-11">
-      <p>This is Dashboard</p>
+      <p>Это страница для демонстрации защищённого роута</p>
     </main>
   );
 }

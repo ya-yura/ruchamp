@@ -1,19 +1,17 @@
 import { getSession } from '@/lib/actions';
-import { Container } from '../../ui/container';
 import { EventsTabs } from './events-tabs';
 import { eventsApi } from '@/lib/api/eventsApi';
-import { PaginationBlock } from './pagination-block';
+import { TypeEvent } from '@/lib/definitions';
+import { Container } from '../../ui/container';
 
 export default async function Events() {
   const session = await getSession();
-  let token;
-  let events;
-  if (!session) {
-    token = null;
+  let events: Array<TypeEvent>;
+  try {
+    events = await eventsApi.getEvents();
+  } catch (err) {
     events = [];
   }
-  token = session.token;
-  events = await eventsApi.getEvents(token);
 
   return (
     <Container>
