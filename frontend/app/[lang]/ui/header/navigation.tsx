@@ -11,7 +11,14 @@ import {
 import { IconArrow } from '../icons';
 import { Locale } from '@/i18n.config';
 
-export default function HeaderNavigation({ lang }: { lang: Locale }) {
+export default function HeaderNavigation({
+  lang,
+  user,
+}: {
+  lang: Locale;
+  user: any;
+}) {
+  // fix "any" type
   return (
     <Menu>
       <MenuTrigger disableButtonEnhancement>
@@ -28,9 +35,14 @@ export default function HeaderNavigation({ lang }: { lang: Locale }) {
       <MenuPopover>
         <nav>
           <MenuList>
-            <MenuItemLink href={`/${lang}/event`}>Событие</MenuItemLink>
             <MenuItemLink href={`/${lang}/events`}>События</MenuItemLink>
-            <MenuItemLink href={`/${lang}/dashboard`}>Dashboard</MenuItemLink>
+            {user && (
+              <>
+                <MenuItemLink href={`/${lang}/dashboard`}>
+                  Dashboard
+                </MenuItemLink>
+              </>
+            )}
           </MenuList>
         </nav>
       </MenuPopover>

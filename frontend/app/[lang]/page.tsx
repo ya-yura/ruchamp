@@ -3,12 +3,10 @@ import { Text, Display, Title2 } from '@fluentui/react-components';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { Container } from './ui/container';
-import { Header } from './ui/header/header';
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '../api/auth/[...nextauth]/options';
-import { auth } from '@/lib/api/auth';
 import { ContentWraper } from './ui/content-wraper';
 import { getSession } from '@/lib/actions';
+import { Footer } from './ui/footer/footer';
+import { Header } from './ui/header/header';
 
 export default async function Home({
   params: { lang },
@@ -17,6 +15,7 @@ export default async function Home({
 }) {
   // const { page } = await getDictionary(lang);
   const session = await getSession();
+
   let user;
   if (!session || session.user.length === 0) {
     user === null;
@@ -74,6 +73,7 @@ export default async function Home({
           </ContentWraper>
         </section>
       </Container>
+      <Footer lang={lang} />
     </>
   );
 }
