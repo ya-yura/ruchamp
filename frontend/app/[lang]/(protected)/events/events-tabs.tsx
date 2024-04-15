@@ -18,13 +18,17 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
     Array<TypeSportsTypes>
   >([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(
+    Math.ceil(events.length / 12),
+  );
   const [pageEvents, setPageEvents] = useState<Array<TypeEvent>>([]);
 
   useEffect(() => {
+    setTotalPages(Math.ceil(events.length / 12));
     setPageEvents(
       events.slice((currentPage - 1) * 12, (currentPage - 1) * 12 + 12),
     );
-  }, [currentPage]);
+  }, [events, currentPage]);
 
   return (
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
@@ -57,16 +61,14 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
           </div>
           <DatePicker className="mb-4 flex justify-center" />
           <FilterByType setSelected={setSelectedSportTypes} />
-          <TabsContent
-            value="futureEvents"
-          >
-            <ul className='grid grid-cols-3 gap-6 mb-10'>
+          <TabsContent value="futureEvents">
+            <ul className="mb-10 grid grid-cols-3 gap-6">
               {pageEvents.map((event) => (
                 <CardEvent key={event.id} event={event} />
               ))}
             </ul>
             <PaginationBlock
-              totalPages={events.length / 12}
+              totalPages={totalPages}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
             />

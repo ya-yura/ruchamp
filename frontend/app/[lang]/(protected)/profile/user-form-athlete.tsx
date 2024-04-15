@@ -20,7 +20,7 @@ type TypeUserFormAthleteProps = {
 };
 
 const formSchema = z.object({
-  weight_category: z.number().optional(),
+  weight_category: z.string().optional(),
   weight: z.number().optional(),
   height: z.number().optional(),
   belt_rank: z.string().optional(),
@@ -36,7 +36,7 @@ export function UserFormAthlete({ athlete }: TypeUserFormAthleteProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      weight_category: athlete?.weight,
+      weight_category: '',
       weight: athlete?.weight,
       height: athlete?.height,
       belt_rank: '',
