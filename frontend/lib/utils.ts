@@ -2,6 +2,8 @@ import { FieldProps } from '@fluentui/react-components';
 import { TypeRegisterFields } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -50,4 +52,18 @@ export function formatDate(inputDate: string): string {
   const year = date.getFullYear();
 
   return `${day} ${month} ${year}, ${hours}:${minutes}`;
+}
+
+export function transformDate(inputDate: string): string {
+  const currentDate = new Date();
+  const parsedDate = parseISO(inputDate);
+  if (currentDate.getFullYear() === parsedDate.getFullYear()) {
+    return format(parsedDate, 'dd MMMM', { locale: ru });
+  } else {
+    return format(parsedDate, 'dd MMMM yyyy', { locale: ru });
+  }
+}
+
+export function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * max);
 }

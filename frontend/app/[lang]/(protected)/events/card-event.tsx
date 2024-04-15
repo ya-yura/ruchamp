@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { TypeEvent } from '@/lib/definitions';
-import { formatDate } from '@/lib/utils';
+import { getRandomInt, transformDate } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -13,8 +13,8 @@ export function CardEvent({ event }: { event: TypeEvent }) {
     <li className="flex h-[450px] w-full cursor-default flex-col overflow-hidden rounded-xl bg-[#292929] transition-shadow hover:shadow-[0px_5px_30px_0px_rgba(0,0,0,0.5)]">
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
-          className="opacity-50"
-          src="/ru/images/event-hero-bg.jpeg"
+          className="opacity-30"
+          src={`/ru/images/mock-event-bg/${getRandomInt(9)}.avif`}
           alt={event.name}
           fill={true}
           style={{ objectFit: 'cover' }}
@@ -35,8 +35,8 @@ export function CardEvent({ event }: { event: TypeEvent }) {
           />
           <div className="flex flex-col">
             <p className="text-sm font-semibold">
-              {formatDate(event.start_datetime)} -{' '}
-              {formatDate(event.end_datetime)}
+              {/* {formatDate(event.start_datetime)} */}
+              {transformDate(event.start_datetime)}
             </p>
             <p className="line-clamp-1 text-[#ADADAD]">{event.location}</p>
           </div>
