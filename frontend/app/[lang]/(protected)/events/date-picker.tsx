@@ -23,6 +23,11 @@ export function DatePicker({
     to: addDays(new Date(2024, 0, 20), 20),
   });
 
+  function isCurrentYear(date: Date): boolean {
+    const currentDate = new Date();
+    return currentDate.getFullYear() === date?.getFullYear();
+  }
+
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover>
@@ -39,11 +44,30 @@ export function DatePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, 'dd LLL y', { locale: ru })} -{' '}
-                  {format(date.to, 'dd LLL y', { locale: ru })}
+                  {format(
+                    date.from,
+                    `dd LLL ${isCurrentYear(date.from) ? '' : 'y'}`,
+                    {
+                      locale: ru,
+                    },
+                  )}{' '}
+                  —{' '}
+                  {format(
+                    date.to,
+                    `dd LLL ${isCurrentYear(date.to) ? '' : 'y'}`,
+                    {
+                      locale: ru,
+                    },
+                  )}
                 </>
               ) : (
-                format(date.from, 'dd LLL y', { locale: ru })
+                format(
+                  date.from,
+                  `dd LLL ${isCurrentYear(date.from) ? '' : 'y'}`,
+                  {
+                    locale: ru,
+                  },
+                )
               )
             ) : (
               <span>Выберите дату</span>
