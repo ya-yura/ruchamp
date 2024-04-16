@@ -7,8 +7,8 @@ import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
-import { TypeSportsTypes } from '@/lib/constants';
-import { useEffect, useState } from 'react';
+import { TypeSportsTypes, sportsTypes } from '@/lib/constants';
+import { useEffect, useMemo, useState } from 'react';
 import { TypeEvent } from '@/lib/definitions';
 import { CardEvent } from './card-event';
 import { PaginationBlock } from './pagination-block';
@@ -24,11 +24,30 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
   const [pageEvents, setPageEvents] = useState<Array<TypeEvent>>([]);
 
   useEffect(() => {
-    setTotalPages(Math.ceil(events.length / 12));
-    setPageEvents(
-      events.slice((currentPage - 1) * 12, (currentPage - 1) * 12 + 12),
+    let filtredEvents: TypeEvent[] = [];
+    const filter: number[] = selectedSportTypes.map((item) =>
+      sportsTypes.indexOf(item),
     );
-  }, [events, currentPage]);
+
+    if (selectedSportTypes.length !== 0) {
+      console.log('123123');
+      filtredEvents = events.filter((event) => {
+        return filter.some((filter) =>
+          event.organizer_id.toString().split('').includes(filter.toString()),
+        );
+      });
+    } else {
+      console.log('else');
+      filtredEvents = events;
+    }
+
+    setTotalPages(Math.ceil(filtredEvents.length / 12));
+    setPageEvents(
+      filtredEvents.slice((currentPage - 1) * 12, (currentPage - 1) * 12 + 12),
+    );
+  }, [events, currentPage, selectedSportTypes]);
+
+  // console.log( selectedSportTypes.map(item => sportsTypes.indexOf(item)))
 
   return (
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
@@ -62,18 +81,22 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
           <DatePicker className="mb-4 flex justify-center" />
           <FilterByType setSelected={setSelectedSportTypes} />
           <TabsContent value="futureEvents">
-            <ul className="mb-10 grid grid-cols-3 gap-6">
-              {pageEvents.map((event) => (
-                <CardEvent key={event.id} event={event} />
-              ))}
-            </ul>
             {pageEvents.length !== 0 ? (
-              <PaginationBlock
-                totalPages={totalPages}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-              />
-            ) : null}
+              <>
+                <ul className="mb-10 grid grid-cols-3 gap-6">
+                  {pageEvents.map((event) => (
+                    <CardEvent key={event.id} event={event} />
+                  ))}
+                </ul>
+                <PaginationBlock
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              </>
+            ) : (
+              <p>Ничего не найдено</p>
+            )}
           </TabsContent>
           <TabsContent value="pastEvents">
             <p>Прошедшие события</p>
