@@ -3,7 +3,8 @@
 import { Body2, Title1 } from '@fluentui/react-components';
 import { makeStyles, tokens } from '@fluentui/react-components';
 import Image from 'next/image';
-import { ContentWraper } from '../../ui/content-wraper';
+import { ContentWraper } from '../../../../../components/content-wraper';
+import { TypeEvent } from '@/lib/definitions';
 
 const useOverrides = makeStyles({
   title: {
@@ -13,7 +14,7 @@ const useOverrides = makeStyles({
   text: { color: tokens.colorNeutralForeground4 },
 });
 
-export function AddressSection() {
+export function AddressSection({event}: {event: TypeEvent | undefined}) {
   const overrides = useOverrides();
 
   return (

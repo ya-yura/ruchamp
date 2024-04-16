@@ -2,8 +2,9 @@
 
 import { Title1 } from '@fluentui/react-components';
 import { makeStyles, tokens } from '@fluentui/react-components';
-import CustomCard from '../../ui/custom-card';
-import { ContentWraper } from '../../ui/content-wraper';
+import CustomCard from '../../../../../components/custom-card';
+import { ContentWraper } from '../../../../../components/content-wraper';
+import { TypeEvent } from '@/lib/definitions';
 
 const useOverrides = makeStyles({
   title: { color: tokens.colorNeutralForeground4, fontWeight: '700' },
@@ -28,12 +29,12 @@ const cardMockData = [
   },
 ];
 
-export function ExpectedEvents() {
+export function ExpectedEvents({ events }: { events: Array<TypeEvent> }) {
   const overrides = useOverrides();
 
   return (
     <section className="flex w-full flex-col px-[72px] pb-7 pt-12">
-      <ContentWraper className='gap-6'>
+      <ContentWraper className="gap-6">
         <Title1 className={overrides.title}>Самые ожидаемые события</Title1>
         <div className="grid grid-cols-4 gap-[18px]">
           {cardMockData.map((item) => (

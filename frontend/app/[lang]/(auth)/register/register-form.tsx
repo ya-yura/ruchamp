@@ -16,9 +16,9 @@ import {
 } from './constants';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@/lib/hooks/useForm';
-import { Greetings } from '../../ui/greetings';
+import { Greetings } from '../../../../components/greetings';
 import { Locale } from '@/i18n.config';
-import { CustomForm } from '../../ui/forms/custom-form';
+import { CustomForm } from '../../../../components/forms/custom-form';
 import { RegisterStepOne } from './register-step-one';
 import { RegisterStepTwo } from './register-step-two';
 import { RegisterStepThree } from './register-step-three';

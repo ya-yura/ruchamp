@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
-import { ContentWraper } from '../../ui/content-wraper';
+import { ContentWraper } from '../../../../components/content-wraper';
 import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -67,11 +67,13 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
                 <CardEvent key={event.id} event={event} />
               ))}
             </ul>
-            <PaginationBlock
-              totalPages={totalPages}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-            />
+            {pageEvents.length !== 0 ? (
+              <PaginationBlock
+                totalPages={totalPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            ) : null}
           </TabsContent>
           <TabsContent value="pastEvents">
             <p>Прошедшие события</p>

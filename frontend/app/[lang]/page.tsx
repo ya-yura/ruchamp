@@ -2,11 +2,11 @@ import Image from 'next/image';
 import { Text, Display, Title2 } from '@fluentui/react-components';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { Container } from './ui/container';
-import { ContentWraper } from './ui/content-wraper';
+import { Container } from '../../components/container';
+import { ContentWraper } from '../../components/content-wraper';
 import { getSession } from '@/lib/actions';
-import { Footer } from './ui/footer/footer';
-import { Header } from './ui/header/header';
+import { Footer } from '../../components/footer/footer';
+import { Header } from '../../components/header/header';
 
 export default async function Home({
   params: { lang },

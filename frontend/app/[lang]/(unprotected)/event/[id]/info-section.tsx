@@ -3,7 +3,7 @@ import { Athletes } from './athletes';
 import { Matches } from './matches';
 import { Grid } from './grid';
 import { Results } from './results';
-import { ContentWraper } from '../../ui/content-wraper';
+import { ContentWraper } from '../../../../../components/content-wraper';
 
 export function InfoSection({ selectedValue }: any) {
   return (

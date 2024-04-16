@@ -67,7 +67,7 @@ export function CardEvent({ event }: { event: TypeEvent }) {
         </Button>
         <Button
           variant="ruchampDefault"
-          onClick={() => router.push('/ru/event')}
+          onClick={() => router.push(`/ru/event/${event.id}`)}
         >
           Подробнее
         </Button>

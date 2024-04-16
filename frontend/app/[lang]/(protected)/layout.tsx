@@ -1,7 +1,7 @@
 import '@/app/[lang]/ui/global.css';
 import { Locale, i18n } from '@/i18n.config';
-import { Header } from '../ui/header/header';
-import { Footer } from '../ui/footer/footer';
+import { Header } from '../../../components/header/header';
+import { Footer } from '../../../components/footer/footer';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/actions';
 

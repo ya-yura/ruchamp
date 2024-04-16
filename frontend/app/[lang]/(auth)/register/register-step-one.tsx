@@ -4,9 +4,9 @@ import {
   SelectTabData,
   SelectTabEvent,
 } from '@fluentui/react-components';
-import { AuthSwitcher } from '../../ui/auth/auth-switcher';
-import { CustomLink } from '../../ui/custom-link';
-import { CustomFieldset } from '../../ui/forms/custom-fieldset';
+import { AuthSwitcher } from '../../../../components/auth/auth-switcher';
+import { CustomLink } from '../../../../components/custom-link';
+import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
 import { TypeCustomFieldsetProps } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 

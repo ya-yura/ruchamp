@@ -2,27 +2,23 @@
 
 import Image from 'next/image';
 import { Badges } from './badges';
-import { makeStyles, LargeTitle, Button } from '@fluentui/react-components';
+import { Button } from '@fluentui/react-components';
 import { InfoSwitcher } from './info-switcher';
-import { ContentWraper } from '../../ui/content-wraper';
+import { ContentWraper } from '../../../../../components/content-wraper';
+import { TypeEvent } from '@/lib/definitions';
 
-const useOverrides = makeStyles({
-  title: {
-    fontSize: '48px',
-    lineHeight: '80px',
-    letterSpacing: '-1.2px',
-    fontWeight: '700',
-  },
-});
-
-export function EventHero({
-  selectedValue,
-  onTabSelect,
-}: {
+type TypeEventHeroProps = {
+  // fix "any" later
+  event: TypeEvent | undefined;
   selectedValue: any;
   onTabSelect: any;
-}) {
-  const overrides = useOverrides();
+};
+
+export function EventHero({
+  event,
+  selectedValue,
+  onTabSelect,
+}: TypeEventHeroProps) {
 
   return (
     <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
@@ -36,9 +32,7 @@ export function EventHero({
       <ContentWraper className="h-[720px] justify-between">
         <Badges />
         <div className="relative flex flex-col gap-10">
-          <LargeTitle as="h1" className={overrides.title}>
-            Кубок Ивана Ярыгина
-          </LargeTitle>
+          <h1 className='text-5xl font-bold tracking-tight leading-tight'>{event?.name}</h1>
           <div className="relative flex gap-6">
             <Button size="large" appearance="primary">
               Участвовать
