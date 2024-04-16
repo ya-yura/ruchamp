@@ -1,9 +1,10 @@
 import { FieldProps } from '@fluentui/react-components';
-import { TypeRegisterFields } from './definitions';
+import { TypeEvent, TypeRegisterFields } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { TypeSportsTypes, sportsTypes } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -64,6 +65,14 @@ export function transformDate(inputDate: string): string {
   }
 }
 
-export function getRandomInt(max: number): number {
-  return Math.floor(Math.random() * max);
+// export function getRandomInt(max: number): number {
+//   return Math.floor(Math.random() * max);
+// }
+
+// Later it may be deleted
+export function chooseTypes(event: TypeEvent | undefined): TypeSportsTypes[] {
+  let res: TypeSportsTypes[] = [];
+  const arr: string[] | undefined = event?.organizer_id.toString().split('');
+  arr?.map((item) => res.push(sportsTypes[+item]));
+  return [...new Set(res)];
 }

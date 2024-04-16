@@ -1,46 +1,23 @@
 'use client';
 
-import { Badge } from '@fluentui/react-components';
-import React from 'react';
-import {
-  makeStyles,
-  mergeClasses,
-  tokens,
-  shorthands,
-} from '@fluentui/react-components';
-import { sportsTypes } from '@/lib/constants';
+import { TypeSportsTypes } from '@/lib/constants';
+import { BadgeButton } from '@/components/badge-button';
+import { cn } from '@/lib/utils';
 
-const useOverrides = makeStyles({
-  badge: {
-    backgroundColor: tokens.colorNeutralForegroundInverted,
-    fontSize: '16px',
-    letterSpacing: '-0.5px',
-    ...shorthands.padding('6px', '16px'),
-  },
-  selected: {
-    backgroundColor: tokens.colorNeutralForeground2,
-    color: tokens.colorNeutralStrokeDisabled,
-  },
-});
+type TypeBadgesProps = {
+  types: TypeSportsTypes[];
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export function Badges() {
-  const overrides = useOverrides();
-
+export function Badges({ types, className }: TypeBadgesProps) {
   return (
-    <div className="flex max-w-5xl flex-wrap gap-3 self-start">
-      {sportsTypes.map((type) => (
-        <Badge
-          key={type}
-          className={
-            type === 'Вольная борьба'
-              ? mergeClasses(overrides.badge, overrides.selected)
-              : overrides.badge
-          }
-          size="extra-large"
-          appearance="filled"
-        >
-          {type}
-        </Badge>
+    <div
+      className={cn(
+        'mb-8 flex max-w-5xl flex-wrap gap-1 self-start',
+        className,
+      )}
+    >
+      {types.map((type) => (
+        <BadgeButton key={type} type={type} isDisabled={true} />
       ))}
     </div>
   );
