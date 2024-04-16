@@ -30,14 +30,12 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
     );
 
     if (selectedSportTypes.length !== 0) {
-      console.log('123123');
       filtredEvents = events.filter((event) => {
         return filter.some((filter) =>
           event.organizer_id.toString().split('').includes(filter.toString()),
         );
       });
     } else {
-      console.log('else');
       filtredEvents = events;
     }
 
@@ -47,8 +45,7 @@ export function EventsTabs({ events }: { events: Array<TypeEvent> }) {
     );
   }, [events, currentPage, selectedSportTypes]);
 
-  // console.log( selectedSportTypes.map(item => sportsTypes.indexOf(item)))
-
+  console.log();
   return (
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
       <div className="absolute mt-[-92px] h-[853px] w-full">
