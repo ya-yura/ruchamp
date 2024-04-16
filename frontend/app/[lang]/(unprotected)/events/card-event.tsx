@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { TypeEvent } from '@/lib/definitions';
-import { getRandomInt, transformDate } from '@/lib/utils';
+import { chooseTypes, transformDate } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ export function CardEvent({ event }: { event: TypeEvent }) {
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"
-          src={`/ru/images/mock-event-bg/${getRandomInt(9)}.avif`}
+          src={`/ru/images/mock-event-bg/${event.id.toString()[event.id.toString().length - 1]}.avif`}
           alt={event.name}
           fill={true}
           style={{ objectFit: 'cover' }}
@@ -22,7 +22,9 @@ export function CardEvent({ event }: { event: TypeEvent }) {
         <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold">
           {event.name}
         </h3>
-        <p className="relative line-clamp-2 text-sm">{event.event_system}</p>
+        <p className="relative line-clamp-2 text-sm">
+          {chooseTypes(event).join(', ')}
+        </p>
       </div>
       <div className="flex flex-col justify-between px-4 py-3">
         <div className="mb-3 flex items-center justify-start gap-5">
@@ -67,7 +69,7 @@ export function CardEvent({ event }: { event: TypeEvent }) {
         </Button>
         <Button
           variant="ruchampDefault"
-          onClick={() => router.push('/ru/event')}
+          onClick={() => router.push(`/ru/event/${event.id}`)}
         >
           Подробнее
         </Button>

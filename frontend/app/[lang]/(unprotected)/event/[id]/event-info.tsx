@@ -8,17 +8,19 @@ import {
   SelectTabEvent,
   TabValue,
 } from '@fluentui/react-components';
+import { TypeEvent } from '@/lib/definitions';
 
-export function EventInfo() {
+export function EventInfo({ event }: {event: TypeEvent}) {
   const [selectedValue, setSelectedValue] = useState<TabValue>('info');
 
   const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     setSelectedValue(data.value);
   };
+
   return (
-    <>
-      <EventHero selectedValue={selectedValue} onTabSelect={onTabSelect} />
-      <InfoSection selectedValue={selectedValue} />
-    </>
+    <div className='mb-10 w-full'>
+      <EventHero event={event} selectedValue={selectedValue} onTabSelect={onTabSelect} />
+      <InfoSection selectedValue={selectedValue} event={event}/>
+    </div>
   );
 }

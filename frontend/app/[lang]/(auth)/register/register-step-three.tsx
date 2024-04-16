@@ -1,12 +1,12 @@
 import { Button, Field, Radio, RadioGroup } from '@fluentui/react-components';
-import { CustomFieldset } from '../../ui/forms/custom-fieldset';
+import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
 import {
   EnumCountries,
   TypeCustomFieldsetProps,
   TypeFirstUserFields,
 } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
-import { CustomSelect } from '../../ui/forms/custom-select';
+import { CustomSelect } from '../../../../components/forms/custom-select';
 
 type TypeRegisterStepThreeProps = {
   lang: Locale;

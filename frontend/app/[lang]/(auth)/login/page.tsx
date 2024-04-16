@@ -1,4 +1,4 @@
-import { Greetings } from '../../ui/greetings';
+import { Greetings } from '../../../../components/greetings';
 import { Locale } from '@/i18n.config';
 import { LoginForm } from './login-form';
 

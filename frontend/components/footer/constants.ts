@@ -6,56 +6,56 @@ type TypeLinkData = {
 export const LinkData1: TypeLinkData[] = [
   {
     text: 'Справка',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Пользовательское соглашение',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Подарочные сертифиакаты',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Возврат билетов',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Участие в исследованиях',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Правила рекомендаций',
-    url: '/',
+    url: '/ru',
   },
 ];
 
 export const LinkData2: TypeLinkData[] = [
   {
     text: 'Партнёрам и организаторам мероприятий',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Билетная система РуЧамп',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Корпоративным клиентам',
-    url: '/',
+    url: '/ru',
   },
 ];
 
 export const LinkData3: TypeLinkData[] = [
   {
     text: 'Согласие на обработку персональных данных',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Статистика',
-    url: '/',
+    url: '/ru',
   },
   {
     text: 'Реклама',
-    url: '/',
+    url: '/ru',
   },
 ];

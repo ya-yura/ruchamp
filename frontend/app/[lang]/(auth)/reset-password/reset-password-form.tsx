@@ -6,9 +6,9 @@ import {
   FieldProps,
   Spinner,
 } from '@fluentui/react-components';
-import { CustomLink } from '../../ui/custom-link';
-import { CustomFieldset } from '../../ui/forms/custom-fieldset';
-import { CustomForm } from '../../ui/forms/custom-form';
+import { CustomLink } from '../../../../components/custom-link';
+import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
+import { CustomForm } from '../../../../components/forms/custom-form';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useForm } from '@/lib/hooks/useForm';

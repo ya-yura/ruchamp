@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Container } from '../../ui/container';
+import { Container } from '../../../../components/container';
 import { UserForm } from './user-form';
 import { UserFormAthlete } from './user-form-athlete';
 import { UserFormOrganizer } from './user-form-organizer';

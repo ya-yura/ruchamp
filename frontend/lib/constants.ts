@@ -1,3 +1,5 @@
+import { TypeEvent } from './definitions';
+
 export type TypeSportsTypes =
   | 'Айкидо'
   | 'Бокатор'

@@ -20,6 +20,8 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         ruchampDefault:
           'bg-[#115EA3] text-primary-foreground hover:bg-[#115EA3]/90',
+        ruchampTransparent:
+          'border border-input bg-transparent text-white hover:bg-accent hover:text-accent-foreground',
       },
       size: {
         default: 'h-10 px-4 py-2',

@@ -1,13 +1,13 @@
 import { Button, Spinner } from '@fluentui/react-components';
-import { CustomFieldset } from '../../ui/forms/custom-fieldset';
+import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
 import {
   EnumUserRole,
   TypeAthleteFields,
   TypeCustomFieldsetProps,
   TypeFirstUserFields,
 } from '@/lib/definitions';
-import { MultiselectWithTags } from '../../ui/forms/custom-multiselect';
-import { CustomSelect } from '../../ui/forms/custom-select';
+import { MultiselectWithTags } from '../../../../components/forms/custom-multiselect';
+import { CustomSelect } from '../../../../components/forms/custom-select';
 import { ErrorCircle20Regular } from '@fluentui/react-icons';
 
 type TypeRegisterStepFourProps = {
