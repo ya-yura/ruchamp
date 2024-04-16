@@ -14,7 +14,7 @@ export function CardEvent({ event }: { event: TypeEvent }) {
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"
-          src={`/ru/images/mock-event-bg/${getRandomInt(9)}.avif`}
+          src={`/ru/images/mock-event-bg/${event.id.toString()[event.id.toString().length - 1]}.avif`}
           alt={event.name}
           fill={true}
           style={{ objectFit: 'cover' }}
