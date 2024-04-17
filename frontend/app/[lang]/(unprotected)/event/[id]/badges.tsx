@@ -4,9 +4,9 @@ import { TypeSportsTypes } from '@/lib/constants';
 import { BadgeButton } from '@/components/badge-button';
 import { cn } from '@/lib/utils';
 
-type TypeBadgesProps = {
+interface TypeBadgesProps extends React.HTMLAttributes<HTMLDivElement> {
   types: TypeSportsTypes[];
-} & React.HTMLAttributes<HTMLDivElement>;
+}
 
 export function Badges({ types, className }: TypeBadgesProps) {
   return (

@@ -1,21 +1,7 @@
-'use client';
-
-import { makeStyles, tokens } from '@fluentui/react-components';
-import Image from 'next/image';
 import { ContentWraper } from '@/components/content-wraper';
 import { TypeEvent } from '@/lib/definitions';
 
-const useOverrides = makeStyles({
-  title: {
-    color: tokens.colorNeutralForeground4,
-    fontWeight: '700',
-  },
-  text: { color: tokens.colorNeutralForeground4 },
-});
-
 export function AddressSection({ event }: { event: TypeEvent }) {
-  const overrides = useOverrides();
-
   return (
     <section className="mb-10 flex w-full flex-col px-[72px]">
       <ContentWraper className="gap-6">

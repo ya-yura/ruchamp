@@ -1,5 +1,5 @@
 import { Locale } from '@/i18n.config';
-import Logo from '../logo';
+import { Logo } from '../logo';
 import { UserMenuButton } from './user-menu-button';
 import HeaderNavigation from './navigation';
 import SearchBar from './search-box';

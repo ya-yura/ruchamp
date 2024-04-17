@@ -6,13 +6,13 @@ import { Results } from './results';
 import { ContentWraper } from '../../../../../components/content-wraper';
 import { TypeEvent } from '@/lib/definitions';
 
-type TypeInfoSectionProps = {
+interface InfoSectionProps {
   event: TypeEvent;
   selectedValue: any;
   // fix "any" type
-};
+}
 
-export function InfoSection({ selectedValue, event }: TypeInfoSectionProps) {
+export function InfoSection({ selectedValue, event }: InfoSectionProps) {
   return (
     <section className="flex w-full flex-col px-[72px] pt-[54px]">
       <ContentWraper>
