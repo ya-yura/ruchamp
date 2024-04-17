@@ -2,7 +2,7 @@ import { FieldProps } from '@fluentui/react-components';
 import { TypeEvent, TypeRegisterFields } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { format, parseISO } from 'date-fns';
+import { format, isPast, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { TypeSportsTypes, sportsTypes } from './constants';
 
@@ -68,4 +68,23 @@ export function chooseTypes(event: TypeEvent | undefined): TypeSportsTypes[] {
 
 export function getRandomInt(max: number): number {
   return Math.floor(Math.random() * max);
+}
+
+export function divideEventsByDateTime(events: TypeEvent[]): {
+  futureEvents: TypeEvent[];
+  pastEvents: TypeEvent[];
+} {
+  const futureEvents: TypeEvent[] = [];
+  const pastEvents: TypeEvent[] = [];
+
+  events.forEach((event) => {
+    const startDateTime = parseISO(event.start_datetime);
+    if (isPast(startDateTime)) {
+      pastEvents.push(event);
+    } else {
+      futureEvents.push(event);
+    }
+  });
+
+  return { futureEvents, pastEvents };
 }

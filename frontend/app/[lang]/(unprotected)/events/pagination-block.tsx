@@ -4,30 +4,39 @@ import {
   PaginationEllipsis,
   PaginationItem,
 } from '@/components/ui/pagination';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
-type TypePaginationBlockProps = {
+interface PaginationBlockProps {
   totalPages: number;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-};
+}
 
 export function PaginationBlock({
   totalPages,
   currentPage,
   setCurrentPage,
-}: TypePaginationBlockProps) {
+}: PaginationBlockProps) {
   const [range, setRange] = useState<Array<number>>([1, 2, 3]);
 
-  function handlePageClick(e: any) {
-    // fix "any" type
-    e.preventDefault();
-    const clickedPage = +e.currentTarget.ariaLabel;
-    const label = e.currentTarget.ariaLabel;
+  useEffect(() => {
+    if (currentPage === 1) {
+      setRange([1, 2, 3]);
+    }
+  }, [currentPage]);
 
-    if (clickedPage === 1) {
-      setCurrentPage(1);
+  function handlePageClick(event: React.MouseEvent<HTMLButtonElement>): void {
+    event.preventDefault();
+    const target = event.currentTarget as HTMLElement;
+    const clickedPage = parseInt(target?.getAttribute('aria-label') || '1');
+    const label = target?.getAttribute('aria-label');
+
+    if (
+      [1, 2].includes(clickedPage) ||
+      (totalPages < 4 && label !== 'next' && label !== 'prev')
+    ) {
+      setCurrentPage(clickedPage);
       setRange([1, 2, 3]);
       return;
     }
@@ -74,7 +83,11 @@ export function PaginationBlock({
         {range[0] > 3 && (
           <>
             <PaginationItem>
-              <Button variant={null} aria-label="1" onClick={handlePageClick}>
+              <Button
+                variant={currentPage === 1 ? 'ruchampDefault' : null}
+                aria-label="1"
+                onClick={handlePageClick}
+              >
                 1
               </Button>
             </PaginationItem>
@@ -90,12 +103,13 @@ export function PaginationBlock({
               variant={currentPage === page ? 'ruchampDefault' : null}
               aria-label={page.toString()}
               onClick={handlePageClick}
+              disabled={page > totalPages}
             >
               {page}
             </Button>
           </PaginationItem>
         ))}
-        {range[2] !== totalPages && (
+        {range[2] !== totalPages && totalPages > 3 && (
           <>
             <PaginationItem>
               <PaginationEllipsis />

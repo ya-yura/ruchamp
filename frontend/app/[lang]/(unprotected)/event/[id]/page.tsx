@@ -1,17 +1,22 @@
 import { AddressSection } from './address-section';
-import { Container } from '../../../../../components/container';
+import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { EventInfo } from './event-info';
 import { eventsApi } from '@/lib/api/eventsApi';
 import { TypeEvent } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
+import { testFutureData } from '@/lib/constants';
 
 export default async function Event({ params }: { params: { id: string } }) {
   const id = params.id;
-  let events: Array<TypeEvent>;
-  let expectedEvents: Array<TypeEvent>;
-  const event: TypeEvent = await eventsApi.getEvent(id);
+  let events: TypeEvent[];
+  let expectedEvents: TypeEvent[];
+  const event: TypeEvent =
+    +id > 1000000
+      ? (testFutureData.find((event) => event.id === +id) as TypeEvent)
+      : await eventsApi.getEvent(id);
   const randomInt = getRandomInt(100);
+
   try {
     events = await eventsApi.getEvents();
   } catch (err) {
@@ -25,10 +30,6 @@ export default async function Event({ params }: { params: { id: string } }) {
     expectedEvents = events.slice(0, events.length);
   } else {
     expectedEvents = [];
-  }
-
-  if (!event) {
-    return <div>Такого события не существует</div>;
   }
 
   return (

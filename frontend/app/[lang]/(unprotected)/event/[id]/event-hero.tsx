@@ -8,18 +8,18 @@ import { TypeEvent } from '@/lib/definitions';
 import { chooseTypes } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-type TypeEventHeroProps = {
+interface EventHeroProps {
   // fix "any" later
   event: TypeEvent | undefined;
   selectedValue: any;
   onTabSelect: any;
-};
+}
 
 export function EventHero({
   event,
   selectedValue,
   onTabSelect,
-}: TypeEventHeroProps) {
+}: EventHeroProps) {
   return (
     <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
       <Image
