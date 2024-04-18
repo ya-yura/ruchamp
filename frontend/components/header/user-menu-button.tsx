@@ -11,7 +11,7 @@ import {
   MenuTrigger,
 } from '@fluentui/react-components';
 import { makeStyles, tokens } from '@fluentui/react-components';
-import { IconArrow } from '../icons';
+import { ArrowIcon } from '../icons';
 
 const useOverrides = makeStyles({
   text: { color: tokens.colorNeutralForeground2 },
@@ -26,7 +26,7 @@ export function UserMenuButton({ user }: { user: TypeUser }) {
         <MenuButton
           className={overriders.text}
           as="button"
-          menuIcon={<IconArrow />}
+          menuIcon={<ArrowIcon />}
           appearance="transparent"
           size="large"
           icon={

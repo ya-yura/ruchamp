@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         ruchampDefault:
-          'bg-[#115EA3] text-primary-foreground text-base font-semibold hover:bg-[#115EA3]/90',
+          'bg-[#0F6CBD] text-primary-foreground text-base font-semibold hover:bg-[#0F6CBD]/90',
         ruchampTransparent:
           'border border-input bg-transparent text-white hover:bg-accent hover:text-accent-foreground',
       },

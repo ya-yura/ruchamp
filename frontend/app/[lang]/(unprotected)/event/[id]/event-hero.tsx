@@ -29,7 +29,7 @@ export function EventHero({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <ContentWraper className=" relative h-[720px] justify-between">
+      <ContentWraper className="relative h-[720px] justify-between">
         <Badges types={chooseTypes(event)} />
         <div className="relative flex flex-col gap-10">
           <h1 className="text-5xl font-bold leading-tight tracking-tight">
