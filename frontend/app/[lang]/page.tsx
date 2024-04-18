@@ -7,6 +7,7 @@ import { ContentWraper } from '../../components/content-wraper';
 import { getSession } from '@/lib/actions';
 import { Footer } from '../../components/footer/footer';
 import { Header } from '../../components/header/header';
+import { HomeHero } from '@/components/home-page/home-hero';
 
 export default async function Home({
   params: { lang },
@@ -15,7 +16,6 @@ export default async function Home({
 }) {
   // const { page } = await getDictionary(lang);
   const session = await getSession();
-
   let user;
   if (!session || session.user.length === 0) {
     user === null;
@@ -25,26 +25,7 @@ export default async function Home({
     <>
       <Header lang={lang} user={user} />
       <Container>
-        <section className="relative mt-[-92px] flex h-[720px] w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
-          <ContentWraper>
-            <Image
-              className="opacity-50"
-              src="/ru/images/fighter-and-ring.avif"
-              alt="Боец выходит на ринг"
-              fill={true}
-              style={{ objectFit: 'cover' }}
-            />
-            <div className="absolute top-0 flex h-full w-full flex-col justify-center px-[72px]">
-              <div className="flex w-2/5 flex-col">
-                <Display as="h1">РуЧамп</Display>
-                <Text as="p" size={600} weight="semibold">
-                  Онлайн-платформа для организации, регистрации и участия в
-                  соревнованиях и мероприятиях в сфере боевых искусств.
-                </Text>
-              </div>
-            </div>
-          </ContentWraper>
-        </section>
+        <HomeHero />
         <section className="w-full px-[72px] py-8">
           <ContentWraper>
             <div className="flex w-full flex-col gap-5">
