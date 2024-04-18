@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Locale } from '@/i18n.config';
 
-export default function SecondHero({ lang }: { lang: Locale }) {
+export function SecondHero({ lang }: { lang: Locale }) {
   return (
     <section className="relative flex h-[500px] w-full overflow-hidden bg-[#000000]">
       <Image

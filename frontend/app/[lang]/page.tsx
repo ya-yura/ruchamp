@@ -6,7 +6,8 @@ import { Header } from '../../components/header/header';
 import { HomeHero } from '@/components/home-page/home-hero';
 import { FeaturesMain } from '@/components/home-page/features-main';
 import { FeaturesAdditional } from '@/components/home-page/features-additional';
-import SecondHero from '@/components/home-page/second-hero';
+import { SecondHero } from '@/components/home-page/second-hero';
+import { TrustedSection } from '@/components/home-page/trusted-section';
 
 export default async function Home({
   params: { lang },
@@ -27,7 +28,8 @@ export default async function Home({
         <HomeHero lang={lang} />
         <FeaturesMain />
         <FeaturesAdditional />
-        <SecondHero lang={lang}/>
+        <SecondHero lang={lang} />
+        <TrustedSection />
       </Container>
       <Footer lang={lang} />
     </>
