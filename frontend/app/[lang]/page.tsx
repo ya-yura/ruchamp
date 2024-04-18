@@ -5,6 +5,7 @@ import { Footer } from '../../components/footer/footer';
 import { Header } from '../../components/header/header';
 import { HomeHero } from '@/components/home-page/home-hero';
 import { FeaturesMain } from '@/components/home-page/features-main';
+import { FeaturesAdditional } from '@/components/home-page/features-additional';
 
 export default async function Home({
   params: { lang },
@@ -24,6 +25,7 @@ export default async function Home({
       <Container>
         <HomeHero lang={lang} />
         <FeaturesMain />
+        <FeaturesAdditional />
       </Container>
       <Footer lang={lang} />
     </>
