@@ -16,28 +16,28 @@ type TypeFeaturesMain = {
 const features: TypeFeaturesMain[] = [
   {
     icon: (
-      <ChannelShareIcon className="transition-colors group-hover:fill-white" />
+      <ChannelShareIcon className="transition-all group-hover:fill-white" />
     ),
     title: 'Турнирная сетка',
     description:
       'Возьмём на себя тяжёлую работу по распределению турниров и отслеживанию результатов.',
   },
   {
-    icon: <AppsIcon className="transition-colors group-hover:fill-white" />,
+    icon: <AppsIcon className="transition-all group-hover:fill-white" />,
     title: 'Регистрации',
     description:
       'Обрабатываем приём заявок и работу с платежами. Просто создайте событие!',
   },
   {
     icon: (
-      <DocumentLightningIcon className="transition-colors group-hover:fill-white" />
+      <DocumentLightningIcon className="transition-all group-hover:fill-white" />
     ),
     title: 'Автоматизация',
     description:
       'Результаты событий транслируются онлайн и создаются отчёты.',
   },
   {
-    icon: <MoleculeIcon className="transition-colors group-hover:fill-white" />,
+    icon: <MoleculeIcon className="transition-all group-hover:fill-white" />,
     title: 'Сообщество',
     description:
       'Присоединяйтесь к нашему сообществу, увеличивающемуся каждый день!',
@@ -53,13 +53,13 @@ export function FeaturesMain() {
             {features.map((feature) => (
               <li
                 key={feature.title}
-                className="group flex h-[228px] w-[308px] cursor-default flex-col rounded-lg bg-[#0D0D0D] px-6 py-8 transition-colors hover:bg-[#0F6CBD]"
+                className="group flex h-[228px] w-[308px] cursor-default flex-col rounded-lg bg-[#0D0D0D] px-6 py-8 transition-all hover:bg-[#0F6CBD]"
               >
                 <div className="mb-4 w-fit">{feature.icon}</div>
                 <h3 className="mb-2 w-full text-wrap text-2xl font-semibold">
                   {feature.title}
                 </h3>
-                <p className="w-full text-wrap text-base font-normal text-gray-500 transition-colors group-hover:text-white">
+                <p className="w-full text-wrap text-base font-normal text-white opacity-60 transition-all group-hover:text-white group-hover:opacity-100">
                   {feature.description}
                 </p>
               </li>

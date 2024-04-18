@@ -24,7 +24,7 @@ export function HomeHero({ lang }: { lang: Locale }) {
           height={455}
         />
         <div className="flex flex-col">
-          <h1 className="mb-11 mt-[70px] text-[40px] font-bold  leading-[47px] tracking-wide">
+          <h1 className="mb-11 mt-[70px] text-[40px] font-bold leading-[47px] tracking-wide">
             Новые{' '}
             <span className="to-53% bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-transparent">
               вызовы
