@@ -1,25 +1,28 @@
 import * as React from 'react';
-import {
-  Tab,
-  TabList,
-} from '@fluentui/react-components';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 
 export function AuthSwitcher({
   selectedValue,
   onTabSelect,
 }: {
-  selectedValue: any;
-  onTabSelect: any;
+  selectedValue: string;
+  onTabSelect: (value: string) => void;
 }) {
-  
   return (
-    <TabList selectedValue={selectedValue} onTabSelect={onTabSelect}>
-      <Tab id="login" value="login">
-        Войти
-      </Tab>
-      <Tab id="register" value="register">
-        Зарегистрироваться
-      </Tab>
-    </TabList>
+    <Tabs
+      defaultValue="login"
+      className="w-full"
+      onValueChange={onTabSelect}
+      value={selectedValue}
+    >
+      <TabsList className="flex w-full">
+        <TabsTrigger className="w-1/2" value="login">
+          Войти
+        </TabsTrigger>
+        <TabsTrigger className="w-1/2" value="register">
+          Зарегистрироваться
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
   );
 }
