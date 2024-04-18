@@ -8,7 +8,7 @@ import {
   MenuPopover,
   MenuTrigger,
 } from '@fluentui/react-components';
-import { IconArrow } from '../icons';
+import { ArrowIcon } from '../icons';
 import { Locale } from '@/i18n.config';
 
 export default function HeaderNavigation({
@@ -26,7 +26,7 @@ export default function HeaderNavigation({
           size="medium"
           iconPosition="after"
           appearance="outline"
-          icon={<IconArrow />}
+          icon={<ArrowIcon />}
         >
           Навигация
         </Button>

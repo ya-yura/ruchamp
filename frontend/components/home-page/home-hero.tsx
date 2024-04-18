@@ -2,8 +2,10 @@ import Image from 'next/image';
 import { ContentWraper } from '@/components/content-wraper';
 import { Button } from '@/components/ui/button';
 import linesSvg from '@/public/ru/images/home-page-hero-lines.svg';
+import Link from 'next/link';
+import { Locale } from '@/i18n.config';
 
-export function HomeHero() {
+export function HomeHero({ lang }: { lang: Locale }) {
   return (
     <section className="relative mt-[-92px] flex h-[680px] w-full flex-col items-center justify-between overflow-hidden bg-[#0a0a0a] px-[72px] pt-[92px]">
       <ContentWraper className=" relative h-full justify-between">
@@ -39,7 +41,11 @@ export function HomeHero() {
             делая соревнования захватывающими и запоминающимися событиями.
           </p>
           <div className="flex gap-5">
-            <Button variant="ruchampDefault">Создать событие</Button>
+            <Link href={`/${lang}/login`}>
+              <Button variant="ruchampDefault" type="button">
+                Создать событие
+              </Button>
+            </Link>
             <svg
               width="46"
               height="38"
