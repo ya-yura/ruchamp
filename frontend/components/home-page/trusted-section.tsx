@@ -4,6 +4,7 @@ import React from 'react';
 import { Carousel, CarouselContent, CarouselItem } from '../ui/carousel';
 import AutoScroll from 'embla-carousel-auto-scroll';
 import Image from 'next/image';
+import { ContentWraper } from '../content-wraper';
 
 export function TrustedSection() {
   const plugin1 = React.useRef(
@@ -18,9 +19,11 @@ export function TrustedSection() {
 
   return (
     <section className="relative flex h-[500px] w-full flex-col bg-gradient-to-b from-[#0A0A0A] py-20">
-      <h1 className="to-53% mb-5 ml-[140px] bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-[40px] font-bold leading-[47px] tracking-wide text-transparent">
-        Нам доверяют
-      </h1>
+      <ContentWraper className="mb-8 ">
+        <h1 className="to-53% ml-[140px] w-fit bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-[40px] font-bold leading-[47px] tracking-wide text-transparent">
+          Нам доверяют
+        </h1>
+      </ContentWraper>
       <div className="flex w-full flex-col gap-5">
         <Carousel
           opts={{
