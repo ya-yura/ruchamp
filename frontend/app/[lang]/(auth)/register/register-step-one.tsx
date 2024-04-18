@@ -11,8 +11,8 @@ import { TypeCustomFieldsetProps } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 
 type TypeRegisterStepOneProps = {
-  selectedValue: 'login' | 'register';
-  onTabSelect: (event: SelectTabEvent, data: SelectTabData) => void;
+  selectedValue: string;
+  onTabSelect: (value: string) => void;
   lang: Locale;
   switchStep: (num: 1 | 2 | 3 | 4) => void;
   isDisabled: boolean;

@@ -1,15 +1,18 @@
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { getSession } from '@/lib/actions';
+import { Locale } from '@/i18n.config';
 
 export default async function AuthLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: { lang: Locale };
 }) {
   const session = await getSession();
   if (session) {
-    redirect('/ru/events');
+    redirect(`/${params.lang}/events`);
   }
 
   return (

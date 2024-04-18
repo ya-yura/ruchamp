@@ -28,8 +28,6 @@ export async function registerUser(
   prevState: string | undefined,
   formData: FormData,
 ) {
-
-  console.log('form data', formData)
   try {
     await auth.register(formData);
     await auth.login(
@@ -58,10 +56,9 @@ export async function authenticate(
       const session = await encrypt({ user, token, expires });
       // Save the session in a cookie
       cookies().set('session', session, { expires, httpOnly: true });
-    }
+    } else throw new Error();
   } catch (error) {
-    console.log(error);
-    return 'Invalid credentials';
+    return 'Введены не верные данные';
   }
 }
 

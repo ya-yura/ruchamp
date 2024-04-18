@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { i18n } from '@/i18n.config';
 
-type TypeCustomLinkProps = {
+interface CustomLinkProps extends React.RefAttributes<HTMLAnchorElement> {
   className?: string;
   href: string;
   lang: string;
   children: React.ReactNode;
-} & React.RefAttributes<HTMLAnchorElement>;
+}
 
 export function CustomLink({
   className,
@@ -14,7 +14,7 @@ export function CustomLink({
   lang,
   children,
   ...props
-}: TypeCustomLinkProps) {
+}: CustomLinkProps) {
   const isDefaultLang = lang === i18n.defaultLocale;
   const path = isDefaultLang ? href : `/${lang}${href}`;
   return (

@@ -39,9 +39,24 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
         >
           <div className="w-full">
             <TabsList className="mx-auto mb-5 flex w-[500px] justify-between bg-transparent text-[#D6D6D6]">
-              <TabsTrigger value="futureEvents">Будущие события</TabsTrigger>
-              <TabsTrigger value="pastEvents">Прошедшие события</TabsTrigger>
-              <TabsTrigger value="usersEvents">Ваши события</TabsTrigger>
+              <TabsTrigger
+                className="rounded-none border-[#115EA3] data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white"
+                value="futureEvents"
+              >
+                Будущие события
+              </TabsTrigger>
+              <TabsTrigger
+                className="rounded-none border-[#115EA3] data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white"
+                value="pastEvents"
+              >
+                Прошедшие события
+              </TabsTrigger>
+              <TabsTrigger
+                className="rounded-none border-[#115EA3] data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white"
+                value="usersEvents"
+              >
+                Ваши события
+              </TabsTrigger>
             </TabsList>
             <div className="absolute right-0 top-2 flex items-center space-x-2">
               <Switch id="showMap" />

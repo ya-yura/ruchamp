@@ -26,7 +26,6 @@ import { RegisterStepFour } from './register-step-four';
 import {
   TypeAthleteFields,
   TypeFirstUserFields,
-  TypeLoginFields,
   TypeRegisterFields,
   TypeUserRole,
 } from '@/lib/definitions';
@@ -48,9 +47,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     handleSelectChange,
   } = useForm();
   const router = useRouter();
-  const [selectedValue, setSelectedValue] = useState<'login' | 'register'>(
-    'register',
-  );
+  const [selectedTabValue, setSelectedTabValue] = useState<string>('register');
   const [greetings, setGreetings] = useState<{
     title: string;
     subtitle: string;
@@ -64,12 +61,12 @@ export function RegisterForm({ lang }: { lang: Locale }) {
   });
 
   useEffect(() => {
-    if (selectedValue === 'login') {
+    if (selectedTabValue === 'login') {
       router.push(`/${lang}/login`);
     } else {
       router.push(`/${lang}/register`);
     }
-  }, [selectedValue]);
+  }, [selectedTabValue]);
 
   useEffect(() => {
     switchTitle(step, setGreetings);
@@ -81,12 +78,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     auth
       .register(values)
       .then(() => {
-        // auth
-        //   .login(
-        //     values.email as keyof TypeLoginFields,
-        //     values.password as keyof TypeLoginFields,
-        //   )
-        router.push('/ru/login');
+        router.push(`/${lang}/login`);
       })
       .catch((err) => {
         console.log('Register error:', err);
@@ -95,8 +87,8 @@ export function RegisterForm({ lang }: { lang: Locale }) {
       .finally(() => setIsLoading(false));
   }
 
-  function onTabSelect(event: SelectTabEvent, data: SelectTabData) {
-    setSelectedValue(data.value as 'login' | 'register');
+  function onTabSelect(value: string): void {
+    setSelectedTabValue(value);
   }
 
   function switchStep(step: 1 | 2 | 3 | 4) {
@@ -114,7 +106,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
       <CustomForm onSubmit={handleSubmit}>
         {step === 1 && (
           <RegisterStepOne
-            selectedValue={selectedValue}
+            selectedValue={selectedTabValue}
             onTabSelect={onTabSelect}
             fields={basicRegisterFields}
             onChange={handleChange}
