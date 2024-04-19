@@ -8,7 +8,7 @@ export function Logo({ lang }: { lang: Locale }) {
     <CustomLink href={`/${lang}`} lang={lang}>
       <div className="flex items-center justify-start gap-3">
         <Image src={LogoIcon} alt="Логотип" />
-        <h5 className="text-2xl font-black text-white">RUCHAMP</h5>
+        <h5 className="text-lg font-black text-white sm:text-2xl">RUCHAMP</h5>
       </div>
     </CustomLink>
   );

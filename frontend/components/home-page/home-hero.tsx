@@ -7,11 +7,9 @@ import { Locale } from '@/i18n.config';
 
 export function HomeHero({ lang }: { lang: Locale }) {
   return (
-    // <section className="relative mt-[-92px] flex h-[680px] w-full flex-col items-center justify-between overflow-hidden bg-[#0a0a0a] px-[72px] pt-[92px]">
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between overflow-hidden bg-[#0a0a0a] px-7 pb-12 pt-[92px] lg:h-[680px] lg:px-[72px] lg:pb-0">
       <ContentWraper className="relative h-full justify-between">
         <Image
-          // className="absolute -right-[70px] -top-[92px]"
           className="absolute -top-[190px] right-0 rotate-90 scale-[2.1] sm:scale-[1.5] md:rotate-0 lg:-right-[70px] lg:-top-[92px]"
           src={linesSvg}
           alt={`Фоновые линии`}
@@ -19,7 +17,6 @@ export function HomeHero({ lang }: { lang: Locale }) {
           height={689}
         />
         <Image
-          // className="absolute -right-[18px] top-[22px]"
           className="relative right-0 top-0 ml-auto lg:absolute lg:-right-[18px] lg:top-[22px]"
           src="/ru/images/home-page-hero-better.png"
           alt={`Боец выходит на ринг`}
@@ -27,10 +24,7 @@ export function HomeHero({ lang }: { lang: Locale }) {
           height={455}
         />
         <div className="relative flex flex-col md:mt-[-333px] lg:mt-0">
-          <h1
-            // className="drop-shadow-contrastText mb-11 mt-[70px] text-[40px] font-bold leading-[47px] tracking-wide"
-            className="drop-shadow-contrastText ld:order-0 mb-8 mt-8 text-3xl font-bold leading-[40px] tracking-wide sm:text-4xl md:order-1 lg:mb-11 lg:mt-[70px] lg:text-[40px] lg:leading-[47px]"
-          >
+          <h1 className="drop-shadow-contrastText ld:order-0 mb-8 mt-8 text-3xl font-bold leading-[40px] tracking-wide sm:text-4xl md:order-1 lg:mb-11 lg:mt-[70px] lg:text-[40px] lg:leading-[47px]">
             Новые{' '}
             <span className="to-53% bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-transparent">
               вызовы

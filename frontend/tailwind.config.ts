@@ -73,7 +73,7 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       dropShadow: {
-        'contrastText': '0 1px 5px rgba(0, 0, 0, 0.9)',
+        contrastText: '0 1px 5px rgba(0, 0, 0, 0.9)',
       },
     },
   },
