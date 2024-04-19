@@ -35,10 +35,10 @@ export function TrustedSection() {
           className="w-full"
         >
           <CarouselContent>
-            {Array.from({ length: 10 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <CarouselItem className="basis-1/7 h-[72px]" key={index}>
                 <Image
-                  src={`/ru/images/mock-trusted-logos/${index + 1}.svg`}
+                  src={`/ru/images/mock-trusted-logos/${index <= 11 ? index + 1 : index - 11}.svg`}
                   alt={`Логотип компании ${index + 1}`}
                   width={198}
                   height={72}
@@ -57,10 +57,10 @@ export function TrustedSection() {
           className="w-full"
         >
           <CarouselContent>
-            {Array.from({ length: 9 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <CarouselItem className="basis-1/7 h-[72px]" key={index}>
                 <Image
-                  src={`/ru/images/mock-trusted-logos/${index + 2}.svg`}
+                  src={`/ru/images/mock-trusted-logos/${index <= 10 ? index + 2 : index - 10}.svg`}
                   alt={`Логотип компании ${index + 1}`}
                   width={198}
                   height={72}
@@ -79,10 +79,10 @@ export function TrustedSection() {
           className="w-full"
         >
           <CarouselContent>
-            {Array.from({ length: 10 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <CarouselItem className="basis-1/7 h-[72px]" key={index}>
                 <Image
-                  src={`/ru/images/mock-trusted-logos/${index + 3}.svg`}
+                  src={`/ru/images/mock-trusted-logos/${index <= 9 ? index + 3 : index - 9}.svg`}
                   alt={`Логотип компании ${index + 1}`}
                   width={198}
                   height={72}
