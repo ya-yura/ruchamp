@@ -17,15 +17,15 @@ export function UserMenuButton({ user }: { user: any }) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        <NavigationMenuItem className="">
-          <NavigationMenuTrigger className="flex h-9 gap-2 border-none bg-transparent py-1 text-base font-semibold text-[#424242] hover:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent data-[active]:text-[#0F6CBD] data-[state=open]:text-[#0F6CBD]">
-            <Avatar>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger className="flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold text-[#424242] hover:bg-transparent hover:text-[#424242] data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=closed]:text-[#424242] data-[state=open]:bg-transparent data-[active]:text-[#0F6CBD] data-[state=open]:text-[#0F6CBD]">
+            <Avatar className="h-8 w-8">
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <p className="hidden sm:block">{user.email}</p>
           </NavigationMenuTrigger>
-          <NavigationMenuContent className="">
+          <NavigationMenuContent>
             <ul className="flex w-[100px] flex-col gap-1 p-1 ">
               <ListItem
                 className="text-right"

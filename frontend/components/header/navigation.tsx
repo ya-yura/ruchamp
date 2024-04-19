@@ -17,18 +17,34 @@ export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="h-9 cursor-pointer border bg-transparent py-1 px-2 sm:px-4">
+          <NavigationMenuTrigger className="h-9 cursor-pointer border bg-transparent px-2 py-1 data-[state=open]:border-white/70 data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=open]:bg-transparent data-[active]:text-white data-[state=closed]:text-white data-[state=open]:text-white/70 sm:px-4">
             Навигация
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="flex w-[180px] flex-col justify-end gap-1 p-1 ">
-              <ListItem className='text-right' title="События" href="/ru/events" />
+              <ListItem
+                className="text-right"
+                title="События"
+                href="/ru/events"
+              />
               {user ? (
-                <ListItem className='text-right' title="Панель управления" href="/ru/dashboard" />
+                <ListItem
+                  className="text-right"
+                  title="Панель управления"
+                  href="/ru/dashboard"
+                />
               ) : (
                 <>
-                  <ListItem className='text-right' title="Регистрация" href="/ru/register" />
-                  <ListItem className='text-right' title="Войти" href="/ru/login" />
+                  <ListItem
+                    className="text-right"
+                    title="Регистрация"
+                    href="/ru/register"
+                  />
+                  <ListItem
+                    className="text-right"
+                    title="Войти"
+                    href="/ru/login"
+                  />
                 </>
               )}
             </ul>
