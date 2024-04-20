@@ -1,25 +1,18 @@
 'use client';
 
-import React from 'react';
-import { SearchBox } from '@fluentui/react-search-preview';
-import { makeStyles, tokens } from '@fluentui/react-components';
+import * as React from 'react';
+import { Input } from '../ui/input';
+import { cn } from '@/lib/utils';
+import { Search } from 'lucide-react';
 
-const useOverrides = makeStyles({
-  searchBox: {
-    backgroundColor: tokens.colorNeutralBackgroundInverted,
-    width: '230px',
-    '& input': {
-      color: tokens.colorNeutralForegroundInverted,
-    },
-  },
-});
-
-export default function SearchBar() {
-  const overrides = useOverrides();
-
+export function SearchBar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="mx-auto">
-      <SearchBox className={overrides.searchBox} placeholder="Найти" role='search'/>
+    <div className={cn('relative flex', className)}>
+      <Search
+        className="absolute left-2 top-2.5 mr-2 h-4 w-4"
+        stroke="lightgray"
+      />
+      <Input className="h-9 pl-7 text-black" placeholder="Найти" />
     </div>
   );
 }

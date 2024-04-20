@@ -22,6 +22,8 @@ const buttonVariants = cva(
           'bg-[#0F6CBD] text-primary-foreground text-base font-semibold hover:bg-[#0F6CBD]/90',
         ruchampTransparent:
           'border border-input bg-transparent text-white hover:bg-accent hover:text-accent-foreground',
+        ruchampTransparentGreyBorder:
+          'border border-input bg-transparent text-white hover:bg-accent hover:text-accent-foreground border-[#616161]',
       },
       size: {
         default: 'h-10 px-4 py-2',

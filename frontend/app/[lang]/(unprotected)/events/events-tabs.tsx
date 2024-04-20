@@ -23,14 +23,15 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   >([]);
   return (
     <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-[#0A0A0A] px-[72px] pt-[92px]">
-      <div className="absolute mt-[-92px] h-[853px] w-full">
+      <div className="absolute mt-[-92px] h-[853px] w-full ">
         <Image
-          className="opacity-30"
+          className="opacity-40"
           src="/ru/images/background-events.jpeg"
           alt={'ДОБАВИТЬ ОПИСАНИЕ'}
           fill={true}
           style={{ objectFit: 'cover' }}
         />
+        <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full bg-gradient-to-b from-[rgba(0,0,0,0.01)] from-50% to-[rgba(0,0,0,1)] to-100%"></div>
       </div>
       <ContentWraper className="h-fit justify-between">
         <Tabs
