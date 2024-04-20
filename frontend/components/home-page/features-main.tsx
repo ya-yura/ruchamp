@@ -45,7 +45,7 @@ const features: TypeFeaturesMain[] = [
 
 export function FeaturesMain() {
   return (
-    <section className="mx-[72px] h-[298px] w-full bg-[#090707]">
+    <section className="mx-[72px] h-fit sm:h-[298px] w-full bg-[#090707]">
       <ContentWraper>
         <ScrollArea className="w-full whitespace-nowrap rounded-md">
           <ul className="flex w-max gap-4 pb-10 pt-4">
