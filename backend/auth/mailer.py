@@ -15,7 +15,7 @@ def send_verification_email(username: str, email: str, token: str):
     <div id="box">
       <h2> Привет {username}, </h2>
         <p> Для завершения регистрации перейдите по
-            <a href="http://localhost:8000/verify/{token}">
+            <a href="https://sportplatform.ru/verify/{token}">
                 ссылке
             </a>. Ссылка действительна в течении 24 часов
         </p>
@@ -50,7 +50,7 @@ def send_forgot_password_email(username: str, email: str, token: str):
     <div id="box">
       <h2> Привет {username}, </h2>
         <p> Для изменения перейдите по
-            <a href="http://localhost:8000/reset-forgot-password/{token}">
+            <a href="https://sportplatform.ru/reset-forgot-password/{token}">
                 ссылке
             </a>. Ссылка действительна в течении 24 часов
         </p>

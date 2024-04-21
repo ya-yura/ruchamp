@@ -34,8 +34,8 @@ fastapi_users = FastAPIUsers[User, int](
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    #"http://51.250.109.207",
-    #"http://51.250.109.207:3000",  # Add more allowed origins as needed
+    #"http://emely.myddns.me",
+    #"http://emely.myddns.me:3000",  # Add more allowed origins as needed
     #"http://sportplatform.ru",
     #"http://sportplatform.ru:3000",
 ]
