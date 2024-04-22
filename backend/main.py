@@ -21,23 +21,22 @@ from shop.routers import router as shop_router
 from match.routers import router as match_router
 
 
-app = FastAPI(
-    title="Ruchamp"
-)
+app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None) 
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],
 )
 
+
 # Configure CORS
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    #"http://localhost",
+    #"http://localhost:3000",
     #"http://emely.myddns.me",
-    #"http://emely.myddns.me:3000",  # Add more allowed origins as needed
-    #"http://sportplatform.ru",
-    #"http://sportplatform.ru:3000",
+    #"http://emely.myddns.me:3000",
+    "http://sportplatform.ru",
+    "http://sportplatform.ru:3000",
 ]
 
 app.add_middleware(
