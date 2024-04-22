@@ -15,7 +15,7 @@ from auth.models import (
     EventOrganizer,
     Spectator,
     SystemAdministrator,
-    Referee,
+    Referee, SportType, athlete_sport_type_association
 )
 from auth.manager import (
     get_user_manager,
@@ -36,6 +36,7 @@ from auth.schemas import (
 )
 from teams.models import TeamMember
 from event.models import Participant, Match
+from fastapi import Body
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -392,12 +393,17 @@ async def create_user(
     user_role = user.role_id
 
     if user_role == 1:
-        await db.execute(insert(Athlete).values(
+        new_athlete = Athlete(
             user_id=user.id,
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
-        ))
+        )
+        query = await db.execute(select(SportType).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+        athlete_sport_type = query.scalars().all()
+        new_athlete.sport_types = athlete_sport_type       
+        db.add(new_athlete)
         await db.commit()
+
 
     if user_role == 2:
         await db.execute(insert(EventOrganizer).values(
@@ -472,3 +478,54 @@ async def update_user(
     await db.commit()
     return {f"User ID - {current_user.id} updated"}
     
+
+
+'''@router.post("/sport")
+async def sport_asosiation(
+    user_data: UserData,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(current_user),
+):
+
+    query = await db.execute(select(
+        Athlete).where(Athlete.user_id == current_user.id))
+    athlete = query.scalars().one_or_none()
+    if athlete is None:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    new_athlete = Athlete(
+        user_id=777,
+        weight=float(user_data.info['athlete_weight']),
+        height=int(user_data.info['athlete_height'])
+    )
+    query = await db.execute(select(SportType).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+    athlete_sport_type = query.scalars().all()
+    new_athlete.sport_types = athlete_sport_type
+        
+    db.add(new_athlete)
+    await db.commit()
+    
+    # await db.execute(insert(Athlete).values(
+    #     user_id=777,
+    #     weight=float(user_data.info['athlete_weight']),
+    #     height=int(user_data.info['athlete_height']),
+    #     #sport_types=str(user_data.info['athlete_sport_type']),
+    # ))
+    # await db.commit()
+    # query = await db.execute(select(Athlete.id).where(Athlete.user_id == 777))
+    # athlete_id = query.scalars().first()
+
+    # query = await db.execute(select(SportType.id).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+    # athlete_sport_type = query.scalars().all()
+    
+    # for id in athlete_sport_type:
+    #     await db.execute(insert(athlete_sport_type_association).values(athlete_id==athlete_id, category_type_id == id))
+        
+    #     await db.commit()
+
+    # # await db.execute(athlete.sport_types = [id for id in sports_types])
+    # # await db.commit()    
+    # #print(athlete)
+    # print(sports_types)
+
+    return {"message": "Sport asosiation created"}'''
