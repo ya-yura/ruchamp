@@ -1,0 +1,72 @@
+# version: '3.7'
+# services:
+#   backend:
+#     container_name: backend
+#     build: ./backend/
+#     env_file:
+#       - .env-non-dev
+#     ports:
+#       - 8000:8000
+#     depends_on:
+#       - db
+  
+#   frontend:
+#     container_name: frontend
+#     build: ./frontend/
+#     ports:
+#       - 3000:3000
+#     depends_on:
+#       - backend
+
+
+#   db:
+#     container_name: db
+#     image: postgres:15
+#     env_file:
+#       - .env-non-dev
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     ports:
+#       - 5432:5432
+  
+  
+  
+#   nginx:
+#     container_name: nginx
+#     build: ./gateway/
+#     command: [nginx-debug, '-g', 'daemon off;']
+#     ports:
+#       - 80:80
+#     depends_on:
+#       - backend
+#       - frontend
+
+
+# volumes:
+#   postgres_data:
+
+version: "3.9"
+
+services:
+    web:
+      build: nginx
+      ports:
+        - 80:80
+        - 443:443
+      depends_on:
+        - backend
+        - frontend
+    backend:
+      build: ./backend
+      expose:
+        - 8000
+      ports:
+        - 8000:8000
+    frontend:
+      build: ./frontend
+      expose:
+        - 3000
+      ports:
+        - 3000:3000
+      depends_on:
+        - backend

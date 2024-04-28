@@ -21,7 +21,8 @@ from shop.routers import router as shop_router
 from match.routers import router as match_router
 
 
-app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None) 
+#app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None)
+app = FastAPI(title="Ruchamp")
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
