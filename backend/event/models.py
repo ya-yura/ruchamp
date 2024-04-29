@@ -1,23 +1,13 @@
 from datetime import datetime
-from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Boolean
+
+from auth.models import (AllWeightClass, Athlete, CategoryType, CombatType,
+                         EventOrganizer, Referee, SportType)
+from connection import Base
+from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
+                        Integer, String)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
-
-from auth.models import (
-    EventOrganizer,
-    CombatType,
-    AllWeightClass,
-    Athlete,
-    CategoryType,
-    SportType,
-    Referee,
-)
-from teams.models import (
-    Team,
-    TeamMember,
-)
-from connection import Base
-
+from teams.models import Team, TeamMember
 
 metadata = Base.metadata
 
@@ -31,8 +21,8 @@ class Event(Base):
     end_datetime = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
     organizer_id = Column(Integer, ForeignKey(EventOrganizer.id, ondelete="CASCADE"))
-    event_order = Column(String, nullable=True) # Это документы, которые будут прикладываться
-    event_system = Column(String, nullable=True) # и это
+    event_order = Column(String, nullable=True)  # Это документы, которые будут прикладываться
+    event_system = Column(String, nullable=True)  # и это
     geo = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
 
@@ -68,8 +58,8 @@ class Match(Base):
     __tablename__ = "Match"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE")) # тип заполнения турнирной сетки
-    category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE")) # категории спортсмена (кмс, мс и пр)
+    combat_type_id = Column(Integer, ForeignKey(CombatType.id, ondelete="CASCADE"))  # тип заполнения турнирной сетки
+    category_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))  # категории спортсмена (кмс, мс и пр)
     sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
     weight_class_id = Column(Integer, ForeignKey(AllWeightClass.id, ondelete="CASCADE"))
     round = Column(Integer, nullable=False)

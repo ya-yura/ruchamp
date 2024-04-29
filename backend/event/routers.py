@@ -1,20 +1,20 @@
 import os
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Request, File, UploadFile
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
-from fastapi_pagination import paginate, Params
-from fastapi.templating import Jinja2Templates
+
 from aiofiles import open as async_open
-
-from connection import get_db
 from auth.models import SystemAdministrator
-from event.models import Event, Match, EventOrganizer
-from event.shemas import EventCreate, MatchRead, MatchCreate, EventUpdate
-from auth.schemas import UserDB
 from auth.routes import current_user
+from auth.schemas import UserDB
+from connection import get_db
+from event.models import Event, EventOrganizer, Match
+from event.shemas import EventCreate, EventUpdate, MatchCreate, MatchRead
+from fastapi import (APIRouter, Depends, File, HTTPException, Request,
+                     UploadFile)
+from fastapi.templating import Jinja2Templates
+from fastapi_pagination import Params, paginate
 from geo.geo import get_geo
-
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')

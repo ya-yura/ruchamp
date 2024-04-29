@@ -1,8 +1,8 @@
 import datetime
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Boolean
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
-from auth.models import Athlete, AllWeightClass, CategoryType
+from auth.models import AllWeightClass, Athlete, CategoryType
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
 Base: DeclarativeMeta = declarative_base()
 

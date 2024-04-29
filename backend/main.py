@@ -1,27 +1,18 @@
+from auth.auth import auth_backend
+from auth.manager import get_user_manager
+from auth.models import User
+from auth.routes import router as auth_router
+from auth.schemas import UserCreate, UserRead
+from event.routers import router as event_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
-
-from auth.auth import auth_backend
-from auth.models import (
-    User,
-)
-from auth.manager import (
-    get_user_manager,
-)
-from auth.schemas import (
-    UserRead,
-    UserCreate,
-)
-from auth.routes import router as auth_router
-from pages.router import router as pages_router
-from event.routers import router as event_router
-from teams.routers import router as team_router
-from shop.routers import router as shop_router
 from match.routers import router as match_router
+from pages.router import router as pages_router
+from shop.routers import router as shop_router
+from teams.routers import router as team_router
 
-
-app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None) 
+app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None)
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -31,10 +22,10 @@ fastapi_users = FastAPIUsers[User, int](
 
 # Configure CORS
 origins = [
-    #"http://localhost",
-    #"http://localhost:3000",
-    #"http://emely.myddns.me",
-    #"http://emely.myddns.me:3000",
+    # "http://localhost",
+    # "http://localhost:3000",
+    # "http://emely.myddns.me",
+    # "http://emely.myddns.me:3000",
     "http://sportplatform.ru",
     "http://sportplatform.ru:3000",
 ]
@@ -72,4 +63,3 @@ app.include_router(event_router)
 app.include_router(team_router)
 app.include_router(shop_router)
 app.include_router(match_router)
-

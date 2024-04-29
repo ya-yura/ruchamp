@@ -1,15 +1,14 @@
 from datetime import datetime
-from sqlalchemy import JSON
-from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, Integer, ForeignKey, Float, Enum, DateTime, Date, TIMESTAMP
 
 from auth.models import Base, EventOrganizer, User
-from event.models import Event
-
 from connection import Base
-
+from event.models import Event
+from sqlalchemy import (JSON, TIMESTAMP, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, String)
+from sqlalchemy.orm import relationship
 
 metadata = Base.metadata
+
 
 # Сектора зала
 class Sector(Base):
@@ -113,5 +112,3 @@ class Transaction(Base):
     payment_method = Column(String, nullable=False)
     transaction_date = Column(DateTime, default=datetime.utcnow)
     amount = Column(Float, nullable=False)
-
-

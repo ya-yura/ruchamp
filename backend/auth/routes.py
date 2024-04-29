@@ -1,43 +1,22 @@
 import uuid
 from typing import Type
-from connection import get_db
-
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
-from fastapi_users import FastAPIUsers
-from sqlalchemy import select, update, insert
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from auth.auth import auth_backend
-from auth.models import (
-    User,
-    Athlete,
-    EventOrganizer,
-    Spectator,
-    SystemAdministrator,
-    Referee, SportType, athlete_sport_type_association
-)
-from auth.manager import (
-    get_user_manager,
-    UserManager,
-)
-from auth.mailer import send_forgot_password_email
-from auth.schemas import (
-    AthleteUpdate,
-    UserDB,
-    SpectatorUpdate,
-    SysAdminUpdate,
-    OrganizerUpdate,
-    UserRead,
-    RefereeUpdate,
-    UserCreate,
-    UserData,
-    UserUpdate
-)
+# from auth.mailer import send_forgot_password_email
+from auth.manager import UserManager, get_user_manager
+from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
+                         SportType, SystemAdministrator, User)
+from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
+                          SpectatorUpdate, SysAdminUpdate, UserCreate,
+                          UserData, UserDB, UserUpdate)
+from connection import get_db
+from event.models import Match, Participant
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi_users import FastAPIUsers
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from teams.models import TeamMember
-from event.models import Participant, Match
-from fastapi import Body
-
 
 router = APIRouter(prefix="/users", tags=["Users"])
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
@@ -66,7 +45,8 @@ async def upload_image(
     db: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
-    allowed_roles = [1, 2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
+    # Роли, которым разрешено загружать изображения
+    allowed_roles = [1, 2, 3, 4, 5]
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -281,7 +261,6 @@ async def forgot_password(
     if email is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-
     return {"email": email}
 
 
@@ -295,19 +274,29 @@ async def get_current_user(
     user_data = {"User": user}
 
     if user.role_id == 1:
-        query = await db.execute(select(Athlete).where(Athlete.user_id == current_user.id))
+        query = await db.execute(select(Athlete).where(
+            Athlete.user_id == current_user.id)
+        )
         result = query.mappings().all()
     elif user.role_id == 2:
-        query = await db.execute(select(EventOrganizer).where(EventOrganizer.user_id == current_user.id))
+        query = await db.execute(select(EventOrganizer).where(
+            EventOrganizer.user_id == current_user.id)
+        )
         result = query.mappings().all()
     elif user.role_id == 3:
-        query = await db.execute(select(Spectator).where(Spectator.user_id == current_user.id))
+        query = await db.execute(select(Spectator).where(
+            Spectator.user_id == current_user.id)
+        )
         result = query.mappings().all()
     elif user.role_id == 4:
-        query = await db.execute(select(SystemAdministrator).where(SystemAdministrator.user_id == current_user.id))
+        query = await db.execute(select(SystemAdministrator).where(
+            SystemAdministrator.user_id == current_user.id)
+        )
         result = query.mappings().all()
     elif user.role_id == 5:
-        query = await db.execute(select(Referee).where(Referee.user_id == current_user.id))
+        query = await db.execute(select(Referee).where(
+            Referee.user_id == current_user.id)
+        )
         result = query.mappings().all()
 
     result.append(user_data)
@@ -398,20 +387,27 @@ async def create_user(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
         )
-        query = await db.execute(select(SportType).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+        query = await db.execute(select(SportType).where(
+            SportType.name.in_(user_data.info['athlete_sport_type'])
+        ))
         athlete_sport_type = query.scalars().all()
-        new_athlete.sport_types = athlete_sport_type       
+        new_athlete.sport_types = athlete_sport_type
         db.add(new_athlete)
         await db.commit()
-
 
     if user_role == 2:
         await db.execute(insert(EventOrganizer).values(
             user_id=user.id,
-            organization_name=user_data.info['event_organizer_organization_name'],
+            organization_name=user_data.info[
+                'event_organizer_organization_name'
+            ],
             website=user_data.info['event_organizer_organization_website'],
-            contact_email=user_data.info['event_organizer_organization_contact_email'],
-            contact_phone=user_data.info['event_organizer_organization_contact_phone'],
+            contact_email=user_data.info[
+                'event_organizer_organization_contact_email'
+            ],
+            contact_phone=user_data.info[
+                'event_organizer_organization_contact_phone'
+            ],
         ))
         await db.commit()
 
@@ -431,11 +427,14 @@ async def create_user(
     if user_role == 5:
         await db.execute(insert(Referee).values(
             user_id=user.id,
-            qualification_level=int(user_data.info['referee_qualification_level']),
+            qualification_level=int(
+                user_data.info['referee_qualification_level']
+            ),
         ))
         await db.commit()
 
     return user
+
 
 @router.put("/update")
 async def update_user(
@@ -449,35 +448,50 @@ async def update_user(
     user = query.scalars().one_or_none()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     user.username = user_update.username
     user.name = user_update.name
     user.sirname = user_update.sirname
     user.fathername = user_update.fathername
 
     if user.role_id == 1:
-        await db.execute(update(Athlete).where(Athlete.user_id == current_user.id).values(
+        await db.execute(update(Athlete).where(
+            Athlete.user_id == current_user.id
+        ).values(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
         ))
     if user.role_id == 2:
-        await db.execute(update(EventOrganizer).where(EventOrganizer.user_id == current_user.id).values(
-            organization_name=user_data.info['event_organizer_organization_name'],
+        await db.execute(update(EventOrganizer).where(
+            EventOrganizer.user_id == current_user.id
+        ).values(
+            organization_name=user_data.info[
+                'event_organizer_organization_name'
+            ],
             website=user_data.info['event_organizer_organization_website'],
-            contact_email=user_data.info['event_organizer_organization_contact_email'],
-            contact_phone=user_data.info['event_organizer_organization_contact_phone'],
+            contact_email=user_data.info[
+                'event_organizer_organization_contact_email'
+            ],
+            contact_phone=user_data.info[
+                'event_organizer_organization_contact_phone'
+            ],
         ))
     if user.role_id == 3:
-        await db.execute(update(Spectator).where(Spectator.user_id == current_user.id).values(
+        await db.execute(update(Spectator).where(
+            Spectator.user_id == current_user.id
+        ).values(
             phone_number=user_data.info['spectator_phone_number'],
         ))
     if user.role_id == 5:
-        await db.execute(update(Referee).where(Referee.user_id == current_user.id).values(
-            qualification_level=int(user_data.info['referee_qualification_level']),
+        await db.execute(update(Referee).where(
+            Referee.user_id == current_user.id
+        ).values(
+            qualification_level=int(
+                user_data.info['referee_qualification_level']
+            ),
         ))
     await db.commit()
     return {f"User ID - {current_user.id} updated"}
-    
 
 
 '''@router.post("/sport")
@@ -492,19 +506,20 @@ async def sport_asosiation(
     athlete = query.scalars().one_or_none()
     if athlete is None:
         raise HTTPException(status_code=404, detail="Athlete not found")
-    
+
     new_athlete = Athlete(
         user_id=777,
         weight=float(user_data.info['athlete_weight']),
         height=int(user_data.info['athlete_height'])
     )
-    query = await db.execute(select(SportType).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+    query = await db.execute(select(SportType).where(
+        SportType.name.in_(user_data.info['athlete_sport_type'])))
     athlete_sport_type = query.scalars().all()
     new_athlete.sport_types = athlete_sport_type
-        
+
     db.add(new_athlete)
     await db.commit()
-    
+
     # await db.execute(insert(Athlete).values(
     #     user_id=777,
     #     weight=float(user_data.info['athlete_weight']),
@@ -512,19 +527,22 @@ async def sport_asosiation(
     #     #sport_types=str(user_data.info['athlete_sport_type']),
     # ))
     # await db.commit()
-    # query = await db.execute(select(Athlete.id).where(Athlete.user_id == 777))
+    # query = await db.execute(select(Athlete.id).where(
+    Athlete.user_id == 777))
     # athlete_id = query.scalars().first()
 
-    # query = await db.execute(select(SportType.id).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+    # query = await db.execute(select(SportType.id).where(SportType.name.in_(
+    user_data.info['athlete_sport_type'])))
     # athlete_sport_type = query.scalars().all()
-    
+
     # for id in athlete_sport_type:
-    #     await db.execute(insert(athlete_sport_type_association).values(athlete_id==athlete_id, category_type_id == id))
-        
+    #     await db.execute(insert(athlete_sport_type_association).values(
+    athlete_id==athlete_id, category_type_id == id))
+
     #     await db.commit()
 
     # # await db.execute(athlete.sport_types = [id for id in sports_types])
-    # # await db.commit()    
+    # # await db.commit()
     # #print(athlete)
     # print(sports_types)
 

@@ -1,7 +1,8 @@
 from datetime import date
-from typing import Optional, List
-from pydantic import BaseModel
+from typing import List, Optional
+
 from fastapi_users import schemas
+from pydantic import BaseModel
 
 
 class UserRead(schemas.BaseUser[int]):
