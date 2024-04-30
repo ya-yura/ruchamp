@@ -62,5 +62,5 @@ app.include_router(
 app.include_router(auth_router)
 app.include_router(event_router)
 # app.include_router(team_router)
-# app.include_router(shop_router)
-# app.include_router(match_router)
+app.include_router(shop_router)
+app.include_router(match_router)
