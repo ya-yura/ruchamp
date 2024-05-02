@@ -6,7 +6,7 @@ import { EventsCarousel } from './events-carousel';
 
 export function ExpectedEvents({ events }: { events: Array<TypeEvent> }) {
   return (
-    <section className="flex w-full flex-col px-[72px] mb-12">
+    <section className="relative flex w-full flex-col px-[72px] pb-12 bg-primary-background">
       <ContentWraper className="gap-6">
         <h3 className="text-4xl font-bold text-[#616161]">
           Самые ожидаемые события

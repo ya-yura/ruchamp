@@ -1,69 +1,81 @@
 import {
-  Button,
-  Caption1,
-  SelectTabData,
-  SelectTabEvent,
-} from '@fluentui/react-components';
-import { AuthSwitcher } from '../../../../components/auth/auth-switcher';
-import { CustomLink } from '../../../../components/custom-link';
-import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
-import { TypeCustomFieldsetProps } from '@/lib/definitions';
+  CustomFieldset,
+  TypeFieldsetData,
+} from '@/components/forms/custom-fieldset';
 import { Locale } from '@/i18n.config';
+import { UseFormReturn } from 'react-hook-form';
+import { TypeRegFormSchema } from './register-form';
+import { CustomLink } from '@/components/custom-link';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 type TypeRegisterStepOneProps = {
-  selectedValue: string;
-  onTabSelect: (value: string) => void;
+  form: UseFormReturn<TypeRegFormSchema>;
   lang: Locale;
   switchStep: (num: 1 | 2 | 3 | 4) => void;
-  isDisabled: boolean;
-  linkText: string;
-  buttonText: string;
-} & TypeCustomFieldsetProps;
+};
+
+const regStepOneFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'email',
+      name: 'user_create.email',
+      placeholder: 'Ваша почта',
+      label: 'Электронная почта',
+      defaultValue: '',
+    },
+    {
+      type: 'password',
+      name: 'user_create.password',
+      placeholder: 'Ваш пароль',
+      label: 'Пароль',
+      defaultValue: '',
+    },
+    {
+      type: 'password',
+      name: 'user_create.confirmPassword',
+      placeholder: 'Повторите пароль',
+      label: 'Повторите пароль',
+      defaultValue: '',
+    },
+  ],
+};
 
 export function RegisterStepOne({
-  selectedValue,
-  onTabSelect,
-  isDisabled,
-  fields,
-  onChange,
-  onBlur,
-  values,
-  errors,
-  passwordState,
+  form,
   lang,
   switchStep,
-  linkText,
-  buttonText,
 }: TypeRegisterStepOneProps) {
   return (
     <>
-      <div className="mb-6 flex w-auto items-center justify-center">
-        <AuthSwitcher selectedValue={selectedValue} onTabSelect={onTabSelect} />
-      </div>
-      <CustomFieldset
-        fields={fields}
-        onChange={onChange}
-        onBlur={onBlur}
-        values={values}
-        errors={errors}
-        passwordState={passwordState}
+      <CustomFieldset<TypeRegFormSchema>
+        form={form}
+        lang={lang}
+        fieldsetData={regStepOneFieldset}
       />
       <div className="flex items-center justify-between">
-        <CustomLink
+        <Link
           className="transition-opacity duration-300 hover:opacity-70"
-          href="/login"
-          lang={lang}
+          href={`/${lang}/login`}
         >
-          <Caption1 as="p">{linkText}</Caption1>
-        </CustomLink>
+          <p className="text-xs">Я уже зарегистрирован</p>
+        </Link>
         <Button
-          appearance="primary"
-          size="large"
+          size="lg"
+          variant="ruchampDefault"
           type="button"
-          disabled={isDisabled}
-          onClick={() => switchStep(2)}
+          onClick={async () => {
+            const output = await form.trigger([
+              'user_create.email',
+              'user_create.password',
+              'user_create.confirmPassword',
+            ]);
+            if (output) {
+              switchStep(2);
+            }
+          }}
         >
-          {buttonText}
+          Выбрать роль
         </Button>
       </div>
     </>

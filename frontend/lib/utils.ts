@@ -1,5 +1,4 @@
-import { FieldProps } from '@fluentui/react-components';
-import { TypeEvent, TypeRegisterFields } from './definitions';
+import { TypeEvent } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, isPast, parseISO } from 'date-fns';
@@ -8,40 +7,6 @@ import { TypeSportsTypes, sportsTypes } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export function comparePasswords(
-  values: Partial<TypeRegisterFields>,
-  touched: Record<string, boolean>,
-  setPasswordState: React.Dispatch<
-    React.SetStateAction<{
-      state: FieldProps['validationState'];
-      message: string;
-    }>
-  >,
-): void {
-  if (
-    touched.password &&
-    touched.repeat_password &&
-    (values.password || values.repeat_password)
-  ) {
-    if (values.password === values.repeat_password) {
-      setPasswordState({
-        state: 'success',
-        message: 'Пароли совпадают',
-      });
-    } else {
-      setPasswordState({
-        state: 'error',
-        message: 'Пароли не совпадают',
-      });
-    }
-  } else {
-    setPasswordState({
-      state: 'none',
-      message: '',
-    });
-  }
 }
 
 export function transformDate(inputDate: string, isWithTime?: boolean): string {

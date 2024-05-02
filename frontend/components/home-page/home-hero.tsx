@@ -7,7 +7,7 @@ import { Locale } from '@/i18n.config';
 
 export function HomeHero({ lang }: { lang: Locale }) {
   return (
-    <section className="sm: relative mt-[-92px] flex w-full flex-col items-center justify-between overflow-hidden bg-[#0a0a0a] px-4 sm:px-6 pb-12 pt-[92px] lg:h-[680px] lg:px-[72px] lg:pb-0">
+    <section className="sm: relative mt-[-92px] flex w-full flex-col items-center justify-between overflow-hidden bg-[#0a0a0a] px-4 pb-12 pt-[92px] sm:px-6 lg:h-[680px] lg:px-[72px] lg:pb-0">
       <ContentWraper className="relative h-full justify-between">
         <Image
           className="absolute -top-[190px] right-0 rotate-90 scale-[2.1] sm:scale-[1.5] md:rotate-0 lg:-right-[70px] lg:-top-[92px]"
@@ -24,18 +24,18 @@ export function HomeHero({ lang }: { lang: Locale }) {
           height={455}
         />
         <div className="relative flex flex-col md:mt-[-333px] lg:mt-0">
-          <h1 className="drop-shadow-contrastText ld:order-0 mb-8 mt-8 rounded-xl bg-black p-4 sm:rounded-none sm:bg-transparent sm:p-0 text-3xl font-bold leading-[32px] tracking-wide sm:text-4xl md:order-1 lg:mb-11 lg:mt-[70px] lg:text-[40px] lg:leading-[47px]">
+          <h1 className="ld:order-0 mb-8 mt-8 rounded-xl bg-black p-4 text-3xl font-bold leading-[32px] tracking-wide text-background drop-shadow-contrastText sm:rounded-none sm:bg-transparent sm:p-0 sm:text-4xl md:order-1 lg:mb-11 lg:mt-[70px] lg:text-[40px] lg:leading-[47px]">
             Новые{' '}
             <span className="to-53% bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-transparent">
               вызовы
             </span>{' '}
-            каждый день <br /> <br className='sm:hidden block h-3' />
+            каждый день <br /> <br className="block h-3 sm:hidden" />
             <span className="to-53% bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-transparent">
               Поможем
             </span>{' '}
             быть готовым к ним
           </h1>
-          <p className="drop-shadow-contrastText ld:order-1 mb-8 w-full text-sm font-normal leading-[20px] md:order-2 lg:mb-[66px] lg:max-w-[460px] lg:text-base lg:leading-[26px]">
+          <p className="ld:order-1 mb-8 w-full text-sm font-normal leading-[20px] drop-shadow-contrastText md:order-2 lg:mb-[66px] lg:max-w-[460px] lg:text-base lg:leading-[26px] text-background">
             Наша миссия - создать платформу, которая сделает мир боевых искусств
             доступным для всех, помогая спортсменам достигать новых высот и
             делая соревнования захватывающими и запоминающимися событиями.

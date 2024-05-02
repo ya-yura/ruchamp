@@ -76,9 +76,9 @@ export default async function Profile() {
         {userCommonData?.role_id === EnumUserRole['spectator'] && (
           <UserFormSpectator spectator={userSpecialData()} />
         )}
-        {userCommonData?.role_id === EnumUserRole['admin'] && (
+        {/* {userCommonData?.role_id === EnumUserRole['admin'] && (
           <UserFormSysadmin sysadmin={userSpecialData()} />
-        )}
+        )} */}
         {userCommonData?.role_id === EnumUserRole['referee'] && (
           <UserFormReferee referee={userSpecialData()} />
         )}
