@@ -1,4 +1,3 @@
-import { Title1 } from '@fluentui/react-components';
 import { LogoutButtons } from './buttons';
 import { getSession } from '@/lib/actions';
 import { redirect } from 'next/navigation';
@@ -16,7 +15,7 @@ export default async function LogoutPage() {
 
   return (
     <div className="relative flex h-[100vh] w-full flex-col items-center justify-center gap-12">
-      <Title1 align="center">Уверены, что хотите выйти?</Title1>
+      <h1 className='text-white'>Уверены, что хотите выйти?</h1>
       <LogoutButtons token={token} />
     </div>
   );

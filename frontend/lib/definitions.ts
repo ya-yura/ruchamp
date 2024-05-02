@@ -1,9 +1,3 @@
-import {
-  FieldProps,
-  InputProps,
-  RadioGroupOnChangeData,
-  SelectOnChangeData,
-} from '@fluentui/react-components';
 import { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
 
 export type TypeHttpRequest = {
@@ -14,25 +8,6 @@ export type TypeHttpRequest = {
 export type TypeLinksDropdown = {
   name: string;
   url: string;
-};
-
-export type TypeCustomFieldsetProps = {
-  isLoading?: boolean;
-  fields: Array<Partial<FieldProps> & Partial<InputProps>>;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSelect?: (
-    ev: ChangeEvent<HTMLSelectElement>,
-    data: SelectOnChangeData,
-  ) => void;
-  onRadioChange?: (
-    ev: FormEvent<HTMLDivElement>,
-    data: RadioGroupOnChangeData,
-  ) => void;
-  onBlur?: () => void;
-  values: TypeRegisterFields;
-  errors?: { [key: string]: string };
-  setValues?: Dispatch<SetStateAction<TypeRegisterFields>>;
-  passwordState?: { state: FieldProps['validationState']; message: string };
 };
 
 export type TypeUserRole = 1 | 2 | 3 | 4 | 5;
@@ -113,7 +88,7 @@ export enum EnumUserRole {
   'athlete' = 1,
   'organizer' = 2,
   'spectator' = 3,
-  'admin' = 4,
+  // 'admin' = 4,
   'referee' = 5,
 }
 

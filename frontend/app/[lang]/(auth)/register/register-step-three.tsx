@@ -1,69 +1,132 @@
-import { Button, Field, Radio, RadioGroup } from '@fluentui/react-components';
-import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
-import {
-  EnumCountries,
-  TypeCustomFieldsetProps,
-  TypeFirstUserFields,
-} from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
-import { CustomSelect } from '../../../../components/forms/custom-select';
+import { UseFormReturn } from 'react-hook-form';
+import { TypeRegFormSchema } from './register-form';
+import {
+  CustomFieldset,
+  TypeFieldsetData,
+} from '@/components/forms/custom-fieldset';
+import { Button } from '@/components/ui/button';
 
 type TypeRegisterStepThreeProps = {
+  form: UseFormReturn<TypeRegFormSchema>;
   lang: Locale;
   switchStep: (num: 1 | 2 | 3 | 4) => void;
-  isDisabled: boolean;
-  genderSelectId: keyof TypeFirstUserFields;
-  buttonText: string;
-  countrySelectLabel: string;
-  defaultCountrySelectLabel: string;
-  idCoutrySelect: string;
-} & TypeCustomFieldsetProps;
+};
+
+const regStepThreeFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'text',
+      name: 'user_create.name',
+      placeholder: 'Введите имя',
+      label: 'Имя',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_create.sirname',
+      placeholder: 'Ваша фамилия',
+      label: 'Фамилия',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_create.fathername',
+      placeholder: 'Ваше отчество',
+      label: 'Отчество',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_create.username',
+      placeholder: 'Ваш юзернейм',
+      label: 'Юзернейм',
+      defaultValue: '',
+    },
+    {
+      type: 'date',
+      name: 'user_create.birthdate',
+      placeholder: 'Ваша дата рождения',
+      label: 'Дата рождения',
+      defaultValue: '',
+    },
+    {
+      type: 'select',
+      name: 'user_create.country',
+      placeholder: 'Выберите из списка',
+      label: 'Страна',
+      defaultValue: '',
+      selectOptions: [
+        {
+          value: 'ru',
+          option: 'Россия',
+        },
+        {
+          value: 'kz',
+          option: 'Казахстан',
+        },
+        {
+          value: 'by',
+          option: 'Беларусь',
+        },
+      ],
+    },
+    {
+      type: 'radio',
+      name: 'user_create.gender',
+      label: 'Пол',
+      defaultValue: '',
+      orientation: 'row',
+      radioOptions: {
+        true: 'Мужчина',
+        false: 'Женщина',
+      },
+    },
+  ],
+};
 
 export function RegisterStepThree({
-  isDisabled,
-  fields,
-  onChange,
-  onSelect,
-  onRadioChange,
-  values,
+  form,
+  lang,
   switchStep,
-  genderSelectId,
-  buttonText,
-  countrySelectLabel,
-  defaultCountrySelectLabel,
-  idCoutrySelect,
 }: TypeRegisterStepThreeProps) {
   return (
     <>
-      <CustomFieldset fields={fields} onChange={onChange} values={values} />
-      <fieldset className="flex w-[400px] flex-col gap-4">
-        <CustomSelect
-          label={countrySelectLabel}
-          defaultOption={defaultCountrySelectLabel}
-          id={idCoutrySelect}
-          onSelect={onSelect}
-          options={EnumCountries}
-        />
-        <Field label="Пол" required>
-          <RadioGroup
-            layout="horizontal"
-            onChange={onRadioChange}
-            name={genderSelectId}
-          >
-            <Radio value="male" label="Мужчина" />
-            <Radio value="female" label="Женщина" />
-          </RadioGroup>
-        </Field>
-      </fieldset>
-      <div className="flex items-center justify-end">
+      <CustomFieldset
+        form={form}
+        lang={lang}
+        fieldsetData={regStepThreeFieldset}
+      />
+      <div className="col-span-12 flex items-center justify-between">
         <Button
-          appearance="primary"
-          size="large"
+          className="text-foreground"
+          size="lg"
           type="button"
-          disabled={isDisabled}
-          onClick={() => switchStep(4)}
+          variant="ruchampTransparentGreyBorder"
+          onClick={() => switchStep(2)}
         >
-          {buttonText}
+          Назад
+        </Button>
+        <Button
+          size="lg"
+          type="button"
+          variant="ruchampDefault"
+          onClick={async () => {
+            const output = await form.trigger([
+              'user_create.birthdate',
+              'user_create.country',
+              'user_create.fathername',
+              'user_create.gender',
+              'user_create.name',
+              'user_create.sirname',
+              'user_create.username',
+            ]);
+            if (output) {
+              switchStep(4);
+            }
+          }}
+        >
+          Продолжить
         </Button>
       </div>
     </>

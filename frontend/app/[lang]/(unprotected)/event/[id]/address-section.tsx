@@ -3,7 +3,7 @@ import { TypeEvent } from '@/lib/definitions';
 
 export function AddressSection({ event }: { event: TypeEvent }) {
   return (
-    <section className="mb-10 flex w-full flex-col px-[72px]">
+    <section className="relative pb-10 flex w-full flex-col px-[72px] bg-primary-background">
       <ContentWraper className="gap-6">
         <h3 className="text-4xl font-bold text-[#616161]">Адрес</h3>
         {/* <div className="relative flex w-full"> */}

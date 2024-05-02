@@ -18,7 +18,7 @@ export function SecondHero({ lang }: { lang: Locale }) {
         <h2 className="to-53% mb-5 max-w-[550px] bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-2xl font-black leading-7 tracking-wide text-transparent sm:text-4xl sm:leading-[47px] md:text-[40px]">
           Ваш путь к победе начинается здесь
         </h2>
-        <p className="mb-6 max-w-[550px] text-sm  text-[#C9C9C9] sm:leading-[24px] md:text-base lg:text-lg">
+        <p className="mb-6 max-w-[550px] text-sm text-background sm:leading-[24px] md:text-base lg:text-lg">
           С нами вы сможете оптимизировать свою работу, улучшить результаты и
           достичь новых высот в спорте. Не упустите свой шанс присоединиться к
           нашему сообществу и стать частью большой спортивной семьи!

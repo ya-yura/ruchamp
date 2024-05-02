@@ -6,7 +6,7 @@ import { Separator } from '../ui/separator';
 
 export function Footer({ lang }: { lang: Locale }) {
   return (
-    <footer className="flex w-full flex-col bg-[#0a0a0a] px-4 py-3 pb-6 sm:px-7 md:px-10 lg:px-[72px]">
+    <footer className="relative flex w-full flex-col bg-primary-background px-4 py-3 pb-6 sm:px-7 md:px-10 lg:px-[72px]">
       <ContentWraper>
         <div className="mb-8">
           <Separator className="bg-[#3D3D3D]" />

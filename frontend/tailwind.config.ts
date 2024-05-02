@@ -9,6 +9,9 @@ const config = {
     './src/**/*.{ts,tsx}',
   ],
   prefix: '',
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     container: {
       center: true,
@@ -27,6 +30,8 @@ const config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          mainAccent: '#0F6CBD',
+          background: '#0A0A0A',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -52,6 +57,12 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+      },
+      boxShadow: {
+        basic: '0 5px 36px 0 rgba(0, 0, 0, 0.08)', // still unused
+        input: '0 1px 0 0 lightgray',
+        inputFocused: '0 1.5px 0 0 rgba(15,108,189,1)',
+        cardShadow: '0 5px 30px 0 rgba(0, 0, 0, 0.5)',
       },
       borderRadius: {
         lg: 'var(--radius)',

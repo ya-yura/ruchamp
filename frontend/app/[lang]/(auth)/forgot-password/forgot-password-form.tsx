@@ -1,55 +1,83 @@
 'use client';
 
-import { Button, Caption1, Spinner } from '@fluentui/react-components';
-import { CustomLink } from '../../../../components/custom-link';
-import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
-import { CustomForm } from '../../../../components/forms/custom-form';
+import {
+  CustomFieldset,
+  TypeFieldsetData,
+} from '@/components/forms/custom-fieldset';
+import { CustomForm } from '@/components/forms/custom-form';
 import { useState } from 'react';
-import { useForm } from '@/lib/hooks/useForm';
-import { forgotPasswordFields } from './constants';
 import { Locale } from '@/i18n.config';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/spinner';
+import { Form } from '@/components/ui/form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+const formSchema = z.object({
+  email: z
+    .string()
+    .regex(
+      /^[a-zA-Zа-яА-Я0-9_.+-]+@[a-zA-Zа-яА-Я0-9-]+\.[a-zA-Zа-яА-Я0-9-.]+$/,
+    ),
+});
+
+const forgotPasswordFieldset: TypeFieldsetData<z.infer<typeof formSchema>> = {
+  fields: [
+    {
+      type: 'email',
+      name: 'email',
+      placeholder: 'Ваша почта',
+      label: 'Электронная почта',
+      defaultValue: '',
+    },
+  ],
+};
 
 export function ForgotPasswordForm({ lang }: { lang: Locale }) {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { values, handleChange } = useForm();
 
-  async function handleSignIn(): Promise<void> {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>): void {
     setIsLoading(true);
     setErrorMessage('');
-    console.log('forgot password logic');
-    setIsLoading(false);
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    handleSignIn();
+    console.log('forgot password logic', values);
   }
   return (
-    <CustomForm onSubmit={handleSubmit}>
-      <CustomFieldset
-        isLoading={isLoading}
-        fields={forgotPasswordFields}
-        onChange={handleChange}
-        values={values}
-      />
-      <div className="flex items-center justify-between">
-        <CustomLink
-          className="transition-opacity duration-300 hover:opacity-70"
-          href="/login"
+    <Form {...form}>
+      <CustomForm onSubmit={form.handleSubmit(onSubmit)}>
+        <CustomFieldset
+          form={form}
           lang={lang}
-        >
-          <Caption1 as="p">Я вспомнил пароль</Caption1>
-        </CustomLink>
-        <Button
-          appearance="primary"
-          size="large"
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading && <Spinner size="tiny" label="" />} Восстановить
-        </Button>
-      </div>
-    </CustomForm>
+          fieldsetData={forgotPasswordFieldset}
+        />
+        <div className="flex items-center justify-between">
+          <Link
+            className="transition-opacity duration-300 hover:opacity-70"
+            href={`/${lang}/login`}
+          >
+            <p className="text-xs">Я вспомнил пароль</p>
+          </Link>
+          <Button
+            className="flex gap-3 px-9"
+            variant="ruchampDefault"
+            type="submit"
+            size="lg"
+            disabled={false}
+          >
+            {false && <Spinner className="h-6 w-6" />}
+            Восстановить
+          </Button>
+        </div>
+      </CustomForm>
+    </Form>
   );
 }

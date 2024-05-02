@@ -1,151 +1,90 @@
 'use client';
 
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import * as React from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
-  Button,
-  Combobox,
-  makeStyles,
-  Option,
-  shorthands,
-  tokens,
-  useId,
-} from '@fluentui/react-components';
-import type { ComboboxProps } from '@fluentui/react-components';
-import { Dismiss12Regular } from '@fluentui/react-icons';
-import { TypeAthleteFields, TypeRegisterFields } from '@/lib/definitions';
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '../ui/scroll-area';
+import { Badge } from '../ui/badge';
+import { DropdownMenuCheckboxItemProps } from '@radix-ui/react-dropdown-menu';
+import { FieldValues, Path, PathValue, UseFormReturn } from 'react-hook-form';
+import { TypeField } from './custom-fieldset';
 
-type TypeMultiSelectWithTagsProps = {
-  multiselectId: keyof TypeAthleteFields;
-  label: string;
+type Checked = DropdownMenuCheckboxItemProps['checked'];
+
+type DropdownMenuCheckboxesProps<T extends FieldValues> = {
+  form: UseFormReturn<T>;
+  item: TypeField<T>;
   placeholder: string;
-  options: string[];
-  setValues?: Dispatch<SetStateAction<TypeRegisterFields>>;
-} & Partial<ComboboxProps>;
+  // checkedItems: string[];
+  // setCheckedItems: React.Dispatch<React.SetStateAction<string[]>>;
+};
 
-const useStyles = makeStyles({
-  root: {
-    // Stack the label above the field with a gap
-    display: 'grid',
-    gridTemplateRows: 'repeat(1fr)',
-    justifyItems: 'start',
-    ...shorthands.gap('2px'),
-    maxWidth: '400px',
-    width: '100%',
-    '& div': {
-      width: '100%',
-    },
-  },
-  tagsList: {
-    listStyleType: 'none',
-    marginBottom: tokens.spacingVerticalXXS,
-    marginTop: 0,
-    paddingLeft: 0,
-    display: 'flex',
-    gridGap: tokens.spacingHorizontalXXS,
-  },
-});
-
-export const MultiselectWithTags = ({
-  multiselectId,
-  label,
+export function DropdownMenuCheckboxes<T extends FieldValues>({
+  item,
   placeholder,
-  options,
-  setValues,
-  ...props
-}: TypeMultiSelectWithTagsProps) => {
-  // generate ids for handling labelling
-  const comboId = useId('combo-multi');
-  const selectedListId = `${comboId}-selection`;
+  form,
+  // checkedItems,
+  // setCheckedItems,
+}: DropdownMenuCheckboxesProps<T>) {
+  const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
 
-  // refs for managing focus when removing tags
-  const selectedListRef = useRef<HTMLUListElement>(null);
-  const comboboxInputRef = useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    form.setValue(item.name, checkedItems as PathValue<T, Path<T>>);
+  }, [checkedItems]);
 
-  const styles = useStyles();
-
-  // Handle selectedOptions both when an option is selected or deselected in the Combobox,
-  // and when an option is removed by clicking on a tag
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-
-  const onSelect: ComboboxProps['onOptionSelect'] = (event, data) => {
-    setSelectedOptions(data.selectedOptions);
-    if (setValues) {
-      setValues((prevValues) => ({
-        ...prevValues,
-        [multiselectId]: data.selectedOptions,
-      }));
-    }
+  const handleCheckedChange = (label: string) => (checked: Checked) => {
+    setCheckedItems((prev) => {
+      let newCheckedItems;
+      if (checked) {
+        newCheckedItems = [...prev, label];
+      } else {
+        newCheckedItems = prev.filter((item) => item !== label);
+      }
+      return newCheckedItems;
+    });
   };
-
-  const onTagClick = (option: string, index: number) => {
-    // remove selected option
-    setSelectedOptions(selectedOptions.filter((o) => o !== option));
-    if (setValues) {
-      setValues((prevValues) => ({
-        ...prevValues,
-        [multiselectId]: (prevValues[multiselectId] as string[]).filter(
-          (o) => o !== option,
-        ),
-      }));
-    }
-    // focus previous or next option, defaulting to focusing back to the combo input
-    const indexToFocus = index === 0 ? 1 : index - 1;
-    const optionToFocus = selectedListRef.current?.querySelector(
-      `#${comboId}-remove-${indexToFocus}`,
-    );
-    if (optionToFocus) {
-      (optionToFocus as HTMLButtonElement).focus();
-    } else {
-      comboboxInputRef.current?.focus();
-    }
-  };
-
-  const labelledBy =
-    selectedOptions.length > 0 ? `${comboId} ${selectedListId}` : comboId;
 
   return (
-    <div className={styles.root}>
-      <label id={comboId}>
-        {label} <span className="text-red-500">*</span>{' '}
-      </label>
-      {selectedOptions.length ? (
-        <ul
-          id={selectedListId}
-          className={styles.tagsList}
-          ref={selectedListRef}
-        >
-          {selectedOptions.map((option, i) => (
-            <li key={option}>
-              <Button
-                size="small"
-                shape="circular"
-                appearance="primary"
-                icon={<Dismiss12Regular />}
-                iconPosition="after"
-                onClick={() => onTagClick(option, i)}
-                id={`${comboId}-remove-${i}`}
-                aria-labelledby={`${comboId}-remove ${comboId}-remove-${i}`}
-              >
-                {option}
-              </Button>
-            </li>
+    <DropdownMenu>
+      {checkedItems && (
+        <div className="flex flex-wrap gap-1">
+          {checkedItems.map((item) => (
+            <Badge
+              className="bg-primary-mainAccent"
+              key={item}
+              onClick={() =>
+                handleCheckedChange(item)(!checkedItems.includes(item))
+              }
+            >
+              {item}
+            </Badge>
           ))}
-        </ul>
-      ) : null}
-      <Combobox
-        aria-labelledby={labelledBy}
-        multiselect={true}
-        placeholder={placeholder}
-        selectedOptions={selectedOptions}
-        onOptionSelect={onSelect}
-        ref={comboboxInputRef}
-        size="large"
-        {...props}
-      >
-        {options.map((option) => (
-          <Option key={option}>{option}</Option>
-        ))}
-      </Combobox>
-    </div>
+        </div>
+      )}
+      <DropdownMenuTrigger asChild>
+        <Button className="justify-start" variant="outline">
+          {placeholder}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-64">
+        <ScrollArea className="h-72 w-60">
+          {item.multiselectOptions?.map((item: PathValue<T, Path<T>>) => (
+            <DropdownMenuCheckboxItem
+              key={item}
+              checked={checkedItems.includes(item)}
+              onCheckedChange={handleCheckedChange(item)}
+            >
+              {item}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </ScrollArea>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-};
+}

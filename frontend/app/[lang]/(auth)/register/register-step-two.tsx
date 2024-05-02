@@ -1,65 +1,85 @@
-import {
-  Button,
-  Field,
-  Radio,
-  RadioGroup,
-  RadioGroupOnChangeData,
-} from '@fluentui/react-components';
 import { Locale } from '@/i18n.config';
-import { FormEvent } from 'react';
-import { TypeFirstUserFields } from '@/lib/definitions';
+import { UseFormReturn } from 'react-hook-form';
+import { TypeRegFormSchema } from './register-form';
+import {
+  CustomFieldset,
+  TypeFieldsetData,
+} from '@/components/forms/custom-fieldset';
+import { Button } from '@/components/ui/button';
 
 type TypeRegisterStepTwoProps = {
+  form: UseFormReturn<TypeRegFormSchema>;
   lang: Locale;
-  label: string;
   switchStep: (num: 1 | 2 | 3 | 4) => void;
-  onRadioChange: (
-    ev: FormEvent<HTMLDivElement>,
-    data: RadioGroupOnChangeData,
-  ) => void;
-  isDisabled: boolean;
-  roleSelectId: keyof TypeFirstUserFields;
-  userRoles: { [key: string]: string };
-  buttonText: string;
+};
+
+const regStepTwoFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'customradio',
+      name: 'user_create.role_id',
+      defaultValue: '1',
+      orientation: 'row',
+      customRadioOptions: [
+        {
+          value: '1',
+          option: 'Спортсмен',
+          icon: '/ru/images/icons/roles/athlete.svg',
+        },
+        {
+          value: '3',
+          option: 'Зритель',
+          icon: '/ru/images/icons/roles/spectator.svg',
+        },
+        {
+          value: '2',
+          option: 'Организатор',
+          icon: '/ru/images/icons/roles/organizer.svg',
+        },
+        {
+          value: '5',
+          option: 'Судья',
+          icon: '/ru/images/icons/roles/referee.svg',
+        },
+      ],
+    },
+  ],
 };
 
 export function RegisterStepTwo({
+  form,
   lang,
-  label,
   switchStep,
-  onRadioChange,
-  isDisabled,
-  roleSelectId,
-  userRoles,
-  buttonText,
 }: TypeRegisterStepTwoProps) {
-
   return (
     <>
-      <fieldset className="w-[400px]">
-        <Field label={label} size="large" required>
-          <RadioGroup
-            onChange={onRadioChange}
-            name={roleSelectId}
-            id={roleSelectId}
-            as="div"
-          >
-            {Object.entries(userRoles).map(([key, value]) => (
-              <Radio key={key} value={key} label={value} as="input" />
-            ))}
-          </RadioGroup>
-        </Field>
-      </fieldset>
-
-      <div className="flex items-center justify-end">
+      <CustomFieldset<TypeRegFormSchema>
+        form={form}
+        lang={lang}
+        fieldsetData={regStepTwoFieldset}
+      />
+      <div className="col-span-12 flex items-center justify-between">
         <Button
-          appearance="primary"
-          size="large"
+          className="text-foreground"
+          size="lg"
           type="button"
-          disabled={isDisabled}
-          onClick={() => switchStep(3)}
+          variant="ruchampTransparentGreyBorder"
+          onClick={() => switchStep(1)}
         >
-          {buttonText}
+          Назад
+        </Button>
+        <Button
+          size="lg"
+          type="button"
+          variant="ruchampDefault"
+          onClick={async () => {
+            const output = await form.trigger(['user_create.role_id']);
+            if (output) {
+              switchStep(3);
+            }
+          }}
+        >
+          Продолжить
         </Button>
       </div>
     </>
