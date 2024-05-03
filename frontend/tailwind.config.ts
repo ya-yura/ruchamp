@@ -59,6 +59,9 @@ const config = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+      transitionDuration: {
+        '2000': '2000ms',
+      },
       boxShadow: {
         basic: '0 5px 36px 0 rgba(0, 0, 0, 0.08)', // still unused
         input: '0 1px 0 0 lightgray',

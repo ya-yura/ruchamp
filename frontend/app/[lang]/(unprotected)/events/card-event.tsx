@@ -4,13 +4,26 @@ import { chooseTypes, transformDate } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
 
-export function CardEvent({ event }: { event: TypeEvent }) {
+export function CardEvent({
+  event,
+  className,
+}: {
+  event: TypeEvent;
+  className?: string;
+}) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const router = useRouter();
 
   return (
-    <li className="group flex h-[450px] w-full cursor-default flex-col overflow-hidden rounded-xl bg-[#292929] transition-all hover:shadow-cardShadow hover:scale-[101%]">
+    <li
+      className={cn(
+        'group flex h-[450px] w-full cursor-default flex-col overflow-hidden',
+        'hover:shadow-cardShadow rounded-xl bg-[#292929] transition-all hover:scale-[101%]',
+        className,
+      )}
+    >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"

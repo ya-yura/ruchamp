@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
 import { TypeSportsTypes } from '@/lib/constants';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { TypeEvent } from '@/lib/definitions';
 import { EventsCards } from './events-cards';
 
@@ -27,8 +27,19 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<
     Array<TypeSportsTypes>
   >([]);
+  const topRef = useRef<HTMLElement | null>(null);
+
+  function scrollToTop(): void {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   return (
-    <section className="relative mt-[-92px] flex w-full flex-col items-center justify-between bg-primary-background px-[72px] pt-[92px]">
+    <section
+      ref={topRef}
+      className="bg-primary-background relative mt-[-92px] flex w-full flex-col items-center justify-between px-[72px] pt-[92px]"
+    >
       <div className="absolute mt-[-92px] h-[853px] w-full ">
         <Image
           className="opacity-40"
@@ -72,12 +83,14 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
             <EventsCards
               events={futureEvents}
               selectedSportTypes={selectedSportTypes}
+              scrollToTop={scrollToTop}
             />
           </TabsContent>
           <TabsContent value="pastEvents">
             <EventsCards
               events={pastEvents}
               selectedSportTypes={selectedSportTypes}
+              scrollToTop={scrollToTop}
             />
           </TabsContent>
           <TabsContent value="usersEvents">
