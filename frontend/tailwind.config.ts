@@ -32,6 +32,7 @@ const config = {
           foreground: 'hsl(var(--primary-foreground))',
           mainAccent: '#0F6CBD',
           background: '#0A0A0A',
+          almostBlack: '#090707'
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -88,7 +89,10 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@xpd/tailwind-3dtransforms'),
+  ],
 } satisfies Config;
 
 export default config;

@@ -18,7 +18,7 @@ export function UserMenuButton({ user }: { user: any }) {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold text-[#424242] hover:bg-transparent hover:text-[#424242] data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=closed]:text-[#424242] data-[state=open]:bg-transparent data-[active]:text-[#0F6CBD] data-[state=open]:text-[#0F6CBD]">
+          <NavigationMenuTrigger className="data-[active]:text-primary-mainAccent data-[state=open]:text-primary-mainAccent flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold text-background hover:bg-transparent hover:text-background data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=open]:bg-transparent data-[state=closed]:text-background">
             <Avatar className="h-8 w-8">
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
               <AvatarFallback>CN</AvatarFallback>
