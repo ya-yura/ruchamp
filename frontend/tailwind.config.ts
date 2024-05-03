@@ -32,6 +32,7 @@ const config = {
           foreground: 'hsl(var(--primary-foreground))',
           mainAccent: '#0F6CBD',
           background: '#0A0A0A',
+          almostBlack: '#090707'
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -57,6 +58,9 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+      },
+      transitionDuration: {
+        '2000': '2000ms',
       },
       boxShadow: {
         basic: '0 5px 36px 0 rgba(0, 0, 0, 0.08)', // still unused
@@ -88,7 +92,10 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@xpd/tailwind-3dtransforms'),
+  ],
 } satisfies Config;
 
 export default config;

@@ -31,7 +31,7 @@ export function EventInfo({ event }: { event: TypeEvent }) {
   };
 
   return (
-    <>
+    <div className="w-full">
       <div className="fixed mt-[-92px] h-[720px] w-full">
         <Image
           className="opacity-40"
@@ -47,7 +47,7 @@ export function EventInfo({ event }: { event: TypeEvent }) {
           <h1 className="text-5xl font-bold leading-tight tracking-tight text-background">
             {event?.name}
           </h1>
-          <div className="relative flex gap-6 mb-[87px]">
+          <div className="relative mb-[87px] flex gap-6">
             <Button variant="ruchampDefault">Участвовать</Button>
             <Button variant="ruchampTransparent">Купить билеты</Button>
           </div>
@@ -80,6 +80,6 @@ export function EventInfo({ event }: { event: TypeEvent }) {
           </Tabs>
         </ContentWraper>
       </section>
-    </>
+    </div>
   );
 }

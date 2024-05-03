@@ -27,12 +27,22 @@ export function EventsCarousel({ events }: { events: Array<TypeEvent> }) {
       <CarouselContent>
         {events.map((event) => (
           <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
-            <CardEvent key={event.id} event={event} />
+            <CardEvent
+              className="hover:scale-100 hover:shadow-none"
+              key={event.id}
+              event={event}
+            />
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-3 h-12 w-12" variant="ghost" />
-      <CarouselNext className="right-3 h-12 w-12" variant="ghost" />
+      <CarouselPrevious
+        className="left-3 h-12 w-12 text-background"
+        variant="ghost"
+      />
+      <CarouselNext
+        className="right-3 h-12 w-12 text-background"
+        variant="ghost"
+      />
     </Carousel>
   );
 }

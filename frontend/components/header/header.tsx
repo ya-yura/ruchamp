@@ -30,7 +30,7 @@ export function Header({ lang, user }: { lang: Locale; user: any }) {
           </div>
           <SearchBar className="mx-3 hidden lg:block" />
           <Button
-            className="ml-auto h-9 sm:mr-1 lg:hidden"
+            className="ml-auto h-9 mr-2 lg:hidden"
             variant="ruchampTransparentGreyBorder"
             size="icon"
           >
