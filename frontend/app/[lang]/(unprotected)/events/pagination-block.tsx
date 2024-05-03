@@ -72,6 +72,7 @@ export function PaginationBlock({
       <PaginationContent>
         <PaginationItem>
           <Button
+            className="text-background"
             variant={null}
             disabled={currentPage < 2}
             aria-label="prev"
@@ -84,6 +85,7 @@ export function PaginationBlock({
           <>
             <PaginationItem>
               <Button
+                className="text-background"
                 variant={currentPage === 1 ? 'ruchampDefault' : null}
                 aria-label="1"
                 onClick={handlePageClick}
@@ -100,6 +102,7 @@ export function PaginationBlock({
         {range.map((page) => (
           <PaginationItem key={page}>
             <Button
+              className="text-background"
               variant={currentPage === page ? 'ruchampDefault' : null}
               aria-label={page.toString()}
               onClick={handlePageClick}
@@ -112,10 +115,11 @@ export function PaginationBlock({
         {range[2] !== totalPages && totalPages > 3 && (
           <>
             <PaginationItem>
-              <PaginationEllipsis />
+              <PaginationEllipsis className="text-background" />
             </PaginationItem>
             <PaginationItem>
               <Button
+                className="text-background"
                 variant={null}
                 aria-label={totalPages.toString()}
                 onClick={handlePageClick}
@@ -127,6 +131,7 @@ export function PaginationBlock({
         )}
         <PaginationItem>
           <Button
+            className="text-background"
             variant={null}
             disabled={currentPage > totalPages - 1}
             aria-label="next"

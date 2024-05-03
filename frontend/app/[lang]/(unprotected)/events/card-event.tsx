@@ -10,7 +10,7 @@ export function CardEvent({ event }: { event: TypeEvent }) {
   const router = useRouter();
 
   return (
-    <li className="flex h-[450px] w-full cursor-default flex-col overflow-hidden rounded-xl bg-[#292929] transition-shadow hover:shadow-[0px_5px_30px_0px_rgba(0,0,0,0.5)]">
+    <li className="group flex h-[450px] w-full cursor-default flex-col overflow-hidden rounded-xl bg-[#292929] transition-all hover:shadow-cardShadow hover:scale-[101%]">
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"
@@ -19,10 +19,10 @@ export function CardEvent({ event }: { event: TypeEvent }) {
           fill={true}
           style={{ objectFit: 'cover' }}
         />
-        <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold">
+        <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
           {event.name}
         </h3>
-        <p className="relative line-clamp-2 text-sm">
+        <p className="relative line-clamp-2 text-sm text-background">
           {chooseTypes(event).join(', ')}
         </p>
       </div>
@@ -36,14 +36,15 @@ export function CardEvent({ event }: { event: TypeEvent }) {
             height={25}
           />
           <div className="flex flex-col">
-            <p className="text-sm font-semibold">
-              {/* {formatDate(event.start_datetime)} */}
+            <p className="text-sm font-semibold text-background">
               {transformDate(event.start_datetime)}
             </p>
-            <p className="line-clamp-1 text-[#ADADAD]">{event.location}</p>
+            <p className="line-clamp-1 text-muted-foreground">
+              {event.location}
+            </p>
           </div>
         </div>
-        <p className="line-clamp-2">{event.event_order}</p>
+        <p className="line-clamp-2 text-background">{event.event_order}</p>
       </div>
       <div className="flex justify-end gap-5 px-4">
         <Button

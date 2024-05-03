@@ -47,8 +47,8 @@ export function UserForm({ user }: { user: TypeUser }) {
         return 'Организатор';
       case EnumUserRole['spectator']:
         return 'Зритель';
-      case EnumUserRole['admin']:
-        return 'Администратор';
+      // case EnumUserRole['admin']:
+      //   return 'Администратор';
       case EnumUserRole['referee']:
         return 'Судья';
     }

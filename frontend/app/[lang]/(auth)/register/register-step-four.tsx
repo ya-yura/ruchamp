@@ -1,104 +1,180 @@
-import { Button, Spinner } from '@fluentui/react-components';
-import { CustomFieldset } from '../../../../components/forms/custom-fieldset';
 import {
-  EnumUserRole,
-  TypeAthleteFields,
-  TypeCustomFieldsetProps,
-  TypeFirstUserFields,
-} from '@/lib/definitions';
-import { MultiselectWithTags } from '../../../../components/forms/custom-multiselect';
-import { CustomSelect } from '../../../../components/forms/custom-select';
-import { ErrorCircle20Regular } from '@fluentui/react-icons';
+  CustomFieldset,
+  TypeFieldsetData,
+} from '@/components/forms/custom-fieldset';
+import { EnumUserRole } from '@/lib/definitions';
+import { UseFormReturn } from 'react-hook-form';
+import { TypeRegFormSchema } from './register-form';
+import { Locale } from '@/i18n.config';
+import { Button } from '@/components/ui/button';
+import { sportsTypes } from '@/lib/constants';
+import { Spinner } from '@/components/spinner';
 
 type TypeRegisterStepFourProps = {
-  userRoleId: TypeFirstUserFields['role_id'];
-  refereeSelectId: string;
-  multiselectId: keyof TypeAthleteFields;
-  refereeOptions: { [key: string]: string };
-  refereeLabel: string;
-  refereeDefaultOption: string;
-  sportsTypeSelectLabel: string;
-  sportsTypePlaceholder: string;
-  sportsOptions: string[];
-  buttonText: string;
-  errorMessage: string | undefined;
-  isDisabled: boolean;
-} & TypeCustomFieldsetProps;
+  form: UseFormReturn<TypeRegFormSchema>;
+  lang: Locale;
+  switchStep: (num: 1 | 2 | 3 | 4) => void;
+  isLoading: boolean;
+  errorMessage: string;
+};
+
+const regAthleteFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'text',
+      name: 'user_data.info.athlete_height',
+      placeholder: 'Ваш рост',
+      label: 'Рост',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_data.info.athlete_weight',
+      placeholder: 'Ваш вес',
+      label: 'Вес',
+      defaultValue: '',
+    },
+    {
+      type: 'multiselect',
+      name: 'user_data.info.athlete_sport_type',
+      placeholder: 'Выберите из списка',
+      label: 'Виды спорта',
+      defaultValue: '',
+      multiselectOptions: sportsTypes,
+    },
+  ],
+};
+
+const regOrganizerFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'text',
+      name: 'user_data.info.event_organizer_organization_name',
+      placeholder: 'Название вашей организации',
+      label: 'Организация',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_data.info.event_organizer_organization_website',
+      placeholder: 'https://',
+      label: 'Сайт организации',
+      defaultValue: '',
+    },
+    {
+      type: 'text',
+      name: 'user_data.info.event_organizer_organization_contact_email',
+      placeholder: 'Электронный адрес компании',
+      label: 'Email',
+      defaultValue: '',
+    },
+    {
+      type: 'tel',
+      name: 'user_data.info.event_organizer_organization_contact_phone',
+      placeholder: 'Контактный телефон компании',
+      label: 'Телефон компании',
+      defaultValue: '',
+    },
+  ],
+};
+
+const regSpectatorFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'tel',
+      name: 'user_data.info.spectator_phone_number',
+      placeholder: 'Ваш телефон',
+      label: 'Телефон',
+      defaultValue: '',
+    },
+  ],
+};
+
+const regRefereeFieldset: TypeFieldsetData<TypeRegFormSchema> = {
+  fields: [
+    {
+      type: 'select',
+      name: 'user_data.info.referee_qualification_level',
+      placeholder: 'Выберите из списка',
+      label: 'Ваша категория',
+      defaultValue: '',
+      selectOptions: [
+        { value: '10', option: 'Начинающий судья' },
+        { value: '3', option: 'Судья 3-й категории' },
+        { value: '2', option: 'Судья 2-й категории' },
+        { value: '1', option: 'Судья 1-й категории' },
+        { value: '4', option: 'Международный судья' },
+      ],
+    },
+  ],
+};
 
 export function RegisterStepFour({
+  form,
+  lang,
+  switchStep,
   isLoading,
-  fields,
-  onChange,
-  onSelect,
-  values,
-  errors,
-  setValues,
-  userRoleId,
-  multiselectId,
-  refereeSelectId,
-  refereeOptions,
-  refereeLabel,
-  refereeDefaultOption,
-  sportsTypeSelectLabel,
-  sportsTypePlaceholder,
-  sportsOptions,
-  buttonText,
   errorMessage,
-  isDisabled,
 }: TypeRegisterStepFourProps) {
+  const values = form.getValues();
+  const userValues = values.user_create;
+  const infoValues = values.user_data.info;
+  const userRoleId = userValues.role_id;
+
+  const fields: Record<EnumUserRole, TypeFieldsetData<TypeRegFormSchema>> = {
+    [EnumUserRole.athlete]: regAthleteFieldset,
+    [EnumUserRole.organizer]: regOrganizerFieldset,
+    [EnumUserRole.spectator]: regSpectatorFieldset,
+    [EnumUserRole.referee]: regRefereeFieldset,
+  };
+
+  const isButtonDisabled = (): boolean => {
+    switch (userRoleId) {
+      case '1':
+        return !(infoValues.athlete_height && infoValues.athlete_weight);
+      case '2':
+        return !(
+          infoValues.event_organizer_organization_contact_email &&
+          infoValues.event_organizer_organization_contact_phone &&
+          infoValues.event_organizer_organization_name &&
+          infoValues.event_organizer_organization_website
+        );
+      case '3':
+        return !infoValues.spectator_phone_number;
+      case '5':
+        return !infoValues.referee_qualification_level;
+      default:
+        return false;
+    }
+  };
+
   return (
     <>
-      {(userRoleId === EnumUserRole.athlete ||
-        userRoleId === EnumUserRole.organizer ||
-        userRoleId === EnumUserRole.spectator) && (
-        <CustomFieldset
-          isLoading={isLoading}
-          fields={fields}
-          onChange={onChange}
-          values={values}
-          errors={errors}
-        />
-      )}
-      {userRoleId === EnumUserRole.athlete && (
-        <fieldset className="mb-6 w-[400px]">
-          <MultiselectWithTags
-            multiselectId={multiselectId}
-            options={sportsOptions}
-            label={sportsTypeSelectLabel}
-            placeholder={sportsTypePlaceholder}
-            setValues={setValues}
-          />
-        </fieldset>
-      )}
-      {userRoleId === EnumUserRole.referee && (
-        <fieldset className="mb-6 w-[400px]">
-          <CustomSelect
-            label={refereeLabel}
-            defaultOption={refereeDefaultOption}
-            id={refereeSelectId}
-            name={refereeSelectId}
-            onSelect={onSelect}
-            options={refereeOptions}
-          />
-        </fieldset>
-      )}
-      {errorMessage && (
-        <p className="mb-3">
-          <ErrorCircle20Regular
-            aria-label={errorMessage}
-            primaryFill="rgb(248 113 113)"
-          />{' '}
-          <span className="text-red-400">{errorMessage}</span>
-        </p>
-      )}
-      <div className="flex items-center justify-end">
+      <CustomFieldset
+        form={form}
+        lang={lang}
+        fieldsetData={fields[userRoleId]}
+        errorMessage={errorMessage}
+      />
+      <div className="col-span-12 flex items-center justify-between">
         <Button
-          appearance="primary"
-          size="large"
-          type="submit"
-          disabled={isLoading || isDisabled}
+          className="text-foreground"
+          size="lg"
+          type="button"
+          variant="ruchampTransparentGreyBorder"
+          onClick={() => switchStep(3)}
         >
-          {isLoading && <Spinner size="tiny" label="" />} {buttonText}
+          Назад
+        </Button>
+        <Button
+          className="flex gap-3 px-9"
+          variant="ruchampDefault"
+          type="submit"
+          size="lg"
+          disabled={isLoading || isButtonDisabled()}
+        >
+          {isLoading && <Spinner className="h-6 w-6" />}
+          Зарегистрироваться
         </Button>
       </div>
     </>
