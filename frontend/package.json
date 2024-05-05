@@ -49,6 +49,7 @@
     "react-hook-form": "^7.51.2",
     "react-phone-number-input": "^3.4.1",
     "sass": "^1.71.1",
+    "sharp": "^0.33.3",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",
