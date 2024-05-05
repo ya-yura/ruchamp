@@ -1,39 +1,16 @@
-from typing import Optional
 import uuid
-from sqlalchemy import select
+from typing import Optional
 
-from fastapi import Depends, Request
-from fastapi_users import (
-    BaseUserManager,
-    IntegerIDMixin,
-    exceptions,
-    models,
-    schemas
-)
-
-from auth.models import (
-    Athlete,
-    Spectator,
-    SystemAdministrator,
-    EventOrganizer,
-    Role,
-    CombatType,
-    AllWeightClass,
-    Referee,
-    Coach,
-
-)
-from auth.schemas import (
-    AthleteUpdate,
-    SpectatorUpdate,
-    SysAdminUpdate,
-    OrganizerUpdate,
-    RefereeUpdate
-    
-)
-from connection import User, get_user_db
 from auth.mailer import send_verification_email
+from auth.models import (Athlete, Coach, CombatType, EventOrganizer, Referee,
+                         Spectator, SystemAdministrator)
+from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
+                          SpectatorUpdate, SysAdminUpdate)
 from config import SECRET
+from connection import User, get_user_db
+from fastapi import Depends, HTTPException, Request
+from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
+from sqlalchemy import select
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -60,7 +37,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         existing_user = await self.user_db.get_by_email(user_create.email)
         if existing_user is not None:
-            raise exceptions.UserAlreadyExists()
+            raise HTTPException(status_code=403, detail="User already exists")
 
         user_dict = (
             user_create.create_update_dict()
@@ -85,7 +62,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         send_verification_email(
             user.username, user.email, user.verification_token
         )
-
 
     async def update_athlete_profile(
         self,
@@ -162,7 +138,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return organizer
-    
+
     async def update_referee_profile(
         self,
         user: User,

@@ -1,24 +1,23 @@
-import uuid
-import qrcode
 import os
-from aiofiles import open as async_open
-from fpdf import FPDF
+import uuid
 from datetime import datetime
-from fastapi import (APIRouter, Depends, HTTPException, Request, File,
-                     UploadFile)
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, insert, delete
 
-from connection import get_db
+import qrcode
+from aiofiles import open as async_open
+from auth.models import Athlete, EventOrganizer
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import EventOrganizer, Athlete
-from shop.models import (Ticket, Merch, Courses, Order, OrderItem, Sector,
-                         Row, Place, Engagement)
-from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
+from connection import get_db
 from event.models import Event, Participant
+from fastapi import (APIRouter, Depends, File, HTTPException, Request,
+                     UploadFile)
+from fpdf import FPDF
+from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
+                         Row, Sector, Ticket)
+from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
+from sqlalchemy import delete, insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from teams.models import TeamMember
-
 
 router = APIRouter(prefix="/shop", tags=["Shop"])
 
@@ -51,7 +50,7 @@ async def create_ticket(
         for j in range(rows):
             await db.execute(insert(Row).values(
                 sector_id=sector,
-                number=j+1,
+                number=j + 1,
             ))
             await db.commit()
     query = await db.execute(select(Row.id))
@@ -60,19 +59,19 @@ async def create_ticket(
         for k in range(place):
             await db.execute(insert(Place).values(
                 row_id=row,
-                number=k+1,
+                number=k + 1,
             ))
             await db.commit()
     query = await db.execute(select(Place.id))
     places = query.scalars().all()
     for place in places:
         await db.execute(insert(Ticket).values(
-                    event_id=event_id,
-                    organizer_id=current_user.id,
-                    place=place,
-                    price=1000,  # Подумать как внутри сектора выставить разные цены билетов
-                    uu_key=str(uuid.uuid4()),
-                ))
+            event_id=event_id,
+            organizer_id=current_user.id,
+            place=place,
+            price=1000,  # Подумать как внутри сектора выставить разные цены билетов
+            uu_key=str(uuid.uuid4()),)
+        )
     await db.commit()
     return {"status": "ok"}
 
@@ -84,7 +83,9 @@ async def get_tickets(event_id: int,
     # показываем количество оставшихся билетов
     query = await db.execute(select(
         Ticket.id, Ticket.place, Ticket.price, Ticket.status
-        ).where(Ticket.event_id == event_id, Ticket.status == "available"))
+    ).where(
+        Ticket.event_id == event_id, Ticket.status == "available"
+    ))
     tikets = query.mappings().all()
 
     return {'Мест осталось:': len(tikets), 'Билеты доступны': tikets}
@@ -213,7 +214,7 @@ async def create_tickets_for_athletes(
                     price=price,
                     status="available",
                     uu_key=str(uuid.uuid4())
-                    ))
+                ))
                 await db.commit()
     return {"Создано билетов": len(all_participants)}
 
@@ -263,8 +264,9 @@ async def order_tickets_for_engagement(
                             detail="Вы не участник данного мероприятия")
 
     query = await db.execute(select(Engagement.price).where(
-            Engagement.id == ticket_id,
-            Engagement.status == 'available'))
+        Engagement.id == ticket_id,
+        Engagement.status == 'available'
+    ))
     ticket_price = query.scalars().one_or_none()
     if ticket_price is None:
         raise HTTPException(status_code=404, detail="Ticket reserved")
@@ -277,15 +279,16 @@ async def order_tickets_for_engagement(
     await db.commit()
 
     new_order_item = OrderItem(
-            order_id=new_order.id,
-            product_type="engagement",
-            product_id=ticket_id,
-            quantity=1,
-            total_price=ticket_price)
+        order_id=new_order.id,
+        product_type="engagement",
+        product_id=ticket_id,
+        quantity=1,
+        total_price=ticket_price
+    )
     db.add(new_order_item)
 
     await db.execute(update(Engagement).where(
-            Engagement.id == ticket_id).values(status='reserved'))
+        Engagement.id == ticket_id).values(status='reserved'))
     await db.commit()
 
     return {'Order created': new_order.id}

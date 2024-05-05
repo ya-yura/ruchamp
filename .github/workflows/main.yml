@@ -1,0 +1,93 @@
+name: Main Ruchamp Workflow
+on:
+  push:
+    branches:
+      - backend-dev
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip 
+          pip install flake8==6.0.0 flake8-isort==6.0.0
+
+      - name: Test with flake8
+        run: python -m flake8 backend/
+  build_and_push_to_docker_hub:
+    name: Push Docker image to DockerHub
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker 
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} 
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/
+          push: true
+          tags: emelyanovsergey89/ruchamp_b:latest
+
+  build_frontend_and_push_to_docker_hub:
+    name: Push frontend Docker image to DockerHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker 
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }} 
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend/
+          push: true
+          tags: emelyanovsergey89/ruchamp_f:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - build_and_push_to_docker_hub
+      - build_frontend_and_push_to_docker_hub
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      # - name: Copy docker-compose.yml via ssh
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.USER }}
+      #     key: ${{ secrets.SSH_KEY }}
+      #     passphrase: ${{ secrets.SSH_PASSPHRASE }}
+      #     source: "docker-compose.prod.yml"
+      #     target: "ruchamp"
+      - name: Executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            sudo docker compose -f docker-compose.prod.yml pull
+            sudo docker compose -f docker-compose.prod.yml down
+            sudo docker compose -f docker-compose.prod.yml up -d
+

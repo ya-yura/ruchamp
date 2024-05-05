@@ -1,4 +1,10 @@
-import { ButtonProps } from '@fluentui/react-components';
+import {
+  FieldProps,
+  InputProps,
+  RadioGroupOnChangeData,
+  SelectOnChangeData,
+} from '@fluentui/react-components';
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
 
 export type TypeHttpRequest = {
   baseUrl: string;
@@ -10,45 +16,127 @@ export type TypeLinksDropdown = {
   url: string;
 };
 
-export type TypeLoginFields = {
-  username: string;
-  password: string;
+export type TypeCustomFieldsetProps = {
+  isLoading?: boolean;
+  fields: Array<Partial<FieldProps> & Partial<InputProps>>;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelect?: (
+    ev: ChangeEvent<HTMLSelectElement>,
+    data: SelectOnChangeData,
+  ) => void;
+  onRadioChange?: (
+    ev: FormEvent<HTMLDivElement>,
+    data: RadioGroupOnChangeData,
+  ) => void;
+  onBlur?: () => void;
+  values: TypeRegisterFields;
+  errors?: { [key: string]: string };
+  setValues?: Dispatch<SetStateAction<TypeRegisterFields>>;
+  passwordState?: { state: FieldProps['validationState']; message: string };
 };
 
-export type TypeStringUserFields = {
+export type TypeUserRole = 1 | 2 | 3 | 4 | 5;
+
+export type TypeFieldValues =
+  | string
+  | string[]
+  | number
+  | boolean
+  | Date
+  | TypeUserRole;
+
+export type TypeFirstUserFields = {
   email: string;
   password: string;
-  repeatPassword: string;
-  username: string;
+  repeat_password: string;
+  role_id: number;
+};
+
+export type TypeBasicUserFields = {
   name: string;
   sirname: string;
   fathername: string;
-  country: string;
+  username: string;
+  gender: boolean;
+  country: 'ru' | 'by' | 'kz';
   birthdate: string;
 };
 
-export type TypeBooleanUserFields = {
+export type TypeSpectatorFields = {
+  spectator_phone_number: string;
+};
+
+export type TypeAthleteFields = {
+  athlete_weight: number;
+  athlete_height: number;
+  athlete_sport_type: string[];
+};
+
+export type TypeOrganizerFields = {
+  event_organizer_organization_name: string;
+  event_organizer_organization_website: string;
+  event_organizer_organization_contact_email: string;
+  event_organizer_organization_contact_phone: string;
+};
+
+export type TypeRefereeFields = {
+  referee_qualification_level: number;
+};
+
+export type TypeOtherUserFields = {
   is_active: boolean;
   is_superuser: boolean;
   is_verified: boolean;
-  gender: boolean;
 };
 
-export type TypeUserRole = {
-  role_id: 1 | 2 | 3 | 4 | 5;
+export type TypeSpecialUserFields = TypeSpectatorFields &
+  TypeAthleteFields &
+  TypeOrganizerFields &
+  TypeRefereeFields;
+
+export type TypeRegisterFields = TypeFirstUserFields &
+  TypeBasicUserFields &
+  TypeSpecialUserFields;
+
+//Check this type
+export type TypeUser = Omit<TypeRegisterFields, 'password'> &
+  TypeOtherUserFields & {
+    id: number;
+  };
+
+export type TypeLoginFields = Omit<
+  TypeFirstUserFields,
+  'repeat_password' | 'role_id'
+>;
+
+export enum EnumUserRole {
+  'athlete' = 1,
+  'organizer' = 2,
+  'spectator' = 3,
+  'admin' = 4,
+  'referee' = 5,
+}
+
+export type TypeUserRoles = {
+  [key in keyof typeof EnumUserRole]: (typeof EnumUserRole)[key];
 };
 
-export type TypeRegisterFields = TypeStringUserFields &
-  TypeBooleanUserFields &
-  TypeUserRole;
+export enum EnumCountries {
+  ru = 'Россия',
+  by = 'Беларусь',
+  kz = 'Казахстан',
+}
 
-export type TypeUser = Omit<TypeRegisterFields, 'password'> & {
+// *** Events ***
+export type TypeEvent = {
+  name: string;
+  start_datetime: string;
+  location: string;
+  event_order: string;
+  geo: string;
+  end_datetime: string;
   id: number;
+  organizer_id: number;
+  event_system: string;
+  image_field: string;
 };
-
-export type TypeCustomLinkProps = {
-  href: string;
-  lang: string;
-  children: React.ReactNode;
-} & React.RefAttributes<HTMLAnchorElement>;
-

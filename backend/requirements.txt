@@ -472,3 +472,5 @@ zipp==3.17.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+fpdf==1.7.2
+qrcode==7.4.2

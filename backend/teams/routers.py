@@ -1,42 +1,23 @@
-from connection import get_db
 from typing import Type
 
-from fastapi import APIRouter
-from fastapi_users import FastAPIUsers
-from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
-from fastapi_pagination import paginate, add_pagination, Params
+from auth.auth import auth_backend
+from auth.manager import UserManager, get_user_manager
+from auth.models import User
+from auth.routes import router as auth_router
+from auth.schemas import AthleteUpdate, UserCreate, UserDB, UserRead
+from connection import get_db
+from event.routers import router as event_router
+from fastapi import (APIRouter, Depends, FastAPI, File, HTTPException,
+                     UploadFile)
+from fastapi_pagination import Params, add_pagination, paginate
 from fastapi_pagination.utils import disable_installed_extensions_check
-
-from sqlalchemy import select, update, delete
+from fastapi_users import FastAPIUsers
+from pages.router import router as pages_router
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-
-from auth.auth import auth_backend
-from auth.models import (
-    User,
-)
-from auth.manager import (
-    get_user_manager,
-    UserManager,
-)
-from auth.schemas import (
-    UserRead,
-    UserCreate,
-    AthleteUpdate,
-    UserDB,
-)
-from teams.schemas import (
-    TeamUpdate,
-    TeamCreate,
-)
-from teams.models import (
-    Team,
-    TeamMember
-)
-from auth.routes import router as auth_router
-from pages.router import router as pages_router
-from event.routers import router as event_router
-
+from teams.models import Team, TeamMember
+from teams.schemas import TeamCreate, TeamUpdate
 
 router = APIRouter(prefix="/team", tags=["Teams"])
 

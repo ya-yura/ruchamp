@@ -1,8 +1,12 @@
 // import million from 'million/compiler'; //It has some promlems with SSR
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true, // It may be so that I need to switch off strict mode for Fluent UI React
+  // images: {
+  //   remotePatterns: ['images.unsplash.com'], // add some if needed
+  // },
   experimental: {
     // fluentui-next-appdir-directive plugin with the paths for @griffel and @fluentui:
     swcPlugins: [
@@ -16,4 +20,9 @@ const nextConfig = {
 // };
 
 // export default million.next(nextConfig, millionConfig);
-export default nextConfig;
+
+// export default nextConfig;
+
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);

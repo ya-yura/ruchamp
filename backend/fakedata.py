@@ -1,51 +1,22 @@
 import datetime
 import random
-from faker import Faker
+
+from auth.models import (AllWeightClass, Athlete, CategoryType, Coach,
+                         CoachType, CombatType, EventOrganizer, Referee,
+                         RefereeType, Role, Spectator, SportType,
+                         SystemAdministrator, User, athlete_coach_association,
+                         athlete_sport_type_association)
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from connection import SessionLocal
-
-from sqlalchemy import create_engine, func, select
-from sqlalchemy.orm import sessionmaker, aliased
+from event.models import (Event, EventSports, EventWeights, Match, MatchPeriod,
+                          MatchResult, Medal, Participant, Prize, Team,
+                          TeamMember)
+from faker import Faker
 from fastapi_users.db import SQLAlchemyUserDatabase
-
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.dialects.postgresql import INTERVAL
+from sqlalchemy.orm import aliased, sessionmaker
 from sqlalchemy.types import TypeDecorator
-
-from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import (
-    Athlete,
-    EventOrganizer,
-    Spectator,
-    SystemAdministrator,
-    User,
-    Role,
-    CombatType,
-    SportType,
-    CategoryType, 
-    AllWeightClass,
-    Referee, 
-    Coach, 
-    CoachType,
-    RefereeType,
-    athlete_sport_type_association,
-    athlete_coach_association,
-)
-from event.models import (
-    Event, 
-    Participant, 
-    Match,
-    MatchResult, 
-    Prize, 
-    Medal,
-    MatchPeriod,
-    EventWeights,
-    EventSports,
-)
-from event.models import (
-    Team,
-    TeamMember,
-)
-
-
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
@@ -78,7 +49,7 @@ num_links = 20
 
 num_medals = 33
 num_prizes = 50
-num_sport_categories = int(num_athletes/2)
+num_sport_categories = int(num_athletes / 2)
 num_weight_categories = num_athletes
 
 
@@ -194,7 +165,6 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
         coach = Coach(**coach_data)
         session.add(coach)
     session.commit()
-
 
 
 def generate_fake_users(session, num_users=num_users):
@@ -531,12 +501,12 @@ def generate_fake_matches(session):
                 round=round_number,
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
-                player_one = (
+                player_one=(
                     session.query(Participant)
                     .order_by(func.random())
                     .first()
                 ),
-                player_two = (
+                player_two=(
                     session.query(Participant)
                     .order_by(func.random())
                     .first()
@@ -548,7 +518,7 @@ def generate_fake_matches(session):
 
 
 # Генерация данных для судей матча
-def generate_fake_match_referees(session):
+'''def generate_fake_match_referees(session):
     matches = session.query(Match).all()
 
     for match in matches:
@@ -566,7 +536,7 @@ def generate_fake_match_referees(session):
             match_referee = MatchReferee(match_id=match.id, referee_id=referee.id, chief=is_chief)
             session.add(match_referee)
 
-    session.commit()
+    session.commit()'''
 
 
 # Генерация данных для периодов матчей
@@ -574,11 +544,11 @@ def generate_fake_match_periods(session, num_periods=5):
     match_periods_data = []
     for _ in range(num_periods):
         match_period_data = {
-            'match_id': fake.random_int(min=1, max=num_matches),  
-            'start_datetime': fake.date_time_between(start_date="-1h", end_date="+1h"), 
-            'end_datetime': fake.date_time_between(start_date="+1min", end_date="+30min"),  
+            'match_id': fake.random_int(min=1, max=num_matches),
+            'start_datetime': fake.date_time_between(start_date="-1h", end_date="+1h"),
+            'end_datetime': fake.date_time_between(start_date="+1min", end_date="+30min"),
             'winner_score': fake.random_int(min=5, max=10),
-            'loser_score': fake.random_int(min=1, max=5),  
+            'loser_score': fake.random_int(min=1, max=5),
         }
         match_periods_data.append(match_period_data)
 
@@ -654,14 +624,14 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# generate_fake_roles(session)
+generate_fake_roles(session)
 
-# generate_fake_combat_types(session)
-# generate_fake_category_types(session)
-# generate_fake_sport_types(session)
-# generate_fake_weight_classes(session)
-# generate_fake_referee_types(session)
-# generate_fake_coach_types(session)
+generate_fake_combat_types(session)
+generate_fake_category_types(session)
+generate_fake_sport_types(session)
+generate_fake_weight_classes(session)
+generate_fake_referee_types(session)
+generate_fake_coach_types(session)
 
 # generate_fake_users(session, num_users)
 # generate_fake_coaches(session)
@@ -677,11 +647,10 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+# generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
 # generate_fake_prizes(session)
 # generate_fake_medals(session)
 # generate_fake_links(session)
-
