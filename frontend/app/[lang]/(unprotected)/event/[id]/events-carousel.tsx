@@ -28,7 +28,7 @@ export function EventsCarousel({ events }: { events: Array<TypeEvent> }) {
         {events.map((event) => (
           <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
             <CardEvent
-              className="hover:scale-100 hover:shadow-none"
+              className="hover:scale-[100%] hover:shadow-none"
               key={event.id}
               event={event}
             />

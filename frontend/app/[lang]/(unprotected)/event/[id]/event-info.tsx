@@ -2,9 +2,10 @@
 
 import { TypeEvent } from '@/lib/definitions';
 import Image from 'next/image';
+import { useContext, useRef } from 'react';
 import { ContentWraper } from '@/components/content-wraper';
 import { Badges } from './badges';
-import { chooseTypes } from '@/lib/utils';
+import { chooseTypes, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Info } from './info';
@@ -12,6 +13,7 @@ import { Athletes } from './athletes';
 import { Matches } from './matches';
 import { Grid } from './grid';
 import { Results } from './results';
+import { ScrollContext } from '@/lib/scroll-observer';
 
 enum EventTabs {
   'info' = 'Информация',
@@ -22,6 +24,16 @@ enum EventTabs {
 }
 
 export function EventInfo({ event }: { event: TypeEvent }) {
+  const refContainer = useRef<HTMLDivElement>(null);
+  const { scrollY } = useContext(ScrollContext);
+
+  let progress = 0;
+
+  const { current: elContainer } = refContainer;
+  if (elContainer) {
+    progress = Math.min(1, scrollY / elContainer.clientHeight);
+  }
+
   const tabs: Record<EventTabs, React.ReactNode> = {
     [EventTabs['info']]: <Info event={event} />,
     [EventTabs['athletes']]: <Athletes />,
@@ -32,13 +44,21 @@ export function EventInfo({ event }: { event: TypeEvent }) {
 
   return (
     <div className="w-full">
-      <div className="fixed mt-[-92px] h-[720px] w-full">
+      <div
+        className={cn(`absolute mt-[-92px] flex h-[720px] w-full items-end`)}
+        ref={refContainer}
+      >
         <Image
           className="opacity-40"
           src={`/ru/images/mock-event-bg/${event?.id.toString()[event?.id.toString().length - 1]}.avif`}
           alt="Обложка мероприятия"
           fill={true}
-          style={{ objectFit: 'cover' }}
+          style={{
+            objectFit: 'cover',
+            transform: `translateY(${8 - progress * 15}vh)`,
+            backgroundPosition: 'top',
+            scale: '130%',
+          }}
         />
       </div>
       <ContentWraper className="relative h-[590px] justify-between">

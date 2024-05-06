@@ -6,6 +6,7 @@ import { eventsApi } from '@/lib/api/eventsApi';
 import { TypeEvent } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
 import { testFutureData } from '@/lib/constants';
+import { ScrollObserver } from '@/lib/scroll-observer';
 
 export default async function Event({ params }: { params: { id: string } }) {
   const id = params.id;
@@ -33,10 +34,12 @@ export default async function Event({ params }: { params: { id: string } }) {
   }
 
   return (
-    <Container>
-      <EventInfo event={event} />
-      <AddressSection event={event} />
-      <ExpectedEvents events={expectedEvents} />
-    </Container>
+    <ScrollObserver>
+      <Container>
+        <EventInfo event={event} />
+        <AddressSection event={event} />
+        <ExpectedEvents events={expectedEvents} />
+      </Container>
+    </ScrollObserver>
   );
 }
