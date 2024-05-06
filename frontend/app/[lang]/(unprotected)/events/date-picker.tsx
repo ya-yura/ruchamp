@@ -6,7 +6,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { ru } from 'date-fns/locale';
 
-import { cn } from '@/lib/utils';
+import { cn, isCurrentYear } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -15,19 +15,13 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-export function DatePicker({
-  className,
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2024, 0, 20),
-    to: addDays(new Date(2024, 0, 20), 20),
-  });
+interface DatePickerProps {
+  date: DateRange | undefined;
+  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  className: string;
+}
 
-  function isCurrentYear(date: Date): boolean {
-    const currentDate = new Date();
-    return currentDate.getFullYear() === date?.getFullYear();
-  }
-
+export function DatePicker({ date, setDate, className }: DatePickerProps) {
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover>

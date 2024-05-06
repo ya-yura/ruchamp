@@ -11,6 +11,7 @@ import { TypeSportsTypes } from '@/lib/constants';
 import { useRef, useState } from 'react';
 import { TypeEvent } from '@/lib/definitions';
 import { EventsCards } from './events-cards';
+import { DateRange } from 'react-day-picker';
 
 interface EventTabsProps {
   futureEvents: TypeEvent[];
@@ -27,6 +28,11 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<
     Array<TypeSportsTypes>
   >([]);
+  const [date, setDate] = useState<DateRange | undefined>(
+    undefined,
+    // {from: new Date(),
+    // to: addDays(new Date(), 20),}
+  );
   const topRef = useRef<HTMLElement | null>(null);
 
   function scrollToTop(): void {
@@ -77,12 +83,17 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
               </Label>
             </div>
           </div>
-          <DatePicker className="mb-4 flex justify-center" />
+          <DatePicker
+            className="mb-4 flex justify-center"
+            date={date}
+            setDate={setDate}
+          />
           <FilterByType setSelected={setSelectedSportTypes} />
           <TabsContent value="futureEvents">
             <EventsCards
               events={futureEvents}
               selectedSportTypes={selectedSportTypes}
+              date={date}
               scrollToTop={scrollToTop}
             />
           </TabsContent>
@@ -90,6 +101,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
             <EventsCards
               events={pastEvents}
               selectedSportTypes={selectedSportTypes}
+              date={date}
               scrollToTop={scrollToTop}
             />
           </TabsContent>
