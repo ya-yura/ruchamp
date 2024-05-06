@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { EnumCountries, EnumUserRole, TypeUser } from '@/lib/definitions';
+import { EnumCountries, EnumUserRole, UserBasicData } from '@/lib/definitions';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -37,10 +36,10 @@ const formSchema = z.object({
   gender: z.string(),
 });
 
-export function UserForm({ user }: { user: TypeUser }) {
+export function UserForm({ user }: { user: UserBasicData }) {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const role = () => {
-    switch (user?.role_id) {
+    switch (user.role_id) {
       case EnumUserRole['athlete']:
         return 'Спортсмен';
       case EnumUserRole['organizer']:

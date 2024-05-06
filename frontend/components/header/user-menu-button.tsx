@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Locale } from '@/i18n.config';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { UserBasicData } from '@/lib/definitions';
 
-export function UserMenuButton({ user }: { user: any }) {
+export function UserMenuButton({ user }: { user: UserBasicData | undefined }) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -23,7 +24,7 @@ export function UserMenuButton({ user }: { user: any }) {
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <p className="hidden sm:block">{user.email}</p>
+            <p className="hidden sm:block">{user?.email}</p>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="flex w-[100px] flex-col gap-1 p-1 ">
