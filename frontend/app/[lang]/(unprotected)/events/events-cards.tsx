@@ -95,7 +95,7 @@ export function EventsCards({
           <p className="mb-5 text-base text-background">
             Найдено событий: <b>{filteredEventsByType.length}</b>
           </p>
-          <ul className="mb-10 grid grid-cols-3 gap-6">
+          <ul className="mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedEvents.map((event) => (
               <CardEvent key={event.id} event={event} />
             ))}

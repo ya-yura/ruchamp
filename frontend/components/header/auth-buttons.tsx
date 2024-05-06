@@ -19,7 +19,7 @@ export function AuthButtons({ lang }: { lang: Locale }) {
       </Link>
       <Link href={`/${lang}/login`}>
         <Button
-          className="flex h-9 gap-2 border-[#616161] bg-transparent px-2.5 sm:border-none sm:bg-white"
+          className="flex h-9 gap-2 bg-transparent px-2.5 sm:border-none sm:bg-white"
           variant="outline"
         >
           <KeysIcon className="fill-[#616161]" />{' '}

@@ -1,30 +1,36 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TypeSportsTypes } from '@/lib/constants';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type TypeBadgeButtonProps = {
-  type: TypeSportsTypes;
+  title: TypeSportsTypes;
   isDisabled?: boolean;
-  setSelected?: Dispatch<SetStateAction<Array<TypeSportsTypes>>>;
+  selected?: TypeSportsTypes[];
+  setSelected?: Dispatch<SetStateAction<TypeSportsTypes[]>>;
 };
 
 export function BadgeButton({
-  type,
+  title,
   isDisabled,
+  selected,
   setSelected,
 }: TypeBadgeButtonProps) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
-  function selectSportType(): void {
+  useEffect(() => {
+    setIsSelected(selected?.some((item) => item === title) || false);
+  }, [selected]);
+
+  function selectBadge(): void {
     if (isDisabled) return;
-    setIsSelected(!isSelected);
+    // setIsSelected(!isSelected);
     if (setSelected) {
       setSelected((prevState) => {
-        if (prevState.includes(type)) {
-          return prevState.filter((item) => item !== type);
+        if (prevState.includes(title)) {
+          return prevState.filter((item) => item !== title);
         } else {
-          return [...prevState, type];
+          return [...prevState, title];
         }
       });
     }
@@ -34,11 +40,11 @@ export function BadgeButton({
     <Button
       variant="outline"
       className="w-fit border-none bg-transparent p-0 hover:border-none hover:bg-transparent"
-      aria-label={type}
-      onClick={selectSportType}
+      aria-label={title}
+      onClick={selectBadge}
     >
       <Badge variant={isSelected ? 'ruchampSelected' : 'ruchampDefault'}>
-        {type}
+        {title}
       </Badge>
     </Button>
   );
