@@ -1,7 +1,13 @@
 // import million from 'million/compiler'; //It has some promlems with SSR
-import { config as loadEnv } from 'dotenv';
+import 'dotenv/config.js';
+import dotenv from 'dotenv';
 
-loadEnv({ path: '../.env-non-dev' });
+const envConfig = dotenv.config({ path: '../.env-non-dev' });
+
+// Merge process.env and the .env-non-dev file
+for (const key in envConfig.parsed) {
+  process.env[key] = envConfig.parsed[key];
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
