@@ -1,9 +1,8 @@
 'use client';
 
-import { TypeEvent } from '@/lib/definitions';
 import Image from 'next/image';
+import { TypeEvent } from '@/lib/definitions';
 import { useRef } from 'react';
-import { ContentWraper } from '@/components/content-wraper';
 import { Badges } from './badges';
 import { chooseTypes } from '@/lib/utils';
 import { Button } from '@/components/ui/button';

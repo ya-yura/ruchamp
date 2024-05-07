@@ -1,4 +1,3 @@
-import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { H3 } from '@/components/text';
 import { TypeEvent } from '@/lib/definitions';

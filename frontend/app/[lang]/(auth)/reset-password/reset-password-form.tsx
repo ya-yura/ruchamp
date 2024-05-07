@@ -14,6 +14,7 @@ import { Form } from '@/components/ui/form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 const formSchema = z
   .object({
@@ -72,15 +73,15 @@ export function ResetPasswordForm({ lang }: { lang: Locale }) {
           lang={lang}
           fieldsetData={forgotPasswordFieldset}
         />
-        <div className="flex items-center justify-between">
+        <ButtonsBlock>
           <Link
-            className="transition-opacity duration-300 hover:opacity-70"
+            className="order-1 transition-opacity duration-300 hover:opacity-70 sm:-order-1"
             href={`/${lang}/login`}
           >
             <p className="text-xs">Я вспомнил пароль</p>
           </Link>
           <Button
-            className="flex gap-3 px-9"
+            className="flex w-full gap-3 px-9 sm:w-auto"
             variant="ruchampDefault"
             type="submit"
             size="lg"
@@ -89,7 +90,7 @@ export function ResetPasswordForm({ lang }: { lang: Locale }) {
             {false && <Spinner className="h-6 w-6" />}
             Сохранить
           </Button>
-        </div>
+        </ButtonsBlock>
       </CustomForm>
     </Form>
   );

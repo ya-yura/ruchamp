@@ -6,6 +6,7 @@ import {
   TypeFieldsetData,
 } from '@/components/forms/custom-fieldset';
 import { Button } from '@/components/ui/button';
+import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 type TypeRegisterStepThreeProps = {
   form: UseFormReturn<TypeRegFormSchema>;
@@ -97,9 +98,9 @@ export function RegisterStepThree({
         lang={lang}
         fieldsetData={regStepThreeFieldset}
       />
-      <div className="col-span-12 flex items-center justify-between">
+      <ButtonsBlock>
         <Button
-          className="text-foreground"
+          className="w-full text-foreground sm:w-auto"
           size="lg"
           type="button"
           variant="ruchampTransparentGreyBorder"
@@ -108,6 +109,7 @@ export function RegisterStepThree({
           Назад
         </Button>
         <Button
+          className="w-full sm:w-auto"
           size="lg"
           type="button"
           variant="ruchampDefault"
@@ -128,7 +130,7 @@ export function RegisterStepThree({
         >
           Продолжить
         </Button>
-      </div>
+      </ButtonsBlock>
     </>
   );
 }

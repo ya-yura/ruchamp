@@ -8,12 +8,12 @@ export default function ForgotPassword({
   params: { lang: Locale };
 }) {
   return (
-    <div className="relative flex h-full w-full">
+    <>
       <Greetings
         title="Восстановим пароль"
         subtitle="Ничего страшного, такое бывает. Сейчас всё исправим. Напомните свой адрес электронной почты."
       />
       <ForgotPasswordForm lang={lang} />
-    </div>
+    </>
   );
 }

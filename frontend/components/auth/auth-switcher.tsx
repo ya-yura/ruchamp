@@ -16,11 +16,11 @@ export function AuthSwitcher({
       value={selectedValue}
     >
       <TabsList className="flex w-full">
-        <TabsTrigger className="w-1/2" value="login">
+        <TabsTrigger className="w-1/3 sm:w-1/2" value="login">
           Войти
         </TabsTrigger>
-        <TabsTrigger className="w-1/2" value="register">
-          Зарегистрироваться
+        <TabsTrigger className="w-2/3 sm:w-1/2" value="register">
+          Регистрация
         </TabsTrigger>
       </TabsList>
     </Tabs>
