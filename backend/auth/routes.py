@@ -397,9 +397,11 @@ async def create_user(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
         )
-        query = await db.execute(select(SportType).where(SportType.name.in_(user_data.info['athlete_sport_type'])))
+        query = await db.execute(select(SportType).where(
+            SportType.name.in_(user_data.info['athlete_sport_type'])
+        ))
         athlete_sport_type = query.scalars().all()
-        new_athlete.sport_types = athlete_sport_type       
+        new_athlete.sport_types = athlete_sport_type
         db.add(new_athlete)
         await db.commit()
 
@@ -455,12 +457,16 @@ async def update_user(
     user.fathername = user_update.fathername
 
     if user.role_id == 1:
-        await db.execute(update(Athlete).where(Athlete.user_id == current_user.id).values(
+        await db.execute(update(Athlete).where(
+            Athlete.user_id == current_user.id
+        ).values(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
         ))
     if user.role_id == 2:
-        await db.execute(update(EventOrganizer).where(EventOrganizer.user_id == current_user.id).values(
+        await db.execute(update(EventOrganizer).where(
+            EventOrganizer.user_id == current_user.id
+        ).values(
             organization_name=user_data.info['event_organizer_organization_name'],
             website=user_data.info['event_organizer_organization_website'],
             contact_email=user_data.info['event_organizer_organization_contact_email'],
