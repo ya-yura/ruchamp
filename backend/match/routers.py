@@ -8,8 +8,8 @@ from auth.models import AllWeightClass, Athlete, CategoryType, Referee, User
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import (Event, EventOrganizer, Match, MatchCounter,
-                          MatchReferee, MatchResult, MatchWinner, Participant)
+from event.models import (Event, EventOrganizer, Match,
+                          MatchResult, MatchWinner)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
 from match.schemas import MatchDB
 from match.utils import pairs_generator, split_pairs

@@ -9,7 +9,7 @@ from fastapi_pagination import Params, paginate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.models import SystemAdministrator
+# from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
@@ -138,7 +138,10 @@ async def update_event(
     event.name = event_data.name
     event.start_datetime = event_data.start_datetime
     event.end_datetime = event_data.end_datetime
+    event.start_request_datetime = event_data.start_request_datetime
+    event.end_request_datetime = event_data.end_request_datetime
     event.location = event_data.location
+    event.description = event_data.description
     await db.commit()
     return {f"Event ID - {event_id} updated"}
 
@@ -200,10 +203,10 @@ async def create_match(
     if current_user.id not in all_organizer_id:
         raise HTTPException(status_code=400, detail="You are not an organizer")
 
-    match = Match(**match_data.dict())
-    db.add(match)
+    new_match = Match(**match_data.dict())
+    db.add(new_match)
     await db.commit()
-    return {f"Match ID - {match.match_id} created"}
+    return {f"Match ID - {new_match.id} created"}
 
 
 @router.put("/matches/update/{match_id}")
@@ -227,10 +230,9 @@ async def update_match(
     match.start_datetime = match_data.start_datetime
     match.end_datetime = match_data.end_datetime
     match.combat_type_id = match_data.combat_type_id
-    match.round = match_data.round
-    match.winner_id = match_data.winner_id
     match.category_id = match_data.category_id
-    match.weight_class_id = match_data.weight_class_id
+    match.nominal_time = match_data.nominal_time
+    match.mat_vol = match_data.mat_vol
     await db.commit()
     return {f"Match ID - {match_id} updated"}
 
@@ -253,18 +255,3 @@ async def delete_match(
     await db.delete(match)
     await db.commit()
     return {f"Match ID - {match_id} deleted"}
-
-
-@router.post("/matches/{match_id}/result")
-async def set_result(
-    match_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    query = await db.execute(select(Match).where(Match.id == match_id))
-    match = query.scalars().one_or_none()
-    if match is None:
-        raise HTTPException(status_code=404, detail="Match not found")
-
-    # подумать как заполнять таблицу результатов
-
-    return {f"Match ID - {match_id}, result: {match}"}

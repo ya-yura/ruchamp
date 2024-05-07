@@ -11,11 +11,9 @@ class TeamMember(BaseModel):
 
 class TeamCreate(BaseModel):
     name: str
-    invite_link: Optional[str]
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
-    captain: int
 
 
 class TeamUpdate(BaseModel):

@@ -17,7 +17,7 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate)
 from connection import get_db
-from event.models import Match, Participant, Event
+from event.models import Match, Event
 from teams.models import TeamMember
 
 router = APIRouter(prefix="/users", tags=["Users"])

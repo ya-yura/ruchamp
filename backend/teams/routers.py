@@ -1,22 +1,20 @@
 from typing import Type
 
-from fastapi import (APIRouter, Depends, FastAPI, File, HTTPException,
+from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi_pagination import Params, add_pagination, paginate
-from fastapi_pagination.utils import disable_installed_extensions_check
+# from fastapi_pagination.utils import disable_installed_extensions_check
 from fastapi_users import FastAPIUsers
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from auth.auth import auth_backend
 from auth.manager import UserManager, get_user_manager
 from auth.models import User
-from auth.routes import router as auth_router
-from auth.schemas import AthleteUpdate, UserCreate, UserDB, UserRead
+# from auth.routes import router as auth_router
+from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
-from event.routers import router as event_router
-from pages.router import router as pages_router
 from teams.models import Team, TeamMember
 from teams.schemas import TeamCreate, TeamUpdate
 
@@ -32,6 +30,8 @@ current_user = fastapi_users.current_user()
 athlete_update = AthleteUpdate
 team_update = TeamUpdate
 user_db_verify = UserDB
+
+add_pagination(router)
 
 
 def is_model_field(model: Type, field_name: str) -> bool:
@@ -142,32 +142,51 @@ async def update_team_profile(
 async def create_team(
     team_data: TeamCreate,
     current_user: UserDB = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
+    # user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
-    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено создавать команды
+    allowed_roles = [1, 2, 4, 5]  # Роли, которым разрешено создавать команды
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
 
-    # Создаем команду
-    team_id = await create_team_and_members(db, team_data, current_user)
+    # Добавить создание ссылки на вступление в команду
 
-    return {"message": "Team created successfully", "team_id": team_id}
+    query = await db.execute(select(Team.name))
+    all_teams_names = query.scalars().all()
+    query = await db.execute(select(Team.captain))
+    all_teams_capitans = query.scalars().all()
+
+    if team_data.name in all_teams_names and current_user.id in all_teams_capitans:
+        raise HTTPException(status_code=403, detail="Такое название команды и капитан уже существуют")
+
+    # Создаем команду
+    new_team = Team(
+        **team_data.dict(),
+        invite_link="123",  # добавить функцию генерации ссылки
+        captain=current_user.id
+    )
+    db.add(new_team)
+    await db.commit()
+
+    await db.execute(insert(TeamMember).values(
+        team=new_team.id, member=current_user.id))
+    await db.commit()
+
+    return {"message": f"Team: {new_team.name} - created"}
 
 
 @router.get("/get-all-teams")
 async def get_all_teams(
-    current_user: UserDB = Depends(current_user),
-    db: AsyncSession = Depends(get_db),
-    params: Params = Depends(),
+    db: AsyncSession = Depends(get_db)
 ):
-    teams = await db.execute(select(Team))
-    return paginate(teams.mappings().all(), params)
+    query = await db.execute(select(Team))
+    teams = query.scalars().all()
+    return teams
 
-disable_installed_extensions_check()
-add_pagination(router)
+# disable_installed_extensions_check()
+# add_pagination(router)
 
 
 @router.get("/get-team/{team_id}")
@@ -177,7 +196,7 @@ async def get_team(
     db: AsyncSession = Depends(get_db),
 ):
     team = await db.execute(select(Team).where(Team.id == team_id))
-    return team.mappings().first()
+    return team.scalars().first()
 
 
 @router.get("/get-team-members/{team_id}")
@@ -194,19 +213,16 @@ async def get_team_members(
     return paginate(team_members.mappings().all(), params)
 
 
-@router.post("/join-team/{team_uuid}")
+@router.post("/join-team/{team_id}")
 async def join_team(
-    team_uuid: str,
+    team_id: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    team = await db.execute(select(Team.id).where(
-        Team.invite_link == team_uuid))
-    team_id = team.scalars().first()
-    team_members_db = await db.execute(select(TeamMember.member).where(
+    query = await db.execute(select(TeamMember.member).where(
         TeamMember.team == team_id))
+    team_members = query.scalars().all()
 
-    team_members = team_members_db.scalars().all()
     if current_user.id in team_members:
         raise HTTPException(
             status_code=400, detail="You are already a member of this team")

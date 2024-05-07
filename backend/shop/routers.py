@@ -14,7 +14,7 @@ from auth.models import Athlete, EventOrganizer
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import Event, Participant
+from event.models import Event
 from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
                          Row, Sector, Ticket)
 from shop.schemas import MerchCreate, MerchUpdate, TicketCreate

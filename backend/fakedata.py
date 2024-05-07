@@ -15,8 +15,8 @@ from auth.models import (AllWeightClass, Athlete, CategoryType, Coach,
                          athlete_sport_type_association)
 from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from connection import SessionLocal
-from event.models import (Event, EventSports, EventWeights, Match, MatchPeriod,
-                          MatchResult, Medal, Participant, Prize, Team,
+from event.models import (Event, Match,
+                          MatchResult, Medal, Prize, Team,
                           TeamMember)
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -656,4 +656,3 @@ generate_fake_coach_types(session)
 # generate_fake_prizes(session)
 # generate_fake_medals(session)
 # generate_fake_links(session)
-

@@ -5,12 +5,15 @@ from pydantic import BaseModel
 
 
 class Event(BaseModel):
-    event_id: int
+    id: int
     name: str
     start_datetime: datetime
     end_datetime: datetime
+    start_request_datetime: datetime
+    end_request_datetime: datetime
     location: str
     geo: str
+    description: str
 
     class Config:
         from_attributes = True
@@ -18,13 +21,16 @@ class Event(BaseModel):
 
 class EventCreate(BaseModel):
     name: str
-    start_datetime: datetime = datetime.now()
-    end_datetime: datetime = (datetime.now() + timedelta(days=1))
+    start_datetime: datetime = (datetime.now() + timedelta(days=31))
+    end_datetime: datetime = (datetime.now() + timedelta(days=32))
+    start_request_datetime: datetime = datetime.now()
+    end_request_datetime: datetime = (datetime.now() + timedelta(days=30))
     location: str
     organizer_id: Optional[int]
     event_order: Optional[str] = None
     event_system: Optional[str] = None
     geo: Optional[str] = None
+    description: Optional[str] = None
 
 
 class EventUpdate(EventCreate):
@@ -32,26 +38,26 @@ class EventUpdate(EventCreate):
 
 
 class MatchRead(BaseModel):
-    start_datetime: datetime = datetime.now()
-    end_datetime: datetime = datetime.now() + timedelta(days=1)
     event_id: Optional[int]
     combat_type_id: Optional[int]
-    category_id: Optional[int]
-    weight_class_id: Optional[int]
-    round: Optional[int]
-    winner_id: Optional[int]
+    category_id: Optional[int]  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    nominal_time: Optional[int]
+    mat_vol: Optional[int]
+    start_datetime: datetime
+    end_datetime: datetime
 
     class Config:
         from_attributes = True
 
 
 class MatchCreate(MatchRead):
-    event_id: Optional[int] = 1
-    combat_type_id: Optional[int] = 1
-    category_id: Optional[int] = 1
-    weight_class_id: Optional[int] = 1
-    round: Optional[int] = 1
-    winner_id: Optional[int] = 1
+    event_id: Optional[int]
+    combat_type_id: Optional[int]
+    category_id: Optional[int]  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    nominal_time: Optional[int]
+    mat_vol: Optional[int]
+    start_datetime: datetime = datetime.now()
+    end_datetime: datetime = datetime.now()
 
     class Config:
         from_attributes = True

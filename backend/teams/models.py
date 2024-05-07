@@ -1,6 +1,6 @@
-from sqlalchemy import JSON, Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-from sqlalchemy.orm import relationship
+# from sqlalchemy.orm import relationship
 
 from auth.models import Athlete
 
@@ -12,8 +12,8 @@ metadata = Base.metadata
 class Team(Base):
     __tablename__ = "Team"
     id = Column(Integer, primary_key=True)
-    captain = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     name = Column(String, nullable=True)
+    captain = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     invite_link = Column(String, nullable=True)
     description = Column(String, nullable=True)
     slug = Column(String, nullable=True)
