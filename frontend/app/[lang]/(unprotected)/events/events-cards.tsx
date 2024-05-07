@@ -4,17 +4,20 @@ import { TypeEvent } from '@/lib/definitions';
 import { TypeSportsTypes, sportsTypes } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, isDateInRange } from '@/lib/utils';
+import { DateRange } from 'react-day-picker';
 
 interface EventsContentProps {
   events: TypeEvent[];
   selectedSportTypes: TypeSportsTypes[];
+  date: DateRange | undefined;
   scrollToTop: () => void;
 }
 
 export function EventsCards({
   events,
   selectedSportTypes,
+  date,
   scrollToTop,
 }: EventsContentProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -29,19 +32,25 @@ export function EventsCards({
   const totalPages = Math.ceil(filteredEventsByType.length / eventsPerPage);
 
   useEffect(() => {
-    const filter = selectedSportTypes.map((item) => sportsTypes.indexOf(item));
+    const filtredByDateEvents = date
+      ? events.filter((event) => isDateInRange(event.start_datetime, date))
+      : events;
+    // Filter by type is in temporary state
+    const filterByType = selectedSportTypes.map((item) =>
+      sportsTypes.indexOf(item),
+    );
     const filteredEvents = selectedSportTypes.length
-      ? events.filter((event) =>
-          filter.some((f) =>
+      ? filtredByDateEvents.filter((event) =>
+          filterByType.some((f) =>
             event.organizer_id.toString().split('').includes(f.toString()),
           ),
         )
-      : events;
+      : filtredByDateEvents;
 
     setFilteredEventsByType(filteredEvents);
     setDisplayedEvents(filteredEvents.slice(0, eventsPerPage));
     setCurrentPage(1);
-  }, [events, selectedSportTypes]);
+  }, [events, selectedSportTypes, date]);
 
   useEffect(() => {
     document.addEventListener('scroll', scrollHandler);
@@ -83,19 +92,17 @@ export function EventsCards({
     <>
       {filteredEventsByType.length ? (
         <>
-          <ul className="mb-10 grid grid-cols-3 gap-6">
+          <p className="mb-5 text-base text-background">
+            Найдено событий: <b>{filteredEventsByType.length}</b>
+          </p>
+          <ul className="mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedEvents.map((event) => (
               <CardEvent key={event.id} event={event} />
             ))}
           </ul>
-          {/* <PaginationBlock
-            totalPages={totalPages}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          /> */}
         </>
       ) : (
-        <p>Ничего не найдено</p>
+        <p className="text-base text-background">Ничего не найдено</p>
       )}
       <Button
         variant="ruchampTransparentGreyBorder"

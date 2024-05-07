@@ -16,7 +16,7 @@ export default async function AuthLayout({
   }
 
   return (
-    <main className="absolute left-0 top-0 h-[100vh] w-full bg-[#0A0A0A]">
+    <main className="bg-primary-background absolute left-0 top-0 h-[100vh] w-full">
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"
@@ -24,7 +24,7 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      {children}
+      <div className="relative grid grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr] h-full w-full">{children}</div>
     </main>
   );
 }

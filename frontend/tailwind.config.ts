@@ -32,7 +32,7 @@ const config = {
           foreground: 'hsl(var(--primary-foreground))',
           mainAccent: '#0F6CBD',
           background: '#0A0A0A',
-          almostBlack: '#090707'
+          almostBlack: '#090707',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -57,6 +57,13 @@ const config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+          background: '#292929',
+          backgroundDark: '#000000',
+        },
+        text: {
+          muted: '#616161',
+          mutedLight: '#D6D6D6',
+          mutedCard: '#999999',
         },
       },
       transitionDuration: {

@@ -20,6 +20,7 @@ import {
   TypeFieldsetData,
 } from '@/components/forms/custom-fieldset';
 import { CustomForm } from '@/components/forms/custom-form';
+import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 const formSchema = z.object({
   username: z
@@ -91,15 +92,15 @@ export function LoginForm({ lang }: { lang: Locale }) {
           errorMessage={errorMessage}
         />
 
-        <div className="flex items-center justify-between">
+        <ButtonsBlock>
           <Link
-            className="transition-opacity duration-300 hover:opacity-70"
+            className="transition-opacity duration-300 hover:opacity-70 order-1 sm:-order-1"
             href={`/${lang}/forgot-password`}
           >
             <p className="text-xs">Я забыл пароль</p>
           </Link>
           <LoginButton isValid={form.formState.isValid} />
-        </div>
+        </ButtonsBlock>
       </CustomForm>
     </Form>
   );
@@ -110,7 +111,7 @@ function LoginButton({ isValid }: { isValid: boolean }) {
 
   return (
     <Button
-      className="flex gap-3 px-9"
+      className="flex gap-3 px-9 w-full sm:w-auto"
       variant="ruchampDefault"
       type="submit"
       disabled={!isValid || pending}

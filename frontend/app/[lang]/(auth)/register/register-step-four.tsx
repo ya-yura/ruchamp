@@ -9,6 +9,7 @@ import { Locale } from '@/i18n.config';
 import { Button } from '@/components/ui/button';
 import { sportsTypes } from '@/lib/constants';
 import { Spinner } from '@/components/spinner';
+import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 type TypeRegisterStepFourProps = {
   form: UseFormReturn<TypeRegFormSchema>;
@@ -156,9 +157,9 @@ export function RegisterStepFour({
         fieldsetData={fields[userRoleId]}
         errorMessage={errorMessage}
       />
-      <div className="col-span-12 flex items-center justify-between">
+      <ButtonsBlock>
         <Button
-          className="text-foreground"
+          className="w-full text-foreground sm:w-auto"
           size="lg"
           type="button"
           variant="ruchampTransparentGreyBorder"
@@ -167,7 +168,7 @@ export function RegisterStepFour({
           Назад
         </Button>
         <Button
-          className="flex gap-3 px-9"
+          className="flex w-full gap-3 px-9 sm:w-auto"
           variant="ruchampDefault"
           type="submit"
           size="lg"
@@ -176,7 +177,7 @@ export function RegisterStepFour({
           {isLoading && <Spinner className="h-6 w-6" />}
           Зарегистрироваться
         </Button>
-      </div>
+      </ButtonsBlock>
     </>
   );
 }

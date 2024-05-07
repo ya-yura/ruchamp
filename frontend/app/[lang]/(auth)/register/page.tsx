@@ -6,9 +6,5 @@ export default function Register({
 }: {
   params: { lang: Locale };
 }) {
-  return (
-    <div className="relative flex h-full w-full">
-      <RegisterForm lang={lang} />
-    </div>
-  );
+  return <RegisterForm lang={lang} />;
 }

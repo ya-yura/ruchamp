@@ -17,7 +17,7 @@ export function Badges({ types, className }: TypeBadgesProps) {
       )}
     >
       {types.map((type) => (
-        <BadgeButton key={type} type={type} isDisabled={true} />
+        <BadgeButton key={type} title={type} isDisabled={true} />
       ))}
     </div>
   );

@@ -68,7 +68,10 @@ export function DropdownMenuCheckboxes<T extends FieldValues>({
         </div>
       )}
       <DropdownMenuTrigger asChild>
-        <Button className="justify-start" variant="outline">
+        <Button
+          className="justify-start focus-visible:ring-1 focus-visible:ring-ring/20 focus-visible:ring-offset-1"
+          variant="outline"
+        >
           {placeholder}
         </Button>
       </DropdownMenuTrigger>

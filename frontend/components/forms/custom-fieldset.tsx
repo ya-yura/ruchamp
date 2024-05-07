@@ -184,13 +184,13 @@ export function CustomFieldset<T extends FieldValues>({
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className={`flex flex-${item.orientation} justify-between`}
+                  className={`flex flex-col sm:flex-${item.orientation} justify-between`}
                 >
                   {item.customRadioOptions.map((option) => (
                     <FormItem key={option.value} className="flex items-center">
                       <FormControl>
                         <RadioGroupItemWithIcon
-                          className="flex flex-col items-center gap-4"
+                          className="flex flex-row sm:flex-col items-center gap-4"
                           value={option.value}
                         >
                           {option.icon && (

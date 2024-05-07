@@ -8,6 +8,7 @@ import { TypeRegFormSchema } from './register-form';
 import { CustomLink } from '@/components/custom-link';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 type TypeRegisterStepOneProps = {
   form: UseFormReturn<TypeRegFormSchema>;
@@ -53,14 +54,15 @@ export function RegisterStepOne({
         lang={lang}
         fieldsetData={regStepOneFieldset}
       />
-      <div className="flex items-center justify-between">
+      <ButtonsBlock>
         <Link
-          className="transition-opacity duration-300 hover:opacity-70"
+          className="transition-opacity duration-300 hover:opacity-70 order-1 sm:-order-1"
           href={`/${lang}/login`}
         >
           <p className="text-xs">Я уже зарегистрирован</p>
         </Link>
         <Button
+          className="w-full sm:w-auto"
           size="lg"
           variant="ruchampDefault"
           type="button"
@@ -77,7 +79,7 @@ export function RegisterStepOne({
         >
           Выбрать роль
         </Button>
-      </div>
+      </ButtonsBlock>
     </>
   );
 }

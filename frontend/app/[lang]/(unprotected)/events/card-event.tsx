@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { TypeEvent } from '@/lib/definitions';
 import { chooseTypes, transformDate } from '@/lib/utils';

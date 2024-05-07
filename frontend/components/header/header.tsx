@@ -8,12 +8,14 @@ import { ContentWraper } from '../content-wraper';
 import { Button } from '../ui/button';
 import { MagniglassIcon } from '../icons';
 import { MenuWithButton } from './menu-with-button';
+import { UserData } from '@/lib/definitions';
 
-export function Header({ lang, user }: { lang: Locale; user: any }) {
-  //fix "any" later
+export function Header({ lang, user }: { lang: Locale; user: [UserData] }) {
   const userCommonData =
     user &&
-    user.find((item: object) => Object.keys(item).includes('User'))['User'];
+    [...user].find((item: object) => Object.keys(item).includes('User'))?.[
+      'User'
+    ];
 
   return (
     <header className="relative z-10 flex items-center justify-between bg-transparent px-4 py-3 sm:px-7 md:px-10 lg:px-[72px]">
@@ -30,7 +32,7 @@ export function Header({ lang, user }: { lang: Locale; user: any }) {
           </div>
           <SearchBar className="mx-3 hidden lg:block" />
           <Button
-            className="ml-auto h-9 mr-2 lg:hidden"
+            className="ml-auto mr-2 h-9 lg:hidden"
             variant="ruchampTransparentGreyBorder"
             size="icon"
           >

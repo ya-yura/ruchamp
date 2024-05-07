@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge';
 import { format, isPast, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { TypeSportsTypes, sportsTypes } from './constants';
+import { DateRange } from 'react-day-picker';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -52,4 +53,30 @@ export function divideEventsByDateTime(events: TypeEvent[]): {
   });
 
   return { futureEvents, pastEvents };
+}
+
+export function isCurrentYear(date: Date): boolean {
+  const currentDate = new Date();
+  return currentDate.getFullYear() === date?.getFullYear();
+}
+
+export function isDateInRange(
+  date: string,
+  dateRange: DateRange | undefined,
+): boolean {
+  if (!dateRange) {
+    return true;
+  }
+  const targetDate = new Date(date);
+  if (isNaN(targetDate.getTime())) {
+    return false;
+  }
+  const fromDate = dateRange.from;
+  if (!fromDate) {
+    return false;
+  }
+  let toDate = dateRange.to ? new Date(dateRange.to) : new Date(fromDate);
+  toDate.setDate(toDate.getDate() + 1);
+
+  return targetDate >= fromDate && targetDate < toDate;
 }

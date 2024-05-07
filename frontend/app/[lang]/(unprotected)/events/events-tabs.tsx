@@ -11,6 +11,9 @@ import { TypeSportsTypes } from '@/lib/constants';
 import { useRef, useState } from 'react';
 import { TypeEvent } from '@/lib/definitions';
 import { EventsCards } from './events-cards';
+import { DateRange } from 'react-day-picker';
+import { CustomSection } from '@/components/custom-section';
+import { cn } from '@/lib/utils';
 
 interface EventTabsProps {
   futureEvents: TypeEvent[];
@@ -25,9 +28,14 @@ enum EventTabs {
 
 export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<
-    Array<TypeSportsTypes>
+    TypeSportsTypes[]
   >([]);
-  const topRef = useRef<HTMLElement | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>(
+    undefined,
+    // {from: new Date(),
+    // to: addDays(new Date(), 20),}
+  );
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   function scrollToTop(): void {
     if (topRef.current) {
@@ -36,10 +44,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   }
 
   return (
-    <section
-      ref={topRef}
-      className="bg-primary-background relative mt-[-92px] flex w-full flex-col items-center justify-between px-[72px] pt-[92px]"
-    >
+    <CustomSection ref={topRef} className="mt-[-92px] pt-[92px]">
       <div className="absolute mt-[-92px] h-[853px] w-full ">
         <Image
           className="opacity-40"
@@ -55,34 +60,34 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
           defaultValue="futureEvents"
           className="relative mx-auto mb-10 w-full"
         >
-          <div className="w-full">
-            <TabsList className="mx-auto mb-5 flex w-[500px] justify-between bg-transparent text-[#D6D6D6]">
+          <div className="items relative flex w-full">
+            <TabsList className="items mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger
                   key={key}
-                  className="rounded-none border-[#115EA3] data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white"
+                  className="rounded-none border-[#115EA3] text-base data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white sm:text-sm"
                   value={key}
                 >
                   {value}
                 </TabsTrigger>
               ))}
             </TabsList>
-            <div className="absolute right-0 top-2 flex items-center space-x-2">
-              <Switch id="showMap" />
-              <Label
-                className="text-sm font-normal text-background"
-                htmlFor="showMap"
-              >
-                На карте
-              </Label>
-            </div>
+            <ModeSwither className="hidden lg:flex" />
           </div>
-          <DatePicker className="mb-4 flex justify-center" />
-          <FilterByType setSelected={setSelectedSportTypes} />
+          <DatePicker
+            className="mb-4 flex justify-center"
+            date={date}
+            setDate={setDate}
+          />
+          <FilterByType
+            selectedSportTypes={selectedSportTypes}
+            setSelected={setSelectedSportTypes}
+          />
           <TabsContent value="futureEvents">
             <EventsCards
               events={futureEvents}
               selectedSportTypes={selectedSportTypes}
+              date={date}
               scrollToTop={scrollToTop}
             />
           </TabsContent>
@@ -90,6 +95,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
             <EventsCards
               events={pastEvents}
               selectedSportTypes={selectedSportTypes}
+              date={date}
               scrollToTop={scrollToTop}
             />
           </TabsContent>
@@ -98,6 +104,22 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
           </TabsContent>
         </Tabs>
       </ContentWraper>
-    </section>
+    </CustomSection>
+  );
+}
+
+export function ModeSwither({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        `absolute right-0 flex items-center space-x-2 py-2`,
+        className,
+      )}
+    >
+      <Switch id="showMap" />
+      <Label className="text-sm font-normal text-background" htmlFor="showMap">
+        На карте
+      </Label>
+    </div>
   );
 }

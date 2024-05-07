@@ -18,10 +18,10 @@ export default async function UnprotectedLayout({
   } else user = session.user;
 
   return (
-    <div>
+    <>
       <Header lang={params.lang} user={user} />
       {children}
       <Footer lang={params.lang} />
-    </div>
+    </>
   );
 }

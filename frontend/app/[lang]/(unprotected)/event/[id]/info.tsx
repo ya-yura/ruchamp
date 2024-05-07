@@ -43,15 +43,28 @@ export function Info({ event }: { event: TypeEvent }) {
   ];
 
   return (
-    <div className="flex gap-4" role="tabpanel" aria-labelledby="info">
-      <div className="flex w-2/3 flex-col gap-[18px]">
+    <div
+      className="grid grid-cols-12 gap-4"
+      role="tabpanel"
+      aria-labelledby="info"
+    >
+      <div className="order-2 col-span-12 flex flex-col gap-[18px] sm:order-1 sm:col-span-8">
         {mockData1.map((item) => (
           <TextCard key={item.title} title={item.title} text={item.text} />
         ))}
       </div>
-      <div className="flex w-1/3 flex-col gap-[18px]">
+      <div className="order-1 col-span-12 grid h-min grid-cols-2 gap-[18px] sm:order-2 sm:col-span-4 sm:grid-cols-1">
         {mockData2.map((item) => (
-          <TextCard key={item.title} title={item.title} text={item.text} />
+          <TextCard
+            className={
+              item.text === 'Организатор'
+                ? 'bg-card-backgroundDark col-span-2 sm:col-span-1'
+                : 'bg-card-backgroundDark'
+            }
+            key={item.title}
+            title={item.title}
+            text={item.text}
+          />
         ))}
       </div>
     </div>

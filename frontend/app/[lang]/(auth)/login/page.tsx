@@ -8,12 +8,12 @@ export default function Login({
   params: { lang: Locale };
 }) {
   return (
-    <div className="relative flex h-full w-full">
+    <>
       <Greetings
         title="Привет!"
         subtitle="Добро пожаловать в Личный кабинет РуЧамп!"
       />
       <LoginForm lang={lang} />
-    </div>
+    </>
   );
 }
