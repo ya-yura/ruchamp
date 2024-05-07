@@ -1,3 +1,4 @@
+import { Locale } from '@/i18n.config';
 import { ContentWraper } from '../content-wraper';
 import { OrganizationsIcon } from '../icons';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
@@ -46,16 +47,16 @@ const features: TypeFeaturesAdditional[] = [
   },
 ];
 
-export function FeaturesAdditional() {
+export function FeaturesAdditional({ lang }: { lang: Locale }) {
   return (
-    <section className="w-full bg-[#0A0A0A] px-0 py-11 sm:py-14 sm:px-7 md:px-10 lg:px-[72px]">
+    <section className="w-full bg-[#0A0A0A] px-0 py-11 sm:px-7 sm:py-14 md:px-10 lg:px-[72px]">
       <ContentWraper>
         <ScrollArea className="block w-full whitespace-nowrap rounded-md sm:hidden">
           <ul className="flex w-max gap-4 pb-7 pt-4">
             {features.map((feature) => (
               <li
                 key={feature.title}
-                className="group flex h-[212px] w-[255px] cursor-default flex-col rounded-lg bg-[#0D0D0D] p-8 transition-colors hover:bg-[#0F6CBD] first-of-type:ml-4 last-of-type:mr-4"
+                className="group flex h-[212px] w-[255px] cursor-default flex-col rounded-lg bg-[#0D0D0D] p-8 transition-colors first-of-type:ml-4 last-of-type:mr-4 hover:bg-[#0F6CBD]"
               >
                 <div className="mb-4 w-fit">{feature.icon}</div>
                 <h4 className="mb-2 w-full text-wrap text-lg font-semibold text-[#C9C9C9] group-hover:text-white">
@@ -67,7 +68,7 @@ export function FeaturesAdditional() {
           <ScrollBar className="hidden" orientation="horizontal" />
         </ScrollArea>
         <ul className="flex w-full flex-col sm:grid sm:grid-flow-dense sm:grid-cols-4 sm:gap-4 lg:gap-6">
-          <div className="flex flex-col justify-center gap-4 sm:gap-2 mx-10 sm:mx-0 sm:col-start-3 sm:col-end-5">
+          <div className="mx-10 flex flex-col justify-center gap-4 sm:col-start-3 sm:col-end-5 sm:mx-0 sm:gap-2">
             <h3 className="to-53% bg-gradient-to-r from-[#95CEFF] from-25%  to-[#0F6CBD] bg-clip-text text-2xl font-bold leading-7 tracking-wide text-transparent sm:text-3xl md:text-4xl md:leading-[47px] lg:text-[40px]">
               Считаете,
               <br />

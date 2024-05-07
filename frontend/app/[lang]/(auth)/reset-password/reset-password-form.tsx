@@ -7,7 +7,6 @@ import {
 import { CustomForm } from '@/components/forms/custom-form';
 import { useState } from 'react';
 import { Locale } from '@/i18n.config';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/spinner';
 import { Form } from '@/components/ui/form';
@@ -15,6 +14,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
+import { CustomLink } from '@/components/custom-link';
 
 const formSchema = z
   .object({
@@ -74,12 +74,13 @@ export function ResetPasswordForm({ lang }: { lang: Locale }) {
           fieldsetData={forgotPasswordFieldset}
         />
         <ButtonsBlock>
-          <Link
+          <CustomLink
             className="order-1 transition-opacity duration-300 hover:opacity-70 sm:-order-1"
-            href={`/${lang}/login`}
+            href={`/login`}
+            lang={lang}
           >
             <p className="text-xs">Я вспомнил пароль</p>
-          </Link>
+          </CustomLink>
           <Button
             className="flex w-full gap-3 px-9 sm:w-auto"
             variant="ruchampDefault"

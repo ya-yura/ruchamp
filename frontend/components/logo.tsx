@@ -6,12 +6,12 @@ import Link from 'next/link';
 
 export function Logo({ lang }: { lang: Locale }) {
   return (
-    <Link href={`/${lang}`} lang={lang}>
+    <CustomLink href={`/`} lang={lang}>
       <div className="flex items-center justify-start gap-3">
         <Image src={LogoIcon} alt="Логотип" />
         <h5 className="text-lg font-black text-white sm:text-2xl">RUCHAMP</h5>
       </div>
-    </Link>
+    </CustomLink>
   );
 }
  

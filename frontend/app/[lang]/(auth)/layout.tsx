@@ -2,17 +2,18 @@ import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { getSession } from '@/lib/actions';
 import { Locale } from '@/i18n.config';
+import { path } from '@/lib/utils';
 
 export default async function AuthLayout({
   children,
-  params,
+  params: { lang },
 }: {
   children: React.ReactNode;
   params: { lang: Locale };
 }) {
   const session = await getSession();
   if (session) {
-    redirect(`/${params.lang}/events`);
+    redirect(path(lang, '/events'));
   }
 
   return (
@@ -24,7 +25,9 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <div className="relative grid grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr] h-full w-full">{children}</div>
+      <div className="relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr]">
+        {children}
+      </div>
     </main>
   );
 }

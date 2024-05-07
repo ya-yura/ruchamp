@@ -1,8 +1,14 @@
+import { Locale } from '@/i18n.config';
 import { LogoutButtons } from './buttons';
 import { getSession } from '@/lib/actions';
+import { path } from '@/lib/utils';
 import { redirect } from 'next/navigation';
 
-export default async function LogoutPage() {
+export default async function LogoutPage({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
   const session = await getSession();
   let token;
   if (!session) {
@@ -10,12 +16,12 @@ export default async function LogoutPage() {
   } else token = session.token;
 
   if (!session) {
-    redirect('/ru');
+    redirect(path(lang, '/'));
   }
 
   return (
     <div className="relative flex h-[100vh] w-full flex-col items-center justify-center gap-12">
-      <h1 className='text-white'>Уверены, что хотите выйти?</h1>
+      <h1 className="text-white">Уверены, что хотите выйти?</h1>
       <LogoutButtons token={token} />
     </div>
   );

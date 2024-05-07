@@ -1,67 +1,21 @@
 {
-  "common": {
-    "logo": "RuChamp Logo",
-    "roles": {
-      "1": "Athlete",
-      "2": "Organizer",
-      "3": "Spectator",
-      "4": "System Administrator",
-      "5": "Judge"
-    }
-  },
-  "header": {
-    "navigation": {
-      "events": "Events",
-      "about": "About",
-      "community": "Community"
-    },
-    "buttons": {
-      "login": "Log In",
-      "createAccount": "Create Account",
-      "logout": "Log Out",
-      "profile": "Profile"
-    }
-  },
+  "common": {},
+  "header": {},
   "page": {
     "home": {
       "hero": {
-        "title": "RuChamp",
-        "description": "An online platform for organizing, registering, and participating in competitions and events in the field of martial arts.",
-        "imageAlt": "Fighter entering the ring"
+        "title": "New",
+        "title1": "challenges",
+        "title2": "every day",
+        "title3": "We help",
+        "title4": "to be prepared",
+        "mission": "Our mission is to create a platform that makes the world of martial arts accessible to everyone, helping athletes reach new heights and making competitions exciting and memorable events.",
+        "buttonText": "Create event"
       },
-      "sectionOne": {
-        "title": "This is the title of a new section",
-        "paragraphOne": "Everyday practice shows that strengthening and developing the structure largely determines the creation of directions for progressive development. Diverse and rich experience in consulting with a wide asset base is an interesting experiment in testing the relevant conditions for activation. Comrades! The constant quantitative growth and the scope of our activities allow us to assess the importance of the positions taken by the participants regarding the tasks set. However, it should be remembered that constant information and propaganda support for our activities largely determines the creation of significant financial and administrative conditions. Diverse and rich experience in consulting with a wide asset base allows us to assess the importance of personnel training systems that meet urgent needs. Diverse and rich experience in further developing various forms of activities plays an important role in shaping the development model.",
-        "paragraphTwo": "On the other hand, the established structure of the organization contributes to the preparation and implementation of the relevant conditions for activation. Diverse and rich experience in starting daily work on shaping a position ensures the participation of a wide circle of specialists in shaping the development model. Comrades! Constant information and propaganda support for our activities play an important role in shaping the positions taken by the participants regarding the tasks set."
-      }
+      "featuresMain": {}
     },
-    "login": {
-      "subtitle": "Enter your login details",
-      "emailInput": {
-        "name": "username",
-        "type": "email",
-        "placeholder": "Enter your email"
-      },
-      "passwordInput": {
-        "name": "password",
-        "type": "password",
-        "placeholder": "Enter your password"
-      },
-      "enter": "Log In",
-      "loginError": "Incorrect email and/or password"
-    },
-    "register": {
-      "subtitle": "Enter your registration details",
-      "register": "Register",
-      "registerError": "Incorrect data or server error",
-      "chooseRole": "Choose your role"
-    },
-    "profile": {
-      "subtitle": "Profile Data",
-      "edit": "Edit",
-      "save": "Save",
-      "cancel": "Cancel",
-      "updateError": "Incorrect data or server error"
-    }
+    "login": {},
+    "register": {},
+    "profile": {}
   }
 }

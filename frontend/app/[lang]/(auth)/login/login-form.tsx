@@ -21,6 +21,8 @@ import {
 } from '@/components/forms/custom-fieldset';
 import { CustomForm } from '@/components/forms/custom-form';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
+import { CustomLink } from '@/components/custom-link';
+import { path } from '@/lib/utils';
 
 const formSchema = z.object({
   username: z
@@ -66,9 +68,9 @@ export function LoginForm({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     if (selectedTabValue === 'login') {
-      router.push(`/${lang}/login`);
+      router.push(path(lang, '/login'));
     } else {
-      router.push(`/${lang}/register`);
+      router.push(path(lang, '/register'));
     }
   }, [selectedTabValue]);
 
@@ -93,12 +95,13 @@ export function LoginForm({ lang }: { lang: Locale }) {
         />
 
         <ButtonsBlock>
-          <Link
-            className="transition-opacity duration-300 hover:opacity-70 order-1 sm:-order-1"
-            href={`/${lang}/forgot-password`}
+          <CustomLink
+            className="order-1 transition-opacity duration-300 hover:opacity-70 sm:-order-1"
+            href={`/forgot-password`}
+            lang={lang}
           >
             <p className="text-xs">Я забыл пароль</p>
-          </Link>
+          </CustomLink>
           <LoginButton isValid={form.formState.isValid} />
         </ButtonsBlock>
       </CustomForm>
@@ -111,7 +114,7 @@ function LoginButton({ isValid }: { isValid: boolean }) {
 
   return (
     <Button
-      className="flex gap-3 px-9 w-full sm:w-auto"
+      className="flex w-full gap-3 px-9 sm:w-auto"
       variant="ruchampDefault"
       type="submit"
       disabled={!isValid || pending}

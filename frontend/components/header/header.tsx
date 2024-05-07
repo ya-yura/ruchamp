@@ -22,7 +22,7 @@ export function Header({ lang, user }: { lang: Locale; user: [UserData] }) {
       <ContentWraper>
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2">
-            <MenuWithButton />
+            <MenuWithButton lang={lang} />
             <div className="flex h-14 items-center justify-start pr-2 lg:pr-10">
               <Logo lang={lang} />
             </div>
@@ -42,7 +42,7 @@ export function Header({ lang, user }: { lang: Locale; user: [UserData] }) {
             <>
               {/* Не удалять */}
               {/* <LanguageSwitcher /> */}
-              <UserMenuButton user={userCommonData} />
+              <UserMenuButton user={userCommonData} lang={lang} />
             </>
           ) : (
             <AuthButtons lang={lang} />

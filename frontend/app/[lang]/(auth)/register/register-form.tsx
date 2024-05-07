@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { isValidPhoneNumber } from 'react-phone-number-input';
+import { path } from '@/lib/utils';
 
 // const athleteSchema = z.object({
 //   athlete_weight: z.number(),
@@ -140,6 +141,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     title: string;
     subtitle: string;
   }>({ title: 'Привет!', subtitle: 'Это страница регистрации.' });
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof regFormSchema>>({
     resolver: zodResolver(regFormSchema),
@@ -179,9 +181,9 @@ export function RegisterForm({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     if (selectedTabValue === 'login') {
-      router.push(`/${lang}/login`);
+      router.push(path(lang, '/login'));
     } else {
-      router.push(`/${lang}/register`);
+      router.push(path(lang, '/register'));
     }
   }, [selectedTabValue]);
 
@@ -197,8 +199,6 @@ export function RegisterForm({ lang }: { lang: Locale }) {
     setStep(step);
   }
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
   function onSubmit(values: z.infer<typeof regFormSchema>): void {
     setIsLoading(true);
     setErrorMessage('');
@@ -206,6 +206,8 @@ export function RegisterForm({ lang }: { lang: Locale }) {
       .register(values)
       .then(() => {
         setIsOpen(true);
+        form.reset();
+        switchStep(1);
       })
       .catch((err) => {
         console.log('Register error:', err);
@@ -273,14 +275,14 @@ export function RegisterForm({ lang }: { lang: Locale }) {
               className="text-foreground"
               variant="ruchampTransparentGreyBorder"
               type="button"
-              onClick={() => router.push(`/${lang}`)}
+              onClick={() => router.push(path(lang, '/'))}
             >
               На главную
             </Button>
             <Button
               variant="ruchampDefault"
               type="button"
-              onClick={() => router.push(`/${lang}/login`)}
+              onClick={() => router.push(path(lang, '/login'))}
             >
               На страницу логина
             </Button>

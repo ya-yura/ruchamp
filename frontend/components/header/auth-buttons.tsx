@@ -2,13 +2,13 @@
 
 import { Locale } from '@/i18n.config';
 import { Button } from '../ui/button';
-import Link from 'next/link';
 import { KeysIcon, PersonBoardIcon } from '../icons';
+import { CustomLink } from '../custom-link';
 
 export function AuthButtons({ lang }: { lang: Locale }) {
   return (
     <div className="flex gap-1 lg:gap-4">
-      <Link href={`/${lang}/register`}>
+      <CustomLink href={`/register`} lang={lang}>
         <Button
           className="hidden h-9 gap-2 px-3 sm:flex"
           variant="ruchampDefault"
@@ -16,8 +16,8 @@ export function AuthButtons({ lang }: { lang: Locale }) {
           <PersonBoardIcon />{' '}
           <p className="hidden md:block">Зарегистрироваться</p>
         </Button>
-      </Link>
-      <Link href={`/${lang}/login`}>
+      </CustomLink>
+      <CustomLink href={`/login`} lang={lang}>
         <Button
           className="flex h-9 gap-2 bg-transparent px-2.5 sm:border-none sm:bg-white"
           variant="outline"
@@ -25,7 +25,7 @@ export function AuthButtons({ lang }: { lang: Locale }) {
           <KeysIcon className="fill-[#616161]" />{' '}
           <p className="hidden md:block">Войти</p>
         </Button>
-      </Link>
+      </CustomLink>
     </div>
   );
 }
