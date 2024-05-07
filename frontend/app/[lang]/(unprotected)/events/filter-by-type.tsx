@@ -49,7 +49,7 @@ export function FilterByType({
   const [unPoularSportsTypes, setUnPopularSportTypes] = useState<
     TypeSportsTypes[]
   >([]);
-  const [windowWidth] = useWindowWidth();
+  const [windowWidth] = useWindowWidth(500);
 
   useEffect(() => {
     if (!windowWidth) return;
