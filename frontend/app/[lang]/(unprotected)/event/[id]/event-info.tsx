@@ -2,10 +2,10 @@
 
 import { TypeEvent } from '@/lib/definitions';
 import Image from 'next/image';
-import { useContext, useRef } from 'react';
+import { useRef } from 'react';
 import { ContentWraper } from '@/components/content-wraper';
 import { Badges } from './badges';
-import { chooseTypes, cn } from '@/lib/utils';
+import { chooseTypes } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Info } from './info';
@@ -13,7 +13,11 @@ import { Athletes } from './athletes';
 import { Matches } from './matches';
 import { Grid } from './grid';
 import { Results } from './results';
-import { ScrollContext } from '@/lib/scroll-observer';
+import { useScrollY } from '@/lib/hooks/useScrollY';
+import { CustomSection } from '@/components/custom-section';
+import { cn } from '@/lib/utils';
+import { H1 } from '@/components/text';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 enum EventTabs {
   'info' = 'Информация',
@@ -25,7 +29,7 @@ enum EventTabs {
 
 export function EventInfo({ event }: { event: TypeEvent }) {
   const refContainer = useRef<HTMLDivElement>(null);
-  const { scrollY } = useContext(ScrollContext);
+  const [scrollY] = useScrollY();
 
   let progress = 0;
 
@@ -45,7 +49,9 @@ export function EventInfo({ event }: { event: TypeEvent }) {
   return (
     <div className="w-full">
       <div
-        className={cn(`absolute mt-[-92px] flex h-[720px] w-full items-end`)}
+        className={cn(
+          `absolute mt-[-92px] flex h-[720px] w-full items-end overflow-hidden`,
+        )}
         ref={refContainer}
       >
         <Image
@@ -61,45 +67,48 @@ export function EventInfo({ event }: { event: TypeEvent }) {
           }}
         />
       </div>
-      <ContentWraper className="relative h-[590px] justify-between">
+      <CustomSection className="relative h-[590px] items-start justify-between bg-transparent">
         <Badges types={chooseTypes(event)} />
         <div className="relative flex flex-col gap-10">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-background">
-            {event?.name}
-          </h1>
-          <div className="relative mb-[87px] flex gap-6">
+          <H1>{event?.name}</H1>
+          <div className="mb-[87px] flex gap-6">
             <Button variant="ruchampDefault">Участвовать</Button>
             <Button variant="ruchampTransparent">Купить билеты</Button>
           </div>
         </div>
-      </ContentWraper>
-      <section className="bg-primary-background relative mt-[0] flex h-fit w-full flex-col items-center justify-between px-[72px]">
-        <ContentWraper className="bg-primary-background relative max-w-7xl justify-between">
-          <Tabs
-            defaultValue={Object.keys(EventTabs)[0]}
-            className="relative mx-auto mb-10 mt-[-38px] w-full"
-          >
-            <div className="w-full">
-              <TabsList className="mx-auto mb-10 flex w-[500px] justify-between bg-transparent text-[#D6D6D6]">
-                {Object.entries(EventTabs).map(([key, value]) => (
-                  <TabsTrigger
-                    key={key}
-                    className="rounded-none border-[#115EA3] data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white"
-                    value={key}
-                  >
-                    {value}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-            {Object.entries(EventTabs).map(([key, value]) => (
-              <TabsContent key={key} value={key}>
-                {tabs[value as EventTabs]}
-              </TabsContent>
-            ))}
-          </Tabs>
-        </ContentWraper>
-      </section>
+      </CustomSection>
+      <CustomSection className="h-fit">
+        <Tabs
+          defaultValue={Object.keys(EventTabs)[0]}
+          className="mb-10 mt-[-38px] w-full"
+        >
+          <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+            <TabsList className="text-text-mutedLight mb-10 flex w-fit justify-between bg-transparent sm:mx-auto">
+              {Object.entries(EventTabs).map(([key, value]) => (
+                <TabsTrigger
+                  key={key}
+                  className={cn(
+                    'rounded-none border-[#115EA3]',
+                    'data-[state=active]:border-b-4 data-[state=active]:bg-transparent',
+                    'data-[state=active]:font-bold data-[state=active]:text-white',
+                    'first-of-type:ml-4 last-of-type:mr-4',
+                    'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                  )}
+                  value={key}
+                >
+                  {value}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <ScrollBar className="hidden" orientation="horizontal" />
+          </ScrollArea>
+          {Object.entries(EventTabs).map(([key, value]) => (
+            <TabsContent key={key} value={key}>
+              {tabs[value as EventTabs]}
+            </TabsContent>
+          ))}
+        </Tabs>
+      </CustomSection>
     </div>
   );
 }
