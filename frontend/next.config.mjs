@@ -1,4 +1,4 @@
-import million from 'million/compiler'; //It has some promlems with SSR
+// import million from 'million/compiler'; //It has some promlems with SSR
 import { config as loadEnv } from 'dotenv';
 
 loadEnv({ path: '../.env-non-dev' });
@@ -12,8 +12,9 @@ const nextConfig = {
   experimental: {},
 };
 
-const millionConfig = {
-  auto: true,
-};
+// const millionConfig = {
+//   auto: true,
+// };
 
-export default million.next(nextConfig, millionConfig);
+// export default million.next(nextConfig, millionConfig);
+export default nextConfig;
