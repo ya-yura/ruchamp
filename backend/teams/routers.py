@@ -1,4 +1,7 @@
+import os
 from typing import Type
+import uuid
+from aiofiles import open as async_open
 
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
@@ -8,6 +11,7 @@ from fastapi_users import FastAPIUsers
 from sqlalchemy import delete, select, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from auth.auth import auth_backend
 from auth.manager import UserManager, get_user_manager
@@ -34,11 +38,15 @@ user_db_verify = UserDB
 add_pagination(router)
 
 
-def is_model_field(model: Type, field_name: str) -> bool:
+def is_model_field(model: Type[DeclarativeMeta], field_name: str) -> bool:
     """
     Проверяет, существует ли атрибут с указанным именем в модели.
     """
-    return isinstance(getattr(model, field_name, None), InstrumentedAttribute)
+    if hasattr(model, field_name):
+        attribute = getattr(model, field_name)
+        # Проверяем, является ли атрибут полем или связью
+        return isinstance(attribute, (InstrumentedAttribute))
+    return False
 
 
 async def update_profile(
@@ -73,7 +81,7 @@ async def upload_image(
     db: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
-    allowed_roles = [2, 3, 4, 5]  # Роли, которым разрешено загружать изображения
+    allowed_roles = [1, 2, 4, 5]  # Роли, которым разрешено загружать изображения
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -120,22 +128,61 @@ async def create_team_and_members(
 '''  TEAM  '''
 
 
-@router.post("/upload-team-photo")
+@router.post("/upload-team-photo/{team_id}")
 async def upload_team_photo(
+    team_id: int,
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(Team, "image_field", image, current_user, db)
+    query = await db.execute(select(Team).where(Team.id == team_id))
+    team = query.scalar_one_or_none()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    query = await db.execute(select(
+        TeamMember.member).where(TeamMember.team == team_id)
+    )
+    members = query.scalars().all()
+    if current_user.id not in members:
+        raise HTTPException(status_code=403, detail="Permission: denied")
+
+    if image.content_type not in ['image/jpeg', 'image/png']:
+        raise HTTPException(status_code=406,
+                            detail="Only .jpeg or .png files allowed")
+
+    image_name = f"{uuid.uuid4().hex}.{image.filename.split('.')[-1]}"
+    image_path = os.path.join("static/team", image_name)
+
+    # Создаем директорию, если она не существует
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
+
+    async with async_open(image_path, "wb") as f:
+        await f.write(await image.read())
+
+    team.image_field = f"/static/team/{image_name}"
+    await db.commit()
+
+    return {f"Team {team.name} - updated"}
 
 
-@router.put("/update-team-profile")
+@router.put("/update-team-profile/{team_id}")
 async def update_team_profile(
-    team_data: team_update,
+    team_id: int,
+    team_data: TeamUpdate,
     current_user: User = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db)
 ):
-    return await update_profile(Team, team_data, current_user, user_manager)
+    query = await db.execute(select(Team.captain).where(Team.id == team_id))
+    captains = query.scalars().all()
+    try:
+        if current_user.id in captains:
+            await db.execute(update(Team).where(
+                Team.id == team_id).values(team_data.dict()))
+            await db.commit()
+    except Exception:
+        raise HTTPException(status_code=403, detail="Permission: denied")
+
+    return {f"Team {team_data.name} - updated"}
 
 
 @router.post("/create")
@@ -237,14 +284,15 @@ async def join_team(
     return {"message": "Team joined successfully"}
 
 
-@router.post("/change_captain")
+@router.post("/change_captain/{team_id}")
 async def change_captain(
+    team_id: int,
     id_member: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
     team = await db.execute(select(Team.id).where(
-        Team.captain == current_user.id))
+        Team.id == team_id and Team.captain == current_user.id))
 
     team_id = team.scalars().one()
 
@@ -262,17 +310,13 @@ async def change_captain(
     return {"message": "Captain changed successfully"}
 
 
-@router.post("/delete-member-team")
+@router.post("/delete-member-team/{team_id}")
 async def delete_member_team(
+    team_id: int,
     member_id: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(TeamMember.team).where(
-        TeamMember.member == current_user.id))
-
-    team_id = query.scalars().one()
-
     team_members_db = await db.execute(select(TeamMember.member).where(
         TeamMember.team == team_id))
 

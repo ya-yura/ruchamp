@@ -22,7 +22,6 @@ class TeamUpdate(BaseModel):
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
-    captain: int
 
 
 class TeamDB(TeamCreate):
