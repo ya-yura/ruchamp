@@ -9,8 +9,7 @@ interface YandexMapProps {
 export function YandexMap({ x, y, title }: YandexMapProps) {
   useEffect(() => {
     const script = document.createElement('script');
-    script.src =
-      'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=145f92f6-1b7b-4180-affe-d92e0bf4fd09';
+    script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
     script.async = true;
 
     document.body.appendChild(script);
