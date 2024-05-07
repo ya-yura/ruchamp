@@ -7,6 +7,7 @@ import {
 } from '../icons';
 import { ContentWraper } from '../content-wraper';
 import { cn } from '@/lib/utils';
+import { Locale } from '@/i18n.config';
 
 type TypeFeaturesMain = {
   icon: React.ReactNode;
@@ -44,7 +45,7 @@ const features: TypeFeaturesMain[] = [
   },
 ];
 
-export function FeaturesMain() {
+export function FeaturesMain({lang}: {lang: Locale}) {
   return (
     <section className="bg-primary-almostBlack mx-[72px] h-fit w-full sm:h-[298px]">
       <ContentWraper className='max-w-full'>

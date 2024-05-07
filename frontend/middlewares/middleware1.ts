@@ -1,58 +1,58 @@
-// // Next-auth middleware
+import { NextResponse } from 'next/server';
+import type { NextFetchEvent, NextRequest } from 'next/server';
 
-// import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { i18n } from '@/i18n.config';
 
-// import { getToken } from 'next-auth/jwt';
-// import { Locale, i18n } from '@/i18n.config';
-// import { CustomMiddleware } from './chain';
+import { match as matchLocale } from '@formatjs/intl-localematcher';
+import Negotiator from 'negotiator';
+import { CustomMiddleware } from './chain';
 
-// const protectedPaths = [
-//   '/dashboard',
-//   '/profile',
-//   '/event',
-//   '/events',
-//   '/logout',
-// ];
+function getLocale(request: NextRequest): string | undefined {
+  const negotiatorHeaders: Record<string, string> = {};
+  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
-// function getProtectedRoutes(protectedPaths: string[], locales: Locale[]) {
-//   let protectedPathsWithLocale = [...protectedPaths];
+  // @ts-ignore locales are readonly
+  const locales: string[] = i18n.locales;
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
-//   protectedPaths.forEach((route) => {
-//     locales.forEach(
-//       (locale) =>
-//         (protectedPathsWithLocale = [
-//           ...protectedPathsWithLocale,
-//           `/${locale}${route}`,
-//         ]),
-//     );
-//   });
+  const locale = matchLocale(languages, locales, i18n.defaultLocale);
+  return locale;
+}
 
-//   return protectedPathsWithLocale;
-// }
+export function withI18nMiddleware(middleware: CustomMiddleware) {
+  return async (
+    request: NextRequest,
+    event: NextFetchEvent,
+    response: NextResponse,
+  ) => {
+    // do i18n stuff
+    const pathname = request.nextUrl.pathname;
+    const pathnameIsMissingLocale = i18n.locales.every(
+      (locale) =>
+        !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    );
 
-// export function withAuthMiddleware(middleware: CustomMiddleware) {
-//   return async (request: NextRequest, event: NextFetchEvent) => {
-//     // Create a response object to pass down the chain
-//     const response = NextResponse.next();
+    // Redirect if there is no locale
+    if (pathnameIsMissingLocale) {
+      const locale = getLocale(request);
 
-//     const token = await getToken({ req: request });
+      if (locale === i18n.defaultLocale) {
+        return NextResponse.rewrite(
+          new URL(
+            `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+            request.url,
+          ),
+        );
+      }
 
-//     // @ts-ignore
-//     request.nextauth = request.nextauth || {};
-//     // @ts-ignore
-//     request.nextauth.token = token;
-//     const pathname = request.nextUrl.pathname;
+      return NextResponse.redirect(
+        new URL(
+          `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+          request.url,
+        ),
+      );
+    }
 
-//     const protectedPathsWithLocale = getProtectedRoutes(protectedPaths, [
-//       ...i18n.locales,
-//     ]);
-
-//     if (!token && protectedPathsWithLocale.includes(pathname)) {
-//       const signInUrl = new URL('/login', request.url);
-//       signInUrl.searchParams.set('callbackUrl', pathname);
-//       return NextResponse.redirect(signInUrl);
-//     }
-
-//     return middleware(request, event, response);
-//   };
-// }
+    return middleware(request, event, response);
+  };
+}

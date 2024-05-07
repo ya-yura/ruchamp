@@ -5,6 +5,7 @@ import { format, isPast, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { TypeSportsTypes, sportsTypes } from './constants';
 import { DateRange } from 'react-day-picker';
+import { Locale, i18n } from '@/i18n.config';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -80,3 +81,8 @@ export function isDateInRange(
 
   return targetDate >= fromDate && targetDate < toDate;
 }
+
+export const path = (lang: Locale, href: string) => {
+  const isDefaultLang = lang === i18n.defaultLocale;
+  return isDefaultLang ? href : `/${lang}${href}`;
+};

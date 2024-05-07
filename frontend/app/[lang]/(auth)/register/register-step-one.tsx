@@ -55,12 +55,13 @@ export function RegisterStepOne({
         fieldsetData={regStepOneFieldset}
       />
       <ButtonsBlock>
-        <Link
+        <CustomLink
           className="transition-opacity duration-300 hover:opacity-70 order-1 sm:-order-1"
-          href={`/${lang}/login`}
+          href={`/login`}
+          lang={lang}
         >
           <p className="text-xs">Я уже зарегистрирован</p>
-        </Link>
+        </CustomLink>
         <Button
           className="w-full sm:w-auto"
           size="lg"

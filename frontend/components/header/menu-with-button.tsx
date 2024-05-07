@@ -1,8 +1,9 @@
-import Link from 'next/link';
 import { HomeIcon, ListIcon, MenuIcon } from '../icons';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetOverlay, SheetTrigger } from '../ui/sheet';
 import { Separator } from '../ui/separator';
+import { CustomLink } from '../custom-link';
+import { Locale } from '@/i18n.config';
 
 type TypeMenuItem = {
   icon: React.ReactNode;
@@ -10,49 +11,49 @@ type TypeMenuItem = {
   url: string;
 };
 
-export function MenuWithButton() {
+export function MenuWithButton({ lang }: { lang: Locale }) {
   const menuMain: TypeMenuItem[] = [
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Главная',
-      url: '/ru',
+      url: '/',
     },
     {
       icon: <ListIcon className="fill-[#E0E0E0]" />,
       text: 'Мероприятия',
-      url: '/ru/events',
+      url: '/events',
     },
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Пятое',
-      url: '/ru',
+      url: '/',
     },
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Десятое',
-      url: '/ru',
+      url: '/',
     },
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Общее',
-      url: '/ru',
+      url: '/',
     },
   ];
   const menuAdditional: TypeMenuItem[] = [
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Профиль',
-      url: '/ru/profile',
+      url: '/profile',
     },
     {
       icon: <ListIcon className="fill-[#E0E0E0]" />,
       text: 'Мои мероприятия',
-      url: '/ru/events',
+      url: '/events',
     },
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
       text: 'Прочее',
-      url: '/ru',
+      url: '/',
     },
   ];
 
@@ -76,25 +77,27 @@ export function MenuWithButton() {
             <ul className="flex flex-col gap-3">
               {menuMain.map((item) => (
                 <li key={item.text}>
-                  <Link
+                  <CustomLink
                     className="flex w-fit items-center gap-3"
                     href={item.url}
+                    lang={lang}
                   >
                     {item.icon}
                     <p className="text-white">{item.text}</p>
-                  </Link>
+                  </CustomLink>
                 </li>
               ))}
               <Separator className="my-3 bg-[#3D3D3D]" />
               {menuAdditional.map((item) => (
                 <li key={item.text}>
-                  <Link
+                  <CustomLink
                     className="flex w-fit items-center gap-3"
                     href={item.url}
+                    lang={lang}
                   >
                     {item.icon}
                     <p className="text-white">{item.text}</p>
-                  </Link>
+                  </CustomLink>
                 </li>
               ))}
             </ul>

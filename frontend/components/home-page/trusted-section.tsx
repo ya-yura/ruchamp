@@ -5,8 +5,9 @@ import { Carousel, CarouselContent, CarouselItem } from '../ui/carousel';
 import AutoScroll from 'embla-carousel-auto-scroll';
 import Image from 'next/image';
 import { ContentWraper } from '../content-wraper';
+import { Locale } from '@/i18n.config';
 
-export function TrustedSection() {
+export function TrustedSection({ lang }: { lang: Locale }) {
   const plugin1 = React.useRef(
     AutoScroll({ playOnInit: true, stopOnInteraction: true, speed: 0.6 }),
   );
@@ -18,9 +19,9 @@ export function TrustedSection() {
   );
 
   return (
-    <section className="relative flex h-fit sm:h-[500px] w-full flex-col bg-gradient-to-b from-[#0A0A0A] py-10 sm:py-20">
+    <section className="relative flex h-fit w-full flex-col bg-gradient-to-b from-[#0A0A0A] py-10 sm:h-[500px] sm:py-20">
       <ContentWraper className="mb-8 ">
-        <h1 className="to-53% ml-10 sm:ml-[140px] w-fit bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-2xl font-bold leading-7 tracking-wide text-transparent sm:text-4xl sm:leading-[47px] md:text-[40px]">
+        <h1 className="to-53% ml-10 w-fit bg-gradient-to-r from-[#95CEFF] from-25% to-[#0F6CBD] bg-clip-text text-2xl font-bold leading-7 tracking-wide text-transparent sm:ml-[140px] sm:text-4xl sm:leading-[47px] md:text-[40px]">
           Нам доверяют
         </h1>
       </ContentWraper>

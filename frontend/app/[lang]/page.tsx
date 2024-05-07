@@ -14,7 +14,6 @@ export default async function Home({
 }: {
   params: { lang: Locale };
 }) {
-  // const { page } = await getDictionary(lang);
   const session = await getSession();
   let user;
   if (!session || session.user.length === 0) {
@@ -26,10 +25,10 @@ export default async function Home({
       <Header lang={lang} user={user} />
       <Container>
         <HomeHero lang={lang} />
-        <FeaturesMain />
-        <FeaturesAdditional />
+        <FeaturesMain lang={lang}/>
+        <FeaturesAdditional lang={lang}/>
         <SecondHero lang={lang} />
-        <TrustedSection />
+        <TrustedSection lang={lang}/>
       </Container>
       <Footer lang={lang} />
     </>

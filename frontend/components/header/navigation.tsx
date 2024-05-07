@@ -1,16 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { cn } from '@/lib/utils';
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Locale } from '@/i18n.config';
+import { ListItem } from './list-item';
 
 export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
   return (
@@ -25,25 +24,29 @@ export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
               <ListItem
                 className="text-right"
                 title="События"
-                href="/ru/events"
+                href="/events"
+                lang={lang}
               />
               {user ? (
                 <ListItem
                   className="text-right"
                   title="Панель управления"
-                  href="/ru/dashboard"
+                  href="/dashboard"
+                  lang={lang}
                 />
               ) : (
                 <>
                   <ListItem
                     className="text-right"
                     title="Регистрация"
-                    href="/ru/register"
+                    href="/register"
+                    lang={lang}
                   />
                   <ListItem
                     className="text-right"
                     title="Войти"
-                    href="/ru/login"
+                    href="/login"
+                    lang={lang}
                   />
                 </>
               )}
@@ -54,29 +57,3 @@ export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
     </NavigationMenu>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<'a'>,
-  React.ComponentPropsWithoutRef<'a'>
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            'block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-            className,
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = 'ListItem';

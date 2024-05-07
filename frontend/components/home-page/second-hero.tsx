@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import boxerSvg from '@/public/ru/images/boxer.svg';
-import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Locale } from '@/i18n.config';
+import { CustomLink } from '../custom-link';
 
 export function SecondHero({ lang }: { lang: Locale }) {
   return (
@@ -23,11 +23,11 @@ export function SecondHero({ lang }: { lang: Locale }) {
           достичь новых высот в спорте. Не упустите свой шанс присоединиться к
           нашему сообществу и стать частью большой спортивной семьи!
         </p>
-        <Link href={`/${lang}/login`}>
+        <CustomLink href={`/login`} lang={lang}>
           <Button variant="ruchampDefault" type="button">
             Присоединиться
           </Button>
-        </Link>
+        </CustomLink>
       </div>
     </section>
   );
