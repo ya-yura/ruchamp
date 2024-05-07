@@ -3,13 +3,13 @@
 
 from sqlalchemy import create_engine
 
-from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import (Base, Role, User, Referee, RefereeType, Coach, CoachType,
-                         CategoryType, Athlete, EventOrganizer, Spectator, 
-                         SystemAdministrator, CombatType, SportType, AllWeightClass,
-                         athlete_grade_association, athlete_sport_type_association,
-                         athlete_coach_association)
-
+from auth.models import (AllWeightClass, Athlete, Base, CategoryType, Coach,
+                         CoachType, CombatType, EventOrganizer, Referee,
+                         RefereeType, Role, Spectator, SportType,
+                         SystemAdministrator, User, athlete_coach_association,
+                         athlete_grade_association,
+                         athlete_sport_type_association)
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 

@@ -1,7 +1,6 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
-from sqlalchemy import JSON
-from sqlalchemy.orm import relationship
+from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import relationship
 
 from auth.models import Athlete
 

@@ -1,5 +1,5 @@
-import random
 import itertools
+import random
 
 
 def split_pairs(users):

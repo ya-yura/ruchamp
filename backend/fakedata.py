@@ -1,51 +1,23 @@
 import datetime
 import random
+
 from faker import Faker
-from connection import SessionLocal
-
-from sqlalchemy import create_engine, func, select
-from sqlalchemy.orm import sessionmaker, aliased
 from fastapi_users.db import SQLAlchemyUserDatabase
-
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.dialects.postgresql import INTERVAL
+from sqlalchemy.orm import aliased, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
-from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import (
-    Athlete,
-    EventOrganizer,
-    Spectator,
-    SystemAdministrator,
-    User,
-    Role,
-    CombatType,
-    SportType,
-    CategoryType, 
-    AllWeightClass,
-    Referee, 
-    Coach, 
-    CoachType,
-    RefereeType,
-    athlete_sport_type_association,
-    athlete_coach_association,
-)
-from event.models import (
-    Event, 
-    Participant, 
-    Match,
-    MatchResult, 
-    Prize, 
-    Medal,
-    MatchPeriod,
-    EventWeights,
-    EventSports,
-)
-from event.models import (
-    Team,
-    TeamMember,
-)
-
-
+from auth.models import (AllWeightClass, Athlete, CategoryType, Coach,
+                         CoachType, CombatType, EventOrganizer, Referee,
+                         RefereeType, Role, Spectator, SportType,
+                         SystemAdministrator, User, athlete_coach_association,
+                         athlete_sport_type_association)
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
+from connection import SessionLocal
+from event.models import (Event, EventSports, EventWeights, Match, MatchPeriod,
+                          MatchResult, Medal, Participant, Prize, Team,
+                          TeamMember)
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)

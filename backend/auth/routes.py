@@ -1,43 +1,24 @@
 import uuid
 from typing import Type
-from connection import get_db
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+from fastapi import APIRouter, Body, Depends, File, HTTPException, UploadFile
 from fastapi_users import FastAPIUsers
-from sqlalchemy import select, update, insert
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from auth.auth import auth_backend
-from auth.models import (
-    User,
-    Athlete,
-    EventOrganizer,
-    Spectator,
-    SystemAdministrator,
-    Referee, SportType, athlete_sport_type_association
-)
-from auth.manager import (
-    get_user_manager,
-    UserManager,
-)
 from auth.mailer import send_forgot_password_email
-from auth.schemas import (
-    AthleteUpdate,
-    UserDB,
-    SpectatorUpdate,
-    SysAdminUpdate,
-    OrganizerUpdate,
-    UserRead,
-    RefereeUpdate,
-    UserCreate,
-    UserData,
-    UserUpdate
-)
+from auth.manager import UserManager, get_user_manager
+from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
+                         SportType, SystemAdministrator, User,
+                         athlete_sport_type_association)
+from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
+                          SpectatorUpdate, SysAdminUpdate, UserCreate,
+                          UserData, UserDB, UserRead, UserUpdate)
+from connection import get_db
+from event.models import Match, Participant, Event
 from teams.models import TeamMember
-from event.models import Participant, Match
-from fastapi import Body
-
 
 router = APIRouter(prefix="/users", tags=["Users"])
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
@@ -281,7 +262,6 @@ async def forgot_password(
     if email is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-
     return {"email": email}
 
 
@@ -313,6 +293,25 @@ async def get_current_user(
     result.append(user_data)
 
     return result
+
+
+@router.get("/me/organizer/events")
+async def get_organizer_events(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(
+        EventOrganizer.id).where(EventOrganizer.user_id == current_user.id))
+    organizer_id = query.scalars().first()
+
+    if organizer_id is None:
+        raise HTTPException(status_code=400, detail="You are not an organizer")
+
+    query = await db.execute(select(
+        Event).where(Event.organizer_id == organizer_id))
+    events = query.scalars().all()
+
+    return {"events": events}
 
 
 @router.get("/me/events")
@@ -404,7 +403,6 @@ async def create_user(
         db.add(new_athlete)
         await db.commit()
 
-
     if user_role == 2:
         await db.execute(insert(EventOrganizer).values(
             user_id=user.id,
@@ -436,6 +434,7 @@ async def create_user(
         await db.commit()
 
     return user
+
 
 @router.put("/update")
 async def update_user(

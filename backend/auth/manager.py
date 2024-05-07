@@ -1,39 +1,19 @@
-from typing import Optional
 import uuid
+from typing import Optional
+
+from fastapi import Depends, HTTPException, Request
+from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions, models,
+                           schemas)
 from sqlalchemy import select
 
-from fastapi import Depends, Request, HTTPException
-from fastapi_users import (
-    BaseUserManager,
-    IntegerIDMixin,
-    exceptions,
-    models,
-    schemas
-)
-
-from auth.models import (
-    Athlete,
-    Spectator,
-    SystemAdministrator,
-    EventOrganizer,
-    Role,
-    CombatType,
-    AllWeightClass,
-    Referee,
-    Coach,
-
-)
-from auth.schemas import (
-    AthleteUpdate,
-    SpectatorUpdate,
-    SysAdminUpdate,
-    OrganizerUpdate,
-    RefereeUpdate
-    
-)
-from connection import User, get_user_db
 from auth.mailer import send_verification_email
+from auth.models import (AllWeightClass, Athlete, Coach, CombatType,
+                         EventOrganizer, Referee, Role, Spectator,
+                         SystemAdministrator)
+from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
+                          SpectatorUpdate, SysAdminUpdate)
 from config import SECRET
+from connection import User, get_user_db
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

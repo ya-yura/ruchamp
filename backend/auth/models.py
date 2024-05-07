@@ -1,9 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Date, Float, Boolean, Integer, TIMESTAMP, ForeignKey, Table, DateTime
-from sqlalchemy import JSON
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
+from sqlalchemy import (JSON, TIMESTAMP, Boolean, Column, Date, DateTime,
+                        Float, ForeignKey, Integer, String, Table)
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import relationship
 
 Base: DeclarativeMeta = declarative_base()
 metadata = Base.metadata

@@ -1,13 +1,12 @@
 from datetime import datetime
-from sqlalchemy import JSON
+
+from sqlalchemy import (JSON, TIMESTAMP, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, String)
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, Integer, ForeignKey, Float, Enum, DateTime, Date, TIMESTAMP
 
 from auth.models import Base, EventOrganizer, User
-from event.models import Event
-
 from connection import Base
-
+from event.models import Event
 
 metadata = Base.metadata
 

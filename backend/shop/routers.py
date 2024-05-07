@@ -1,24 +1,24 @@
-import uuid
-import qrcode
 import os
-from aiofiles import open as async_open
-from fpdf import FPDF
+import uuid
 from datetime import datetime
-from fastapi import (APIRouter, Depends, HTTPException, Request, File,
-                     UploadFile)
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, insert, delete
 
-from connection import get_db
+import qrcode
+from aiofiles import open as async_open
+from fastapi import (APIRouter, Depends, File, HTTPException, Request,
+                     UploadFile)
+from fpdf import FPDF
+from sqlalchemy import delete, insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from auth.models import Athlete, EventOrganizer
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import EventOrganizer, Athlete
-from shop.models import (Ticket, Merch, Courses, Order, OrderItem, Sector,
-                         Row, Place, Engagement)
-from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
+from connection import get_db
 from event.models import Event, Participant
+from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
+                         Row, Sector, Ticket)
+from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
 from teams.models import TeamMember
-
 
 router = APIRouter(prefix="/shop", tags=["Shop"])
 

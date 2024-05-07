@@ -1,23 +1,14 @@
 from datetime import datetime
-from sqlalchemy import DateTime,Column, String, Integer, TIMESTAMP, ForeignKey, Boolean
+
+from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
+                        Integer, String)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
-from auth.models import (
-    EventOrganizer,
-    CombatType,
-    AllWeightClass,
-    Athlete,
-    CategoryType,
-    SportType,
-    Referee,
-)
-from teams.models import (
-    Team,
-    TeamMember,
-)
+from auth.models import (AllWeightClass, Athlete, CategoryType, CombatType,
+                         EventOrganizer, Referee, SportType)
 from connection import Base
-
+from teams.models import Team, TeamMember
 
 metadata = Base.metadata
 

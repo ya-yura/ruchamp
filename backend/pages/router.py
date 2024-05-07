@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from event.routers import get_events
 from connection import get_db
 from event.models import Event
-
+from event.routers import get_events
 
 router = APIRouter(
     prefix="/pages",
