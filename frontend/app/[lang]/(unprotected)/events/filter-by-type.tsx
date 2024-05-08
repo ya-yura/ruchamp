@@ -16,6 +16,8 @@ import { Badge } from '@/components/ui/badge';
 interface FilterByTypeProps {
   selectedSportTypes: TypeSportsTypes[];
   setSelected: Dispatch<SetStateAction<TypeSportsTypes[]>>;
+  isOnMode: boolean;
+  setIsOnMode: Dispatch<SetStateAction<boolean>>;
 }
 
 type Limit = {
@@ -42,6 +44,8 @@ const limits: Limits = {
 export function FilterByType({
   selectedSportTypes,
   setSelected,
+  isOnMode,
+  setIsOnMode,
 }: FilterByTypeProps) {
   const [poularSportsTypes, setPopularSportTypes] = useState<TypeSportsTypes[]>(
     [],
@@ -98,7 +102,11 @@ export function FilterByType({
             />
           ))}
         </PopoverContent>
-        <ModeSwither className="relative ml-auto lg:hidden" />
+        <ModeSwither
+          isOnMode={isOnMode}
+          setIsOnMode={setIsOnMode}
+          className="relative ml-auto lg:hidden"
+        />
       </div>
     </Popover>
   );

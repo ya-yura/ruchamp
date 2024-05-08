@@ -8,13 +8,18 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
 import { TypeSportsTypes } from '@/lib/constants';
-import { useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { TypeEvent } from '@/lib/definitions';
 import { EventsCards } from './events-cards';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
 import { cn } from '@/lib/utils';
 
+interface ModeSwitherProps {
+  isOnMode: boolean;
+  setIsOnMode: Dispatch<SetStateAction<boolean>>;
+  className?: string;
+}
 interface EventTabsProps {
   futureEvents: TypeEvent[];
   pastEvents: TypeEvent[];
@@ -35,6 +40,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
     // {from: new Date(),
     // to: addDays(new Date(), 20),}
   );
+  const [isMapMode, setIsMapMode] = useState<boolean>(false);
   const topRef = useRef<HTMLDivElement | null>(null);
 
   function scrollToTop(): void {
@@ -72,7 +78,11 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
                 </TabsTrigger>
               ))}
             </TabsList>
-            <ModeSwither className="hidden lg:flex" />
+            <ModeSwither
+              isOnMode={isMapMode}
+              setIsOnMode={setIsMapMode}
+              className="hidden lg:flex"
+            />
           </div>
           <DatePicker
             className="mb-4 flex justify-center"
@@ -82,6 +92,8 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
           <FilterByType
             selectedSportTypes={selectedSportTypes}
             setSelected={setSelectedSportTypes}
+            isOnMode={isMapMode}
+            setIsOnMode={setIsMapMode}
           />
           <TabsContent value="futureEvents">
             <EventsCards
@@ -89,6 +101,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
               selectedSportTypes={selectedSportTypes}
               date={date}
               scrollToTop={scrollToTop}
+              isMapMode={isMapMode}
             />
           </TabsContent>
           <TabsContent value="pastEvents">
@@ -97,6 +110,7 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
               selectedSportTypes={selectedSportTypes}
               date={date}
               scrollToTop={scrollToTop}
+              isMapMode={isMapMode}
             />
           </TabsContent>
           <TabsContent value="usersEvents">
@@ -108,7 +122,11 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   );
 }
 
-export function ModeSwither({ className }: { className?: string }) {
+export function ModeSwither({
+  className,
+  isOnMode,
+  setIsOnMode,
+}: ModeSwitherProps) {
   return (
     <div
       className={cn(
@@ -116,7 +134,11 @@ export function ModeSwither({ className }: { className?: string }) {
         className,
       )}
     >
-      <Switch id="showMap" />
+      <Switch
+        checked={isOnMode}
+        onCheckedChange={() => setIsOnMode(!isOnMode)}
+        id="showMap"
+      />
       <Label className="text-sm font-normal text-background" htmlFor="showMap">
         На карте
       </Label>

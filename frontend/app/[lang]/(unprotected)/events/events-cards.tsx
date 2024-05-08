@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
 import { cn, isDateInRange } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
+import { YandexMap } from '@/components/yandex-map';
 
 interface EventsContentProps {
   events: TypeEvent[];
   selectedSportTypes: TypeSportsTypes[];
   date: DateRange | undefined;
   scrollToTop: () => void;
+  isMapMode: boolean;
 }
 
 export function EventsCards({
@@ -19,6 +21,7 @@ export function EventsCards({
   selectedSportTypes,
   date,
   scrollToTop,
+  isMapMode,
 }: EventsContentProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filteredEventsByType, setFilteredEventsByType] = useState<TypeEvent[]>(
@@ -27,6 +30,7 @@ export function EventsCards({
   const [displayedEvents, setDisplayedEvents] = useState<TypeEvent[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isUpButtonShown, setIsUpButtonShown] = useState<boolean>(false);
+  const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
 
   const eventsPerPage = 12;
   const totalPages = Math.ceil(filteredEventsByType.length / eventsPerPage);
@@ -50,6 +54,7 @@ export function EventsCards({
     setFilteredEventsByType(filteredEvents);
     setDisplayedEvents(filteredEvents.slice(0, eventsPerPage));
     setCurrentPage(1);
+    setMapKey((prevKey) => prevKey + 1); // This state is to reload map with new data
   }, [events, selectedSportTypes, date]);
 
   useEffect(() => {
@@ -95,11 +100,19 @@ export function EventsCards({
           <p className="mb-5 text-base text-background">
             Найдено событий: <b>{filteredEventsByType.length}</b>
           </p>
-          <ul className="mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedEvents.map((event) => (
-              <CardEvent key={event.id} event={event} />
-            ))}
-          </ul>
+          {isMapMode ? (
+            <YandexMap
+              key={mapKey} // This key is to reload map with new data
+              places={filteredEventsByType}
+              size={{ width: '100%', height: '50vh' }}
+            />
+          ) : (
+            <ul className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {displayedEvents.map((event) => (
+                <CardEvent key={event.id} event={event} />
+              ))}
+            </ul>
+          )}
         </>
       ) : (
         <p className="text-base text-background">Ничего не найдено</p>
