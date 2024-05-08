@@ -11,19 +11,11 @@ class EventsApi {
   }
 
   getEvents(): Promise<Array<TypeEvent>> {
-    return fetch(`${this.baseUrl}/event/events`, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then(checkResponse);
+    return fetch(`${this.baseUrl}/event/events`, {}).then(checkResponse);
   }
 
   getEvent(id: string): Promise<TypeEvent> {
-    return fetch(`${this.baseUrl}/event/${id}`, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then(checkResponse);
+    return fetch(`${this.baseUrl}/event/${id}`, {}).then(checkResponse);
   }
 }
 

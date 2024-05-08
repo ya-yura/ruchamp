@@ -9,25 +9,26 @@ export default async function Events() {
   let events: TypeEvent[];
   try {
     events = await eventsApi.getEvents();
-    events.sort((a, b) => {
-      const dateA = new Date(a.start_datetime);
-      const dateB = new Date(b.start_datetime);
-      return dateA.getTime() - dateB.getTime();
-    });
   } catch (err) {
     events = [];
   }
-
-  testFutureData.sort((a, b) => {
-    const dateA = new Date(a.start_datetime);
-    const dateB = new Date(b.start_datetime);
-    return dateA.getTime() - dateB.getTime();
-  });
 
   const { futureEvents, pastEvents } = divideEventsByDateTime([
     ...events,
     ...testFutureData,
   ]);
+
+  // When data will be real, make proper sorting
+  futureEvents.sort((a, b) => {
+    const dateA = new Date(a.start_datetime);
+    const dateB = new Date(b.start_datetime);
+    return dateA.getTime() - dateB.getTime();
+  });
+  pastEvents.sort((a, b) => {
+    const dateA = new Date(a.start_datetime);
+    const dateB = new Date(b.start_datetime);
+    return dateA.getTime() - dateB.getTime();
+  });
 
   return (
     <Container>
