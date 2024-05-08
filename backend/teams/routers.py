@@ -15,7 +15,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from auth.auth import auth_backend
 from auth.manager import UserManager, get_user_manager
-from auth.models import User
+from auth.models import User, Athlete
 # from auth.routes import router as auth_router
 from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
@@ -192,8 +192,11 @@ async def create_team(
     # user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
+    query = await db.execute(select(Athlete.id).where(Athlete.user_id == current_user.id))
+    athlete_id = query.scalar_one_or_none()
+
     role_id = current_user.role_id
-    allowed_roles = [1, 2, 4, 5]  # Роли, которым разрешено создавать команды
+    allowed_roles = [1, 2, 4]  # Роли, которым разрешено создавать команды
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -211,14 +214,14 @@ async def create_team(
     # Создаем команду
     new_team = Team(
         **team_data.dict(),
-        invite_link="123",  # добавить функцию генерации ссылки
-        captain=current_user.id
+        invite_link="123/link",  # добавить функцию генерации ссылки
+        captain=athlete_id
     )
     db.add(new_team)
     await db.commit()
 
     await db.execute(insert(TeamMember).values(
-        team=new_team.id, member=current_user.id))
+        team=new_team.id, member=athlete_id))
     await db.commit()
 
     return {"message": f"Team: {new_team.name} - created"}

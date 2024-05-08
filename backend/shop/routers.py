@@ -358,6 +358,9 @@ async def upload_image_in_merch(
     async with async_open(image_path, "wb") as f:
         await f.write(await image.read())
 
+    # Создаем директорию, если она не существует
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
+
     merch.image_field = f"/static/merch/{image_name}"
     await db.commit()
 
