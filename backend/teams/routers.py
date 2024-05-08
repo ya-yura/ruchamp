@@ -135,6 +135,11 @@ async def upload_team_photo(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalar_one_or_none()
+
     query = await db.execute(select(Team).where(Team.id == team_id))
     team = query.scalar_one_or_none()
     if not team:
@@ -143,7 +148,7 @@ async def upload_team_photo(
         TeamMember.member).where(TeamMember.team == team_id)
     )
     members = query.scalars().all()
-    if current_user.id not in members:
+    if athlete_id not in members:
         raise HTTPException(status_code=403, detail="Permission: denied")
 
     if image.content_type not in ['image/jpeg', 'image/png']:
@@ -172,10 +177,15 @@ async def update_team_profile(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalar_one_or_none()
+
     query = await db.execute(select(Team.captain).where(Team.id == team_id))
     captains = query.scalars().all()
     try:
-        if current_user.id in captains:
+        if athlete_id in captains:
             await db.execute(update(Team).where(
                 Team.id == team_id).values(team_data.dict()))
             await db.commit()
