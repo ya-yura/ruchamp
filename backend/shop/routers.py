@@ -329,7 +329,7 @@ async def create_merch(
     return {'Merch created': merch.name}
 
 
-@router.post("/merch/upload_image/{merch_id}")
+@router.post("/merch/upload-image/{merch_id}")
 async def upload_image_in_merch(
     merch_id: int,
     image: UploadFile = File(...),

@@ -66,7 +66,7 @@ async def create_event(
     return {f"Event {new_event.name} - created"}
 
 
-@router.post("/update_image/{event_id}")
+@router.post("/update-image/{event_id}")
 async def update_image_in_event(
     event_id: int,
     image: UploadFile = File(...),
@@ -102,7 +102,7 @@ async def update_image_in_event(
     return {f"Event {event_id} updated"}
 
 
-@router.post("/update_geo/{event_id}")
+@router.post("/update-geo/{event_id}")
 async def update_geo_in_event(event_id: int,
                               db: AsyncSession = Depends(get_db)):
 

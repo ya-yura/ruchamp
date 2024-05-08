@@ -261,10 +261,27 @@ async def get_team(
     team = query.mappings().all()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
+
+    query = await db.execute(select(
+        TeamMember.member).where(TeamMember.team == team_id)
+    )
+    members = query.mappings().all()
+    members_info = {}
+
+    '''for member in members:
+        query = await db.execute(select(User.sirname, User.name, User.fathername).where(User.id == current_user.id))
+        user = query.mappings().all()
+        members_info.update
+
     
+    #print(team)
+    #print(members)'''
+    result = []
+    result.append(team)
+    result.append(members)
+    #print(result)
 
-
-    return team
+    return result
 
 
 @router.get("/get-team-members/{team_id}")
@@ -276,7 +293,7 @@ async def get_team_members(
 ):
     query = await db.execute(select(TeamMember).where(
         TeamMember.team == team_id))
-    team_members = query.scalars().all()
+    team_members = query.mappings().all()
 
     return team_members
 
@@ -310,7 +327,7 @@ async def join_team(
     return {"message": "Team joined successfully"}
 
 
-@router.post("/change_captain/{team_id}")
+@router.post("/change-captain/{team_id}")
 async def change_captain(
     team_id: int,
     member_id: int,
