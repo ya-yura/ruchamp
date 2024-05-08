@@ -66,8 +66,8 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
           defaultValue="futureEvents"
           className="relative mx-auto mb-10 w-full"
         >
-          <div className="items relative flex w-full">
-            <TabsList className="items mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
+          <div className="relative flex h-[164px] w-full sm:h-[64px]">
+            <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger
                   key={key}
