@@ -5,7 +5,7 @@ import { EventInfo } from './event-info';
 import { eventsApi } from '@/lib/api/eventsApi';
 import { TypeEvent } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
-import { testFutureData } from '@/lib/constants';
+import { testData } from '@/lib/constants';
 
 export default async function Event({ params }: { params: { id: string } }) {
   const id = params.id;
@@ -13,7 +13,7 @@ export default async function Event({ params }: { params: { id: string } }) {
   let expectedEvents: TypeEvent[];
   const event: TypeEvent =
     +id > 1000000
-      ? (testFutureData.find((event) => event.id === +id) as TypeEvent)
+      ? (testData.find((event) => event.id === +id) as TypeEvent)
       : await eventsApi.getEvent(id);
   const randomInt = getRandomInt(100);
 
