@@ -192,7 +192,9 @@ async def create_team(
     # user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
-    query = await db.execute(select(Athlete.id).where(Athlete.user_id == current_user.id))
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id)
+    )
     athlete_id = query.scalar_one_or_none()
 
     role_id = current_user.role_id
@@ -255,12 +257,12 @@ async def get_team_members(
     team_id: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
-    params: Params = Depends(),
 ):
-    team_members = await db.execute(select(TeamMember).where(
+    query = await db.execute(select(TeamMember).where(
         TeamMember.team == team_id))
+    team_members = query.scalars().all()
 
-    return paginate(team_members.mappings().all(), params)
+    return team_members
 
 
 @router.post("/join-team/{team_id}")
