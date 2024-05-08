@@ -414,14 +414,17 @@ def generate_fake_events(session, num_events=num_events):
         organizer = random.choice(organizers)
         event_data = {
             'name': fake.sentence(),
-            'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
-            'end_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
+            'start_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
+            'end_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
+            'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(61, 90)),
+            'end_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(91, 120)),
             'location': fake.address(),
             'organizer_id': organizer.id,
             'event_order': fake.text(),
             'event_system': fake.word(),
             'geo': str(fake.latitude()) + ',' + str(fake.longitude()),
             'image_field': fake.image_url(),
+            'description': fake.text(),
         }
         events_data.append(event_data)
 
@@ -626,27 +629,27 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-generate_fake_roles(session)
+# generate_fake_roles(session)
 
-generate_fake_combat_types(session)
-generate_fake_category_types(session)
-generate_fake_sport_types(session)
-generate_fake_weight_classes(session)
-generate_fake_referee_types(session)
-generate_fake_coach_types(session)
+# generate_fake_combat_types(session)
+# generate_fake_category_types(session)
+# generate_fake_sport_types(session)
+# generate_fake_weight_classes(session)
+# generate_fake_referee_types(session)
+# generate_fake_coach_types(session)
 
 # generate_fake_users(session, num_users)
 # generate_fake_coaches(session)
 # generate_fake_referees(session)
 # generate_fake_athletes(session)
-# generate_fake_event_organizers(session)
-# generate_fake_spectators(session)
-# generate_fake_system_administrators(session)
+generate_fake_event_organizers(session)
+generate_fake_spectators(session)
+generate_fake_system_administrators(session)
 
-# generate_fake_teams(session)
-# generate_fake_team_member(session)
+generate_fake_teams(session)
+generate_fake_team_member(session)
 
-# generate_fake_events(session)
+generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
 # generate_fake_matches(session)

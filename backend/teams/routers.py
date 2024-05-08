@@ -265,20 +265,27 @@ async def get_team(
     query = await db.execute(select(
         TeamMember.member).where(TeamMember.team == team_id)
     )
-    members = query.mappings().all()
-    members_info = {}
+    members = query.scalars().all()
+    users = []
 
-    '''for member in members:
-        query = await db.execute(select(User.sirname, User.name, User.fathername).where(User.id == current_user.id))
+    for member in members:
+        query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+        athlete_id = query.scalar_one_or_none()
+        query = await db.execute(select(User.sirname, User.name, User.fathername, User.birthdate).where(User.id == athlete_id))
         user = query.mappings().all()
-        members_info.update
+        query = await db.execute(select(Athlete.height, Athlete.weight, Athlete.image_field).where(Athlete.id == member))
+        athlete = query.mappings().all()
+        user.append(athlete)
+        users.append(user)
+    
+    print(users)
 
     
     #print(team)
     #print(members)'''
     result = []
     result.append(team)
-    result.append(members)
+    result.append(users)
     #print(result)
 
     return result
