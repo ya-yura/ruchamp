@@ -365,7 +365,7 @@ async def change_captain(
     return {"message": "Captain changed successfully"}
 
 
-@router.post("/delete-member-team/{team_id}")
+@router.delete("/delete-member-team/{team_id}")
 async def delete_member_team(
     team_id: int,
     member_id: int,
