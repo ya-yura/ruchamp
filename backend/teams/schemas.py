@@ -17,7 +17,7 @@ class TeamCreate(BaseModel):
 
 
 class TeamUpdate(BaseModel):
-    name: str
+    name: Optional[str]
     invite_link: Optional[str]
     description: Optional[str]
     slug: Optional[str]

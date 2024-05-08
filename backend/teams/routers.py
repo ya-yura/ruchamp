@@ -281,6 +281,11 @@ async def join_team(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalar_one_or_none()
+
     query = await db.execute(select(TeamMember.member).where(
         TeamMember.team == team_id))
     team_members = query.scalars().all()
@@ -293,7 +298,7 @@ async def join_team(
         raise HTTPException(status_code=404, detail="Team not found")
 
     await db.execute(TeamMember.__table__.insert().values(
-        team=team_id, member=current_user.id))
+        team=team_id, member=athlete_id))
 
     await db.commit()
     return {"message": "Team joined successfully"}
@@ -302,12 +307,17 @@ async def join_team(
 @router.post("/change_captain/{team_id}")
 async def change_captain(
     team_id: int,
-    id_member: int,
+    member_id: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalar_one_or_none()
+
     team = await db.execute(select(Team.id).where(
-        Team.id == team_id and Team.captain == current_user.id))
+        Team.id == team_id and Team.captain == athlete_id))
 
     team_id = team.scalars().one()
 
@@ -315,12 +325,12 @@ async def change_captain(
         TeamMember.team == team_id))
 
     team_members = team_members_db.scalars().all()
-    if id_member not in team_members:
+    if member_id not in team_members:
         raise HTTPException(
             status_code=400, detail="Member is not a member of this team")
 
     await db.execute(update(Team).where(
-        Team.id == team_id).values(captain=id_member))
+        Team.id == team_id).values(captain=member_id))
     await db.commit()
     return {"message": "Captain changed successfully"}
 
@@ -332,10 +342,10 @@ async def delete_member_team(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    team_members_db = await db.execute(select(TeamMember.member).where(
+    query = await db.execute(select(TeamMember.member).where(
         TeamMember.team == team_id))
 
-    team_members = team_members_db.scalars().all()
+    team_members = query.scalars().all()
 
     team_cap = await db.execute(select(Team.captain).where(Team.id == team_id))
     team_cap_id = team_cap.scalars().one()
