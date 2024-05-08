@@ -257,8 +257,14 @@ async def get_team(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    team = await db.execute(select(Team).where(Team.id == team_id))
-    return team.scalars().first()
+    query = await db.execute(select(Team).where(Team.id == team_id))
+    team = query.mappings().all()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+
+
+    return team
 
 
 @router.get("/get-team-members/{team_id}")
@@ -290,7 +296,7 @@ async def join_team(
         TeamMember.team == team_id))
     team_members = query.scalars().all()
 
-    if current_user.id in team_members:
+    if athlete_id in team_members:
         raise HTTPException(
             status_code=400, detail="You are already a member of this team")
 
