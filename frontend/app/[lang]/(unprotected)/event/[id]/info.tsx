@@ -1,6 +1,6 @@
 import { TextCard } from './text-card';
 import { TypeEvent } from '@/lib/definitions';
-import { transformDate } from '@/lib/utils';
+import { cn, transformDate } from '@/lib/utils';
 
 type TypeMockData = {
   title?: string;
@@ -48,25 +48,83 @@ export function Info({ event }: { event: TypeEvent }) {
       role="tabpanel"
       aria-labelledby="info"
     >
-      <div className="order-2 col-span-12 flex flex-col gap-[18px] sm:order-1 sm:col-span-8">
-        {mockData1.map((item) => (
-          <TextCard key={item.title} title={item.title} text={item.text} />
-        ))}
-      </div>
-      <div className="order-1 col-span-12 grid h-min grid-cols-2 gap-[18px] sm:order-2 sm:col-span-4 sm:grid-cols-1">
-        {mockData2.map((item) => (
-          <TextCard
-            className={
-              item.text === 'Организатор'
-                ? 'bg-card-backgroundDark col-span-2 sm:col-span-1'
-                : 'bg-card-backgroundDark'
-            }
-            key={item.title}
-            title={item.title}
-            text={item.text}
-          />
-        ))}
-      </div>
+      <ul className="order-2 col-span-12 flex flex-col gap-[18px] sm:order-1 sm:col-span-8">
+        <li
+          className={cn(
+            'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            Подзаголовок 1
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            {event.description}
+          </p>
+        </li>
+        <li
+          className={cn(
+            'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            Подзаголовок 2
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            {event.description}
+          </p>
+        </li>
+        <li
+          className={cn(
+            'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            Подзаголовок 3
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            {event.description}
+          </p>
+        </li>
+      </ul>
+      <ul className="order-1 col-span-12 grid h-min grid-cols-2 gap-[18px] sm:order-2 sm:col-span-4 sm:grid-cols-1">
+        <li
+          className={cn(
+            'bg-card-backgroundDark flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            {transformDate(event.start_datetime, true)}
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            Начало мероприятия
+          </p>
+        </li>
+        <li
+          className={cn(
+            'bg-card-backgroundDark flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            {transformDate(event.end_request_datetime)} —{' '}
+            {transformDate(event.end_request_datetime)}
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            Приём заявок на участие
+          </p>
+        </li>
+        <li
+          className={cn(
+            'bg-card-backgroundDark col-span-2 flex flex-col items-start rounded-lg p-4 sm:col-span-1 sm:p-5 lg:px-6 lg:py-8',
+          )}
+        >
+          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+            Министерство Спорта
+          </h4>
+          <p className="text-text-mutedCard whitespace-pre-line text-sm">
+            Организатор
+          </p>
+        </li>
+      </ul>
     </div>
   );
 }

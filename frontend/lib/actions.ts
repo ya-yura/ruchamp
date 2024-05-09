@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from './api/auth';
 
-const secretKey = 'secret'; // replace later
+const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: any) {

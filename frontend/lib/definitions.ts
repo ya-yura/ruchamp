@@ -81,11 +81,14 @@ export interface UserData {
 export type TypeEvent = {
   name: string;
   start_datetime: string;
+  start_request_datetime: string;
   location: string;
   event_order: string;
   geo: string;
+  description: string;
   end_datetime: string;
   id: number;
+  end_request_datetime: string;
   organizer_id: number;
   event_system: string;
   image_field: string;
