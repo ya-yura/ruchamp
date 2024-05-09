@@ -246,8 +246,6 @@ async def get_all_teams(
 ):
     query = await db.execute(select(Team.id))
     teams_id = query.scalars().all()
-
-    teams_info = []
     res = []
     for team_id in teams_id:
         query = await db.execute(select(
@@ -255,7 +253,10 @@ async def get_all_teams(
             Team.description,
             Team.slug,
             Team.invite_link,
-            Team.image_field
+            Team.image_field,
+            Team.country,
+            Team.city,
+            Team.region,
         ).where(Team.id == team_id))
         team = query.mappings().all()
 
@@ -302,7 +303,6 @@ async def get_team(
     query = await db.execute(select(
         Team.name,
         Team.image_field,
-        Team.captain
     ).where(Team.id == team_id))
     team_info = query.mappings().all()
 
@@ -335,7 +335,10 @@ async def get_team(
         query = await db.execute(select(
             Athlete.height,
             Athlete.weight,
-            Athlete.image_field
+            Athlete.image_field,
+            Athlete.country,
+            Athlete.city,
+            Athlete.region,
         ).where(Athlete.id == member))
         athlete = query.mappings().all()
 

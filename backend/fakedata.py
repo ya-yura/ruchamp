@@ -241,6 +241,9 @@ def generate_fake_athletes(session, num_athletes=num_athletes):
             'weight': fake.random_int(min=30, max=180),
             'height': fake.random_int(min=120, max=200),
             'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
+            'country': fake.country(),
+            'city': fake.city(),
+            'region': fake.region(),
             'sport_types': fake.random_elements(
                 elements=session.query(SportType).all(),
                 length=fake.random_int(min=1, max=4),
@@ -363,6 +366,9 @@ def generate_fake_teams(session, num_teams=num_teams):
             'description': fake.sentence(),
             'slug': fake.slug(),
             'image_field': fake.image_url(),
+            'country': fake.country(),
+            'city': fake.city(),
+            'region': fake.region(),
         }
 
         captain = fake.random_element(elements=athletes)
@@ -629,19 +635,19 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# generate_fake_roles(session)
+generate_fake_roles(session)
 
-# generate_fake_combat_types(session)
-# generate_fake_category_types(session)
-# generate_fake_sport_types(session)
-# generate_fake_weight_classes(session)
-# generate_fake_referee_types(session)
-# generate_fake_coach_types(session)
+generate_fake_combat_types(session)
+generate_fake_category_types(session)
+generate_fake_sport_types(session)
+generate_fake_weight_classes(session)
+generate_fake_referee_types(session)
+generate_fake_coach_types(session)
 
-# generate_fake_users(session, num_users)
-# generate_fake_coaches(session)
-# generate_fake_referees(session)
-# generate_fake_athletes(session)
+generate_fake_users(session, num_users)
+generate_fake_coaches(session)
+generate_fake_referees(session)
+generate_fake_athletes(session)
 generate_fake_event_organizers(session)
 generate_fake_spectators(session)
 generate_fake_system_administrators(session)
