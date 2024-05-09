@@ -1,5 +1,6 @@
 import { Event } from '@/lib/definitions';
 import { useEffect } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 interface MapSize {
   width: string;
@@ -65,8 +66,24 @@ export function YandexMap({ places, size }: YandexMapProps) {
 
   return (
     <div
-      id="map"
+      className="relative flex overflow-hidden rounded-md"
       style={{ width: size?.width || '100%', height: size?.height || '400px' }}
-    ></div>
+    >
+      <Skeleton
+        className="absolute z-0"
+        style={{
+          width: size?.width || '100%',
+          height: size?.height || '400px',
+        }}
+      />
+      <div
+        id="map"
+        className="absolute z-10"
+        style={{
+          width: size?.width || '100%',
+          height: size?.height || '400px',
+        }}
+      ></div>
+    </div>
   );
 }

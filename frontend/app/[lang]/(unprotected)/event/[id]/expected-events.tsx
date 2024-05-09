@@ -5,8 +5,8 @@ import { ContentWraper } from '@/components/content-wraper';
 
 export function ExpectedEvents({ events }: { events: Event[] }) {
   return (
-    <CustomSection className="items-start gap-6 pb-12">
-      <ContentWraper>
+    <CustomSection>
+      <ContentWraper className="items-start gap-6 pb-12">
         <h3 className="text-4xl font-bold text-[#616161]">
           Самые ожидаемые события
         </h3>
