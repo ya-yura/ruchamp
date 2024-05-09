@@ -62,7 +62,11 @@ class CategoryType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
-    athletes = relationship('Athlete', secondary=athlete_grade_association, back_populates='grades')
+    athletes = relationship(
+        'Athlete',
+        secondary=athlete_grade_association,
+        back_populates='grades'
+    )
 
 
 # Виды спорта, которые фигурируют в системе
@@ -71,7 +75,11 @@ class SportType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
-    athletes = relationship('Athlete', secondary=athlete_sport_type_association, back_populates='sport_types')
+    athletes = relationship(
+        'Athlete',
+        secondary=athlete_sport_type_association,
+        back_populates='sport_types'
+    )
 
 
 # классы веса (супертяж, тяж и пр)
@@ -94,9 +102,17 @@ class Coach(Base):
     gender = Column(Boolean, default=True, nullable=True)
     country = Column(String, nullable=True)
     birthdate = Column(Date, nullable=True)
-    qualification_level = Column(Integer, ForeignKey(CoachType.id, ondelete="CASCADE"), nullable=True)
+    qualification_level = Column(
+        Integer,
+        ForeignKey(CoachType.id, ondelete="CASCADE"),
+        nullable=True
+    )
 
-    athletes = relationship("Athlete", secondary=athlete_coach_association, back_populates="coaches")
+    athletes = relationship(
+        "Athlete",
+        secondary=athlete_coach_association,
+        back_populates="coaches"
+    )
 
 
 # пользователь системы
@@ -127,7 +143,9 @@ class Referee(Base):
     __tablename__ = "Referee"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"))
-    qualification_level = Column(Integer, ForeignKey(RefereeType.id, ondelete="CASCADE"))
+    qualification_level = Column(
+        Integer, ForeignKey(RefereeType.id, ondelete="CASCADE")
+    )
     image_field = Column(String, nullable=True)
 
 
@@ -139,10 +157,25 @@ class Athlete(Base):
     weight = Column(Float, nullable=True)
     height = Column(Integer, nullable=True)
     image_field = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+    region = Column(String, nullable=True)
 
-    sport_types = relationship('SportType', secondary=athlete_sport_type_association, back_populates='athletes')
-    coaches = relationship("Coach", secondary=athlete_coach_association, back_populates="athletes")
-    grades = relationship('CategoryType', secondary=athlete_grade_association, back_populates='athletes')
+    sport_types = relationship(
+        'SportType',
+        secondary=athlete_sport_type_association,
+        back_populates='athletes'
+    )
+    coaches = relationship(
+        'Coach',
+        secondary=athlete_coach_association,
+        back_populates='athletes'
+    )
+    grades = relationship(
+        'CategoryType',
+        secondary=athlete_grade_association,
+        back_populates='athletes'
+    )
 
 
 # организатор

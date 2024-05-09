@@ -18,6 +18,9 @@ class Team(Base):
     description = Column(String, nullable=True)
     slug = Column(String, nullable=True)
     image_field = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+    region = Column(String, nullable=True)
 
 
 class TeamMember(Base):
