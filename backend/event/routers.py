@@ -36,11 +36,33 @@ async def get_events_id(
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Event).where(Event.id == event_id))
-    event = query.scalars().one_or_none()
+    query = await db.execute(select(
+        Event.id,
+        Event.name,
+        Event.description,
+        Event.location,
+        Event.start_request_datetime,
+        Event.end_request_datetime,
+        Event.start_datetime,
+        Event.end_datetime,
+        Event.event_order,
+        Event.event_system,
+        Event.image_field,
+        Event.geo,
+    ).where(Event.id == event_id))
+    event = query.mappings().all()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
-    return event
+    query = await db.execute(select(Event.organizer_id).where(Event.id == event_id))
+    event_organizer_id = query.scalars().first()
+    query = await db.execute(select(EventOrganizer.organization_name).where(EventOrganizer.id == event_organizer_id))
+    organizer = query.mappings().all()
+    event_info = event
+    org_info = organizer[0]
+    # result = event_info | org_info
+    # print(result)
+
+    return event_info
 
 
 @router.post("/create")

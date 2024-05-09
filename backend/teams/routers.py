@@ -15,7 +15,8 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from auth.auth import auth_backend
 from auth.manager import UserManager, get_user_manager
-from auth.models import User, Athlete
+from auth.models import (User, Athlete, athlete_coach_association, Coach,
+                         SportType, athlete_sport_type_association)
 # from auth.routes import router as auth_router
 from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
@@ -205,7 +206,7 @@ async def create_team(
     query = await db.execute(select(
         Athlete.id).where(Athlete.user_id == current_user.id)
     )
-    athlete_id = query.scalar_one_or_none()
+    athlete_id = query.scalars().first()
 
     role_id = current_user.role_id
     allowed_roles = [1, 2, 4]  # Роли, которым разрешено создавать команды
@@ -243,12 +244,37 @@ async def create_team(
 async def get_all_teams(
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Team))
-    teams = query.scalars().all()
-    return teams
+    query = await db.execute(select(Team.id))
+    teams_id = query.scalars().all()
 
-# disable_installed_extensions_check()
-# add_pagination(router)
+    teams_info = []
+    res = []
+    for team_id in teams_id:
+        query = await db.execute(select(
+            Team.name,
+            Team.description,
+            Team.slug,
+            Team.invite_link,
+            Team.image_field
+        ).where(Team.id == team_id))
+        team = query.mappings().all()
+
+        query = await db.execute(select(Team.captain).where(Team.id == team_id))
+        captain_user_id = query.scalars().first()
+
+        query = await db.execute(select(
+            User.id,
+            User.sirname,
+            User.name,
+            User.fathername
+        ).where(User.id == captain_user_id))
+        captain_info = query.mappings().all()
+        team.append(captain_info[0])
+        res.append(team)
+
+    result = {"Teams": res}
+
+    return result
 
 
 @router.get("/get-team/{team_id}")
@@ -257,10 +283,33 @@ async def get_team(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    query = await db.execute(select(Team).where(Team.id == team_id))
-    team = query.mappings().all()
-    if not team:
+    query = await db.execute(select(Team.captain).where(Team.id == team_id))
+    athlete_id = query.scalars().first()
+
+    query = await db.execute(select(
+        Athlete.user_id
+    ).where(Athlete.id == athlete_id))
+    captain_user_id = query.scalars().first()
+
+    query = await db.execute(select(
+        User.id,
+        User.sirname,
+        User.name,
+        User.fathername
+    ).where(User.id == captain_user_id))
+    captain_info = query.mappings().all()
+
+    query = await db.execute(select(
+        Team.name,
+        Team.image_field,
+        Team.captain
+    ).where(Team.id == team_id))
+    team_info = query.mappings().all()
+
+    if not team_info:
         raise HTTPException(status_code=404, detail="Team not found")
+
+    team = team_info
 
     query = await db.execute(select(
         TeamMember.member).where(TeamMember.team == team_id)
@@ -269,24 +318,50 @@ async def get_team(
     users = []
 
     for member in members:
-        query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+        query = await db.execute(select(Athlete.user_id)
+                                 .where(Athlete.id == member))
         athlete_id = query.scalar_one_or_none()
-        query = await db.execute(select(User.sirname, User.name, User.fathername, User.birthdate).where(User.id == athlete_id))
-        user = query.mappings().all()
-        query = await db.execute(select(Athlete.height, Athlete.weight, Athlete.image_field).where(Athlete.id == member))
-        athlete = query.mappings().all()
-        user.append(athlete)
-        users.append(user)
-    
-    print(users)
 
-    
-    #print(team)
-    #print(members)'''
-    result = []
-    result.append(team)
-    result.append(users)
-    #print(result)
+        query = await db.execute(select(
+            User.id,
+            User.sirname,
+            User.name,
+            User.fathername,
+            User.birthdate,
+            User.gender
+        ).where(User.id == athlete_id))
+        user = query.mappings().all()
+
+        query = await db.execute(select(
+            Athlete.height,
+            Athlete.weight,
+            Athlete.image_field
+        ).where(Athlete.id == member))
+        athlete = query.mappings().all()
+
+        query = await db.execute(select(
+            SportType.name
+        ).join(
+            athlete_sport_type_association
+        ).where(athlete_sport_type_association.c.athlete_id == member))
+        sport_types = query.scalars().all()
+
+        query = await db.execute(select(
+            Coach.sirname,
+            Coach.name,
+            Coach.fathername,
+            Coach.qualification_level
+        ).join(
+            athlete_coach_association
+        ).where(athlete_coach_association.c.athlete_id == member))
+        coachs = query.mappings().all()
+
+        user.append(athlete[0])
+        user.append(sport_types)
+        user.append(coachs[0])
+        users.append(user)
+
+    result = {"Team": team[0], "Captain": captain_info[0], "Members": users}
 
     return result
 
