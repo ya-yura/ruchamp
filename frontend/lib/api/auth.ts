@@ -1,5 +1,5 @@
 import { TypeRegFormSchema } from '@/app/[lang]/(auth)/register/register-form';
-import { TypeHttpRequest, UserData } from '../definitions';
+import { HttpRequest, UserData } from '../definitions';
 
 export function checkResponse(res: any) {
   return res.ok ? res.json() : Promise.reject(res.status);
@@ -9,7 +9,7 @@ class Auth {
   private baseUrl: string;
   private headers: { [header: string]: string };
 
-  constructor({ baseUrl, headers }: TypeHttpRequest) {
+  constructor({ baseUrl, headers }: HttpRequest) {
     this.baseUrl = baseUrl;
     this.headers = headers;
   }

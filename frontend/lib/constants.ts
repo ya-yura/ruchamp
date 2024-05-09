@@ -1,6 +1,6 @@
-import { TypeEvent } from './definitions';
+import { Event } from './definitions';
 
-export type TypeSportsTypes =
+export type SportsTypes =
   | 'Айкидо'
   | 'Бокатор'
   | 'Бокс'
@@ -28,7 +28,7 @@ export type TypeSportsTypes =
   | 'Ушу'
   | 'Эскрима';
 
-export const sportsTypes: TypeSportsTypes[] = [
+export const sportsTypes: SportsTypes[] = [
   'ММА',
   'Бокс',
   'Карате',
@@ -57,7 +57,7 @@ export const sportsTypes: TypeSportsTypes[] = [
   'Эскрима',
 ];
 
-export const testData: TypeEvent[] = [
+export const testData: Event[] = [
   {
     name: 'Турнир чемпионов.',
     start_datetime: '2024-04-20T09:12:58.544900',

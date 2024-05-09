@@ -1,4 +1,4 @@
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { useEffect } from 'react';
 
 interface MapSize {
@@ -7,7 +7,7 @@ interface MapSize {
 }
 
 interface YandexMapProps {
-  places: TypeEvent[];
+  places: Event[];
   size?: MapSize;
 }
 

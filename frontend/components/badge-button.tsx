@@ -1,13 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TypeSportsTypes } from '@/lib/constants';
+import { SportsTypes } from '@/lib/constants';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type TypeBadgeButtonProps = {
-  title: TypeSportsTypes;
+  title: SportsTypes;
   isDisabled?: boolean;
-  selected?: TypeSportsTypes[];
-  setSelected?: Dispatch<SetStateAction<TypeSportsTypes[]>>;
+  selected?: SportsTypes[];
+  setSelected?: Dispatch<SetStateAction<SportsTypes[]>>;
 };
 
 export function BadgeButton({

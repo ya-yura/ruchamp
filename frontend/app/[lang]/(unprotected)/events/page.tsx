@@ -1,12 +1,12 @@
 import { EventsTabs } from './events-tabs';
 import { eventsApi } from '@/lib/api/eventsApi';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { Container } from '@/components/container';
 import { testData } from '@/lib/constants';
 import { divideEventsByDateTime } from '@/lib/utils';
 
 export default async function Events() {
-  let events: TypeEvent[];
+  let events: Event[];
   try {
     events = await eventsApi.getEvents();
   } catch (err) {

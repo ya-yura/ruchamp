@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { chooseTypes, transformDate } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ export function CardEvent({
   event,
   className,
 }: {
-  event: TypeEvent;
+  event: Event;
   className?: string;
 }) {
   const [isLiked, setIsLiked] = useState<boolean>(false);

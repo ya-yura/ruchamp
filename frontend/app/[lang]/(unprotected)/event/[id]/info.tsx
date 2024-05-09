@@ -1,5 +1,5 @@
 import { TextCard } from './text-card';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { cn, transformDate } from '@/lib/utils';
 
 type TypeMockData = {
@@ -7,7 +7,7 @@ type TypeMockData = {
   text: string;
 };
 
-export function Info({ event }: { event: TypeEvent }) {
+export function Info({ event }: { event: Event }) {
   const mockData1: TypeMockData[] = [
     {
       title: '',

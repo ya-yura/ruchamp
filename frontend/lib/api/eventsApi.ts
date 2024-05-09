@@ -1,20 +1,20 @@
-import { TypeEvent, TypeHttpRequest } from '../definitions';
+import { Event, HttpRequest } from '../definitions';
 import { checkResponse } from './auth';
 
 class EventsApi {
   private baseUrl: string;
   private headers: { [header: string]: string };
 
-  constructor({ baseUrl, headers }: TypeHttpRequest) {
+  constructor({ baseUrl, headers }: HttpRequest) {
     this.baseUrl = baseUrl;
     this.headers = headers;
   }
 
-  getEvents(): Promise<Array<TypeEvent>> {
+  getEvents(): Promise<Array<Event>> {
     return fetch(`${this.baseUrl}/event/events`, {}).then(checkResponse);
   }
 
-  getEvent(id: string): Promise<TypeEvent> {
+  getEvent(id: string): Promise<Event> {
     return fetch(`${this.baseUrl}/event/${id}`, {}).then(checkResponse);
   }
 }

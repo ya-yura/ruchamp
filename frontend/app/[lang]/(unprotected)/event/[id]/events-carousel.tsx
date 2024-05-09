@@ -7,12 +7,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { CardEvent } from '../../events/card-event';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 
-export function EventsCarousel({ events }: { events: Array<TypeEvent> }) {
+export function EventsCarousel({ events }: { events: Event[] }) {
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true }),
   );
