@@ -15,7 +15,9 @@ class EventsApi {
   }
 
   getEvent(id: string): Promise<Event> {
-    return fetch(`${this.baseUrl}/event/${id}`, {}).then(checkResponse);
+    return fetch(`${this.baseUrl}/event/${id}`, {})
+      .then(checkResponse)
+      .then((res) => res[0]);
   }
 }
 

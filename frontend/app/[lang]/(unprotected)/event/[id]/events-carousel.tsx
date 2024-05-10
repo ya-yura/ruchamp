@@ -8,7 +8,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Event } from '@/lib/definitions';
-import { BigCardWithImage } from '../../events/card-event';
+import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 import { transformDate } from '@/lib/utils';

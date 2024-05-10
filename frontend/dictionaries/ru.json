@@ -16,6 +16,13 @@
     },
     "login": {},
     "register": {},
-    "profile": {}
+    "profile": {},
+    "events": {
+      "filters": {
+        "futureEvents": "Будущие события",
+        "pastEvents": "Прошлые события",
+        "usersEvents": "Ваши события"
+      }
+    }
   }
 }
