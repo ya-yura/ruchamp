@@ -1,6 +1,7 @@
 import { Event } from '@/lib/definitions';
 import { useEffect } from 'react';
 import { Skeleton } from './ui/skeleton';
+import { H5 } from './text';
 
 interface MapSize {
   width: string;
@@ -84,6 +85,17 @@ export function YandexMap({ places, size }: YandexMapProps) {
           height: size?.height || '400px',
         }}
       ></div>
+      {places.length === 0 && (
+        <div
+          className="absolute z-10 flex items-center justify-center rounded-md bg-muted"
+          style={{
+            width: size?.width || '100%',
+            height: size?.height || '400px',
+          }}
+        >
+          <H5 className="text-muted-foreground">Ничего не найдено</H5>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,27 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ContentWraper } from '../../../../components/content-wraper';
+import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
 import { SportsTypes, sportsTypes } from '@/lib/constants';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Event } from '@/lib/definitions';
-import { EventsCards } from './events-cards';
+import { BigCardsWithImageField } from './events-cards';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
-import { cn } from '@/lib/utils';
+import { cn, isDateInRange } from '@/lib/utils';
+import { Dictionary } from '../../dictionary-provider';
+import { YandexMap } from '@/components/yandex-map';
 
 interface ModeSwitherProps {
   isOnMode: boolean;
@@ -20,27 +29,68 @@ interface ModeSwitherProps {
   className?: string;
 }
 interface EventTabsProps {
+  dictionary: Dictionary['page']['events'];
   futureEvents: Event[];
   pastEvents: Event[];
+  usersEvents: Event[];
 }
 
 enum EventTabs {
-  'futureEvents' = 'Будущие события',
-  'pastEvents' = 'Прошедшие события',
-  'usersEvents' = 'Ваши события',
+  FUTURE_EVENTS = 'futureEvents',
+  PAST_EVENTS = 'pastEvents',
+  USERS_EVENTS = 'usersEvents',
 }
 
-export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
+export function EventsTabs({
+  dictionary,
+  futureEvents,
+  pastEvents,
+  usersEvents,
+}: EventTabsProps) {
+  const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<SportsTypes[]>(
     [],
   );
-  const [date, setDate] = useState<DateRange | undefined>(
-    undefined,
-    // {from: new Date(),
-    // to: addDays(new Date(), 20),}
-  );
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
+  const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let events: Event[];
+    switch (tabValue) {
+      case EventTabs.FUTURE_EVENTS:
+        events = futureEvents;
+        break;
+      case EventTabs.PAST_EVENTS:
+        events = pastEvents;
+        break;
+      case EventTabs.USERS_EVENTS:
+        events = usersEvents;
+        break;
+      default:
+        events = futureEvents;
+    }
+    const filtredByDateEvents = date
+      ? events.filter((event) => isDateInRange(event.start_datetime, date))
+      : events;
+
+    // Filter by type is in temporary variant
+    const filterByType = selectedSportTypes.map((item) =>
+      sportsTypes.indexOf(item),
+    );
+    const filteredEvents = selectedSportTypes.length
+      ? filtredByDateEvents.filter((event) =>
+          filterByType.some((f) =>
+            event.id.toString().split('').includes(f.toString()),
+          ),
+        )
+      : filtredByDateEvents;
+
+    setFilteredEvents(filteredEvents);
+    setMapKey((prevKey) => prevKey + 1); // This state is to reload map with new data
+  }, [tabValue, selectedSportTypes, date]);
 
   function scrollToTop(): void {
     if (topRef.current) {
@@ -48,22 +98,33 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
     }
   }
 
+  const handleTabChange = useCallback((value: string) => {
+    setTabValue(value as EventTabs);
+  }, []);
+
+  const labels = {
+    [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
+    [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,
+    [EventTabs.USERS_EVENTS]: dictionary.filters.usersEvents,
+  };
+
   return (
     <CustomSection ref={topRef}>
       <ContentWraper className="h-fit justify-between">
         <Tabs
-          defaultValue="futureEvents"
           className="relative mx-auto mb-10 w-full"
+          value={tabValue}
+          onValueChange={handleTabChange}
         >
           <div className="flex h-[164px] w-full sm:h-[64px]">
             <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger
-                  key={key}
+                  key={value}
                   className="rounded-none border-[#115EA3] text-base data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white sm:text-sm"
-                  value={key}
+                  value={value}
                 >
-                  {value}
+                  {labels[value]}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -85,27 +146,29 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
             isOnMode={isMapMode}
             setIsOnMode={setIsMapMode}
           />
-          <TabsContent value="futureEvents">
-            <EventsCards
-              events={futureEvents}
-              selectedSportTypes={selectedSportTypes}
-              date={date}
-              scrollToTop={scrollToTop}
-              isMapMode={isMapMode}
-            />
-          </TabsContent>
-          <TabsContent value="pastEvents">
-            <EventsCards
-              events={pastEvents}
-              selectedSportTypes={selectedSportTypes}
-              date={date}
-              scrollToTop={scrollToTop}
-              isMapMode={isMapMode}
-            />
-          </TabsContent>
-          <TabsContent value="usersEvents">
-            <p className="text-background">Ваши события</p>
-          </TabsContent>
+
+          {Object.entries(EventTabs).map(([key, value]) => (
+            <TabsContent key={value} value={value}>
+              <p className="mb-5 text-base text-background">
+                {filteredEvents.length > 1
+                  ? `Найдено: ${filteredEvents.length}`
+                  : 'Ничего не найдено'}
+              </p>
+              {isMapMode ? (
+                <YandexMap
+                  key={mapKey} // This key is to reload map with new data
+                  places={filteredEvents}
+                  size={{ width: '100%', height: '50vh' }}
+                />
+              ) : (
+                <BigCardsWithImageField<Event>
+                  cards={filteredEvents}
+                  type="event"
+                  scrollToTop={scrollToTop}
+                />
+              )}
+            </TabsContent>
+          ))}
         </Tabs>
       </ContentWraper>
     </CustomSection>
