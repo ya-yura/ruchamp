@@ -2,7 +2,7 @@ import os
 import uuid
 
 from aiofiles import open as async_open
-from fastapi import (APIRouter, Depends, File, HTTPException, Request,
+from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi.templating import Jinja2Templates
 from fastapi_pagination import Params, paginate
@@ -32,7 +32,6 @@ async def get_events(
 
 @router.get("/{event_id}")
 async def get_events_id(
-    request: Request,
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
@@ -53,14 +52,19 @@ async def get_events_id(
     event = query.mappings().all()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
-    query = await db.execute(select(Event.organizer_id).where(Event.id == event_id))
+    query = await db.execute(
+        select(Event.organizer_id).where(Event.id == event_id)
+    )
     event_organizer_id = query.scalars().first()
-    query = await db.execute(select(EventOrganizer.organization_name).where(EventOrganizer.id == event_organizer_id))
+
+    query = await db.execute(select(
+        EventOrganizer.organization_name
+    ).where(EventOrganizer.id == event_organizer_id)
+    )
     organizer = query.mappings().all()
+
     event_info = event
-    org_info = organizer[0]
-    # result = event_info | org_info
-    # print(result)
+    event_info.append(organizer[0])
 
     return event_info
 

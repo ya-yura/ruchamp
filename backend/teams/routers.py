@@ -246,9 +246,10 @@ async def get_all_teams(
 ):
     query = await db.execute(select(Team.id))
     teams_id = query.scalars().all()
-    res = []
+    result = []
     for team_id in teams_id:
         query = await db.execute(select(
+            Team.id,
             Team.name,
             Team.description,
             Team.slug,
@@ -260,20 +261,59 @@ async def get_all_teams(
         ).where(Team.id == team_id))
         team = query.mappings().all()
 
-        query = await db.execute(select(Team.captain).where(Team.id == team_id))
+        query = await db.execute(
+            select(Team.captain).where(Team.id == team_id)
+        )
         captain_user_id = query.scalars().first()
+        query = await db.execute(
+            select(Athlete.user_id).where(Athlete.id == captain_user_id)
+        )
+        user_id = query.scalars().first()
 
         query = await db.execute(select(
-            User.id,
             User.sirname,
             User.name,
-            User.fathername
-        ).where(User.id == captain_user_id))
+            User.fathername,
+        ).where(User.id == user_id))
         captain_info = query.mappings().all()
-        team.append(captain_info[0])
-        res.append(team)
 
-    result = {"Teams": res}
+        query = await db.execute(
+            select(TeamMember.member).where(TeamMember.team == team_id)
+        )
+        members = query.scalars().all()
+        members_info = []
+        for member in members:
+            i = 0
+            query = await db.execute(
+                select(Athlete.user_id).where(Athlete.id == member)
+            )
+            user_id = query.scalars().first()
+
+            query = await db.execute(select(
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+            ).where(User.id == user_id))
+            user_info = query.mappings().all()
+
+            query = await db.execute(select(
+                Athlete.height,
+                Athlete.weight,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+            ).where(Athlete.user_id == user_id))
+            athlete = query.mappings().all()
+            user_info.append(athlete[i])
+
+            members_info.append(user_info)
+            i += 1
+
+        team.append(captain_info[0])
+        team.append(members_info)
+        result.append(team)
 
     return result
 
@@ -293,7 +333,6 @@ async def get_team(
     captain_user_id = query.scalars().first()
 
     query = await db.execute(select(
-        User.id,
         User.sirname,
         User.name,
         User.fathername
@@ -303,6 +342,12 @@ async def get_team(
     query = await db.execute(select(
         Team.name,
         Team.image_field,
+        Team.description,
+        Team.invite_link,
+        Team.slug,
+        Team.country,
+        Team.city,
+        Team.region,
     ).where(Team.id == team_id))
     team_info = query.mappings().all()
 

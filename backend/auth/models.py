@@ -1,12 +1,41 @@
 from datetime import datetime
 
-from sqlalchemy import (JSON, TIMESTAMP, Boolean, Column, Date, DateTime,
+from sqlalchemy import (JSON, TIMESTAMP, Boolean, Column, Date,
                         Float, ForeignKey, Integer, String, Table)
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
 Base: DeclarativeMeta = declarative_base()
 metadata = Base.metadata
+
+
+# --------------- GEO ------------------
+
+class Country(Base):
+    __tablename__ = "Country"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+class Region(Base):
+    __tablename__ = "Region"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    country_id = Column(Integer, ForeignKey("Country.id", ondelete="CASCADE"))
+    country = relationship("Country", back_populates="regions")
+    areas = relationship("Area", back_populates="region")
+
+
+Country.regions = relationship("Region", back_populates="country")
+
+
+class Area(Base):
+    __tablename__ = "Area"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    region_id = Column(Integer, ForeignKey("Region.id", ondelete="CASCADE"))
+    region = relationship("Region", back_populates="areas")
+
 
 athlete_sport_type_association = Table(
     'athlete_sport_type_association', Base.metadata,
@@ -157,9 +186,9 @@ class Athlete(Base):
     weight = Column(Float, nullable=True)
     height = Column(Integer, nullable=True)
     image_field = Column(String, nullable=True)
-    country = Column(String, nullable=True)
+    country = Column(Integer, ForeignKey(Country.id, ondelete="CASCADE"))
     city = Column(String, nullable=True)
-    region = Column(String, nullable=True)
+    region = Column(Integer, ForeignKey(Region.id, ondelete="CASCADE"))
 
     sport_types = relationship(
         'SportType',
