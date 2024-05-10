@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   Carousel,
@@ -8,9 +8,10 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Event } from '@/lib/definitions';
-import { CardEvent } from '../../events/card-event';
+import { BigCardWithImage } from '../../events/card-event';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
+import { transformDate } from '@/lib/utils';
 
 export function EventsCarousel({ events }: { events: Event[] }) {
   const plugin = React.useRef(
@@ -26,12 +27,17 @@ export function EventsCarousel({ events }: { events: Event[] }) {
       plugins={[plugin.current]}
       className="w-full"
     >
-      <CarouselContent className='py-2'>
+      <CarouselContent className="py-2">
         {events.map((event) => (
           <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
-            <CardEvent
+            <BigCardWithImage
               key={event.id}
-              event={event}
+              type="event"
+              id={event.id}
+              name={event.name}
+              title={transformDate(event.start_datetime)}
+              subtitle={event.location}
+              description={event.description}
             />
           </CarouselItem>
         ))}

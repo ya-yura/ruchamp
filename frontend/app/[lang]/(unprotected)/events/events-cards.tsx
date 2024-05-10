@@ -1,10 +1,10 @@
-import { CardEvent } from './card-event';
+import { BigCardWithImage } from './card-event';
 import { useEffect, useState } from 'react';
 import { Event } from '@/lib/definitions';
 import { SportsTypes, sportsTypes } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
-import { cn, isDateInRange } from '@/lib/utils';
+import { cn, isDateInRange, transformDate } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 import { YandexMap } from '@/components/yandex-map';
 
@@ -24,9 +24,7 @@ export function EventsCards({
   isMapMode,
 }: EventsContentProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filteredEventsByType, setFilteredEventsByType] = useState<Event[]>(
-    [],
-  );
+  const [filteredEventsByType, setFilteredEventsByType] = useState<Event[]>([]);
   const [displayedEvents, setDisplayedEvents] = useState<Event[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isUpButtonShown, setIsUpButtonShown] = useState<boolean>(false);
@@ -46,7 +44,7 @@ export function EventsCards({
     const filteredEvents = selectedSportTypes.length
       ? filtredByDateEvents.filter((event) =>
           filterByType.some((f) =>
-            event.organizer_id.toString().split('').includes(f.toString()),
+            event.id.toString().split('').includes(f.toString()),
           ),
         )
       : filtredByDateEvents;
@@ -109,7 +107,15 @@ export function EventsCards({
           ) : (
             <ul className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {displayedEvents.map((event) => (
-                <CardEvent key={event.id} event={event} />
+                <BigCardWithImage
+                  key={event.id}
+                  type="event"
+                  id={event.id}
+                  name={event.name}
+                  title={transformDate(event.start_datetime)}
+                  subtitle={event.location}
+                  description={event.description}
+                />
               ))}
             </ul>
           )}

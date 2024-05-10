@@ -26,9 +26,9 @@ export function transformDate(inputDate: string, isWithTime?: boolean): string {
 }
 
 // Later it may be deleted
-export function chooseTypes(event: Event | undefined): SportsTypes[] {
+export function chooseTypes(id: number): SportsTypes[] {
   let res: SportsTypes[] = [];
-  const arr: string[] | undefined = event?.organizer_id.toString().split('');
+  const arr: string[] = id.toString().split('');
   arr?.map((item) => res.push(sportsTypes[+item]));
   return [...new Set(res)];
 }

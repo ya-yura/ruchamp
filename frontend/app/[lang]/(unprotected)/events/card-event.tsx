@@ -1,20 +1,31 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Event } from '@/lib/definitions';
-import { chooseTypes, transformDate } from '@/lib/utils';
+import { chooseTypes } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export function CardEvent({
-  event,
-  className,
-}: {
-  event: Event;
+interface BigCardWithImage {
+  type: string;
+  id: number;
+  name: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
   className?: string;
-}) {
+}
+
+export function BigCardWithImage({
+  type,
+  id,
+  name,
+  title,
+  subtitle,
+  description,
+  className,
+}: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const router = useRouter();
 
@@ -22,44 +33,41 @@ export function CardEvent({
     <li
       className={cn(
         'group flex h-[450px] w-full cursor-default flex-col overflow-hidden',
-        'hover:shadow-cardShadow rounded-xl bg-[#292929] transition-all hover:scale-[101%]',
+        'rounded-xl bg-[#292929] transition-all hover:scale-[101%] hover:shadow-cardShadow',
         className,
       )}
     >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"
-          src={`/ru/images/mock-event-bg/${event.id.toString()[event.id.toString().length - 1]}.avif`}
-          alt={event.name}
+          src={`/ru/images/mock-event-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}
         />
         <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
-          {event.name}
+          {name}
         </h3>
         <p className="relative line-clamp-2 text-sm text-background">
-          {chooseTypes(event).join(', ')}
+          {chooseTypes(id).join(', ')}
         </p>
       </div>
       <div className="flex flex-col justify-between px-4 py-3">
         <div className="mb-3 flex items-center justify-start gap-5">
-          <Image
-            className=""
-            src="/ru/images/icon-loop.png"
-            alt={'Иконка'}
-            width={25}
-            height={25}
-          />
+          <div className="m-0 flex h-[30px] w-[30px] items-center justify-center p-0">
+            <Image
+              src="/ru/images/icon-loop.png"
+              alt={'Иконка'}
+              width={25}
+              height={25}
+            />
+          </div>
           <div className="flex flex-col">
-            <p className="text-sm font-semibold text-background">
-              {transformDate(event.start_datetime)}
-            </p>
-            <p className="line-clamp-1 text-muted-foreground">
-              {event.location}
-            </p>
+            <p className="text-sm font-semibold text-background">{title}</p>
+            <p className="line-clamp-1 text-muted-foreground">{subtitle}</p>
           </div>
         </div>
-        <p className="line-clamp-2 text-background">{event.event_order}</p>
+        <p className="line-clamp-2 text-background">{description}</p>
       </div>
       <div className="flex justify-end gap-5 px-4">
         <Button
@@ -85,7 +93,7 @@ export function CardEvent({
         </Button>
         <Button
           variant="ruchampDefault"
-          onClick={() => router.push(`/ru/event/${event.id}`)}
+          onClick={() => router.push(`/ru/${type}/${id}`)}
         >
           Подробнее
         </Button>

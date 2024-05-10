@@ -70,7 +70,7 @@ export function EventInfo({ event }: { event: Event }) {
       </div>
       <CustomSection className="relative h-[590px] items-start  bg-transparent">
         <ContentWraper className="h-[590px] justify-between">
-          <Badges types={chooseTypes(event)} />
+          <Badges types={chooseTypes(event.id)} />
           <div className="relative flex flex-col gap-10">
             <H1>{event?.name}</H1>
             <div className="mb-[87px] flex gap-6">
