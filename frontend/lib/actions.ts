@@ -3,9 +3,11 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from './api/auth';
+import { auth, checkResponse } from './api/auth';
 
 const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: any) {
@@ -71,4 +73,8 @@ export async function updateSession(request: NextRequest) {
     expires: parsed.expires,
   });
   return res;
+}
+
+export async function getTeams() {
+  return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
 }

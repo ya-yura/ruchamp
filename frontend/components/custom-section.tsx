@@ -11,7 +11,7 @@ const CustomSection = React.forwardRef<HTMLDivElement, CustomSectionProps>(
     return (
       <section
         className={cn(
-          `bg-primary-background relative flex w-full flex-col`,
+          `flex w-full flex-col bg-primary-background`,
           `items-center justify-between`,
           `px-4`,
           `sm:px-7`,

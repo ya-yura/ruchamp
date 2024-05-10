@@ -1,9 +1,9 @@
-import { TypeEvent } from './definitions';
+import { Event } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, isPast, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { TypeSportsTypes, sportsTypes } from './constants';
+import { SportsTypes, sportsTypes } from './constants';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
 
@@ -26,9 +26,9 @@ export function transformDate(inputDate: string, isWithTime?: boolean): string {
 }
 
 // Later it may be deleted
-export function chooseTypes(event: TypeEvent | undefined): TypeSportsTypes[] {
-  let res: TypeSportsTypes[] = [];
-  const arr: string[] | undefined = event?.organizer_id.toString().split('');
+export function chooseTypes(id: number): SportsTypes[] {
+  let res: SportsTypes[] = [];
+  const arr: string[] = id.toString().split('');
   arr?.map((item) => res.push(sportsTypes[+item]));
   return [...new Set(res)];
 }
@@ -37,12 +37,12 @@ export function getRandomInt(max: number): number {
   return Math.floor(Math.random() * max);
 }
 
-export function divideEventsByDateTime(events: TypeEvent[]): {
-  futureEvents: TypeEvent[];
-  pastEvents: TypeEvent[];
+export function divideEventsByDateTime(events: Event[]): {
+  futureEvents: Event[];
+  pastEvents: Event[];
 } {
-  const futureEvents: TypeEvent[] = [];
-  const pastEvents: TypeEvent[] = [];
+  const futureEvents: Event[] = [];
+  const pastEvents: Event[] = [];
 
   events.forEach((event) => {
     const startDateTime = parseISO(event.start_datetime);

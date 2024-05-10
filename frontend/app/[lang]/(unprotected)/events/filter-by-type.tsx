@@ -1,6 +1,6 @@
 'use client';
 
-import { TypeSportsTypes, sportsTypes } from '@/lib/constants';
+import { SportsTypes } from '@/lib/constants';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BadgeButton } from '@/components/badge-button';
 import { ModeSwither } from './events-tabs';
@@ -14,10 +14,11 @@ import { useWindowWidth } from '@/lib/hooks/useWindowWidth';
 import { Badge } from '@/components/ui/badge';
 
 interface FilterByTypeProps {
-  selectedSportTypes: TypeSportsTypes[];
-  setSelected: Dispatch<SetStateAction<TypeSportsTypes[]>>;
-  isOnMode: boolean;
-  setIsOnMode: Dispatch<SetStateAction<boolean>>;
+  options: SportsTypes[];
+  selected: SportsTypes[];
+  setSelected: Dispatch<SetStateAction<SportsTypes[]>>;
+  isOnMode?: boolean;
+  setIsOnMode?: Dispatch<SetStateAction<boolean>>;
 }
 
 type Limit = {
@@ -42,32 +43,31 @@ const limits: Limits = {
 };
 
 export function FilterByType({
-  selectedSportTypes,
+  options,
+  selected,
   setSelected,
   isOnMode,
   setIsOnMode,
 }: FilterByTypeProps) {
-  const [poularSportsTypes, setPopularSportTypes] = useState<TypeSportsTypes[]>(
+  const [poularSportsTypes, setPopularSportTypes] = useState<SportsTypes[]>([]);
+  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<SportsTypes[]>(
     [],
   );
-  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<
-    TypeSportsTypes[]
-  >([]);
   const [windowWidth] = useWindowWidth(500);
 
   useEffect(() => {
     if (!windowWidth) return;
     if (windowWidth < limits.mobile.resolution) {
-      setPopularSportTypes(sportsTypes.slice(0, limits.mobile.quantity));
-      setUnPopularSportTypes(sportsTypes.slice(limits.mobile.quantity));
+      setPopularSportTypes(options.slice(0, limits.mobile.quantity));
+      setUnPopularSportTypes(options.slice(limits.mobile.quantity));
     } else if (
       limits.mobile.resolution <= windowWidth &&
       windowWidth < limits.tablet.resolution
     ) {
-      setPopularSportTypes(sportsTypes.slice(0, limits.tablet.quantity));
-      setUnPopularSportTypes(sportsTypes.slice(limits.tablet.quantity));
+      setPopularSportTypes(options.slice(0, limits.tablet.quantity));
+      setUnPopularSportTypes(options.slice(limits.tablet.quantity));
     } else {
-      setPopularSportTypes(sportsTypes);
+      setPopularSportTypes(options);
       setUnPopularSportTypes([]);
     }
   }, [windowWidth]);
@@ -79,7 +79,7 @@ export function FilterByType({
           <BadgeButton
             key={type}
             title={type}
-            selected={selectedSportTypes}
+            selected={selected}
             setSelected={setSelected}
           />
         ))}
@@ -97,16 +97,18 @@ export function FilterByType({
             <BadgeButton
               key={type}
               title={type}
-              selected={selectedSportTypes}
+              selected={selected}
               setSelected={setSelected}
             />
           ))}
         </PopoverContent>
-        <ModeSwither
-          isOnMode={isOnMode}
-          setIsOnMode={setIsOnMode}
-          className="relative ml-auto lg:hidden"
-        />
+        {isOnMode && setIsOnMode && (
+          <ModeSwither
+            isOnMode={isOnMode}
+            setIsOnMode={setIsOnMode}
+            className="relative ml-auto lg:hidden"
+          />
+        )}
       </div>
     </Popover>
   );

@@ -1,15 +1,14 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Image from 'next/image';
 import { ContentWraper } from '../../../../components/content-wraper';
 import { DatePicker } from './date-picker';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
-import { TypeSportsTypes } from '@/lib/constants';
+import { SportsTypes, sportsTypes } from '@/lib/constants';
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { EventsCards } from './events-cards';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
@@ -21,8 +20,8 @@ interface ModeSwitherProps {
   className?: string;
 }
 interface EventTabsProps {
-  futureEvents: TypeEvent[];
-  pastEvents: TypeEvent[];
+  futureEvents: Event[];
+  pastEvents: Event[];
 }
 
 enum EventTabs {
@@ -32,9 +31,9 @@ enum EventTabs {
 }
 
 export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
-  const [selectedSportTypes, setSelectedSportTypes] = useState<
-    TypeSportsTypes[]
-  >([]);
+  const [selectedSportTypes, setSelectedSportTypes] = useState<SportsTypes[]>(
+    [],
+  );
   const [date, setDate] = useState<DateRange | undefined>(
     undefined,
     // {from: new Date(),
@@ -50,23 +49,13 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
   }
 
   return (
-    <CustomSection ref={topRef} className="mt-[-92px] pt-[92px]">
-      <div className="absolute mt-[-92px] h-[853px] w-full ">
-        <Image
-          className="opacity-40"
-          src="/ru/images/background-events.jpeg"
-          alt=""
-          fill={true}
-          style={{ objectFit: 'cover' }}
-        />
-        <div className="to-primary-background absolute bottom-0 left-0 right-0 top-0 h-full w-full bg-gradient-to-b from-[rgba(0,0,0,0.01)] from-50% to-100%"></div>
-      </div>
+    <CustomSection ref={topRef}>
       <ContentWraper className="h-fit justify-between">
         <Tabs
           defaultValue="futureEvents"
           className="relative mx-auto mb-10 w-full"
         >
-          <div className="relative flex h-[164px] w-full sm:h-[64px]">
+          <div className="flex h-[164px] w-full sm:h-[64px]">
             <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger
@@ -90,7 +79,8 @@ export function EventsTabs({ futureEvents, pastEvents }: EventTabsProps) {
             setDate={setDate}
           />
           <FilterByType
-            selectedSportTypes={selectedSportTypes}
+            options={sportsTypes}
+            selected={selectedSportTypes}
             setSelected={setSelectedSportTypes}
             isOnMode={isMapMode}
             setIsOnMode={setIsMapMode}

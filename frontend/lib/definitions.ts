@@ -1,4 +1,4 @@
-export type TypeHttpRequest = {
+export type HttpRequest = {
   baseUrl: string;
   headers: { 'Content-Type': string; Authorization: string };
 };
@@ -78,7 +78,7 @@ export interface UserData {
 }
 
 // *** Events ***
-export type TypeEvent = {
+export interface Event {
   name: string;
   start_datetime: string;
   start_request_datetime: string;
@@ -92,4 +92,15 @@ export type TypeEvent = {
   organizer_id: number;
   event_system: string;
   image_field: string;
-};
+}
+
+// *** Teams ***
+export interface Team {
+  name: string;
+  captain: number;
+  description: string;
+  image_field: string;
+  id: number;
+  invite_link: string;
+  slug: string;
+}

@@ -27,6 +27,12 @@ export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
                 href="/events"
                 lang={lang}
               />
+              <ListItem
+                className="text-right"
+                title="Команды"
+                href="/teams"
+                lang={lang}
+              />
               {user ? (
                 <ListItem
                   className="text-right"

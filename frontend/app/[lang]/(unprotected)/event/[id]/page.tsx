@@ -1,19 +1,19 @@
 import { AddressSection } from './address-section';
-import { Container } from '@/components/container';
+import { Container } from '@/components/container'; 
 import { ExpectedEvents } from './expected-events';
 import { EventInfo } from './event-info';
 import { eventsApi } from '@/lib/api/eventsApi';
-import { TypeEvent } from '@/lib/definitions';
+import { Event } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
 import { testData } from '@/lib/constants';
 
-export default async function Event({ params }: { params: { id: string } }) {
+export default async function EventPage({ params }: { params: { id: string } }) {
   const id = params.id;
-  let events: TypeEvent[];
-  let expectedEvents: TypeEvent[];
-  const event: TypeEvent =
+  let events: Event[];
+  let expectedEvents: Event[];
+  const event: Event =
     +id > 1000000
-      ? (testData.find((event) => event.id === +id) as TypeEvent)
+      ? (testData.find((event) => event.id === +id) as Event)
       : await eventsApi.getEvent(id);
   const randomInt = getRandomInt(100);
 
