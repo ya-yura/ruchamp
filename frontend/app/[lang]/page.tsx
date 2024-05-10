@@ -25,10 +25,10 @@ export default async function Home({
       <Header lang={lang} user={user} />
       <Container>
         <HomeHero lang={lang} />
-        <FeaturesMain lang={lang}/>
-        <FeaturesAdditional lang={lang}/>
+        <FeaturesMain lang={lang} />
+        <FeaturesAdditional lang={lang} />
         <SecondHero lang={lang} />
-        <TrustedSection lang={lang}/>
+        <TrustedSection lang={lang} />
       </Container>
       <Footer lang={lang} />
     </>

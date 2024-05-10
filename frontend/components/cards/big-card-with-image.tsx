@@ -38,7 +38,7 @@ export function BigCardWithImage({
   return (
     <li
       className={cn(
-        'group flex h-[450px] w-full cursor-default flex-col overflow-hidden',
+        'group flex h-[450px] w-full cursor-default flex-col overflow-hidden pb-3',
         'rounded-xl bg-[#292929] transition-all hover:scale-[101%] hover:shadow-cardShadow',
         className,
       )}
@@ -46,7 +46,7 @@ export function BigCardWithImage({
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
           className="opacity-30"
-          src={`/ru/images/mock-event-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
           alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}
@@ -75,7 +75,7 @@ export function BigCardWithImage({
         </div>
         <p className="line-clamp-2 text-background">{description}</p>
       </div>
-      <div className="flex justify-end gap-5 px-4">
+      <div className="mt-auto flex justify-end gap-5 px-4">
         <Button
           className="border-none bg-transparent p-0 hover:border-none hover:bg-transparent"
           variant="outline"

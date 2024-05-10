@@ -4,22 +4,21 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
 import { cn, transformDate } from '@/lib/utils';
 
-interface BigCardsWithImageFieldProps<T> {
+interface BigCardsWithImageFieldProps {
   cards: any; // fix "any"
   type: 'event' | 'team';
   scrollToTop: () => void;
 }
 
-export function BigCardsWithImageField<T>({
+export function BigCardsWithImageField({
   cards,
   type,
   scrollToTop,
-}: BigCardsWithImageFieldProps<T>) {
+}: BigCardsWithImageFieldProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [displayedCards, setDisplayedCards] = useState<any[]>([]); // fix "any"
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isUpButtonShown, setIsUpButtonShown] = useState<boolean>(false);
-  const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const cardsPerPage = 12;
   const totalPages = Math.ceil(cards.length / cardsPerPage);
 
@@ -73,7 +72,7 @@ export function BigCardsWithImageField<T>({
             title={
               type === 'event' && card.start_datetime
                 ? transformDate(card.start_datetime)
-                : ''
+                : `${card.captain.sirname} ${card.captain.name} ${card.captain.fathername}`
             }
             subtitle={card.location}
             description={card.description}

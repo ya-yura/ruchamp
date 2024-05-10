@@ -5,8 +5,8 @@ import { FilterByType } from '../events/filter-by-type';
 import { SportsTypes, sportsTypes } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
 import { Team } from '@/lib/definitions';
-import { TeamsCards } from './teams-cards';
 import { ContentWraper } from '@/components/content-wraper';
+import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
 
 export function TeamsListing({ teams }: { teams: Team[] }) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<SportsTypes[]>(
@@ -19,6 +19,7 @@ export function TeamsListing({ teams }: { teams: Team[] }) {
       topRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
+
   return (
     <>
       <CustomSection className="relative mt-7 bg-transparent" ref={topRef}>
@@ -30,9 +31,14 @@ export function TeamsListing({ teams }: { teams: Team[] }) {
           />
         </ContentWraper>
 
-        <TeamsCards
-          teams={teams}
-          selectedSportTypes={selectedSportTypes}
+        <p className="mb-5 mr-auto text-base text-background">
+          {teams.length > 1
+            ? `Найдено: ${teams.length}`
+            : 'Ничего не найдено'}
+        </p>
+        <BigCardsWithImageField
+          cards={teams}
+          type="team"
           scrollToTop={scrollToTop}
         />
       </CustomSection>

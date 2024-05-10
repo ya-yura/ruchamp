@@ -16,7 +16,7 @@ import {
   useState,
 } from 'react';
 import { Event } from '@/lib/definitions';
-import { BigCardsWithImageField } from './events-cards';
+import { BigCardsWithImageField } from '../../../../components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
 import { cn, isDateInRange } from '@/lib/utils';
@@ -161,7 +161,7 @@ export function EventsTabs({
                   size={{ width: '100%', height: '50vh' }}
                 />
               ) : (
-                <BigCardsWithImageField<Event>
+                <BigCardsWithImageField
                   cards={filteredEvents}
                   type="event"
                   scrollToTop={scrollToTop}
