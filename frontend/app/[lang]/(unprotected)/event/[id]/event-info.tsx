@@ -46,6 +46,8 @@ export function EventInfo({ event }: { event: Event }) {
     [EventTabs['results']]: <Results />,
   };
 
+  console.log(event)
+
   return (
     <div className="w-full">
       <div
