@@ -396,6 +396,9 @@ async def create_user(
             user_id=user.id,
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
+            country=int(user_data.info['athlete_country']),
+            city=user_data.info['athlete_city'],
+            region=int(user_data.info['athlete_region']),
         )
         query = await db.execute(select(SportType).where(
             SportType.name.in_(user_data.info['athlete_sport_type'])

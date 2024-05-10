@@ -14,6 +14,9 @@ class TeamCreate(BaseModel):
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
+    country: Optional[int]
+    city: Optional[str]
+    region: Optional[int]
 
 
 class TeamUpdate(BaseModel):
@@ -22,6 +25,9 @@ class TeamUpdate(BaseModel):
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
+    country: Optional[int]
+    city: Optional[str]
+    region: Optional[int]
 
 
 class TeamDB(TeamCreate):
