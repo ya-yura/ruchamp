@@ -306,7 +306,16 @@ async def get_all_teams(
                 Athlete.city,
             ).where(Athlete.user_id == user_id))
             athlete = query.mappings().all()
+
+            query = await db.execute(select(
+                SportType.name
+            ).join(
+                athlete_sport_type_association
+            ).where(athlete_sport_type_association.c.athlete_id == member))
+            sport_types = query.scalars().all()
+
             user_info.append(athlete[i])
+            user_info.append(sport_types)
 
             members_info.append(user_info)
             i += 1
