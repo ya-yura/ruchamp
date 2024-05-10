@@ -44,6 +44,7 @@ export default async function Events({
     <Container>
       <EventsTabs
         dictionary={dictionary}
+        lang={lang}
         futureEvents={futureEvents}
         pastEvents={pastEvents}
         usersEvents={usersEvents}
