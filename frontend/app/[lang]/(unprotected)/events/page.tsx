@@ -4,14 +4,24 @@ import { Event } from '@/lib/definitions';
 import { Container } from '@/components/container';
 import { testData } from '@/lib/constants';
 import { divideEventsByDateTime } from '@/lib/utils';
+import { Locale } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
 
-export default async function Events() {
+export default async function Events({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
+  const { page } = await getDictionary(lang);
+  const dictionary = page.events;
   let events: Event[];
   try {
     events = await eventsApi.getEvents();
   } catch (err) {
     events = [];
   }
+
+  const usersEvents: Event[] = [];
 
   const { futureEvents, pastEvents } = divideEventsByDateTime([
     ...events,
@@ -32,7 +42,12 @@ export default async function Events() {
 
   return (
     <Container>
-      <EventsTabs futureEvents={futureEvents} pastEvents={pastEvents} />
+      <EventsTabs
+        dictionary={dictionary}
+        futureEvents={futureEvents}
+        pastEvents={pastEvents}
+        usersEvents={usersEvents}
+      />
     </Container>
   );
 }
