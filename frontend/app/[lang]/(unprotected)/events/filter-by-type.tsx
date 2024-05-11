@@ -1,6 +1,5 @@
 'use client';
 
-import { SportsTypes } from '@/lib/constants';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BadgeButton } from '@/components/badge-button';
 import {
@@ -14,9 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { ModeSwither } from '@/components/mode-switcher';
 
 interface FilterByTypeProps {
-  options: SportsTypes[];
-  selected: SportsTypes[];
-  setSelected: Dispatch<SetStateAction<SportsTypes[]>>;
+  options: string[];
+  selected: string[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
   children?: React.ReactNode;
 }
 
@@ -47,10 +46,8 @@ export function FilterByType({
   setSelected,
   children,
 }: FilterByTypeProps) {
-  const [poularSportsTypes, setPopularSportTypes] = useState<SportsTypes[]>([]);
-  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<SportsTypes[]>(
-    [],
-  );
+  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>([]);
+  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<string[]>([]);
   const [windowWidth] = useWindowWidth(500);
 
   useEffect(() => {
