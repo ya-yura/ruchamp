@@ -1,9 +1,7 @@
 'use client';
 
-import { SportsTypes } from '@/lib/constants';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BadgeButton } from '@/components/badge-button';
-import { ModeSwither } from './events-tabs';
 import {
   Popover,
   PopoverContent,
@@ -12,13 +10,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth';
 import { Badge } from '@/components/ui/badge';
+import { ModeSwither } from '@/components/mode-switcher';
 
 interface FilterByTypeProps {
-  options: SportsTypes[];
-  selected: SportsTypes[];
-  setSelected: Dispatch<SetStateAction<SportsTypes[]>>;
-  isOnMode?: boolean;
-  setIsOnMode?: Dispatch<SetStateAction<boolean>>;
+  options: string[];
+  selected: string[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
+  children?: React.ReactNode;
 }
 
 type Limit = {
@@ -46,13 +44,10 @@ export function FilterByType({
   options,
   selected,
   setSelected,
-  isOnMode,
-  setIsOnMode,
+  children,
 }: FilterByTypeProps) {
-  const [poularSportsTypes, setPopularSportTypes] = useState<SportsTypes[]>([]);
-  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<SportsTypes[]>(
-    [],
-  );
+  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>([]);
+  const [unPoularSportsTypes, setUnPopularSportTypes] = useState<string[]>([]);
   const [windowWidth] = useWindowWidth(500);
 
   useEffect(() => {
@@ -102,13 +97,7 @@ export function FilterByType({
             />
           ))}
         </PopoverContent>
-        {isOnMode && setIsOnMode && (
-          <ModeSwither
-            isOnMode={isOnMode}
-            setIsOnMode={setIsOnMode}
-            className="relative ml-auto lg:hidden"
-          />
-        )}
+        {children}
       </div>
     </Popover>
   );

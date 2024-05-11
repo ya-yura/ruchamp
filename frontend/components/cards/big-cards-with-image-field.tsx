@@ -2,7 +2,7 @@ import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
-import { cn, transformDate } from '@/lib/utils';
+import { chooseTypes, cn, transformDate } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 
 interface BigCardsWithImageFieldProps {
@@ -72,6 +72,11 @@ export function BigCardsWithImageField({
             type={type}
             id={card.id}
             name={card.name}
+            tags={
+              type === 'team'
+                ? card.sportTypes.join(', ')
+                : chooseTypes(card.id).join(', ') // fix later
+            }
             title={
               type === 'event' && card.start_datetime
                 ? transformDate(card.start_datetime)

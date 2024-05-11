@@ -1,11 +1,11 @@
 'use client';
 
-import { SportsTypes } from '@/lib/constants';
+import { sportTypes } from '@/lib/constants';
 import { BadgeButton } from '@/components/badge-button';
 import { cn } from '@/lib/utils';
 
 interface TypeBadgesProps extends React.HTMLAttributes<HTMLDivElement> {
-  types: SportsTypes[];
+  types: string[];
 }
 
 export function Badges({ types, className }: TypeBadgesProps) {

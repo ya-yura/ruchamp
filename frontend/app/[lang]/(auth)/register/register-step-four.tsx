@@ -7,7 +7,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { TypeRegFormSchema } from './register-form';
 import { Locale } from '@/i18n.config';
 import { Button } from '@/components/ui/button';
-import { sportsTypes } from '@/lib/constants';
+import { sportTypes } from '@/lib/constants';
 import { Spinner } from '@/components/spinner';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
 
@@ -41,7 +41,7 @@ const regAthleteFieldset: TypeFieldsetData<TypeRegFormSchema> = {
       placeholder: 'Выберите из списка',
       label: 'Виды спорта',
       defaultValue: '',
-      multiselectOptions: sportsTypes,
+      multiselectOptions: sportTypes,
     },
   ],
 };

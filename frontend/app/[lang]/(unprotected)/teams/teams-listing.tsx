@@ -2,15 +2,15 @@
 
 import React, { useRef, useState } from 'react';
 import { FilterByType } from '../events/filter-by-type';
-import { SportsTypes, sportsTypes } from '@/lib/constants';
+import { sportTypes } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
-import { Team } from '@/lib/definitions';
 import { ContentWraper } from '@/components/content-wraper';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
 import { Locale } from '@/i18n.config';
+import { Team } from './page';
 
 export function TeamsListing({ teams, lang }: { teams: Team[]; lang: Locale }) {
-  const [selectedSportTypes, setSelectedSportTypes] = useState<SportsTypes[]>(
+  const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>(
     [],
   );
   const topRef = useRef<HTMLDivElement | null>(null);
@@ -26,7 +26,7 @@ export function TeamsListing({ teams, lang }: { teams: Team[]; lang: Locale }) {
       <CustomSection className="relative mt-7 bg-transparent" ref={topRef}>
         <ContentWraper>
           <FilterByType
-            options={sportsTypes}
+            options={sportTypes}
             selected={selectedSportTypes}
             setSelected={setSelectedSportTypes}
           />
