@@ -277,6 +277,11 @@ async def get_current_user(
     if user.role_id == 1:
         query = await db.execute(select(Athlete).where(Athlete.user_id == current_user.id))
         result = query.mappings().all()
+        query = await db.execute(select(Athlete.id).where(Athlete.user_id == current_user.id))
+        athlete_id = query.scalars().first()
+        query = await db.execute(select(SportType.name).join(athlete_sport_type_association).where(athlete_sport_type_association.c.athlete_id == athlete_id))
+        athlete_sport_type = query.scalars().all()
+        result.append(athlete_sport_type)
     elif user.role_id == 2:
         query = await db.execute(select(EventOrganizer).where(EventOrganizer.user_id == current_user.id))
         result = query.mappings().all()

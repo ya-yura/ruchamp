@@ -82,7 +82,9 @@ async def upload_image(
     db: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
-    allowed_roles = [1, 2, 4, 5]  # Роли, которым разрешено загружать изображения
+
+    # Роли, которым разрешено загружать изображения
+    allowed_roles = [1, 2, 4, 5]
 
     if role_id not in allowed_roles:
         raise HTTPException(status_code=403, detail="Permission denied")
@@ -222,7 +224,10 @@ async def create_team(
     all_teams_capitans = query.scalars().all()
 
     if team_data.name in all_teams_names and current_user.id in all_teams_capitans:
-        raise HTTPException(status_code=403, detail="Такое название команды и капитан уже существуют")
+        raise HTTPException(
+            status_code=403,
+            detail="Такое название команды и капитан уже существуют"
+        )
 
     # Создаем команду
     new_team = Team(
