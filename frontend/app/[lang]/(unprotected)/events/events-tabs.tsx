@@ -3,32 +3,19 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { FilterByType } from './filter-by-type';
-import { SportsTypes, sportsTypes } from '@/lib/constants';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { sportTypes } from '@/lib/constants';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Event } from '@/lib/definitions';
 import { BigCardsWithImageField } from '../../../../components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
-import { cn, isDateInRange } from '@/lib/utils';
+import { isDateInRange } from '@/lib/utils';
 import { Dictionary } from '../../dictionary-provider';
 import { YandexMap } from '@/components/yandex-map';
 import { Locale } from '@/i18n.config';
+import { ModeSwither } from '@/components/mode-switcher';
 
-interface ModeSwitherProps {
-  isOnMode: boolean;
-  setIsOnMode: Dispatch<SetStateAction<boolean>>;
-  className?: string;
-}
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
   lang: Locale;
@@ -51,9 +38,7 @@ export function EventsTabs({
   usersEvents,
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
-  const [selectedSportTypes, setSelectedSportTypes] = useState<SportsTypes[]>(
-    [],
-  );
+  const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
@@ -81,7 +66,7 @@ export function EventsTabs({
 
     // Filter by type is in temporary variant
     const filterByType = selectedSportTypes.map((item) =>
-      sportsTypes.indexOf(item),
+      sportTypes.indexOf(item),
     );
     const filteredEvents = selectedSportTypes.length
       ? filtredByDateEvents.filter((event) =>
@@ -134,6 +119,8 @@ export function EventsTabs({
             <ModeSwither
               isOnMode={isMapMode}
               setIsOnMode={setIsMapMode}
+              label="На карте"
+              id="showMap"
               className="hidden lg:flex"
             />
           </div>
@@ -143,12 +130,18 @@ export function EventsTabs({
             setDate={setDate}
           />
           <FilterByType
-            options={sportsTypes}
+            options={sportTypes}
             selected={selectedSportTypes}
             setSelected={setSelectedSportTypes}
-            isOnMode={isMapMode}
-            setIsOnMode={setIsMapMode}
-          />
+          >
+            <ModeSwither
+              isOnMode={isMapMode}
+              setIsOnMode={setIsMapMode}
+              label="На карте"
+              id="showMap"
+              className="relative ml-auto lg:hidden"
+            />
+          </FilterByType>
 
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
@@ -176,29 +169,5 @@ export function EventsTabs({
         </Tabs>
       </ContentWraper>
     </CustomSection>
-  );
-}
-
-export function ModeSwither({
-  className,
-  isOnMode,
-  setIsOnMode,
-}: ModeSwitherProps) {
-  return (
-    <div
-      className={cn(
-        `absolute right-0 flex items-center space-x-2 py-2`,
-        className,
-      )}
-    >
-      <Switch
-        checked={isOnMode}
-        onCheckedChange={() => setIsOnMode(!isOnMode)}
-        id="showMap"
-      />
-      <Label className="text-sm font-normal text-background" htmlFor="showMap">
-        На карте
-      </Label>
-    </div>
   );
 }

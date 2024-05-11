@@ -26,6 +26,7 @@ export function BigCardWithImage({
   type,
   id,
   name,
+  tags,
   title,
   subtitle,
   description,
@@ -55,9 +56,7 @@ export function BigCardWithImage({
         <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
           {name}
         </h3>
-        <p className="relative line-clamp-2 text-sm text-background">
-          {chooseTypes(id).join(', ')}
-        </p>
+        <p className="relative line-clamp-2 text-sm text-background">{tags}</p>
       </div>
       <div className="flex flex-col justify-between px-4 py-3">
         <div className="mb-3 flex items-center justify-start gap-5">

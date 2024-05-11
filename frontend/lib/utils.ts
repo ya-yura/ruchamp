@@ -1,9 +1,9 @@
 import { Event } from './definitions';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { format, isPast, parseISO } from 'date-fns';
+import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { SportsTypes, sportsTypes } from './constants';
+import { sportTypes } from './constants';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
 
@@ -26,10 +26,10 @@ export function transformDate(inputDate: string, isWithTime?: boolean): string {
 }
 
 // Later it may be deleted
-export function chooseTypes(id: number): SportsTypes[] {
-  let res: SportsTypes[] = [];
+export function chooseTypes(id: number): string[] {
+  let res: string[] = [];
   const arr: string[] = id.toString().split('');
-  arr?.map((item) => res.push(sportsTypes[+item]));
+  arr?.map((item) => res.push(sportTypes[+item]));
   return [...new Set(res)];
 }
 
@@ -86,3 +86,21 @@ export const path = (lang: Locale, href: string) => {
   const isDefaultLang = lang === i18n.defaultLocale;
   return isDefaultLang ? href : `/${lang}${href}`;
 };
+
+export function calculateGender(
+  genders: boolean[],
+): 'male' | 'female' | 'mixed' | '' {
+  const maleCount = genders.filter((gender) => gender).length;
+  const femaleCount = genders.length - maleCount;
+  if (maleCount > 0 && femaleCount > 0) return 'mixed';
+  if (maleCount > 0) return 'male';
+  if (femaleCount > 0) return 'female';
+  return '';
+}
+
+export function calculateAge(birthDate: string): number {
+  const today: Date = new Date();
+  const dob: Date = parse(birthDate, 'yyyy-MM-dd', new Date());
+  const age: number = differenceInYears(today, dob);
+  return age;
+}
