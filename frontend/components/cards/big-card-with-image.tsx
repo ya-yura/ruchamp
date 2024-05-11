@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { chooseTypes } from '@/lib/utils';
+import { chooseTypes, path } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -29,6 +29,7 @@ export function BigCardWithImage({
   title,
   subtitle,
   description,
+  lang,
   className,
 }: any) {
   // fix "any"
@@ -99,7 +100,7 @@ export function BigCardWithImage({
         </Button>
         <Button
           variant="ruchampDefault"
-          onClick={() => router.push(`/ru/${type}/${id}`)}
+          onClick={() => router.push(path(lang, `/${type}/${id}`))}
         >
           Подробнее
         </Button>

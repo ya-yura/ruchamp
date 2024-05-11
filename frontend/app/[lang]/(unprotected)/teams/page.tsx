@@ -2,6 +2,7 @@ import React from 'react';
 import { Container } from '@/components/container';
 import { TeamsListing } from './teams-listing';
 import { getTeams } from '@/lib/actions';
+import { Locale } from '@/i18n.config';
 
 interface TeamInfo {
   id?: number;
@@ -22,7 +23,11 @@ interface CaptainInfo {
   fathername: string;
 }
 
-export default async function Teams() {
+export default async function Teams({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
   const res = await getTeams();
   const teamsRaw = res.Teams;
   const teams = teamsRaw.map((team: [TeamInfo, CaptainInfo], index: number) => {
@@ -37,7 +42,7 @@ export default async function Teams() {
 
   return (
     <Container>
-      <TeamsListing teams={teams} />
+      <TeamsListing teams={teams} lang={lang} />
     </Container>
   );
 }

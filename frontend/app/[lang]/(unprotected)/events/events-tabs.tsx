@@ -22,6 +22,7 @@ import { CustomSection } from '@/components/custom-section';
 import { cn, isDateInRange } from '@/lib/utils';
 import { Dictionary } from '../../dictionary-provider';
 import { YandexMap } from '@/components/yandex-map';
+import { Locale } from '@/i18n.config';
 
 interface ModeSwitherProps {
   isOnMode: boolean;
@@ -30,6 +31,7 @@ interface ModeSwitherProps {
 }
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
+  lang: Locale;
   futureEvents: Event[];
   pastEvents: Event[];
   usersEvents: Event[];
@@ -43,6 +45,7 @@ enum EventTabs {
 
 export function EventsTabs({
   dictionary,
+  lang,
   futureEvents,
   pastEvents,
   usersEvents,
@@ -165,6 +168,7 @@ export function EventsTabs({
                   cards={filteredEvents}
                   type="event"
                   scrollToTop={scrollToTop}
+                  lang={lang}
                 />
               )}
             </TabsContent>

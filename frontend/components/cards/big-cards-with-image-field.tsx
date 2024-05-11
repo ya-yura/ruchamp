@@ -3,17 +3,20 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
 import { cn, transformDate } from '@/lib/utils';
+import { Locale } from '@/i18n.config';
 
 interface BigCardsWithImageFieldProps {
   cards: any; // fix "any"
   type: 'event' | 'team';
   scrollToTop: () => void;
+  lang: Locale;
 }
 
 export function BigCardsWithImageField({
   cards,
   type,
   scrollToTop,
+  lang,
 }: BigCardsWithImageFieldProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [displayedCards, setDisplayedCards] = useState<any[]>([]); // fix "any"
@@ -76,6 +79,7 @@ export function BigCardsWithImageField({
             }
             subtitle={card.location}
             description={card.description}
+            lang={lang}
           />
         ))}
       </ul>
