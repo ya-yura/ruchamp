@@ -10,9 +10,7 @@ import { Locale } from '@/i18n.config';
 import { Team } from './page';
 
 export function TeamsListing({ teams, lang }: { teams: Team[]; lang: Locale }) {
-  const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>(
-    [],
-  );
+  const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
   const topRef = useRef<HTMLDivElement | null>(null);
 
   function scrollToTop(): void {
@@ -30,17 +28,19 @@ export function TeamsListing({ teams, lang }: { teams: Team[]; lang: Locale }) {
             selected={selectedSportTypes}
             setSelected={setSelectedSportTypes}
           />
-        </ContentWraper>
 
-        <p className="mb-5 mr-auto text-base text-background">
-          {teams.length > 1 ? `Найдено: ${teams.length}` : 'Ничего не найдено'}
-        </p>
-        <BigCardsWithImageField
-          cards={teams}
-          type="team"
-          scrollToTop={scrollToTop}
-          lang={lang}
-        />
+          <p className="mb-5 mr-auto text-base text-background">
+            {teams.length > 1
+              ? `Найдено: ${teams.length}`
+              : 'Ничего не найдено'}
+          </p>
+          <BigCardsWithImageField
+            cards={teams}
+            type="team"
+            scrollToTop={scrollToTop}
+            lang={lang}
+          />
+        </ContentWraper>
       </CustomSection>
     </>
   );
