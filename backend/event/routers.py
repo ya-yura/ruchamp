@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import timedelta
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -12,8 +13,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
+from auth.models import SportType, athlete_sport_type_association
 from connection import get_db
-from event.models import Event, EventOrganizer, Match
+from event.models import (Event, EventOrganizer, Match, CombatType,
+                          CategoryType, AllWeightClass)
 from event.shemas import EventCreate, EventUpdate, MatchCreate, MatchRead
 from geo.geo import get_geo
 
@@ -23,11 +26,75 @@ templates = Jinja2Templates(directory='templates')
 
 @router.get("/events")
 async def get_events(
-    db: AsyncSession = Depends(get_db),
-    params: Params = Depends()
+    db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Event))
-    return query.scalars().all()
+    query = await db.execute(select(Event.id))
+    events_id = query.scalars().all()
+    result = []
+    for event_id in events_id:
+        query = await db.execute(
+            select(
+                Event.id,
+                Event.name,
+                Event.start_request_datetime,
+                Event.end_request_datetime,
+                Event.start_datetime,
+                Event.end_datetime,
+                EventOrganizer.organization_name.label("organizer_name"),
+                Event.location,
+                Event.event_system,
+                Event.event_order,
+                Event.image_field,
+                Event.description
+            ).join(
+                EventOrganizer, EventOrganizer.id == Event.organizer_id
+            ).where(Event.id == event_id)
+        )
+        event_info = query.mappings().all()
+        query = await db.execute(
+            select(Match.id)
+            .where(Match.event_id == event_id)
+        )
+        matches_id = query.scalars().all()
+
+        sports_in_matches_info = []
+
+        for match_id in matches_id:
+            query = await db.execute(
+                select(Match.sport_id).where(Match.id == match_id))
+            match_sport_id = query.scalars().all()
+
+            for sport_id in match_sport_id:
+                query = await db.execute(
+                    select(SportType.name)
+                    .where(SportType.id == sport_id)
+                )
+                sport_name = query.scalars().first()
+                sports_in_matches_info.append(sport_name)
+
+        event_info.append(sports_in_matches_info)
+        result.append(event_info)
+
+    return result
+
+
+@router.get("/events/me")
+async def get_events_me(
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(
+        select(EventOrganizer.id)
+        .where(EventOrganizer.user_id == current_user.id)
+    )
+    event_org_id = query.scalars().first()
+
+    query = await db.execute(
+        select(Event).where(Event.organizer_id == event_org_id)
+    )
+    event = query.mappings().all()
+
+    return event
 
 
 @router.get("/{event_id}")
@@ -75,8 +142,8 @@ async def create_event(
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
-    query_org = await db.execute(select(EventOrganizer.user_id))
-    all_organizer_id = query_org.scalars().all()
+    query = await db.execute(select(EventOrganizer.user_id))
+    all_organizer_id = query.scalars().all()
 
     # Подумать: почему админ не добавляется в организаторы
     # query_admin = await db.execute(select(SystemAdministrator.user_id))
@@ -195,11 +262,99 @@ async def delete_event(
 @router.get("/{event_id}/matches")
 async def get_participants(
     event_id: int,
-    db: AsyncSession = Depends(get_db),
-    params: Params = Depends()
+    db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(Match).where(Match.event_id == event_id))
-    return paginate(query.scalars().all(), params)
+    query = await db.execute(
+        select(
+            Event.name,
+            EventOrganizer.organization_name.label("organization_name")
+        ).join(
+            EventOrganizer,
+            Event.organizer_id == EventOrganizer.id
+        ).where(Event.id == event_id))
+    event_name = query.mappings().all()
+    query = await db.execute(select(EventOrganizer.organization_name).where())
+
+    query = await db.execute(
+        select(Match.id)
+        .where(Match.event_id == event_id)
+    )
+    all_matches_id = query.scalars().all()
+    matches = []
+    for match_id in all_matches_id:
+        query = await db.execute(
+            select(
+                SportType.name.label("sport_name"),
+                CombatType.name.label("combat_type"),
+                CategoryType.name.label("category_type"),
+                Match.age,
+                AllWeightClass.name.label("weigth_category"),
+                Match.mat_vol,
+                Match.nominal_time,
+                Match.start_datetime,
+                Match.end_datetime
+            ).join(
+                CombatType, CombatType.id == Match.combat_type_id
+            ).join(
+                CategoryType, CategoryType.id == Match.category_id
+            ).join(
+                SportType, SportType.id == Match.sport_id
+            ).join(
+                AllWeightClass, AllWeightClass.id == Match.weights_id
+            ).where(Match.id == match_id))
+        match_info = query.mappings().all()
+        matches.append(match_info[0])
+
+    result = {"Event info": event_name[0], "Matches info": matches}
+    return result
+
+
+@router.post("/{event_id}/matches/create")
+async def create_match(
+    event_id: int,
+    match_data: MatchCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+
+    query = await db.execute(select(EventOrganizer.user_id))
+    all_organizer_id = query.scalars().all()
+    if current_user.id not in all_organizer_id:
+        raise HTTPException(status_code=400, detail="You are not an organizer")
+
+    query = await db.execute(
+        select(Event.organizer_id)
+        .where(Event.id == event_id)
+    )
+    event_org_id = query.scalars().all()
+    query = await db.execute(
+        select(EventOrganizer.id)
+        .where(EventOrganizer.user_id == current_user.id)
+    )
+    event_org_current_id = query.scalars().all()
+
+    if event_org_id != event_org_current_id:
+        raise HTTPException(
+            status_code=400, detail="You are not an organizer this event"
+        )
+
+    new_match = Match(
+        event_id=event_id,
+        sport_id=match_data.sport_id,
+        combat_type_id=match_data.combat_type_id,
+        category_id=match_data.category_id,
+        age=match_data.age,
+        weights_id=match_data.weights_id,
+        nominal_time=match_data.nominal_time,
+        mat_vol=match_data.mat_vol,
+        start_datetime=match_data.start_datetime,
+        end_datetime=match_data.start_datetime+timedelta(
+            minutes=match_data.nominal_time
+        )
+    )
+    db.add(new_match)
+    await db.commit()
+    return {f"Match ID - {new_match.id} created"}
 
 
 @router.get("/matches/{match_id}", response_model=MatchRead)
@@ -214,25 +369,6 @@ async def get_matches_id(
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
     return match
-
-
-# Подумать надо нам это или нет?
-@router.post("/matches/create")
-async def create_match(
-    match_data: MatchCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserDB = Depends(current_user)
-):
-
-    query_org = await db.execute(select(EventOrganizer.user_id))
-    all_organizer_id = query_org.scalars().all()
-    if current_user.id not in all_organizer_id:
-        raise HTTPException(status_code=400, detail="You are not an organizer")
-
-    new_match = Match(**match_data.dict())
-    db.add(new_match)
-    await db.commit()
-    return {f"Match ID - {new_match.id} created"}
 
 
 @router.put("/matches/update/{match_id}")

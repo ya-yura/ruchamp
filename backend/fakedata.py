@@ -57,7 +57,7 @@ num_weight_categories = num_athletes
 # Заполнение таблицы стран
 countries_data = [
     {"name": "Россия"},
-    {"name": "Белоруссия"},
+    {"name": "Беларусь"},
     {"name": "Казахстан"}
 ]
 

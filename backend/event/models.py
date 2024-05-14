@@ -1,6 +1,8 @@
+from datetime import datetime
 from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
-                        Integer, String, Text)
+                        Integer, String, Text, Enum, event)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import relationship
 
 from auth.models import (AllWeightClass, CategoryType, CombatType,
                          EventOrganizer, Referee, SportType)
@@ -67,6 +69,21 @@ class Match(Base):
         ForeignKey(CategoryType.id, ondelete="CASCADE")
     )
 
+    # Виды спорта по которым проводим матчи
+    sport_id = Column(
+        Integer,
+        ForeignKey(SportType.id, ondelete="CASCADE")
+    )
+
+    # Весовые категории спортсменов
+    weights_id = Column(
+        Integer,
+        ForeignKey(AllWeightClass.id, ondelete="CASCADE")
+    )
+
+    # Возрастные категории спортсменов
+    age = Column(Integer, nullable=False)
+
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
 
@@ -92,14 +109,6 @@ class MatchWeights(Base):
         Integer,
         ForeignKey(AllWeightClass.id, ondelete="CASCADE")
     )
-
-
-# Победители матчей
-class MatchWinner(Base):
-    __tablename__ = "MatchWinner"
-    id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    winner = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
 
 
 # Допустимые возрастные категории спортсменов матча
@@ -271,3 +280,72 @@ class WinnerTable(Base):
         ForeignKey(Prize.id, ondelete="CASCADE"),
         nullable=True
     )
+
+
+# -------------- Заявки ----------------------
+
+
+# Заявки на участие от команд
+class TournamentApplication(Base):
+    __tablename__ = "TournamentApplication"
+    id = Column(Integer, primary_key=True)
+    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    status = Column(Enum(
+        "accepted",
+        "approved",
+        "rejected",
+        "paid",
+        name="application_status"),
+        nullable=False)
+    # Время создания заявки
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    # Время обновления статуса
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+    status_history = relationship(
+        "ApplicationStatusHistory",
+        back_populates="application",
+        cascade="all, delete-orphan"
+    )
+
+
+# Тут храним историю изменения статусов заявок
+class ApplicationStatusHistory(Base):
+    __tablename__ = "ApplicationStatusHistory"
+    id = Column(Integer, primary_key=True)
+    application_id = Column(
+        Integer,
+        ForeignKey(TournamentApplication.id, ondelete="CASCADE")
+    )
+    status = Column(
+        Enum(
+            "accepted",
+            "approved",
+            "rejected",
+            "paid",
+            name="application_status"
+        ),
+        nullable=False
+    )
+    # Время обновления статуса
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    application = relationship(
+        "TournamentApplication",
+        back_populates="status_history"
+    )
+
+
+# Автоматически создаем новую запись в таблице истории при изменении статуса
+@event.listens_for(TournamentApplication.status, 'set')
+def record_status_change(target, value, oldvalue, initiator):
+    new_status_history = ApplicationStatusHistory(
+        application=target,
+        status=value
+    )
+    target.status_history.append(new_status_history)

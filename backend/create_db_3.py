@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 
 from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from event.models import (Base, Event, EventParticipant, Match, MatchSport,
-                          MatchWeights, MatchWinner, MatchAge, MatchCategory,
+                          MatchWeights, MatchAge, MatchCategory,
                           MatchGender, MatchParticipant, Fight, FightReferee,
                           FightCounter, FightWinner, MatchResult, Prize,
                           Medal, WinnerTable)

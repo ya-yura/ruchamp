@@ -50,14 +50,16 @@ class MatchRead(BaseModel):
         from_attributes = True
 
 
-class MatchCreate(MatchRead):
-    event_id: Optional[int]
+class MatchCreate(BaseModel):
+    sport_id: Optional[int]
     combat_type_id: Optional[int]
     category_id: Optional[int]  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    age: Optional[int]
+    weights_id: Optional[int]
     nominal_time: Optional[int]
     mat_vol: Optional[int]
     start_datetime: datetime = datetime.now()
-    end_datetime: datetime = datetime.now()
+    # end_datetime: datetime = datetime.now()
 
     class Config:
         from_attributes = True
