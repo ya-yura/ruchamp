@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
-                        Integer, String, Text, Enum, event)
+                        Integer, String, Text, Enum)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
@@ -8,6 +8,7 @@ from auth.models import (AllWeightClass, CategoryType, CombatType,
                          EventOrganizer, Referee, SportType)
 from connection import Base
 from teams.models import Team, TeamMember
+
 
 metadata = Base.metadata
 
@@ -341,11 +342,13 @@ class ApplicationStatusHistory(Base):
     )
 
 
-# Автоматически создаем новую запись в таблице истории при изменении статуса
+'''# Автоматически создаем новую запись в таблице истории при изменении статуса
 @event.listens_for(TournamentApplication.status, 'set')
-def record_status_change(target, value, oldvalue, initiator):
-    new_status_history = ApplicationStatusHistory(
-        application=target,
-        status=value
-    )
-    target.status_history.append(new_status_history)
+async def record_status_change(target, value, oldvalue, initiator):
+    async with SessionLocal() as session:
+        new_status_history = ApplicationStatusHistory(
+            application=target,
+            status=value
+        )
+        target.status_history.append(new_status_history)
+        await session.commit()'''

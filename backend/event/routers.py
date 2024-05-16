@@ -6,18 +6,22 @@ from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi.templating import Jinja2Templates
-from fastapi_pagination import Params, paginate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import SportType, athlete_sport_type_association
+from auth.models import (SportType, athlete_sport_type_association, Athlete,
+                         User)
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
-                          CategoryType, AllWeightClass)
-from event.shemas import EventCreate, EventUpdate, MatchCreate, MatchRead
+                          CategoryType, AllWeightClass, TournamentApplication,
+                          ApplicationStatusHistory)
+from event.shemas import (EventCreate, EventUpdate, MatchCreate,
+                          MatchRead, CreateTournamentApplication,
+                          UpdateTournamentApplication)
+from teams.models import Team
 from geo.geo import get_geo
 
 router = APIRouter(prefix="/event", tags=["Events"])
@@ -28,6 +32,7 @@ templates = Jinja2Templates(directory='templates')
 async def get_events(
     db: AsyncSession = Depends(get_db)
 ):
+    sports_in_matches_info = []
     query = await db.execute(select(Event.id))
     events_id = query.scalars().all()
     result = []
@@ -45,20 +50,19 @@ async def get_events(
                 Event.event_system,
                 Event.event_order,
                 Event.image_field,
-                Event.description
+                Event.description,
             ).join(
                 EventOrganizer, EventOrganizer.id == Event.organizer_id
             ).where(Event.id == event_id)
         )
         event_info = query.mappings().all()
+        event = event_info[0]
         query = await db.execute(
             select(Match.id)
             .where(Match.event_id == event_id)
         )
         matches_id = query.scalars().all()
-
         sports_in_matches_info = []
-
         for match_id in matches_id:
             query = await db.execute(
                 select(Match.sport_id).where(Match.id == match_id))
@@ -72,8 +76,10 @@ async def get_events(
                 sport_name = query.scalars().first()
                 sports_in_matches_info.append(sport_name)
 
-        event_info.append(sports_in_matches_info)
-        result.append(event_info)
+        event_result = {k: v for k, v in event.items()}
+
+        event_result["sports_in_matches"] = sports_in_matches_info
+        result.append(event_result)
 
     return result
 
@@ -105,6 +111,7 @@ async def get_events_id(
     query = await db.execute(select(
         Event.id,
         Event.name,
+        EventOrganizer.organization_name.label("organizer_name"),
         Event.description,
         Event.location,
         Event.start_request_datetime,
@@ -115,25 +122,14 @@ async def get_events_id(
         Event.event_system,
         Event.image_field,
         Event.geo,
+    ).join(
+        EventOrganizer, EventOrganizer.id == Event.organizer_id
     ).where(Event.id == event_id))
     event = query.mappings().all()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
-    query = await db.execute(
-        select(Event.organizer_id).where(Event.id == event_id)
-    )
-    event_organizer_id = query.scalars().first()
 
-    query = await db.execute(select(
-        EventOrganizer.organization_name
-    ).where(EventOrganizer.id == event_organizer_id)
-    )
-    organizer = query.mappings().all()
-
-    event_info = event
-    event_info.append(organizer[0])
-
-    return event_info
+    return event
 
 
 @router.post("/create")
@@ -309,7 +305,7 @@ async def get_participants(
     return result
 
 
-@router.post("/{event_id}/matches/create")
+@router.post("/{event_id}/matches/create")  # Здесь надо переделать, узнать от фронта в каком формате приходят данные
 async def create_match(
     event_id: int,
     match_data: MatchCreate,
@@ -417,3 +413,84 @@ async def delete_match(
     await db.delete(match)
     await db.commit()
     return {f"Match ID - {match_id} deleted"}
+
+
+@router.post("/tournament_applications/create")
+async def create_tournament_application(
+    tournament_application_data: CreateTournamentApplication,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(select(Team.captain).where(
+        Team.id == tournament_application_data.team_id
+    ))
+    captain_id = query.scalars().first()
+
+    query = await db.execute(select(Athlete.user_id).where(
+        Athlete.id == captain_id
+    ))
+    user_id = query.scalars().first()
+
+    if user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="You are not a captain")
+
+    query = await db.execute(select(Match.id).where(
+        Match.id == tournament_application_data.match_id
+    ))
+    match_id = query.scalars().first()
+
+    if match_id is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    application = TournamentApplication(**tournament_application_data.dict())
+    db.add(application)
+    await db.commit()
+    db.refresh(application)
+
+    return {f"Application ID - {application.id} created"}
+
+
+@router.put("/tournament_applications/{application_id}/update")
+async def update_tournament_application(
+    application_id: int,
+    update_application_data: UpdateTournamentApplication,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(select(TournamentApplication.match_id).where(
+        TournamentApplication.id == application_id
+    ))
+    match_id = query.scalars().first()
+
+    query = await db.execute(select(Match.event_id).where(Match.id == match_id))
+    event_id = query.scalars().first()
+
+    query = await db.execute(select(Event.organizer_id).where(
+        Event.id == event_id
+    ))
+    organizer_id = query.scalars().first()
+
+    query = await db.execute(select(EventOrganizer.user_id).where(
+        EventOrganizer.id == organizer_id
+    ))
+    user_id = query.scalars().first()
+
+    if user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="You are not an organizer")
+
+    query = await db.execute(select(TournamentApplication).where(
+        TournamentApplication.id == application_id
+    ))
+    application = query.scalars().one_or_none()
+    application.status = update_application_data.status
+
+    await db.commit()
+
+    new_status_history = ApplicationStatusHistory(
+        application_id=application_id,
+        status=update_application_data.status
+    )
+    db.add(new_status_history)
+    await db.commit()
+
+    return {f'Application ID - {application_id} updated'}
