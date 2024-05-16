@@ -1,11 +1,12 @@
 from datetime import datetime
 from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
-                        Integer, String, Text, Enum)
+                        Integer, String, Text, Enum, event)
 # from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
 
 from auth.models import (AllWeightClass, CategoryType, CombatType,
-                         EventOrganizer, Referee, SportType)
+                         EventOrganizer, Referee, SportType,
+                         Athlete)
 from connection import Base
 from teams.models import Team, TeamMember
 
@@ -41,12 +42,12 @@ class Event(Base):
     description = Column(Text, nullable=True)
 
 
-# Участники спортивного события
+'''# Участники спортивного события
 class EventParticipant(Base):
     __tablename__ = "EventParticipant"
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
-    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
+    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))'''
 
 
 # -----------------------------------------------------------------------------
@@ -144,8 +145,29 @@ class MatchGender(Base):
 class MatchParticipant(Base):
     __tablename__ = "MatchParticipant"
     id = Column(Integer, primary_key=True)
-    event_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    player_id = Column(Integer, ForeignKey(TeamMember.id, ondelete="CASCADE"))
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    team_member_id = Column(
+        Integer,
+        ForeignKey(TeamMember.id, ondelete="CASCADE"),
+        nullable=True
+    )
+    player_id = Column(
+        Integer,
+        ForeignKey(Athlete.id, ondelete="CASCADE"),
+        nullable=True
+    )
+
+
+@event.listens_for(MatchParticipant.team_member_id, 'set')
+def check_participant_conditions(target, value, oldvalue, initiator=None):
+    if target.team_member_id is None and target.player_id is None:
+        raise ValueError(
+            "Оба поля teammember_id и player_id не могут быть пустыми."
+        )
+    if target.team_member_id is not None and target.player_id is not None:
+        raise ValueError(
+            "Оба поля teammember_id и player_id не могут быть заполнены."
+        )
 
 
 # -----------------------------------------------------------------------------
@@ -352,3 +374,60 @@ async def record_status_change(target, value, oldvalue, initiator):
         )
         target.status_history.append(new_status_history)
         await session.commit()'''
+
+
+# Заявки на участие от спортсменов
+class AthleteApplication(Base):
+    __tablename__ = "AthleteApplication"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    status = Column(
+        Enum(
+            "accepted",
+            "approved",
+            "rejected",
+            "paid",
+            name="application_status"
+        ), nullable=False
+    )
+    # Время создания заявки
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    # Время обновления статуса
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+    status_history = relationship(
+        "AthleteApplicationStatusHistory",
+        back_populates="application",
+        cascade="all, delete-orphan"
+    )
+
+
+# Тут храним историю изменения статусов заявок
+class AthleteApplicationStatusHistory(Base):
+    __tablename__ = "AthleteApplicationStatusHistory"
+    id = Column(Integer, primary_key=True)
+    application_id = Column(
+        Integer,
+        ForeignKey(AthleteApplication.id, ondelete="CASCADE")
+    )
+    status = Column(
+        Enum(
+            "accepted",
+            "approved",
+            "rejected",
+            "paid",
+            name="application_status"
+        ), nullable=False
+    )
+    # Время обновления статуса
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    application = relationship(
+        "AthleteApplication",
+        back_populates="status_history"
+    )

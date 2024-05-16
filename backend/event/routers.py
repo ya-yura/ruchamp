@@ -17,7 +17,7 @@ from auth.models import (SportType, athlete_sport_type_association, Athlete,
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
-                          ApplicationStatusHistory)
+                          ApplicationStatusHistory, MatchParticipant)
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplication,
                           UpdateTournamentApplication)
@@ -51,6 +51,7 @@ async def get_events(
                 Event.event_order,
                 Event.image_field,
                 Event.description,
+                Event.geo
             ).join(
                 EventOrganizer, EventOrganizer.id == Event.organizer_id
             ).where(Event.id == event_id)
@@ -494,3 +495,20 @@ async def update_tournament_application(
     await db.commit()
 
     return {f'Application ID - {application_id} updated'}
+
+
+@router.post("/proverka")
+async def create_proverka(
+    match_id: int,
+    player_id: int,
+    team_member_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    new_proverka = MatchParticipant(
+        match_id=match_id,
+        player_id=player_id,
+        team_member_id=team_member_id
+    )
+    db.add(new_proverka)
+    await db.commit()
+    return {f"Proverka ID - {new_proverka.id} created"}
