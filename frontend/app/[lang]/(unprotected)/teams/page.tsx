@@ -57,6 +57,7 @@ export interface Team extends TeamInfo {
   weights: number[];
   ages: number[];
   location: string;
+  sportTypes: string[];
 }
 
 type TeamDataFromServer = [
