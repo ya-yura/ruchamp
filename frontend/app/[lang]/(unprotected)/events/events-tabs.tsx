@@ -90,6 +90,7 @@ export function EventsTabs({
     setTabValue(value as EventTabs);
   }, []);
 
+  //dictionary
   const labels = {
     [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
     [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,

@@ -23,6 +23,13 @@
         "pastEvents": "Past Events",
         "usersEvents": "Your Events"
       }
+    },
+    "teams": {
+      "filters": {
+        "male": "Male",
+        "female": "Female",
+        "mixed": "Mixed"
+      }
     }
   }
 }
