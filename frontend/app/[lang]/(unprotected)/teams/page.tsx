@@ -5,6 +5,7 @@ import { getTeams } from '@/lib/actions';
 import { Locale } from '@/i18n.config';
 import { calculateAge, calculateGender } from '@/lib/utils';
 import { Country, Region } from '@/lib/definitions';
+import { getDictionary } from '@/lib/dictionary';
 
 interface TeamInfo {
   id: number;
@@ -44,12 +45,6 @@ interface MemberSportTypes extends Array<string> {}
 
 type Gender = 'male' | 'female' | 'mixed' | '';
 
-// type TeamData = [
-//   TeamInfo,
-//   CaptainInfo,
-//   Array<[MemberPersonalInfo, MemberAthleteInfo, MemberSportTypes]>,
-// ];
-
 interface TeamMember {
   personalInfo: MemberPersonalInfo;
   athleteInfo: MemberAthleteInfo;
@@ -62,6 +57,7 @@ export interface Team extends TeamInfo {
   weights: number[];
   ages: number[];
   location: string;
+  sportTypes: string[];
 }
 
 type TeamDataFromServer = [
@@ -153,6 +149,8 @@ export default async function Teams({
 }: {
   params: { lang: Locale };
 }) {
+  const { page } = await getDictionary(lang);
+  const dictionary = page.teams;
   const teamData: TeamDataFromServer[] = await getTeams();
   const teams: Team[] = [testTeam, ...teamData].map((team) => {
     const [teamInfo, captainInfo, members] = team;
@@ -183,7 +181,7 @@ export default async function Teams({
 
   return (
     <Container>
-      <TeamsListing teams={teams} lang={lang} />
+      <TeamsListing teams={teams} lang={lang} dictionary={dictionary} />
     </Container>
   );
 }

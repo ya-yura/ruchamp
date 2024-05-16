@@ -45,6 +45,13 @@ export function EventsTabs({
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
 
+  //dictionary
+  const labels = {
+    [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
+    [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,
+    [EventTabs.USERS_EVENTS]: dictionary.filters.usersEvents,
+  };
+
   useEffect(() => {
     let events: Event[];
     switch (tabValue) {
@@ -89,12 +96,6 @@ export function EventsTabs({
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as EventTabs);
   }, []);
-
-  const labels = {
-    [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
-    [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,
-    [EventTabs.USERS_EVENTS]: dictionary.filters.usersEvents,
-  };
 
   return (
     <CustomSection ref={topRef}>
