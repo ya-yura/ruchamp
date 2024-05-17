@@ -343,23 +343,34 @@ async def get_current_user(
             select(EventOrganizer)
             .where(EventOrganizer.user_id == current_user.id)
         )
-        result = query.mappings().all()
+        event_organizer_info = query.mappings().all()
+        event_organizer = event_organizer_info[0]
+        result.append(event_organizer)
+
     elif user.role_id == 3:
         query = await db.execute(
             select(Spectator).where(Spectator.user_id == current_user.id)
         )
-        result = query.mappings().all()
+        spectator_info = query.mappings().all()
+        spectator = spectator_info[0]
+        result.append(spectator)
+
     elif user.role_id == 4:
         query = await db.execute(
             select(SystemAdministrator)
             .where(SystemAdministrator.user_id == current_user.id)
         )
-        result = query.mappings().all()
+        sysadmin_info = query.mappings().all()
+        sysadmin = sysadmin_info[0]
+        result.append(sysadmin)
+
     elif user.role_id == 5:
         query = await db.execute(
             select(Referee).where(Referee.user_id == current_user.id)
         )
-        result = query.mappings().all()
+        referee_info = query.mappings().all()
+        referee = referee_info[0]
+        result.append(referee)
 
     result.append(user)
 
