@@ -75,7 +75,7 @@ export function BigCardsWithImageField({
             tags={
               type === 'team'
                 ? card.sportTypes.join(', ')
-                : chooseTypes(card.id).join(', ') // fix later
+                : card.sports_in_matches.join(', ')
             }
             title={
               type === 'event' && card.start_datetime
