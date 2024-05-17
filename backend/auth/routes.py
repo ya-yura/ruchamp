@@ -12,7 +12,9 @@ from auth.mailer import send_forgot_password_email
 from auth.manager import UserManager, get_user_manager
 from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
                          SportType, SystemAdministrator, User,
-                         athlete_sport_type_association)
+                         athlete_sport_type_association, Coach,
+                         athlete_coach_association, CategoryType,
+                         athlete_grade_association)
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate)
@@ -271,15 +273,40 @@ async def get_current_user(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    query = await db.execute(select(User).where(User.id == current_user.id))
-    user = query.scalars().first()
-    user_data = {"user": user}
+    result = []
+    query = await db.execute(
+        select(
+            User.id,
+            User.username,
+            User.email,
+            User.sirname,
+            User.name,
+            User.fathername,
+            User.birthdate,
+            User.gender,
+            User.role_id
+            ).where(User.id == current_user.id)
+        )
+    user_info = query.mappings().all()
+    user = user_info[0]
 
     if user.role_id == 1:
         query = await db.execute(
-            select(Athlete).where(Athlete.user_id == current_user.id)
+            select(
+                Athlete.id,
+                Athlete.user_id,
+                Athlete.weight,
+                Athlete.height,
+                # Athlete.grades,
+                # Athlete.coaches,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+                Athlete.image_field
+            ).where(Athlete.user_id == current_user.id)
         )
-        result = query.mappings().all()
+        athlete_info = query.mappings().all()
+        athlete = {k: v for k, v in athlete_info[0].items()}
 
         query = await db.execute(
             select(Athlete.id).where(Athlete.user_id == current_user.id)
@@ -292,7 +319,24 @@ async def get_current_user(
             .where(athlete_sport_type_association.c.athlete_id == athlete_id)
         )
         athlete_sport_type = query.scalars().all()
-        result.append(athlete_sport_type)
+        athlete["sport_types"] = athlete_sport_type
+
+        query = await db.execute(
+            select(Coach.name)
+            .join(athlete_coach_association)
+            .where(athlete_coach_association.c.athlete_id == athlete_id)
+        )
+        athlete_coaches = query.scalars().all()
+        athlete["coaches"] = athlete_coaches
+
+        query = await db.execute(
+            select(CategoryType.name)
+            .join(athlete_grade_association)
+            .where(athlete_grade_association.c.athlete_id == athlete_id)
+        )
+        athleye_grade = query.scalars().all()
+        athlete["grades"] = athleye_grade
+        result.append(athlete)
 
     elif user.role_id == 2:
         query = await db.execute(
@@ -317,7 +361,7 @@ async def get_current_user(
         )
         result = query.mappings().all()
 
-    result.append(user_data)
+    result.append(user)
 
     return result
 
@@ -341,7 +385,7 @@ async def get_organizer_events(
     return {"events": events}
 
 
-@router.get("/me/events")
+'''@router.get("/me/events")
 async def get_current_user_events(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -354,11 +398,11 @@ async def get_current_user_events(
         TeamMember.id).where(TeamMember.member == athlete_id))
     member_id = query.scalars().first()
 
-    '''query = await db.execute(select(
+    query = await db.execute(select(
         Participant.event_id).where(Participant.player_id == member_id))
-    events = query.scalars().all()'''
+    events = query.scalars().all()
 
-    return {"events": events}
+    return {"events": events}'''
 
 
 @router.get("/me/matches")
