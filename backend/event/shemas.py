@@ -51,15 +51,18 @@ class MatchRead(BaseModel):
 
 
 class MatchCreate(BaseModel):
-    sport_id: Optional[int]
-    combat_type_id: Optional[int]
-    category_id: Optional[int]  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
-    age: Optional[int]
-    weights_id: Optional[int]
-    nominal_time: Optional[int]
-    mat_vol: Optional[int]
+    sport_type: str = "Дзюдо"
+    combat_type: str = "Олимпийская система"
+    grade: str = "1-й юношеский разряд"  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    gender: str = "Мужчины"
+    age_min: int  # Возраст от
+    age_max: int  # Возраст до
+    weight: float  # Вес до
+    nominal_time: str = "10 минут"
+    mat_vol: Optional[int] = 4
     start_datetime: datetime = datetime.now()
-    # end_datetime: datetime = datetime.now()
+    price: Optional[int] = None
+    price_athlete: Optional[int] = None
 
     class Config:
         from_attributes = True

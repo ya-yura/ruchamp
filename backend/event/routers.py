@@ -1,12 +1,13 @@
 import os
 import uuid
+import re
 from datetime import timedelta
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select, update
+from sqlalchemy import select, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from auth.models import SystemAdministrator
@@ -17,7 +18,9 @@ from auth.models import (SportType, athlete_sport_type_association, Athlete,
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
-                          ApplicationStatusHistory, MatchParticipant)
+                          ApplicationStatusHistory, MatchParticipant,
+                          MatchAge, MatchSport, MatchGender, MatchCategory,
+                          MatchWeights)
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplication,
                           UpdateTournamentApplication)
@@ -284,17 +287,6 @@ async def get_participants(
     db: AsyncSession = Depends(get_db)
 ):
     query = await db.execute(
-        select(
-            Event.name,
-            EventOrganizer.organization_name.label("organization_name")
-        ).join(
-            EventOrganizer,
-            Event.organizer_id == EventOrganizer.id
-        ).where(Event.id == event_id))
-    event_name = query.mappings().all()
-    query = await db.execute(select(EventOrganizer.organization_name).where())
-
-    query = await db.execute(
         select(Match.id)
         .where(Match.event_id == event_id)
     )
@@ -327,7 +319,7 @@ async def get_participants(
         match_info = query.mappings().all()
         matches.append(match_info[0])
 
-    result = {"event_info": event_name[0], "matches_info": matches}
+    result = matches
     return result
 
 
@@ -338,12 +330,13 @@ async def create_match(
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
-
+    # Проверка: есть юзер в списке оргазизаторов или нет
     query = await db.execute(select(EventOrganizer.user_id))
     all_organizer_id = query.scalars().all()
     if current_user.id not in all_organizer_id:
         raise HTTPException(status_code=400, detail="You are not an organizer")
 
+    # Проверяем этот ивент организовал юзер(организатор)
     query = await db.execute(
         select(Event.organizer_id)
         .where(Event.id == event_id)
@@ -360,27 +353,77 @@ async def create_match(
             status_code=400, detail="You are not an organizer this event"
         )
 
-    # Здесь смотрим какие данные приходят от фронта, и их распихиваем по таблицам
-    # чтоб связи между таблицами были которые в Ивент моделс лежать
-    # в общем переделать надо
+    # логика
+    # спорт id матча
+    query = await db.execute(select(SportType.id).where(
+        SportType.name == match_data.sport_type
+    ))
+    match_sport_type_id = query.scalars().first()
 
-    '''new_match = Match(
+    # ID Ситстема проведения (Олимпийская, двойное выбывание, и прочее)
+    query = await db.execute(select(CombatType.id).where(
+        CombatType.name.ilike(f"%{match_data.combat_type}%")
+    ))
+    match_category_type_id = query.scalars().first()
+
+    # ID Grade атлетов
+    query = await db.execute(select(CategoryType.id).where(
+        CategoryType.name.ilike(f"%{match_data.grade}%")
+    ))
+    match_grade_id = query.scalars().first()
+
+    # Gender: мужской = True или женский = False
+    if match_data.gender == "Мужчины":
+        match_gender = True
+    else:
+        match_gender = False
+
+    # Возраст участников
+    age_min = match_data.age_min
+    age_max = match_data.age_max
+
+    # Весовая категория участников
+    query = await db.execute(
+        select(AllWeightClass.id).where(
+            and_(
+                AllWeightClass.min_weight <= match_data.weight,
+                AllWeightClass.max_weight >= match_data.weight
+                )
+            )
+        )
+    match_weights_id = query.scalars().first()
+
+    # Время поединка в секундах
+    time = re.search(r'^(\d+)\s', match_data.nominal_time)
+    if time:
+        match_nominal_time = int(time.group(1))
+
+    nominal_time = match_nominal_time * 60
+
+    # Количество матов (рингов)
+    mat_vol = match_data.mat_vol
+
+    print(match_sport_type_id)
+    print(match_category_type_id)
+    print(match_grade_id)
+    print(match_gender)
+    print(age_min)
+    print(age_max)
+    print(match_weights_id)
+    print(nominal_time)
+    new_match = Match(
         event_id=event_id,
-        sport_id=match_data.sport_id,
-        combat_type_id=match_data.combat_type_id,
-        category_id=match_data.category_id,
-        age=match_data.age,
-        weights_id=match_data.weights_id,
-        nominal_time=match_data.nominal_time,
-        mat_vol=match_data.mat_vol,
+        combat_type_id=match_category_type_id,
         start_datetime=match_data.start_datetime,
+        nominal_time=nominal_time,
+        mat_vol=match_data.mat_vol,
         end_datetime=match_data.start_datetime+timedelta(
-            minutes=match_data.nominal_time
+            seconds=nominal_time
         )
     )
     db.add(new_match)
-    await db.commit()'''
-    return {f"Match ID - created"}
+    await db.commit()
+    return {f"Match ID {new_match.id} - created"}
 
 
 @router.get("/matches/{match_id}", response_model=MatchRead)

@@ -340,8 +340,16 @@ async def get_current_user(
 
     elif user.role_id == 2:
         query = await db.execute(
-            select(EventOrganizer)
-            .where(EventOrganizer.user_id == current_user.id)
+            select(
+                EventOrganizer.id,
+                EventOrganizer.user_id,
+                EventOrganizer.website,
+                EventOrganizer.contact_email,
+                EventOrganizer.contact_phone,
+                EventOrganizer.organization_name,
+                EventOrganizer.description,
+                EventOrganizer.image_field,
+            ).where(EventOrganizer.user_id == current_user.id)
         )
         event_organizer_info = query.mappings().all()
         event_organizer = event_organizer_info[0]

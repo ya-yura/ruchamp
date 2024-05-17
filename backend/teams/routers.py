@@ -354,6 +354,7 @@ async def get_team(
     captain_info = query.mappings().all()
 
     query = await db.execute(select(
+        Team.id,
         Team.name,
         Team.image_field,
         Team.description,

@@ -64,28 +64,6 @@ class Match(Base):
         Integer,
         ForeignKey(CombatType.id, ondelete="CASCADE")
     )
-
-    # категории спортсмена (кмс, мс и пр)
-    category_id = Column(
-        Integer,
-        ForeignKey(CategoryType.id, ondelete="CASCADE")
-    )
-
-    # Виды спорта по которым проводим матчи
-    sport_id = Column(
-        Integer,
-        ForeignKey(SportType.id, ondelete="CASCADE")
-    )
-
-    # Весовые категории спортсменов
-    weights_id = Column(
-        Integer,
-        ForeignKey(AllWeightClass.id, ondelete="CASCADE")
-    )
-
-    # Возрастные категории спортсменов
-    age = Column(Integer, nullable=False)
-
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
 
