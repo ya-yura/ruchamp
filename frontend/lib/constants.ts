@@ -50,6 +50,7 @@ export const testData: Event[] = [
     organizer_id: 715,
     event_system: 'багровый',
     image_field: 'https://placekitten.com/976/755',
+    sports_in_matches: ['Айкидо', 'Кайдо', 'Дзюдо'],
   },
   {
     name: 'Соревнование по арм рестлингу',
@@ -67,6 +68,7 @@ export const testData: Event[] = [
     organizer_id: 1242,
     event_system: 'приятель',
     image_field: 'https://dummyimage.com/173x602',
+    sports_in_matches: ['Айкидо', 'Вольная борьба', 'Каратэномичи'],
   },
   {
     name: 'Случайное событие 1',
@@ -83,6 +85,7 @@ export const testData: Event[] = [
     organizer_id: 888,
     event_system: 'случайный',
     image_field: 'https://example.com/image1.jpg',
+    sports_in_matches: ['Кудо', 'Каратэ'],
   },
   {
     name: 'Случайное событие 2',
@@ -99,6 +102,7 @@ export const testData: Event[] = [
     organizer_id: 999,
     event_system: 'случайный',
     image_field: 'https://example.com/image2.jpg',
+    sports_in_matches: ['Кикбоксинг', 'Бокс'],
   },
   {
     name: 'Случайное событие 3',
@@ -114,6 +118,7 @@ export const testData: Event[] = [
     organizer_id: 777,
     event_system: 'случайный',
     image_field: 'https://example.com/image3.jpg',
+    sports_in_matches: ['Самбо', 'Дзюдо'],
   },
   {
     name: 'Случайное событие 4',
@@ -130,6 +135,7 @@ export const testData: Event[] = [
     organizer_id: 555,
     event_system: 'случайный',
     image_field: 'https://example.com/image4.jpg',
+    sports_in_matches: ['Айкидо', 'Кайдо', 'Каратэномичи'],
   },
   {
     name: 'Случайное событие 5',
@@ -146,5 +152,6 @@ export const testData: Event[] = [
     organizer_id: 333,
     event_system: 'случайный',
     image_field: 'https://example.com/image5.jpg',
+    sports_in_matches: ['Айкидо', 'Кайдо', 'Каратэномичи'],
   },
 ];

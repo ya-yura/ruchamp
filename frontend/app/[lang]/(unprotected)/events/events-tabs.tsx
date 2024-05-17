@@ -5,7 +5,7 @@ import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
 import { FilterByType } from './filter-by-type';
 import { sportTypes } from '@/lib/constants';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Event } from '@/lib/definitions';
 import { BigCardsWithImageField } from '../../../../components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
@@ -39,7 +39,7 @@ export function EventsTabs({
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  // const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
@@ -52,7 +52,8 @@ export function EventsTabs({
     [EventTabs.USERS_EVENTS]: dictionary.filters.usersEvents,
   };
 
-  useEffect(() => {
+  // Filtering logic
+  const filteredEvents = useMemo(() => {
     let events: Event[];
     switch (tabValue) {
       case EventTabs.FUTURE_EVENTS:
@@ -70,21 +71,14 @@ export function EventsTabs({
     const filtredByDateEvents = date
       ? events.filter((event) => isDateInRange(event.start_datetime, date))
       : events;
-
-    // Filter by type is in temporary variant
-    const filterByType = selectedSportTypes.map((item) =>
-      sportTypes.indexOf(item),
-    );
-    const filteredEvents = selectedSportTypes.length
+    setMapKey((prevKey) => prevKey + 1); // This state is to reload map with new data
+    return selectedSportTypes.length
       ? filtredByDateEvents.filter((event) =>
-          filterByType.some((f) =>
-            event.id.toString().split('').includes(f.toString()),
+          event.sports_in_matches.some((item) =>
+            selectedSportTypes.includes(item),
           ),
         )
       : filtredByDateEvents;
-
-    setFilteredEvents(filteredEvents);
-    setMapKey((prevKey) => prevKey + 1); // This state is to reload map with new data
   }, [tabValue, selectedSportTypes, date]);
 
   function scrollToTop(): void {
@@ -147,7 +141,7 @@ export function EventsTabs({
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
               <p className="mb-5 text-base text-background">
-                {filteredEvents.length > 1
+                {!!filteredEvents.length
                   ? `Найдено: ${filteredEvents.length}`
                   : 'Ничего не найдено'}
               </p>
