@@ -109,6 +109,7 @@ async def get_events_id(
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
+    result = []
     query = await db.execute(select(
         Event.id,
         Event.name,
@@ -126,11 +127,32 @@ async def get_events_id(
     ).join(
         EventOrganizer, EventOrganizer.id == Event.organizer_id
     ).where(Event.id == event_id))
-    event = query.mappings().all()
-    if event is None:
+    event_info = query.mappings().all()
+    if event_info == []:
         raise HTTPException(status_code=404, detail="Event not found")
+    event = event_info[0]
+    query = await db.execute(
+        select(Match.id).where(Match.event_id == event_id)
+    )
+    matches_id = query.scalars().all()
+    sports_in_matches_info = []
+    for match_id in matches_id:
+        query = await db.execute(
+            select(Match.sport_id).where(Match.id == match_id)
+        )
+        match_sport_id = query.scalars().all()
+        for sport_id in match_sport_id:
+            query = await db.execute(
+                select(SportType.name).where(SportType.id == sport_id)
+            )
+            sport_name = query.scalars().first()
+            sports_in_matches_info.append(sport_name)
 
-    return event
+    event_result = {k: v for k, v in event.items()}
+    event_result["sports_in_matches"] = sports_in_matches_info
+    result.append(event_result)
+
+    return result
 
 
 @router.post("/create")
@@ -277,6 +299,9 @@ async def get_participants(
         .where(Match.event_id == event_id)
     )
     all_matches_id = query.scalars().all()
+    if all_matches_id == []:
+        raise HTTPException(status_code=404, detail="No matches found")
+
     matches = []
     for match_id in all_matches_id:
         query = await db.execute(
@@ -302,7 +327,7 @@ async def get_participants(
         match_info = query.mappings().all()
         matches.append(match_info[0])
 
-    result = {"Event info": event_name[0], "Matches info": matches}
+    result = {"event_info": event_name[0], "matches_info": matches}
     return result
 
 
@@ -335,7 +360,11 @@ async def create_match(
             status_code=400, detail="You are not an organizer this event"
         )
 
-    new_match = Match(
+    # Здесь смотрим какие данные приходят от фронта, и их распихиваем по таблицам
+    # чтоб связи между таблицами были которые в Ивент моделс лежать
+    # в общем переделать надо
+
+    '''new_match = Match(
         event_id=event_id,
         sport_id=match_data.sport_id,
         combat_type_id=match_data.combat_type_id,
@@ -350,8 +379,8 @@ async def create_match(
         )
     )
     db.add(new_match)
-    await db.commit()
-    return {f"Match ID - {new_match.id} created"}
+    await db.commit()'''
+    return {f"Match ID - created"}
 
 
 @router.get("/matches/{match_id}", response_model=MatchRead)
@@ -416,7 +445,7 @@ async def delete_match(
     return {f"Match ID - {match_id} deleted"}
 
 
-@router.post("/tournament_applications/create")
+@router.post("/tournament-applications/create")
 async def create_tournament_application(
     tournament_application_data: CreateTournamentApplication,
     db: AsyncSession = Depends(get_db),
@@ -451,7 +480,7 @@ async def create_tournament_application(
     return {f"Application ID - {application.id} created"}
 
 
-@router.put("/tournament_applications/{application_id}/update")
+@router.put("/tournament-applications/{application_id}/update")
 async def update_tournament_application(
     application_id: int,
     update_application_data: UpdateTournamentApplication,
@@ -495,20 +524,3 @@ async def update_tournament_application(
     await db.commit()
 
     return {f'Application ID - {application_id} updated'}
-
-
-@router.post("/proverka")
-async def create_proverka(
-    match_id: int,
-    player_id: int,
-    team_member_id: int,
-    db: AsyncSession = Depends(get_db),
-):
-    new_proverka = MatchParticipant(
-        match_id=match_id,
-        player_id=player_id,
-        team_member_id=team_member_id
-    )
-    db.add(new_proverka)
-    await db.commit()
-    return {f"Proverka ID - {new_proverka.id} created"}

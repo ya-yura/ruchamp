@@ -273,7 +273,7 @@ async def get_current_user(
 ):
     query = await db.execute(select(User).where(User.id == current_user.id))
     user = query.scalars().first()
-    user_data = {"User": user}
+    user_data = {"user": user}
 
     if user.role_id == 1:
         query = await db.execute(
@@ -354,9 +354,9 @@ async def get_current_user_events(
         TeamMember.id).where(TeamMember.member == athlete_id))
     member_id = query.scalars().first()
 
-    query = await db.execute(select(
+    '''query = await db.execute(select(
         Participant.event_id).where(Participant.player_id == member_id))
-    events = query.scalars().all()
+    events = query.scalars().all()'''
 
     return {"events": events}
 

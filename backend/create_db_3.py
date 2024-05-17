@@ -6,7 +6,8 @@ from event.models import (Base, Event, Match, MatchSport,
                           MatchGender, MatchParticipant, Fight, FightReferee,
                           FightCounter, FightWinner, MatchResult, Prize,
                           Medal, WinnerTable, TournamentApplication,
-                          ApplicationStatusHistory)
+                          ApplicationStatusHistory, AthleteApplication,
+                          AthleteApplicationStatusHistory)
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 

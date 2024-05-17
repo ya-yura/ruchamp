@@ -146,28 +146,12 @@ class MatchParticipant(Base):
     __tablename__ = "MatchParticipant"
     id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    team_member_id = Column(
-        Integer,
-        ForeignKey(TeamMember.id, ondelete="CASCADE"),
-        nullable=True
-    )
     player_id = Column(
         Integer,
         ForeignKey(Athlete.id, ondelete="CASCADE"),
         nullable=True
     )
-
-
-@event.listens_for(MatchParticipant.team_member_id, 'set')
-def check_participant_conditions(target, value, oldvalue, initiator=None):
-    if target.team_member_id is None and target.player_id is None:
-        raise ValueError(
-            "Оба поля teammember_id и player_id не могут быть пустыми."
-        )
-    if target.team_member_id is not None and target.player_id is not None:
-        raise ValueError(
-            "Оба поля teammember_id и player_id не могут быть заполнены."
-        )
+    team_member = Column(Boolean, default=True, nullable=False)
 
 
 # -----------------------------------------------------------------------------
