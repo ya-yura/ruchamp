@@ -4,7 +4,7 @@ from sqlalchemy import (JSON, TIMESTAMP, Column, Date, DateTime, Enum, Float,
                         ForeignKey, Integer, String)
 from sqlalchemy.orm import relationship
 
-from auth.models import Base, EventOrganizer, User
+from auth.models import EventOrganizer, User, Spectator, Athlete
 from connection import Base
 from event.models import Event, Match
 
@@ -35,19 +35,22 @@ class Place(Base):
     number = Column(Integer, nullable=False)
 
 
-# Билеты зрителей
+# Стоимость билета на матч для зрителя
 class Ticket(Base):
     __tablename__ = "Ticket"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(
-        Integer,
-        ForeignKey(EventOrganizer.id),
-        nullable=False
-    )
-    event_id = Column(Integer, ForeignKey(Event.id), nullable=False)
-    day = Column(DateTime, nullable=True)
-    place = Column(Integer, ForeignKey(Place.id), nullable=False)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
     price = Column(Float, nullable=False)
+
+
+# Билеты зрителей
+class SpectatorTicket(Base):
+    __tablename__ = "SpectatorTicket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    spectator_id = Column(
+        Integer, ForeignKey(Spectator.id), nullable=False
+    )
     status = Column(
         Enum(
             "available",
@@ -62,17 +65,20 @@ class Ticket(Base):
     uu_key = Column(String, nullable=True)
 
 
-# Билеты на участие в мероприятии в качестве спортсмена
+# Взнос на участие в мероприятии в качестве спортсмена
 class Engagement(Base):
     __tablename__ = "Engagement"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(
-        Integer,
-        ForeignKey(EventOrganizer.id),
-        nullable=False
-    )
     match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
     price = Column(Float, nullable=False)
+
+
+# Билеты спортсменов
+class AthleteTicket(Base):
+    __tablename__ = "AthleteTicket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    athlete_id = Column(Integer, ForeignKey(Athlete.id), nullable=False)
     status = Column(
         Enum(
             "available",

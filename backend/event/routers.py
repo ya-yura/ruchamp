@@ -13,18 +13,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import (SportType, athlete_sport_type_association, Athlete,
-                         User)
+from auth.models import (SportType, Athlete)
+# from auth.models import User, athlete_sport_type_association
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
-                          ApplicationStatusHistory, MatchParticipant,
-                          MatchAge, MatchSport, MatchGender, MatchCategory,
-                          MatchWeights)
+                          ApplicationStatusHistory, MatchAge, MatchSport,
+                          MatchGender, MatchCategory, AthleteApplication,
+                          MatchWeights)  # MatchParticipant
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
-                          MatchRead, CreateTournamentApplication,
+                          MatchRead, CreateTournamentApplicationTeam,
+                          CreateTournamentApplicationAthlete,
                           UpdateTournamentApplication)
 from teams.models import Team
+from shop.models import Ticket, Engagement
 from geo.geo import get_geo
 
 router = APIRouter(prefix="/event", tags=["Events"])
@@ -323,7 +325,8 @@ async def get_participants(
     return result
 
 
-@router.post("/{event_id}/matches/create")  # Здесь надо переделать, узнать от фронта в каком формате приходят данные
+# Здесь надо переделать, узнать от фронта в каком формате приходят данные
+@router.post("/{event_id}/matches/create")
 async def create_match(
     event_id: int,
     match_data: MatchCreate,
@@ -378,10 +381,6 @@ async def create_match(
     else:
         match_gender = False
 
-    # Возраст участников
-    age_min = match_data.age_min
-    age_max = match_data.age_max
-
     # Весовая категория участников
     query = await db.execute(
         select(AllWeightClass.id).where(
@@ -400,17 +399,6 @@ async def create_match(
 
     nominal_time = match_nominal_time * 60
 
-    # Количество матов (рингов)
-    mat_vol = match_data.mat_vol
-
-    print(match_sport_type_id)
-    print(match_category_type_id)
-    print(match_grade_id)
-    print(match_gender)
-    print(age_min)
-    print(age_max)
-    print(match_weights_id)
-    print(nominal_time)
     new_match = Match(
         event_id=event_id,
         combat_type_id=match_category_type_id,
@@ -423,6 +411,53 @@ async def create_match(
     )
     db.add(new_match)
     await db.commit()
+
+    match_sport = MatchSport(
+        match_id=new_match.id,
+        sport_id=match_sport_type_id
+    )
+    db.add(match_sport)
+
+    match_weight = MatchWeights(
+        match_id=new_match.id,
+        weight_id=match_weights_id
+
+    )
+    db.add(match_weight)
+
+    match_age = MatchAge(
+        match_id=new_match.id,
+        age_from=match_data.age_min,
+        age_till=match_data.age_max
+    )
+    db.add(match_age)
+
+    match_category = MatchCategory(
+        match_id=new_match.id,
+        category_id=match_grade_id
+    )
+    db.add(match_category)
+
+    match_gender = MatchGender(
+        match_id=new_match.id,
+        gender=match_gender
+    )
+    db.add(match_gender)
+
+    match_athlete_price = Engagement(
+        match_id=new_match.id,
+        price=match_data.price_athlete
+    )
+    db.add(match_athlete_price)
+
+    match_spectator_price = Ticket(
+        match_id=new_match.id,
+        price=match_data.price
+    )
+    db.add(match_spectator_price)
+
+    await db.commit()
+
     return {f"Match ID {new_match.id} - created"}
 
 
@@ -488,14 +523,14 @@ async def delete_match(
     return {f"Match ID - {match_id} deleted"}
 
 
-@router.post("/tournament-applications/create")
-async def create_tournament_application(
-    tournament_application_data: CreateTournamentApplication,
+@router.post("/tournament-applications-team/create")
+async def create_tournament_application_team(
+    tournament_application_team_data: CreateTournamentApplicationTeam,
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
     query = await db.execute(select(Team.captain).where(
-        Team.id == tournament_application_data.team_id
+        Team.id == tournament_application_team_data.team_id
     ))
     captain_id = query.scalars().first()
 
@@ -508,14 +543,49 @@ async def create_tournament_application(
         raise HTTPException(status_code=400, detail="You are not a captain")
 
     query = await db.execute(select(Match.id).where(
-        Match.id == tournament_application_data.match_id
+        Match.id == tournament_application_team_data.match_id
     ))
     match_id = query.scalars().first()
 
     if match_id is None:
         raise HTTPException(status_code=404, detail="Match not found")
 
-    application = TournamentApplication(**tournament_application_data.dict())
+    application = TournamentApplication(
+        **tournament_application_team_data.dict()
+    )
+    db.add(application)
+    await db.commit()
+    db.refresh(application)
+
+    return {f"Application ID - {application.id} created"}
+
+
+@router.post("/tournament-applications-athlete/create")
+async def create_tournament_application_athlete(
+    tournament_application_athlete_data: CreateTournamentApplicationAthlete,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+
+    if athlete_id is None:
+        raise HTTPException(status_code=400, detail="You are not an athlete")
+
+    query = await db.execute(select(Match.id).where(
+        Match.id == tournament_application_athlete_data.match_id
+    ))
+    match_id = query.scalars().first()
+
+    if match_id is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    application = AthleteApplication(
+        **tournament_application_athlete_data.dict()
+    )
     db.add(application)
     await db.commit()
     db.refresh(application)
@@ -535,7 +605,9 @@ async def update_tournament_application(
     ))
     match_id = query.scalars().first()
 
-    query = await db.execute(select(Match.event_id).where(Match.id == match_id))
+    query = await db.execute(
+        select(Match.event_id).where(Match.id == match_id)
+    )
     event_id = query.scalars().first()
 
     query = await db.execute(select(Event.organizer_id).where(

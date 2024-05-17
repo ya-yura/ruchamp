@@ -40,7 +40,7 @@ class EventUpdate(EventCreate):
 class MatchRead(BaseModel):
     event_id: Optional[int]
     combat_type_id: Optional[int]
-    category_id: Optional[int]  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    category_id: Optional[int]
     nominal_time: Optional[int]
     mat_vol: Optional[int]
     start_datetime: datetime
@@ -53,7 +53,7 @@ class MatchRead(BaseModel):
 class MatchCreate(BaseModel):
     sport_type: str = "Дзюдо"
     combat_type: str = "Олимпийская система"
-    grade: str = "1-й юношеский разряд"  # Или здесть список должен быть? Или под каждый критерий создаем отдельный матч?
+    grade: str = "1-й юношеский разряд"
     gender: str = "Мужчины"
     age_min: int  # Возраст от
     age_max: int  # Возраст до
@@ -61,15 +61,25 @@ class MatchCreate(BaseModel):
     nominal_time: str = "10 минут"
     mat_vol: Optional[int] = 4
     start_datetime: datetime = datetime.now()
-    price: Optional[int] = None
-    price_athlete: Optional[int] = None
+    price: Optional[float] = None
+    seat_capacity: Optional[int] = None
+    price_athlete: Optional[float] = None
 
     class Config:
         from_attributes = True
 
 
-class CreateTournamentApplication(BaseModel):
+class CreateTournamentApplicationTeam(BaseModel):
     team_id: int
+    match_id: int
+    status: str = 'accepted'
+
+    class Config:
+        from_attributes = True
+
+
+class CreateTournamentApplicationAthlete(BaseModel):
+    athlete_id: int
     match_id: int
     status: str = 'accepted'
 
