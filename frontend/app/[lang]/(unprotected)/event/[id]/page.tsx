@@ -1,13 +1,31 @@
 import { AddressSection } from './address-section';
-import { Container } from '@/components/container'; 
+import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
-import { EventInfo } from './event-info';
+import { PageWithInfo } from '@/components/page-with-info';
 import { eventsApi } from '@/lib/api/eventsApi';
 import { Event } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
 import { testData } from '@/lib/constants';
+import { Info } from './info';
+import { Athletes } from './athletes';
+import { Matches } from './matches';
+import { Grid } from './grid';
+import { Results } from './results';
+import { EventActionButtons } from './event-action-buttons';
 
-export default async function EventPage({ params }: { params: { id: string } }) {
+export enum EventTabs {
+  'info' = 'Информация',
+  'athletes' = 'Спортсмены',
+  'matches' = 'Матчи',
+  'grid' = 'Турнирная сетка',
+  'results' = 'Результаты',
+}
+
+export default async function EventPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const id = params.id;
   let events: Event[];
   let expectedEvents: Event[];
@@ -32,9 +50,25 @@ export default async function EventPage({ params }: { params: { id: string } }) 
     expectedEvents = [];
   }
 
+  const tabsContent: Record<EventTabs, React.ReactNode> = {
+    [EventTabs['info']]: <Info event={event} />,
+    [EventTabs['athletes']]: <Athletes />,
+    [EventTabs['matches']]: <Matches />,
+    [EventTabs['grid']]: <Grid />,
+    [EventTabs['results']]: <Results />,
+  };
+
   return (
     <Container>
-      <EventInfo event={event} />
+      <PageWithInfo<EventTabs>
+        id={event.id}
+        type={'event'}
+        title={event.name}
+        bages={['Убрать', 'Этот', 'Хардкод']}
+        buttons={<EventActionButtons />}
+        tabsContent={tabsContent}
+        tabsObj={EventTabs}
+      />
       <AddressSection event={event} />
       <ExpectedEvents events={expectedEvents} />
     </Container>

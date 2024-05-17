@@ -5,9 +5,9 @@ import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
 import { FilterByType } from './filter-by-type';
 import { sportTypes } from '@/lib/constants';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Event } from '@/lib/definitions';
-import { BigCardsWithImageField } from '../../../../components/cards/big-cards-with-image-field';
+import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
 import { isDateInRange } from '@/lib/utils';
@@ -39,7 +39,6 @@ export function EventsTabs({
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
-  // const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
