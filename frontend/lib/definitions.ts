@@ -92,6 +92,7 @@ export interface Event {
   organizer_id: number;
   event_system: string;
   image_field: string;
+  sports_in_matches: string[];
 }
 
 // // *** Teams ***

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FilterByType } from '../events/filter-by-type';
 import { sportTypes } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
@@ -28,26 +28,27 @@ export function TeamsListing({ teams, lang, dictionary }: TeamsListingProps) {
   const [genderValue, setGenderValue] = useState<GenderTabs>(GenderTabs.MALE);
   const [ages, setAges] = useState<number[]>([18, 30]); //don't forget to change default in RangeSlider props
   const [weights, setWeights] = useState<number[]>([50, 90]); //don't forget to change default in RangeSlider props
-  const [filteredTeams, setFilteredTeams] = useState<Team[]>([]);
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const filtredByGender = teams.filter((team) => team.gender === genderValue);
-    const filtredByAge = filtredByGender.filter(
+  // Filtring logic
+  const filteredTeams = useMemo(() => {
+    const filteredByGender = teams.filter(
+      (team) => team.gender === genderValue,
+    );
+    const filteredByAge = filteredByGender.filter(
       (team) =>
         team.ages[0] >= ages[0] && team.ages[team.ages.length - 1] <= ages[1],
     );
-    const filtredByWeight = filtredByAge.filter(
+    const filteredByWeight = filteredByAge.filter(
       (team) =>
         team.weights[0] >= weights[0] &&
         team.weights[team.weights.length - 1] <= weights[1],
     );
-    const filtredByType = !!selectedSportTypes.length
-      ? filtredByWeight.filter((team) =>
+    return selectedSportTypes.length
+      ? filteredByWeight.filter((team) =>
           team.sportTypes.some((item) => selectedSportTypes.includes(item)),
         )
-      : filtredByWeight;
-    setFilteredTeams(filtredByType);
+      : filteredByWeight;
   }, [teams, genderValue, ages, weights, selectedSportTypes]);
 
   const handleTabChange = useCallback((value: string) => {
@@ -79,7 +80,7 @@ export function TeamsListing({ teams, lang, dictionary }: TeamsListingProps) {
         />
 
         <p className="mb-5 mr-auto text-base text-background">
-          {filteredTeams.length > 1
+          {!!filteredTeams.length
             ? `Найдено: ${filteredTeams.length}`
             : 'Ничего не найдено'}
         </p>
