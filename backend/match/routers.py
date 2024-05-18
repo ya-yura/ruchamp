@@ -1,19 +1,19 @@
 import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, insert, delete
 
-from connection import get_db
-from event.models import (Event, Match, EventOrganizer, Participant,
-                          MatchReferee, MatchCounter, MatchResult, MatchWinner)
-from auth.models import User, Athlete, AllWeightClass, CategoryType, Referee
-from match.schemas import MatchDB
-from match.models import TempAthlete, TempDrawParticipants, AgeCategory
-from auth.schemas import UserDB
+from auth.models import AllWeightClass, Athlete, CategoryType, Referee, User
 from auth.routes import current_user
+from auth.schemas import UserDB
+from connection import get_db
+from event.models import (Event, EventOrganizer, Match,
+                          MatchResult)
+from match.models import AgeCategory, TempAthlete, TempDrawParticipants
+from match.schemas import MatchDB
+from match.utils import pairs_generator, split_pairs
 from teams.models import TeamMember
-from match.utils import split_pairs, pairs_generator
-
 
 router = APIRouter(prefix="/api", tags=["Matchs"])
 

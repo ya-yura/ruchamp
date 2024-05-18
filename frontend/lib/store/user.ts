@@ -1,15 +1,15 @@
 import { create } from 'zustand';
-import type { TypeUser } from '../definitions';
+import type { UserData } from '../definitions';
 import { persist } from 'zustand/middleware';
-import { auth } from '../client-api/auth';
+import { auth } from '../api/auth';
 
 export type TypeState = {
-  user: TypeUser | null;
+  user: UserData | null;
 };
 
 export type TypeActions = {
   getUser: (token: string) => Promise<void>;
-  updateUser: (data: Partial<TypeUser>) => void;
+  // updateUser: (data: UserData) => void;
 };
 
 export const useUserStore = create<TypeState & TypeActions>()(
@@ -19,19 +19,19 @@ export const useUserStore = create<TypeState & TypeActions>()(
       getUser: async (token: string) => {
         auth
           .getCurrentUser(token)
-          .then((res) => {
-            set((state) => ({
-              user: (state.user = res),
-            }));
-          })
+          // .then((res) => {
+          //   set((state) => ({
+          //     user: (state.user = res),
+          //   }));
+          // })
           .catch((err) =>
             console.error('Error occured while fetching user:', err),
           );
       },
-      updateUser: (data: Partial<TypeUser>) =>
-        set((state) => ({
-          user: Object.assign(state.user as TypeUser, data),
-        })),
+      // updateUser: (data: UserData) =>
+      //   set((state) => ({
+      //     user: Object.assign(state.user as UserData, data),
+      //   })),
     }),
     { name: 'user-store', skipHydration: true },
   ),

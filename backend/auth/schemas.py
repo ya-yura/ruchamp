@@ -1,7 +1,8 @@
 from datetime import date
-from typing import Optional, List
-from pydantic import BaseModel
+from typing import List, Optional
+
 from fastapi_users import schemas
+from pydantic import BaseModel
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -43,12 +44,16 @@ class UserData(BaseModel):
     info: Optional[dict] = None
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
-
-
 class User(schemas.BaseUser):
     pass
+
+
+class UserUpdate(BaseModel):
+    username: str
+    name: str
+    sirname: str
+    fathername: str
+    country: str
 
 
 class UserDB(User, schemas.BaseUser):

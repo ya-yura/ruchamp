@@ -1,18 +1,25 @@
 // import million from 'million/compiler'; //It has some promlems with SSR
+import 'dotenv/config.js';
+import dotenv from 'dotenv';
+
+const envConfig = dotenv.config({ path: '../.env-non-dev' });
+
+// Merge process.env and the .env-non-dev file
+for (const key in envConfig.parsed) {
+  process.env[key] = envConfig.parsed[key];
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true, // It may be so that I need to switch off strict mode for Fluent UI React
-  experimental: {
-    // fluentui-next-appdir-directive plugin with the paths for @griffel and @fluentui:
-    swcPlugins: [
-      ['fluentui-next-appdir-directive', { paths: ['@griffel', '@fluentui'] }],
-    ],
-  },
+  reactStrictMode: true,
+  // images: {
+  //   remotePatterns: ['images.unsplash.com'], // add some if needed
+  // },
+  experimental: {},
 };
 
 // const millionConfig = {
-//   auto: false, // unfortunately, it looks like million.js does not work with Fluent at least in automode
+//   auto: true,
 // };
 
 // export default million.next(nextConfig, millionConfig);

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -10,20 +11,23 @@ class TeamMember(BaseModel):
 
 class TeamCreate(BaseModel):
     name: str
-    invite_link: Optional[str]
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
-    captain: int
+    country: Optional[int]
+    city: Optional[str]
+    region: Optional[int]
 
 
 class TeamUpdate(BaseModel):
-    name: str
+    name: Optional[str]
     invite_link: Optional[str]
     description: Optional[str]
     slug: Optional[str]
     image_field: Optional[str]
-    captain: int
+    country: Optional[int]
+    city: Optional[str]
+    region: Optional[int]
 
 
 class TeamDB(TeamCreate):

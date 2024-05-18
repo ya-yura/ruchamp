@@ -1,0 +1,70 @@
+version: '3.7'
+
+volumes:
+  static:
+
+services:
+
+  cms:
+    container_name: cms
+    build: ./project_cms
+    #command: gunicorn project_cms.wsgi:application --bind 0.0.0.0:9000
+    volumes:
+      - static:/backend_static
+    # ports:
+    #   - 9000:9000
+
+  # backend:
+  #   container_name: backend
+  #   image: emelyanovsergey89/ruchamp_b
+  #   env_file:
+  #     - .env-non-dev
+  #   ports:
+  #     - 8000:8000
+    # depends_on:
+    #   - db
+
+
+  # db:
+  #   container_name: db
+  #   image: postgres:15
+  #   env_file:
+  #     - .env-non-dev
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - 5432:5432
+  
+  # frontend:
+  #   container_name: frontend
+  #   image: emelyanovsergey89/ruchamp_f
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - backend
+  
+  nginx:
+    container_name: nginx
+    build: ./nginx/
+    ports:
+      - 9000:80
+    volumes:
+      - static:/staticfiles/
+    # image: nginx:1.25.2-alpine
+    # ports:
+    #     - 80:80
+    #     - 443:443
+    # volumes:
+    #   - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    #   - ./certbot/www:/var/www/certbot/:ro
+    #   - ./certbot/conf/:/etc/nginx/ssl/:ro
+    #   - static_volume:/home/app/web/staticfiles
+    #   - ./media:/project_cms/media
+    # depends_on:
+    #   - cms
+  
+  # certbot:
+  #   image: certbot/certbot:latest
+  #   volumes:
+  #     - ./certbot/www/:/var/www/certbot/:rw
+  #     - ./certbot/conf/:/etc/letsencrypt/:rw

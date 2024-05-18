@@ -1,15 +1,15 @@
 from datetime import datetime
-from sqlalchemy import JSON
+
+from sqlalchemy import (JSON, TIMESTAMP, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, String)
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, Integer, ForeignKey, Float, Enum, DateTime, Date, TIMESTAMP
 
-from auth.models import Base, EventOrganizer, User
-from event.models import Event
-
+from auth.models import EventOrganizer, User, Spectator, Athlete
 from connection import Base
-
+from event.models import Event, Match
 
 metadata = Base.metadata
+
 
 # Сектора зала
 class Sector(Base):
@@ -35,27 +35,61 @@ class Place(Base):
     number = Column(Integer, nullable=False)
 
 
-# Билеты зрителей
+# Стоимость билета на матч для зрителя
 class Ticket(Base):
     __tablename__ = "Ticket"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id), nullable=False)
-    event_id = Column(Integer, ForeignKey(Event.id), nullable=False)
-    day = Column(DateTime, nullable=True)
-    place = Column(Integer, ForeignKey(Place.id), nullable=False)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
     price = Column(Float, nullable=False)
-    status = Column(Enum("available", "reserved", "sold_out", "used", name="ticket_status"), nullable=False, default="available")
+
+
+# Билеты зрителей
+class SpectatorTicket(Base):
+    __tablename__ = "SpectatorTicket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    spectator_id = Column(
+        Integer, ForeignKey(Spectator.id), nullable=False
+    )
+    status = Column(
+        Enum(
+            "available",
+            "reserved",
+            "sold_out",
+            "used",
+            name="ticket_status"
+        ),
+        nullable=False,
+        default="available"
+    )
     uu_key = Column(String, nullable=True)
 
 
-# абонемент на участие в мероприятии в качестве спортсмена
+# Взнос на участие в мероприятии в качестве спортсмена
 class Engagement(Base):
     __tablename__ = "Engagement"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id), nullable=False)
-    event_id = Column(Integer, ForeignKey(Event.id), nullable=False)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
     price = Column(Float, nullable=False)
-    status = Column(Enum("available", "reserved", "sold_out", "used", name="ticket_status"), nullable=False, default="available")
+
+
+# Билеты спортсменов
+class AthleteTicket(Base):
+    __tablename__ = "AthleteTicket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    athlete_id = Column(Integer, ForeignKey(Athlete.id), nullable=False)
+    status = Column(
+        Enum(
+            "available",
+            "reserved",
+            "sold_out",
+            "used",
+            name="ticket_status"
+        ),
+        nullable=False,
+        default="available"
+    )
     uu_key = Column(String, nullable=True)
 
 
@@ -63,7 +97,11 @@ class Engagement(Base):
 class Merch(Base):
     __tablename__ = "Merchandise"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id), nullable=False)
+    organizer_id = Column(
+        Integer,
+        ForeignKey(EventOrganizer.id),
+        nullable=False
+    )
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
@@ -74,7 +112,11 @@ class Merch(Base):
 class Courses(Base):
     __tablename__ = "Subscription"
     id = Column(Integer, primary_key=True)
-    organizer_id = Column(Integer, ForeignKey(EventOrganizer.id), nullable=False)
+    organizer_id = Column(
+        Integer,
+        ForeignKey(EventOrganizer.id),
+        nullable=False
+    )
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
@@ -91,7 +133,11 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    status = Column(Enum("pending", "completed", "canceled", name="order_status"), nullable=False, default="pending")
+    status = Column(
+        Enum("pending", "completed", "canceled", name="order_status"),
+        nullable=False,
+        default="pending"
+    )
 
 
 # Перечень товаров заказа
@@ -99,7 +145,10 @@ class OrderItem(Base):
     __tablename__ = "OrderItem"
     id = Column(Integer, primary_key=True)
     order_id = Column(Integer, ForeignKey("Order.id"), nullable=False)
-    product_type = Column(String, nullable=False)  # Может быть "merch", "courses", "engagement" или "ticket"
+
+    # Может быть "merch", "courses", "engagement" или "ticket"
+    product_type = Column(String, nullable=False)
+
     product_id = Column(Integer, nullable=False)
     quantity = Column(Integer, nullable=False)
     total_price = Column(Float, nullable=False)
@@ -113,5 +162,3 @@ class Transaction(Base):
     payment_method = Column(String, nullable=False)
     transaction_date = Column(DateTime, default=datetime.utcnow)
     amount = Column(Float, nullable=False)
-
-

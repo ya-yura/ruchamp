@@ -1,51 +1,23 @@
 import datetime
 import random
+
 from faker import Faker
-from connection import SessionLocal
-
-from sqlalchemy import create_engine, func, select
-from sqlalchemy.orm import sessionmaker, aliased
 from fastapi_users.db import SQLAlchemyUserDatabase
-
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.dialects.postgresql import INTERVAL
+from sqlalchemy.orm import aliased, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
-from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-from auth.models import (
-    Athlete,
-    EventOrganizer,
-    Spectator,
-    SystemAdministrator,
-    User,
-    Role,
-    CombatType,
-    SportType,
-    CategoryType, 
-    AllWeightClass,
-    Referee, 
-    Coach, 
-    CoachType,
-    RefereeType,
-    athlete_sport_type_association,
-    athlete_coach_association,
-)
-from event.models import (
-    Event, 
-    Participant, 
-    Match,
-    MatchResult, 
-    Prize, 
-    Medal,
-    MatchPeriod,
-    EventWeights,
-    EventSports,
-)
-from event.models import (
-    Team,
-    TeamMember,
-)
-
-
+from auth.models import (AllWeightClass, Athlete, CategoryType, Coach,
+                         CoachType, CombatType, EventOrganizer, Referee,
+                         RefereeType, Role, Spectator, SportType,
+                         SystemAdministrator, User, athlete_coach_association,
+                         athlete_sport_type_association, Country, Region, Area)
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
+from connection import SessionLocal
+from event.models import (Event, Match,
+                          MatchResult, Medal, Prize, Team,
+                          TeamMember)
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
@@ -80,6 +52,289 @@ num_medals = 33
 num_prizes = 50
 num_sport_categories = int(num_athletes/2)
 num_weight_categories = num_athletes
+
+
+# Заполнение таблицы стран
+countries_data = [
+    {"name": "Россия"},
+    {"name": "Беларусь"},
+    {"name": "Казахстан"}
+]
+
+regions_data = {
+    "Россия": [
+        {"name": "Центральный федеральный округ"},
+        {"name": "Северо-Западный федеральный округ"},
+        {"name": "Южный федеральный округ"},
+        {"name": "Приволжский федеральный округ"},
+        {"name": "Уральский федеральный округ"},
+        {"name": "Сибирский федеральный округ"},
+        {"name": "Дальневосточный федеральный округ"}
+    ],
+    "Белоруссия": [
+        {"name": "Брестская область"},
+        {"name": "Витебская область"},
+        {"name": "Гомельская область"},
+        {"name": "Гродненская область"},
+        {"name": "Минская область"},
+        {"name": "Могилевская область"}
+    ],
+    "Казахстан": [
+        {"name": "Акмолинская область"},
+        {"name": "Актюбинская область"},
+        {"name": "Алматинская область"},
+        {"name": "Атырауская область"},
+        {"name": "Восточно-Казахстанская область"},
+        {"name": "Жамбылская область"},
+        {"name": "Западно-Казахстанская область"},
+        {"name": "Карагандинская область"},
+        {"name": "Костанайская область"},
+        {"name": "Кызылординская область"},
+        {"name": "Мангистауская область"},
+        {"name": "Павлодарская область"},
+        {"name": "Северо-Казахстанская область"},
+        {"name": "Туркестанская область"}
+    ]
+}
+
+areas_data = {
+    "Центральный федеральный округ": [
+        {"name": "Московская область"},
+        {"name": "Владимирская область"},
+        {"name": "Тверская область"},
+        {"name": "Калужская область"},
+        {"name": "Ярославская область"},
+        {"name": "Рязанская область"},
+        {"name": "Ивановская область"},
+        {"name": "Костромская область"},
+        {"name": "Смоленская область"},
+        {"name": "Тульская область"},
+        {"name": "Белгородская область"},
+        {"name": "Липецкая область"},
+        {"name": "Орловская область"},
+        {"name": "Тамбовская область"},
+        {"name": "Курская область"}
+    ],
+    "Северо-Западный федеральный округ": [
+        {"name": "Санкт-Петербург"},
+        {"name": "Ленинградская область"},
+        {"name": "Псковская область"},
+        {"name": "Новгородская область"},
+        {"name": "Мурманская область"},
+        {"name": "Архангельская область"},
+        {"name": "Вологодская область"},
+        {"name": "Калининградская область"},
+        {"name": "Республика Карелия"},
+        {"name": "Республика Коми"}
+    ],
+    "Южный федеральный округ": [
+        {"name": "Краснодарский край"},
+        {"name": "Ростовская область"},
+        {"name": "Ставропольский край"},
+        {"name": "Республика Адыгея"},
+        {"name": "Республика Калмыкия"},
+        {"name": "Астраханская область"},
+        {"name": "Волгоградская область"}
+    ],
+    "Приволжский федеральный округ": [
+        {"name": "Республика Татарстан"},
+        {"name": "Чувашская Республика"},
+        {"name": "Республика Марий Эл"},
+        {"name": "Удмуртская Республика"},
+        {"name": "Самарская область"},
+        {"name": "Саратовская область"},
+        {"name": "Пензенская область"},
+        {"name": "Ульяновская область"},
+        {"name": "Пермский край"},
+        {"name": "Кировская область"},
+        {"name": "Оренбургская область"}
+    ],
+    "Уральский федеральный округ": [
+        {"name": "Свердловская область"},
+        {"name": "Челябинская область"},
+        {"name": "Республика Башкортостан"},
+        {"name": "Пермский край"},
+        {"name": "Республика Коми"},
+        {"name": "Курганская область"},
+        {"name": "Тюменская область"},
+        {"name": "Ханты-Мансийский автономный округ — Югра"},
+        {"name": "Ямало-Ненецкий автономный округ"}
+    ],
+    "Сибирский федеральный округ": [
+        {"name": "Новосибирская область"},
+        {"name": "Омская область"},
+        {"name": "Томская область"},
+        {"name": "Кемеровская область"},
+        {"name": "Республика Алтай"},
+        {"name": "Республика Тыва"},
+        {"name": "Республика Хакасия"},
+        {"name": "Алтайский край"},
+        {"name": "Забайкальский край"},
+        {"name": "Иркутская область"},
+        {"name": "Красноярский край"}
+    ],
+    "Дальневосточный федеральный округ": [
+        {"name": "Приморский край"},
+        {"name": "Хабаровский край"},
+        {"name": "Амурская область"},
+        {"name": "Республика Саха (Якутия)"},
+        {"name": "Еврейская автономная область"},
+        {"name": "Чукотский автономный округ"},
+        {"name": "Сахалинская область"},
+        {"name": "Камчатский край"}
+    ],
+    "Брестская область": [
+        {"name": "Брест"},
+        {"name": "Барановичи"},
+        {"name": "Пинск"},
+        {"name": "Кобрин"},
+        {"name": "Лунинец"}
+    ],
+    "Витебская область": [
+        {"name": "Витебск"},
+        {"name": "Орша"},
+        {"name": "Полоцк"},
+        {"name": "Новополоцк"},
+        {"name": "Глубокое"}
+    ],
+    "Гомельская область": [
+        {"name": "Гомель"},
+        {"name": "Мозырь"},
+        {"name": "Жлобин"},
+        {"name": "Речица"},
+        {"name": "Светлогорск"}
+    ],
+    "Гродненская область": [
+        {"name": "Гродно"},
+        {"name": "Лида"},
+        {"name": "Волковыск"},
+        {"name": "Слоним"},
+        {"name": "Ивье"}
+    ],
+    "Минская область": [
+        {"name": "Минск"},
+        {"name": "Борисов"},
+        {"name": "Молодечно"},
+        {"name": "Слуцк"},
+        {"name": "Мядель"}
+    ],
+    "Могилевская область": [
+        {"name": "Могилев"},
+        {"name": "Бобруйск"},
+        {"name": "Горки"},
+        {"name": "Осиповичи"},
+        {"name": "Славгород"}
+    ],
+    "Акмолинская область": [
+        {"name": "Кокшетау"},
+        {"name": "Темиртау"},
+        {"name": "Щучинск"},
+        {"name": "Аксу"},
+        {"name": "Макинск"}
+    ],
+    "Актюбинская область": [
+        {"name": "Актобе"},
+        {"name": "Хромтау"},
+        {"name": "Кандыагаш"},
+        {"name": "Шалкар"},
+        {"name": "Темир"}
+    ],
+    "Алматинская область": [
+        {"name": "Алматы"},
+        {"name": "Талдыкорган"},
+        {"name": "Капшагай"},
+        {"name": "Текели"},
+        {"name": "Ушарал"}
+    ],
+    "Атырауская область": [
+        {"name": "Атырау"},
+        {"name": "Кульсары"},
+        {"name": "Махамбет"},
+        {"name": "Доссор"}
+    ],
+    "Восточно-Казахстанская область": [
+        {"name": "Усть-Каменогорск"},
+        {"name": "Семей"},
+        {"name": "Аягоз"},
+        {"name": "Курчатов"},
+        {"name": "Жаркент"}
+    ],
+    "Жамбылская область": [
+        {"name": "Тараз"},
+        {"name": "Жамбыл"},
+        {"name": "Мерке"},
+        {"name": "Каратау"}
+    ],
+    "Западно-Казахстанская область": [
+        {"name": "Уральск"},
+        {"name": "Актобе"},
+        {"name": "Аральск"},
+        {"name": "Казталовка"}
+    ],
+    "Карагандинская область": [
+        {"name": "Караганда"},
+        {"name": "Темиртау"},
+        {"name": "Сарань"},
+        {"name": "Абай"},
+        {"name": "Актас"}
+    ],
+    "Костанайская область": [
+        {"name": "Костанай"},
+        {"name": "Рудный"},
+        {"name": "Аркалык"},
+        {"name": "Житикара"},
+        {"name": "Лисаковск"}
+    ],
+    "Кызылординская область": [
+        {"name": "Кызылорда"},
+        {"name": "Байконур"},
+        {"name": "Жалагаш"},
+        {"name": "Аральское море"}
+    ],
+    "Мангистауская область": [
+        {"name": "Актау"},
+        {"name": "Шетпе"},
+        {"name": "Форт-Шевченко"},
+        {"name": "Жанаозен"},
+        {"name": "Темиртау"}
+    ],
+    "Павлодарская область": [
+        {"name": "Павлодар"},
+        {"name": "Экибастуз"},
+        {"name": "Качирск"},
+        {"name": "Лебяжье"},
+        {"name": "Майкудук"}
+    ],
+    "Северо-Казахстанская область": [
+        {"name": "Петропавловск"},
+        {"name": "Клинцы"},
+        {"name": "Уркараган"},
+        {"name": "Жетысай"}
+    ],
+    "Туркестанская область": [
+        {"name": "Шымкент"},
+        {"name": "Туркестан"},
+        {"name": "Жангелды"},
+        {"name": "Мактаарал"}
+    ]
+}
+
+
+# Заполнение таблицы стран
+def generate_fake_countries(session):
+    for country_data in countries_data:
+        country = Country(**country_data)
+        session.add(country)
+        for region_data in regions_data[country.name]:
+            region = Region(**region_data)
+            region.country = country  # Связь с родительской страной
+            session.add(region)
+            for area_data in areas_data[region_data["name"]]:
+                area = Area(**area_data)
+                area.region = region  # Связь с родительским регионом
+                session.add(area)
+
+    session.commit()
 
 
 def generate_fake_roles(session):
@@ -184,7 +439,7 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
             'sirname': fake.last_name(),
             'fathername': fake.first_name_male() if fake.boolean(chance_of_getting_true=50) else fake.first_name_female(),
             'gender': fake.boolean(),
-            'country': fake.country(),
+            'country': fake.random_element(elements=[random_country.name for random_country in session.query(Country).all()]),
             'birthdate': fake.date_of_birth(minimum_age=30, maximum_age=60),
             'qualification_level': fake.random_element(elements=[coach_type.id for coach_type in session.query(CoachType).all()]),
         }
@@ -194,7 +449,6 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
         coach = Coach(**coach_data)
         session.add(coach)
     session.commit()
-
 
 
 def generate_fake_users(session, num_users=num_users):
@@ -210,7 +464,7 @@ def generate_fake_users(session, num_users=num_users):
             'sirname': fake.last_name(),
             'fathername': fake.first_name_male() if fake.boolean(chance_of_getting_true=50) else fake.first_name_female(),
             'gender': fake.boolean(chance_of_getting_true=75),
-            'country': fake.country(),
+            'country': fake.random_element(elements=[random_country.name for random_country in session.query(Country).all()]),
             'birthdate': fake.date_of_birth(minimum_age=12, maximum_age=80),
 
             'hashed_password': fake.password(length=12),
@@ -264,11 +518,15 @@ def generate_fake_athletes(session, num_athletes=num_athletes):
         athlete_users.extend(additional_users)
 
     for user in athlete_users:
+
         athlete_data = {
             'user_id': user.id,
             'weight': fake.random_int(min=30, max=180),
             'height': fake.random_int(min=120, max=200),
             'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
+            'country': fake.random_element(elements=[random_country.id for random_country in session.query(Country).all()]),
+            'region': fake.random_element(elements=[random_region.id for random_region in session.query(Region).all()]),
+            'city': fake.city(),
             'sport_types': fake.random_elements(
                 elements=session.query(SportType).all(),
                 length=fake.random_int(min=1, max=4),
@@ -385,12 +643,16 @@ def generate_fake_teams(session, num_teams=num_teams):
     athletes = session.query(Athlete).all()
 
     for _ in range(num_teams):
+
         team_data = {
             'name': fake.company(),
             'invite_link': str(fake.uuid4()),
             'description': fake.sentence(),
             'slug': fake.slug(),
             'image_field': fake.image_url(),
+            'country': fake.random_element(elements=[random_country.id for random_country in session.query(Country).all()]),
+            'city': fake.city(),
+            'region': fake.random_element(elements=[random_region.id for random_region in session.query(Region).all()]),
         }
 
         captain = fake.random_element(elements=athletes)
@@ -442,14 +704,17 @@ def generate_fake_events(session, num_events=num_events):
         organizer = random.choice(organizers)
         event_data = {
             'name': fake.sentence(),
-            'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
-            'end_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
+            'start_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
+            'end_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
+            'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(61, 90)),
+            'end_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(91, 120)),
             'location': fake.address(),
             'organizer_id': organizer.id,
             'event_order': fake.text(),
             'event_system': fake.word(),
             'geo': str(fake.latitude()) + ',' + str(fake.longitude()),
             'image_field': fake.image_url(),
+            'description': fake.text(),
         }
         events_data.append(event_data)
 
@@ -654,34 +919,34 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# generate_fake_roles(session)
+generate_fake_countries(session)
+generate_fake_roles(session)
 
-# generate_fake_combat_types(session)
-# generate_fake_category_types(session)
-# generate_fake_sport_types(session)
-# generate_fake_weight_classes(session)
-# generate_fake_referee_types(session)
-# generate_fake_coach_types(session)
+generate_fake_combat_types(session)
+generate_fake_category_types(session)
+generate_fake_sport_types(session)
+generate_fake_weight_classes(session)
+generate_fake_referee_types(session)
+generate_fake_coach_types(session)
 
-# generate_fake_users(session, num_users)
-# generate_fake_coaches(session)
-# generate_fake_referees(session)
-# generate_fake_athletes(session)
-# generate_fake_event_organizers(session)
-# generate_fake_spectators(session)
-# generate_fake_system_administrators(session)
+generate_fake_users(session, num_users)
+generate_fake_coaches(session)
+generate_fake_referees(session)
+generate_fake_athletes(session)
+generate_fake_event_organizers(session)
+generate_fake_spectators(session)
+generate_fake_system_administrators(session)
 
-# generate_fake_teams(session)
-# generate_fake_team_member(session)
+generate_fake_teams(session)
+generate_fake_team_member(session)
 
-# generate_fake_events(session)
+generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
-generate_fake_matches(session)
+# generate_fake_matches(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
 
 # generate_fake_prizes(session)
 # generate_fake_medals(session)
 # generate_fake_links(session)
-
