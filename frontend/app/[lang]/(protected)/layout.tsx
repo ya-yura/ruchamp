@@ -19,7 +19,7 @@ export default async function ProtectedLayout({
   } else user = session.user;
 
   if (!session) {
-    redirect('/ru');
+    redirect('/');
   }
 
   return (

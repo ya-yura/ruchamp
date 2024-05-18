@@ -1,17 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { Event } from '@/lib/definitions';
-import { useRef } from 'react';
-import { Badges } from './badges';
-import { chooseTypes } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { ReactNode, useRef } from 'react';
+import { Badges } from '../app/[lang]/(unprotected)/event/[id]/badges';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Info } from './info';
-import { Athletes } from './athletes';
-import { Matches } from './matches';
-import { Grid } from './grid';
-import { Results } from './results';
 import { useScrollY } from '@/lib/hooks/useScrollY';
 import { CustomSection } from '@/components/custom-section';
 import { cn } from '@/lib/utils';
@@ -19,16 +11,26 @@ import { H1 } from '@/components/text';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ContentWraper } from '@/components/content-wraper';
 
-enum EventTabs {
-  'info' = 'Информация',
-  'athletes' = 'Спортсмены',
-  'matches' = 'Матчи',
-  'grid' = 'Турнирная сетка',
-  'results' = 'Результаты',
+interface PageWithInfoProps<T extends string> {
+  id: number;
+  type: 'event' | 'team';
+  title: string;
+  bages: string[];
+  buttons: ReactNode;
+  tabsContent: Record<T, ReactNode>;
+  tabsObj: Record<string, T>;
 }
 
-export function EventInfo({ event }: { event: Event }) {
-  const refContainer = useRef<HTMLDivElement>(null);
+export function PageWithInfo<T extends string>({
+  id,
+  type,
+  title,
+  bages,
+  buttons,
+  tabsContent,
+  tabsObj,
+}: PageWithInfoProps<T>) {
+  const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
 
   let progress = 0;
@@ -37,14 +39,6 @@ export function EventInfo({ event }: { event: Event }) {
   if (elContainer) {
     progress = Math.min(1, scrollY / elContainer.clientHeight);
   }
-
-  const tabs: Record<EventTabs, React.ReactNode> = {
-    [EventTabs['info']]: <Info event={event} />,
-    [EventTabs['athletes']]: <Athletes />,
-    [EventTabs['matches']]: <Matches />,
-    [EventTabs['grid']]: <Grid />,
-    [EventTabs['results']]: <Results />,
-  };
 
   return (
     <div className="w-full">
@@ -56,8 +50,8 @@ export function EventInfo({ event }: { event: Event }) {
       >
         <Image
           className=""
-          src={`/ru/images/mock-event-bg/${event?.id.toString()[event?.id.toString().length - 1]}.avif`}
-          alt="Обложка мероприятия"
+          src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          alt="Обложка"
           fill={true}
           style={{
             objectFit: 'cover',
@@ -70,25 +64,22 @@ export function EventInfo({ event }: { event: Event }) {
       </div>
       <CustomSection className="relative h-[590px] items-start  bg-transparent">
         <ContentWraper className="h-[590px] justify-between">
-          <Badges types={chooseTypes(event.id)} />
+          <Badges types={bages} />
           <div className="relative flex flex-col gap-10">
-            <H1>{event?.name}</H1>
-            <div className="mb-[87px] flex gap-6">
-              <Button variant="ruchampDefault">Участвовать</Button>
-              <Button variant="ruchampTransparent">Купить билеты</Button>
-            </div>
+            <H1>{title}</H1>
+            {buttons}
           </div>
         </ContentWraper>
       </CustomSection>
       <CustomSection className="relative">
         <ContentWraper>
           <Tabs
-            defaultValue={Object.keys(EventTabs)[0]}
+            defaultValue={Object.keys(tabsObj)[0]}
             className="mb-10 mt-[-38px] w-full"
           >
             <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
               <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
-                {Object.entries(EventTabs).map(([key, value]) => (
+                {Object.entries(tabsObj).map(([key, value]) => (
                   <TabsTrigger
                     key={key}
                     className={cn(
@@ -106,9 +97,9 @@ export function EventInfo({ event }: { event: Event }) {
               </TabsList>
               <ScrollBar className="hidden" orientation="horizontal" />
             </ScrollArea>
-            {Object.entries(EventTabs).map(([key, value]) => (
+            {Object.entries(tabsObj).map(([key, value]) => (
               <TabsContent key={key} value={key}>
-                {tabs[value as EventTabs]}
+                {tabsContent[value as T]}
               </TabsContent>
             ))}
           </Tabs>

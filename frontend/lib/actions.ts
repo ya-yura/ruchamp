@@ -78,3 +78,17 @@ export async function updateSession(request: NextRequest) {
 export async function getTeams() {
   return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
 }
+
+export async function getTeam(id: string, token: string) {
+  return fetch(`${baseUrl}/team/get-team/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(checkResponse)
+    .catch((err) => {
+      console.log('getTeam error', err);
+    });
+}
