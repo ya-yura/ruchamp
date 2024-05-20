@@ -1,5 +1,5 @@
 import '@/app/[lang]/ui/global.css';
-import { Locale, i18n } from '@/i18n.config';
+import { Locale } from '@/i18n.config';
 import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
 import { getSession } from '@/lib/actions';

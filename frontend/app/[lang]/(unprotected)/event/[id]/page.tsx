@@ -3,7 +3,7 @@ import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
 import { eventsApi } from '@/lib/api/eventsApi';
-import { Event } from '@/lib/definitions';
+import { Event, EventTabs } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
 import { testData } from '@/lib/constants';
 import { Info } from './info';
@@ -12,14 +12,6 @@ import { Matches } from './matches';
 import { Grid } from './grid';
 import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
-
-export enum EventTabs {
-  'info' = 'Информация',
-  'athletes' = 'Спортсмены',
-  'matches' = 'Матчи',
-  'grid' = 'Турнирная сетка',
-  'results' = 'Результаты',
-}
 
 export default async function EventPage({
   params,
