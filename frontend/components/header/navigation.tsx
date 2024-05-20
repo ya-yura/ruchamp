@@ -11,7 +11,13 @@ import {
 import { Locale } from '@/i18n.config';
 import { ListItem } from './list-item';
 
-export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
+export function HeaderNavigation({
+  lang,
+  isLoggedIn,
+}: {
+  lang: Locale;
+  isLoggedIn: boolean;
+}) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -33,7 +39,7 @@ export function HeaderNavigation({ lang, user }: { lang: Locale; user: any }) {
                 href="/teams"
                 lang={lang}
               />
-              {user ? (
+              {isLoggedIn ? (
                 <ListItem
                   className="text-right"
                   title="Панель управления"

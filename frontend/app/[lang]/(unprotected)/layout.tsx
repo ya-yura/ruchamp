@@ -4,6 +4,7 @@ import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
 import { getSession } from '@/lib/actions';
 import Image from 'next/image';
+import { getInitials } from '@/lib/utils';
 
 export default async function UnprotectedLayout({
   children,
@@ -13,14 +14,31 @@ export default async function UnprotectedLayout({
   params: { lang: Locale };
 }) {
   const session = await getSession();
-  let user;
+  let userEmail: string;
+  let userAvatar: string;
+  let initials: string;
   if (!session || session.user.length === 0) {
-    user === null;
-  } else user = session.user;
+    userEmail = '';
+    userAvatar = '';
+    initials = '';
+  } else {
+    const user = session.user;
+    const firstName: string = user[1].name;
+    const lastName: string = user[1].sirname;
+    userEmail = user[1].email;
+    userAvatar = user[0].image_field;
+    initials = getInitials(firstName, lastName);
+  }
 
   return (
     <>
-      <Header lang={params.lang} user={user} />
+      <Header
+        userEmail={userEmail}
+        userAvatar={userAvatar}
+        initials={initials}
+        isLoggedIn={!!session}
+        lang={params.lang}
+      />
       <div className="absolute mt-[-92px] h-[853px] w-full ">
         <Image
           className="opacity-40"
@@ -29,7 +47,7 @@ export default async function UnprotectedLayout({
           fill={true}
           style={{ objectFit: 'cover' }}
         />
-        <div className="to-primary-background absolute bottom-0 left-0 right-0 top-0 h-full w-full bg-gradient-to-b from-[rgba(0,0,0,0.01)] from-50% to-100%"></div>
+        <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full bg-gradient-to-b from-[rgba(0,0,0,0.01)] from-50% to-primary-background to-100%"></div>
       </div>
       {children}
       <Footer lang={params.lang} />
