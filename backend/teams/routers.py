@@ -21,7 +21,8 @@ from auth.models import (User, Athlete, athlete_coach_association, Coach,
 from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
 from teams.models import Team, TeamMember
-from teams.schemas import TeamCreate, TeamUpdate
+from teams.schemas import TeamCreate, TeamUpdate, Participant
+from event.models import MatchParticipant
 
 router = APIRouter(prefix="/team", tags=["Teams"])
 
@@ -547,3 +548,54 @@ async def delete_member_team(
             TeamMember.member == member_id))
         await db.commit()
         return {"message": "Member deleted successfully"}
+
+
+@router.get("/rating/all-teams")
+async def all_teams_rating(
+    db: AsyncSession = Depends(get_db)
+):
+    result = {}
+    teams_info = {}
+    query = await db.execute(select(Team.id))
+    teams = query.scalars().all()
+    all_members = []
+    for team in teams:
+        query = await db.execute(select(TeamMember.member).where(TeamMember.team == team))
+        members = query.scalars().all()
+        all_members.append(members)
+        result[team] = members
+    for key, value in result.items():
+        for member in value:
+            query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+            users = query.scalars().all()
+            for user_id in users:
+                query = await db.execute(
+                    select(
+                        User.id,
+                        User.name,
+                        User.sirname,
+                        User.fathername,
+                        User.birthdate
+                    )
+                    .where(User.id == user_id)
+                )
+                user = query.mappings().all()
+
+                teams_info.setdefault(key, []).append(user[0])
+            
+    '''all_users = []
+    users = []
+    for members in all_members:
+        for member in members:
+            query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+            user_id = query.scalars().first()
+            users.append(user_id)
+        all_users.append(users)'''
+                                
+
+
+
+    # print(teams)
+    # print(all_members)
+    # print(all_users)
+    return teams_info

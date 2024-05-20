@@ -19,7 +19,7 @@ from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
                           ApplicationStatusHistory, MatchAge, MatchSport,
-                          MatchGender, MatchCategory, AthleteApplication,
+                          MatchGender, MatchCategory,
                           MatchWeights)  # MatchParticipant
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplicationTeam,
@@ -300,24 +300,23 @@ async def get_participants(
     for match_id in all_matches_id:
         query = await db.execute(
             select(
-                SportType.name.label("sport_name"),
-                CombatType.name.label("combat_type"),
-                CategoryType.name.label("category_type"),
-                Match.age,
-                AllWeightClass.name.label("weigth_category"),
-                Match.mat_vol,
-                Match.nominal_time,
+                Match.id,
                 Match.start_datetime,
-                Match.end_datetime
-            ).join(
-                CombatType, CombatType.id == Match.combat_type_id
-            ).join(
-                CategoryType, CategoryType.id == Match.category_id
-            ).join(
-                SportType, SportType.id == Match.sport_id
-            ).join(
-                AllWeightClass, AllWeightClass.id == Match.weights_id
-            ).where(Match.id == match_id))
+                Match.end_datetime,
+                SportType.name.label("sport_name"),
+                MatchGender.gender.label("gender"),
+                AllWeightClass.name.label("weigth_category"),
+                CategoryType.name.label("category_type"),
+            )
+            .join(CombatType, CombatType.id == Match.combat_type_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchGender, MatchGender.match_id == Match.id)
+            .join(MatchWeights, MatchWeights.match_id == Match.id)
+            .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
+            .join(MatchCategory, MatchCategory.match_id == Match.id)
+            .join(CategoryType, CategoryType.id == MatchCategory.category_id)
+            .where(Match.id == match_id))
         match_info = query.mappings().all()
         matches.append(match_info[0])
 
@@ -461,7 +460,7 @@ async def create_match(
     return {f"Match ID {new_match.id} - created"}
 
 
-@router.get("/matches/{match_id}", response_model=MatchRead)
+'''@router.get("/matches/{match_id}", response_model=MatchRead)
 async def get_matches_id(
     match_id: int,
     db: AsyncSession = Depends(get_db)
@@ -472,7 +471,7 @@ async def get_matches_id(
     match = query.scalars().one_or_none()
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
-    return match
+    return match'''
 
 
 @router.put("/matches/update/{match_id}")
@@ -552,39 +551,6 @@ async def create_tournament_application_team(
 
     application = TournamentApplication(
         **tournament_application_team_data.dict()
-    )
-    db.add(application)
-    await db.commit()
-    db.refresh(application)
-
-    return {f"Application ID - {application.id} created"}
-
-
-@router.post("/tournament-applications-athlete/create")
-async def create_tournament_application_athlete(
-    tournament_application_athlete_data: CreateTournamentApplicationAthlete,
-    db: AsyncSession = Depends(get_db),
-    current_user: UserDB = Depends(current_user)
-):
-    query = await db.execute(
-        select(Athlete.id)
-        .where(Athlete.user_id == current_user.id)
-    )
-    athlete_id = query.scalars().first()
-
-    if athlete_id is None:
-        raise HTTPException(status_code=400, detail="You are not an athlete")
-
-    query = await db.execute(select(Match.id).where(
-        Match.id == tournament_application_athlete_data.match_id
-    ))
-    match_id = query.scalars().first()
-
-    if match_id is None:
-        raise HTTPException(status_code=404, detail="Match not found")
-
-    application = AthleteApplication(
-        **tournament_application_athlete_data.dict()
     )
     db.add(application)
     await db.commit()

@@ -127,9 +127,14 @@ class MatchParticipant(Base):
     player_id = Column(
         Integer,
         ForeignKey(Athlete.id, ondelete="CASCADE"),
-        nullable=True
     )
-    team_member = Column(Boolean, default=True, nullable=False)
+    '''Здесь надо переделать, на булевый флаг, чтоб передавать
+      состоит в команде спортсмен или нет'''
+    team_id = Column(
+        Integer,
+        ForeignKey(Team.id, ondelete="CASCADE"),
+        default=0,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -274,7 +279,13 @@ class WinnerTable(Base):
 class TournamentApplication(Base):
     __tablename__ = "TournamentApplication"
     id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
+    team_id = Column(
+        Integer,
+        ForeignKey(Team.id, ondelete="CASCADE"),
+        nullable=True,
+        default=None
+    )
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     status = Column(Enum(
         "accepted",
@@ -322,62 +333,5 @@ class ApplicationStatusHistory(Base):
 
     application = relationship(
         "TournamentApplication",
-        back_populates="status_history"
-    )
-
-
-# Заявки на участие от спортсменов
-class AthleteApplication(Base):
-    __tablename__ = "AthleteApplication"
-    id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    status = Column(
-        Enum(
-            "accepted",
-            "approved",
-            "rejected",
-            "paid",
-            name="application_status"
-        ), nullable=False
-    )
-    # Время создания заявки
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    # Время обновления статуса
-    updated_at = Column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
-    )
-    status_history = relationship(
-        "AthleteApplicationStatusHistory",
-        back_populates="application",
-        cascade="all, delete-orphan"
-    )
-
-
-# Тут храним историю изменения статусов заявок
-class AthleteApplicationStatusHistory(Base):
-    __tablename__ = "AthleteApplicationStatusHistory"
-    id = Column(Integer, primary_key=True)
-    application_id = Column(
-        Integer,
-        ForeignKey(AthleteApplication.id, ondelete="CASCADE")
-    )
-    status = Column(
-        Enum(
-            "accepted",
-            "approved",
-            "rejected",
-            "paid",
-            name="application_status"
-        ), nullable=False
-    )
-    # Время обновления статуса
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    application = relationship(
-        "AthleteApplication",
         back_populates="status_history"
     )

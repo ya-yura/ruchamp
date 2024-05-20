@@ -16,8 +16,8 @@ from auth.models import (AllWeightClass, Athlete, CategoryType, Coach,
 from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from connection import SessionLocal
 from event.models import (Event, Match,
-                          MatchResult, Medal, Prize, Team,
-                          TeamMember)
+                          MatchResult, Medal, Prize, Team)
+from teams.models import TeamMember
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
@@ -639,6 +639,18 @@ def generate_fake_system_administrators(session, num_administrators=num_administ
 
 
 # Генерация данных для команд
+def generate_fake_teams_0(session):
+    team_data = {
+            'id': 0,
+            'name': "Нет команды",
+    }
+
+    # Создаем команду
+    team = Team(**team_data)
+    session.add(team)
+    session.commit()
+
+
 def generate_fake_teams(session, num_teams=num_teams):
     athletes = session.query(Athlete).all()
 
@@ -919,28 +931,29 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-generate_fake_countries(session)
-generate_fake_roles(session)
+# generate_fake_countries(session)
+# generate_fake_roles(session)
 
-generate_fake_combat_types(session)
-generate_fake_category_types(session)
-generate_fake_sport_types(session)
-generate_fake_weight_classes(session)
-generate_fake_referee_types(session)
-generate_fake_coach_types(session)
+# generate_fake_combat_types(session)
+# generate_fake_category_types(session)
+# generate_fake_sport_types(session)
+# generate_fake_weight_classes(session)
+# generate_fake_referee_types(session)
+# generate_fake_coach_types(session)
 
-generate_fake_users(session, num_users)
-generate_fake_coaches(session)
-generate_fake_referees(session)
-generate_fake_athletes(session)
-generate_fake_event_organizers(session)
-generate_fake_spectators(session)
-generate_fake_system_administrators(session)
+# generate_fake_users(session, num_users)
+# generate_fake_coaches(session)
+# generate_fake_referees(session)
+# generate_fake_athletes(session)
+# generate_fake_event_organizers(session)
+# generate_fake_spectators(session)
+# generate_fake_system_administrators(session)
 
-generate_fake_teams(session)
-generate_fake_team_member(session)
+generate_fake_teams_0(session)
+# generate_fake_teams(session)
+# generate_fake_team_member(session)
 
-generate_fake_events(session)
+# generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
 # generate_fake_matches(session)
