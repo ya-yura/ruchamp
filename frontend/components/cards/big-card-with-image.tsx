@@ -6,21 +6,19 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Event } from '@/lib/definitions';
+import { Locale } from '@/i18n.config';
 
-// fix "any"
-// export interface BigCardWithImage {
-//   type: string;
-//   id: number;
-//   name: string;
-//   title?: string;
-//   subtitle?: string;
-//   description?: string;
-//   className?: string;
-//   geo?: string;
-//   location?: string;
-//   start_datetime?: string;
-// }
+interface BigCardWithImage {
+  type: 'event' | 'team';
+  id: number;
+  name: string;
+  tags: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  lang: Locale;
+  className?: string;
+}
 
 export function BigCardWithImage({
   type,
@@ -32,8 +30,7 @@ export function BigCardWithImage({
   description,
   lang,
   className,
-}: any) {
-  // fix "any"
+}: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const router = useRouter();
 

@@ -7,13 +7,7 @@ import { Matches } from './matches';
 import { Results } from './results';
 import { getSession, getTeam } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
-
-export enum TeamTabs {
-  'info' = 'Информация',
-  'athletes' = 'Спортсмены',
-  'matches' = 'Матчи',
-  'results' = 'Результаты',
-}
+import { TeamTabs } from '@/lib/definitions';
 
 export default async function TeamPage({ params }: { params: { id: string } }) {
   const session = await getSession();
@@ -30,7 +24,7 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
   return (
     <Container>
       <PageWithInfo<TeamTabs>
-        id={team.Team.region}
+        id={team.Team.id}
         type={'team'}
         title={team.Team.name}
         bages={['Убрать', 'Этот', 'Хардкод']}

@@ -95,16 +95,22 @@ export interface Event {
   sports_in_matches: string[];
 }
 
-// // *** Teams ***
-// export interface Team {
-//   name: string;
-//   captain: number;
-//   description: string;
-//   image_field: string;
-//   id: number;
-//   invite_link: string;
-//   slug: string;
-// }
+export enum EventTabs {
+  'info' = 'Информация',
+  'athletes' = 'Спортсмены',
+  'matches' = 'Матчи',
+  'grid' = 'Турнирная сетка',
+  'results' = 'Результаты',
+}
+
+// *** Teams ***
+
+export enum TeamTabs {
+  'info' = 'Информация',
+  'athletes' = 'Спортсмены',
+  'matches' = 'Матчи',
+  'results' = 'Результаты',
+}
 
 export enum Country {
   'Россия' = 1,

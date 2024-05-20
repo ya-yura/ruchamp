@@ -35,9 +35,11 @@ export function EventsCarousel({ events }: { events: Event[] }) {
               type="event"
               id={event.id}
               name={event.name}
+              tags={event.sports_in_matches.join(', ')}
               title={transformDate(event.start_datetime)}
               subtitle={event.location}
               description={event.description}
+              lang={'ru'} // fix hardcode
             />
           </CarouselItem>
         ))}
