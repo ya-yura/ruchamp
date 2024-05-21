@@ -24,6 +24,7 @@ from teams.models import Team, TeamMember
 from teams.schemas import TeamCreate, TeamUpdate, Participant
 from event.models import MatchParticipant
 
+
 router = APIRouter(prefix="/team", tags=["Teams"])
 
 fastapi_users = FastAPIUsers[User, int](
@@ -383,25 +384,25 @@ async def get_team(
                                  .where(Athlete.id == member))
         athlete_id = query.scalar_one_or_none()
 
-        query = await db.execute(select(
-            User.id,
-            User.sirname,
-            User.name,
-            User.fathername,
-            User.birthdate,
-            User.gender
-        ).where(User.id == athlete_id))
+        query = await db.execute(
+            select(
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+            )
+            .join(Athlete, Athlete.user_id == athlete_id)
+            .where(User.id == athlete_id)
+        )
         user = query.mappings().all()
-
-        query = await db.execute(select(
-            Athlete.height,
-            Athlete.weight,
-            Athlete.image_field,
-            Athlete.country,
-            Athlete.city,
-            Athlete.region,
-        ).where(Athlete.id == member))
-        athlete = query.mappings().all()
 
         query = await db.execute(select(
             SportType.name
@@ -409,6 +410,9 @@ async def get_team(
             athlete_sport_type_association
         ).where(athlete_sport_type_association.c.athlete_id == member))
         sport_types = query.scalars().all()
+
+        user_info = {key: value for key, value in user[0].items()}
+        user_info['sport_types'] = sport_types
 
         query = await db.execute(select(
             Coach.sirname,
@@ -418,12 +422,10 @@ async def get_team(
         ).join(
             athlete_coach_association
         ).where(athlete_coach_association.c.athlete_id == member))
-        coachs = query.mappings().all()
+        coaches = query.mappings().all()
 
-        user.append(athlete[0])
-        user.append(sport_types)
-        user.append(coachs[0])
-        users.append(user)
+        user_info['coaches'] = coaches
+        users.append(user_info)
 
     result = {"Team": team[0], "Captain": captain_info[0], "Members": users}
 
@@ -560,13 +562,17 @@ async def all_teams_rating(
     teams = query.scalars().all()
     all_members = []
     for team in teams:
-        query = await db.execute(select(TeamMember.member).where(TeamMember.team == team))
+        query = await db.execute(
+            select(TeamMember.member).where(TeamMember.team == team)
+        )
         members = query.scalars().all()
         all_members.append(members)
         result[team] = members
     for key, value in result.items():
         for member in value:
-            query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+            query = await db.execute(
+                select(Athlete.user_id).where(Athlete.id == member)
+            )
             users = query.scalars().all()
             for user_id in users:
                 query = await db.execute(
@@ -582,20 +588,21 @@ async def all_teams_rating(
                 user = query.mappings().all()
 
                 teams_info.setdefault(key, []).append(user[0])
-            
+
     '''all_users = []
     users = []
     for members in all_members:
         for member in members:
-            query = await db.execute(select(Athlete.user_id).where(Athlete.id == member))
+            query = await db.execute(
+                select(Athlete.user_id).where(Athlete.id == member)
+            )
             user_id = query.scalars().first()
             users.append(user_id)
         all_users.append(users)'''
-                                
-
-
 
     # print(teams)
     # print(all_members)
     # print(all_users)
     return teams_info
+
+
