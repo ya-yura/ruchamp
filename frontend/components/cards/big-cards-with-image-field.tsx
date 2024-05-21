@@ -2,13 +2,13 @@ import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
-import { chooseTypes, cn, transformDate } from '@/lib/utils';
+import { cn, transformDate } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { Event } from '@/lib/definitions';
 import { Team } from '@/app/[lang]/(unprotected)/teams/page';
 
 interface BigCardsWithImageFieldProps {
-  cards: Event[] | Team[]; 
+  cards: Event[] | Team[];
   type: 'event' | 'team';
   scrollToTop: () => void;
   lang: Locale;

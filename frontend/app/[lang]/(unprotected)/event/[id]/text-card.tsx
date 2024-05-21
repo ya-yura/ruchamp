@@ -1,23 +1,28 @@
+import { H4 } from '@/components/text';
 import { cn } from '@/lib/utils';
 
-interface CustomCardProps {
+interface TextCardProps {
   title?: string;
-  text: string;
+  text?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export function TextCard({ title, text, className }: CustomCardProps) {
+export function TextCard({ title, text, className, children }: TextCardProps) {
   return (
-    <div
+    <li
       className={cn(
-        'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
+        'flex flex-col items-start rounded-lg bg-card-background p-4 sm:p-5 lg:px-6 lg:py-8',
         className,
       )}
     >
-      {title && (
-        <h4 className="mb-3 text-xl sm:text-base md:text-xl font-semibold text-background">{title}</h4>
+      {title && <H4 className="mb-3">{title}</H4>}
+      {text && (
+        <p className="whitespace-pre-line text-sm text-text-mutedCard">
+          {text}
+        </p>
       )}
-      <p className="text-text-mutedCard whitespace-pre-line text-sm">{text}</p>
-    </div>
+      {children}
+    </li>
   );
 }
