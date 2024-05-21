@@ -104,11 +104,29 @@ async def get_events_me(
     event_org_id = query.scalars().first()
 
     query = await db.execute(
-        select(Event).where(Event.organizer_id == event_org_id)
+        select(
+            Event.id,
+            Event.name,
+            Event.start_request_datetime,
+            Event.end_request_datetime,
+            Event.start_datetime,
+            Event.end_datetime,
+            EventOrganizer.organization_name.label("organizer_name"),
+            Event.location,
+            Event.event_system,
+            Event.event_order,
+            Event.image_field,
+            Event.description,
+            Event.geo
+        )
+        .join(
+                EventOrganizer, EventOrganizer.id == Event.organizer_id
+            )
+        .where(Event.organizer_id == event_org_id)
     )
-    event = query.mappings().all()
+    events = query.mappings().all()
 
-    return event
+    return events
 
 
 @router.get("/{event_id}")
