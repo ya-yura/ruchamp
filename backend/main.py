@@ -58,9 +58,8 @@ app.include_router(
     tags=["auth"],
 )
 
-app.include_router(pages_router)
 app.include_router(auth_router)
 app.include_router(event_router)
+app.include_router(match_router)
 app.include_router(team_router)
 app.include_router(shop_router)
-app.include_router(match_router)

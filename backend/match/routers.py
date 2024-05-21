@@ -1,37 +1,109 @@
 import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, insert, select, update, join
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
-from auth.models import AllWeightClass, Athlete, CategoryType, Referee, User
+from auth.models import (AllWeightClass, Athlete, CategoryType, Referee, User,
+                         SportType, Country, Region)
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import (Event, EventOrganizer, Match,
-                          MatchResult)
+from event.models import (Event, EventOrganizer, Match, MatchAge,
+                          MatchGender, MatchSport, MatchWeights,
+                          MatchResult, MatchParticipant, CombatType,
+                          MatchCategory, Medal)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
 from match.schemas import MatchDB
 from match.utils import pairs_generator, split_pairs
-from teams.models import TeamMember
+from teams.models import TeamMember, Team
+from teams.schemas import Participant
 
-router = APIRouter(prefix="/api", tags=["Matchs"])
+router = APIRouter(prefix="/matches", tags=["Matches"])
 
 
-@router.get("/matchs")
-async def get_matchs(db: AsyncSession = Depends(get_db)):
+@router.post("/add-participant")
+async def add_participant(
+    participant: Participant,
+    db: AsyncSession = Depends(get_db),
+):
+    new_participant = MatchParticipant(**participant.dict())
+    db.add(new_participant)
+    await db.commit()
+    return {f"Participant ID - {participant.player_id} added"}
+
+
+@router.get("/{event_id}/all-participants")
+async def get_all_participants(
+    event_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    result = []
+    query = await db.execute(select(Match.id).where(Match.event_id == event_id))
+    matches = query.scalars().all()
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    for match in matches:
+
+        query = await db.execute(
+            select(MatchParticipant.player_id)
+            .where(MatchParticipant.match_id == match)
+        )
+        participants = query.scalars().all()
+
+        for athelete_id in participants:
+            query = await db.execute(
+                select(Athlete.user_id).where(Athlete.id == athelete_id)
+            )
+            user_id = query.scalars().first()
+
+            query = await db.execute(
+                select(
+                    User.id.label("user_id"),
+                    User.name,
+                    User.sirname,
+                    User.fathername,
+                    Athlete.country.label("country"),
+                    Athlete.region.label("region"),
+                    Athlete.city.label("city"),
+                    Team.name.label("team"),
+                    User.birthdate,
+                    Athlete.weight.label("weight"),
+                    CategoryType.name.label("grade"),
+                    User.gender.label("gender"),
+                )
+                .join(Athlete, Athlete.user_id == User.id)
+                .join(MatchParticipant, MatchParticipant.match_id == match)
+                .join(Team, Team.id == MatchParticipant.team_id)
+                .join(MatchCategory, MatchCategory.match_id == match)
+                .join(
+                    CategoryType,
+                    CategoryType.id == MatchCategory.category_id
+                )
+                .where(User.id == user_id))
+            users_info = query.mappings().all()
+
+            result.append(users_info[0])
+
+    return result
+
+
+'''@router.get("/matches")
+async def get_matches(db: AsyncSession = Depends(get_db)):
     query = await db.execute(select(Match))
     return query.scalars().all()
 
 
-@router.get("/matchs/{id}")
+@router.get("/matches/{id}")
 async def get_match(id: int, db: AsyncSession = Depends(get_db)):
     query = await db.execute(select(Match).where(Match.id == id))
     return query.scalars().one_or_none()
 
 
 # Организатор может поменять участников например
-@router.post("/matchs/update/{match_id}")
+@router.post("/matches/update/{match_id}")
 async def update_match(
     match_id: int,
     match_data: MatchDB,
@@ -300,9 +372,9 @@ async def start_match(
     player_1 = players[0]['player_one']
     player_2 = players[0]['player_two']
 
-    '''Возможно здесь правитьльно вытащить Фамилию Имя Отчество из таблицы
-        Users И вывести его вместо ID на фронт.
-        С Фамилией Именем Отчеством судьи аналогичная ситуация'''
+    #Возможно здесь правитьльно вытащить Фамилию Имя Отчество из таблицы
+        #Users И вывести его вместо ID на фронт.
+        #С Фамилией Именем Отчеством судьи аналогичная ситуация
 
     return {"Участник 1": player_1, "Участник 2": player_2, "Судья": referee}
 
@@ -381,4 +453,143 @@ async def result_match(
         ))
         await db.commit()
 
-    return {"Результаты записаны": match_id}
+    return {"Результаты записаны": match_id}'''
+
+
+@router.get("/matches-results/{event_id}")
+async def get_matches_results(
+    event_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    result = []
+    query = await db.execute(
+        select(Match.id).where(Match.event_id == event_id)
+    )
+    matches = query.scalars().all()
+
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    for match_id in matches:
+
+        query = await db.execute(
+            select(
+                Match.id.label('match_id'),
+                CombatType.name.label('combat_type'),
+                Match.start_datetime,
+                Match.end_datetime,
+                MatchAge.age_from.label('age_min'),
+                MatchAge.age_till.label('age_max'),
+                AllWeightClass.min_weight.label('min_weight'),
+                AllWeightClass.max_weight.label('max_weight'),
+                SportType.name.label('sport_name'),
+                MatchGender.gender.label('gender'),
+            ).select_from(Match)
+            .join(CombatType, CombatType.id == Match.combat_type_id)
+            .join(MatchAge, MatchAge.match_id == Match.id)
+            .join(MatchWeights, MatchWeights.match_id == Match.id)
+            .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchGender, MatchGender.match_id == Match.id)
+            .where(Match.id == match_id)
+        )
+        match_data = query.mappings().all()
+
+        query = await db.execute(
+            select(
+                MatchResult.p1_id.label('1 - место'),
+                MatchResult.p1_score.label('очки'),
+                User.id,
+                User.name,
+                User.sirname,
+                User.fathername,
+                Athlete.country
+            ).select_from(MatchResult)
+            .join(MatchParticipant, MatchParticipant.id == MatchResult.p1_id)
+            .join(Athlete, Athlete.id == MatchParticipant.player_id)
+            .join(User, User.id == Athlete.user_id)
+            .where(MatchResult.match_id == match_id))
+        match_result_part_id_1 = query.mappings().first()
+
+        match_data.append(match_result_part_id_1)
+
+        query = await db.execute(
+            select(
+                MatchResult.p2_id.label('2 - место'),
+                MatchResult.p2_score.label('очки'),
+                User.id,
+                User.name,
+                User.sirname,
+                User.fathername,
+            ).select_from(MatchResult)
+            .join(MatchParticipant, MatchParticipant.id == MatchResult.p2_id)
+            .join(Athlete, Athlete.id == MatchParticipant.player_id)
+            .join(User, User.id == Athlete.user_id)
+            .where(MatchResult.match_id == match_id))
+        match_result_part_id_2 = query.mappings().first()
+
+        match_data.append(match_result_part_id_2)
+
+        query = await db.execute(
+            select(
+                MatchResult.p3_id.label('3 - место'),
+                MatchResult.p3_score.label('очки'),
+                User.id,
+                User.name,
+                User.sirname,
+                User.fathername,
+            ).select_from(MatchResult)
+            .join(MatchParticipant, MatchParticipant.id == MatchResult.p3_id)
+            .join(Athlete, Athlete.id == MatchParticipant.player_id)
+            .join(User, User.id == Athlete.user_id)
+            .where(MatchResult.match_id == match_id))
+        match_result_part_id_3 = query.mappings().first()
+
+        match_data.append(match_result_part_id_3)
+
+        result.append(match_data)
+
+    return result
+
+
+@router.post("/matchs-results/{match_id}")
+async def post_matchs_results(
+    match_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(
+            MatchParticipant.id
+        ).where(MatchParticipant.match_id == match_id))
+    players = query.scalars().all()
+
+    new_result = MatchResult(
+        match_id=match_id,
+        p1_id=players[0],
+        p2_id=players[1],
+        p3_id=players[2],
+        p1_score='300',
+        p2_score='200',
+        p3_score='100'
+    )
+    db.add(new_result)
+    await db.commit()
+    return {"ok"}
+
+
+@router.post("/matchs-results/{match_id}/{participant_id}/{medal_type}")
+async def post_matchs_results_medal(
+    match_id: int,
+    participant_id: int,
+    medal_type: str,
+    db: AsyncSession = Depends(get_db)
+):
+    new_medal = Medal(
+        match_id=match_id,
+        recipient_id=participant_id,
+        medal_type=medal_type
+    )
+    db.add(new_medal)
+    await db.commit()
+    return {"ok"}
