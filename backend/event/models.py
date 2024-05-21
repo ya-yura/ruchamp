@@ -57,6 +57,7 @@ class EventParticipant(Base):
 class Match(Base):
     __tablename__ = "Match"
     id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=True, default=None)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
 
     # тип заполнения турнирной сетки
@@ -161,6 +162,7 @@ class Fight(Base):
         ForeignKey(MatchParticipant.id, ondelete="CASCADE")
     )
     mat = Column(Integer, nullable=False)
+    round = Column(Integer, nullable=False)
 
 
 # Судьи боя

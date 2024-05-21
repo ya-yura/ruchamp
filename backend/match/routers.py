@@ -13,7 +13,7 @@ from connection import get_db
 from event.models import (Event, EventOrganizer, Match, MatchAge,
                           MatchGender, MatchSport, MatchWeights,
                           MatchResult, MatchParticipant, CombatType,
-                          MatchCategory)
+                          MatchCategory, Medal)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
 from match.schemas import MatchDB
 from match.utils import pairs_generator, split_pairs
@@ -65,8 +65,8 @@ async def get_all_participants(
                     User.name,
                     User.sirname,
                     User.fathername,
-                    Country.name.label("country"),
-                    Region.name.label("region"),
+                    Athlete.country.label("country"),
+                    Athlete.region.label("region"),
                     Athlete.city.label("city"),
                     Team.name.label("team"),
                     User.birthdate,
@@ -75,8 +75,6 @@ async def get_all_participants(
                     User.gender.label("gender"),
                 )
                 .join(Athlete, Athlete.user_id == User.id)
-                .join(Country, Country.id == Athlete.country)
-                .join(Region, Region.id == Athlete.region)
                 .join(MatchParticipant, MatchParticipant.match_id == match)
                 .join(Team, Team.id == MatchParticipant.team_id)
                 .join(MatchCategory, MatchCategory.match_id == match)
@@ -506,6 +504,7 @@ async def get_matches_results(
                 User.name,
                 User.sirname,
                 User.fathername,
+                Athlete.country
             ).select_from(MatchResult)
             .join(MatchParticipant, MatchParticipant.id == MatchResult.p1_id)
             .join(Athlete, Athlete.id == MatchParticipant.player_id)
@@ -575,5 +574,22 @@ async def post_matchs_results(
         p3_score='100'
     )
     db.add(new_result)
+    await db.commit()
+    return {"ok"}
+
+
+@router.post("/matchs-results/{match_id}/{participant_id}/{medal_type}")
+async def post_matchs_results_medal(
+    match_id: int,
+    participant_id: int,
+    medal_type: str,
+    db: AsyncSession = Depends(get_db)
+):
+    new_medal = Medal(
+        match_id=match_id,
+        recipient_id=participant_id,
+        medal_type=medal_type
+    )
+    db.add(new_medal)
     await db.commit()
     return {"ok"}
