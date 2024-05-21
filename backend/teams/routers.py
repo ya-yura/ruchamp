@@ -325,9 +325,10 @@ async def get_all_teams(
 
             members_info.append(user_info)
             i += 1
-        if captain_info is None:
-            raise HTTPException(status_code=404, detail="Captain not found")
-        team.append(captain_info[0])
+        if captain_info:
+            team.append(captain_info[0])
+        else:
+            continue
         team.append(members_info)
         result.append(team)
 
