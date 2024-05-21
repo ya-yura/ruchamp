@@ -1,3 +1,4 @@
+import { H4 } from '@/components/text';
 import { TextCard } from './text-card';
 import { Event } from '@/lib/definitions';
 import { cn, transformDate } from '@/lib/utils';
@@ -54,9 +55,9 @@ export function Info({ event }: { event: Event }) {
             'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             Подзаголовок 1
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             {event.description}
           </p>
@@ -66,9 +67,9 @@ export function Info({ event }: { event: Event }) {
             'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             Подзаголовок 2
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             {event.description}
           </p>
@@ -78,9 +79,9 @@ export function Info({ event }: { event: Event }) {
             'bg-card-background flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             Подзаголовок 3
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             {event.description}
           </p>
@@ -92,9 +93,9 @@ export function Info({ event }: { event: Event }) {
             'bg-card-backgroundDark flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             {transformDate(event.start_datetime, true)}
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             Начало мероприятия
           </p>
@@ -104,10 +105,10 @@ export function Info({ event }: { event: Event }) {
             'bg-card-backgroundDark flex flex-col items-start rounded-lg p-4 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             {transformDate(event.end_request_datetime)} —{' '}
             {transformDate(event.end_request_datetime)}
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             Приём заявок на участие
           </p>
@@ -117,9 +118,9 @@ export function Info({ event }: { event: Event }) {
             'bg-card-backgroundDark col-span-2 flex flex-col items-start rounded-lg p-4 sm:col-span-1 sm:p-5 lg:px-6 lg:py-8',
           )}
         >
-          <h4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
+          <H4 className="mb-3 text-xl font-semibold text-background sm:text-base md:text-xl">
             Министерство Спорта
-          </h4>
+          </H4>
           <p className="text-text-mutedCard whitespace-pre-line text-sm">
             Организатор
           </p>

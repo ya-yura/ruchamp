@@ -25,14 +25,6 @@ export function transformDate(inputDate: string, isWithTime?: boolean): string {
   }
 }
 
-// Later it may be deleted
-export function chooseTypes(id: number): string[] {
-  let res: string[] = [];
-  const arr: string[] = id.toString().split('');
-  arr?.map((item) => res.push(sportTypes[+item]));
-  return [...new Set(res)];
-}
-
 export function getRandomInt(max: number): number {
   return Math.floor(Math.random() * max);
 }
@@ -110,4 +102,19 @@ export function getInitials(firstName: string, lastName: string): string {
   const firstInitial = firstName.charAt(0);
   const lastInitial = lastName.charAt(0);
   return `${firstInitial}${lastInitial}`;
+}
+
+export function filterDuplicates<T extends Record<string, any>>(
+  array: T[],
+): T[] {
+  const uniqueDataMap = new Map<string, T>();
+
+  array.forEach((item) => {
+    const key = JSON.stringify(item);
+    if (!uniqueDataMap.has(key)) {
+      uniqueDataMap.set(key, item);
+    }
+  });
+
+  return Array.from(uniqueDataMap.values());
 }
