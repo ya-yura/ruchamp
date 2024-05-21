@@ -350,9 +350,7 @@ async def get_team(
     captain_user_id = query.scalars().first()
 
     query = await db.execute(select(
-        User.sirname,
-        User.name,
-        User.fathername
+        User.id.label("user_id")
     ).where(User.id == captain_user_id))
     captain_info = query.mappings().all()
 
