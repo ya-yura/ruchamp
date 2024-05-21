@@ -71,7 +71,9 @@ async def get_events(
         sports_in_matches_info = []
         for match_id in matches_id:
             query = await db.execute(
-                select(Match.sport_id).where(Match.id == match_id))
+                select(MatchSport.sport_id)
+                .where(MatchSport.match_id == match_id)
+            )
             match_sport_id = query.scalars().all()
 
             for sport_id in match_sport_id:
@@ -143,7 +145,8 @@ async def get_events_id(
     sports_in_matches_info = []
     for match_id in matches_id:
         query = await db.execute(
-            select(Match.sport_id).where(Match.id == match_id)
+            select(MatchSport.id)
+            .where(MatchSport.match_id == match_id)
         )
         match_sport_id = query.scalars().all()
         for sport_id in match_sport_id:
