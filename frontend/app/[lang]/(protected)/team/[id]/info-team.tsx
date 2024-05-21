@@ -1,7 +1,14 @@
 import { Event } from '@/lib/definitions';
 import { cn, transformDate } from '@/lib/utils';
+import { Captain, CoachDetails, TeamById } from './page';
 
-export function Info() {
+interface InfoTeamProps {
+  teamInfo: TeamById;
+  captain: Captain;
+  coaches: CoachDetails[];
+}
+
+export function InfoTeam({ teamInfo, captain, coaches }: InfoTeamProps) {
   return (
     <div
       className="grid grid-cols-12 gap-4"
@@ -18,7 +25,7 @@ export function Info() {
             Подзаголовок 1
           </h4>
           <p className="whitespace-pre-line text-sm text-text-mutedCard">
-            {/* {event.description} */}
+            {teamInfo.description} {captain.name} {coaches[0].name}
           </p>
         </li>
         <li

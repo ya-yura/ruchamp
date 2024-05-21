@@ -27,7 +27,7 @@ const mockData2: TypeMockData[] = [
   },
 ];
 
-export function Matches() {
+export function MatchesTeam() {
   return (
     <div className="flex gap-4" role="tabpanel" aria-labelledby="matches">
       <div className="flex w-2/3 flex-col gap-[18px]">
