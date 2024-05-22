@@ -10,7 +10,7 @@ import { MatchesTeam } from './matches-team';
 import { ResultsTeam } from './results-team';
 import { filterDuplicates } from '@/lib/utils';
 
-export interface TeamById {
+export interface TeamInfo {
   id: number;
   name: string;
   image_field: string;
@@ -22,53 +22,43 @@ export interface TeamById {
   region: number;
 }
 
-export interface Captain {
-  sirname: string;
-  name: string;
-  fathername: string;
+export interface CaptainId {
+  user_id: number;
 }
 
-interface MemberPersonalDetails {
-  id: number;
-  sirname: string;
-  name: string;
-  fathername: string;
-  birthdate: string;
-  gender: boolean;
-}
-
-interface MemberPhysicalDetails {
-  height: number;
-  weight: number;
-  image_field: string | null;
-  country: number;
-  city: string;
-  region: number;
-}
-
-export interface CoachDetails {
+export interface Coach {
   sirname: string;
   name: string;
   fathername: string;
   qualification_level: number;
 }
 
-type Member = [
-  MemberPersonalDetails,
-  MemberPhysicalDetails,
-  string[],
-  CoachDetails,
-];
+export interface TeamMember {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender: boolean;
+  height: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  sport_types: string[];
+  coaches: Coach[];
+}
 
-export interface TeamByIdFromServer {
-  Team: TeamById;
-  Captain: Captain;
-  Members: Member[];
+interface TeamByIdFromServer {
+  Team: TeamInfo;
+  Captain: CaptainId;
+  Members: TeamMember[];
 }
 
 const testTeam: TeamByIdFromServer = {
   Team: {
-    id: 98,
+    id: 99999,
     name: 'Соболева Лтд',
     image_field: 'https://dummyimage.com/164x520',
     description: 'Грудь встать отдел опасность постоянный угодный страсть.',
@@ -79,86 +69,73 @@ const testTeam: TeamByIdFromServer = {
     region: 18,
   },
   Captain: {
-    sirname: 'Абрамов',
-    name: 'Аверьян',
-    fathername: 'Платон',
+    user_id: 322,
   },
   Members: [
-    [
-      {
-        id: 322,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба'],
-      {
-        sirname: 'Шарапова',
-        name: 'Ладимир',
-        fathername: 'Лариса',
-        qualification_level: 1,
-      },
-    ],
-    [
-      {
-        id: 213,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба', 'test', 'test', 'test1'],
-      {
-        sirname: 'Шарапова',
-        name: 'Ладимир',
-        fathername: 'Лариса',
-        qualification_level: 1,
-      },
-    ],
-    [
-      {
-        id: 213,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба', 'test', 'test', 'test1'],
-      {
-        sirname: 'Жеглов',
-        name: 'Володя',
-        fathername: 'Донатович',
-        qualification_level: 2,
-      },
-    ],
+    {
+      id: 322,
+      sirname: 'Абрамов',
+      name: 'Аверьян',
+      fathername: 'Платон',
+      birthdate: '2011-09-27',
+      gender: false,
+      height: 187,
+      weight: 128.0,
+      image_field: 'https://picsum.photos/993/329',
+      country: 3,
+      region: 12,
+      city: 'клх Тобольск',
+      sport_types: ['Самбо', 'Греко-римская борьба'],
+      coaches: [
+        {
+          sirname: 'Шарапова',
+          name: 'Ладимир',
+          fathername: 'Лариса',
+          qualification_level: 1,
+        },
+        {
+          sirname: 'Меркушев',
+          name: 'Ферапонт',
+          fathername: 'Ян',
+          qualification_level: 2,
+        },
+      ],
+    },
+    {
+      id: 9999,
+      sirname: 'Парамонов',
+      name: 'Сергей',
+      fathername: 'Италианович',
+      birthdate: '1995-09-27',
+      gender: true,
+      height: 187,
+      weight: 98.0,
+      image_field: 'https://picsum.photos/993/329',
+      country: 1,
+      region: 1,
+      city: 'Химки',
+      sport_types: ['Самбо', 'Айкидо', 'Бокс'],
+      coaches: [
+        {
+          sirname: 'Шарапова',
+          name: 'Ладимир',
+          fathername: 'Лариса',
+          qualification_level: 1,
+        },
+        {
+          sirname: 'Меркушев',
+          name: 'Ферапонт',
+          fathername: 'Ян',
+          qualification_level: 2,
+        },
+        {
+          sirname: 'Фалалеев',
+          name: 'Дмитрий',
+          fathername: 'Сергеевич',
+          qualification_level: 1,
+        },
+      ],
+    },
   ],
 };
 
@@ -167,11 +144,17 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
   const teamInfo = team.Team;
-  const captain = team.Captain;
-  const coaches = filterDuplicates<CoachDetails>(
-    team.Members.map((member) => member[3]),
+  const members = team.Members;
+  const captainId = team.Captain.user_id;
+  const captain: TeamMember | undefined = members.find(
+    (member) => member.id === captainId,
   );
-  const sportTypes = [...new Set(team.Members.flatMap((member) => member[2]))];
+  const coaches = filterDuplicates<Coach>(
+    members.flatMap((member) => member.coaches),
+  );
+  const sportTypes: string[] = [
+    ...new Set(members.flatMap((member) => member.sport_types)),
+  ];
 
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
