@@ -322,6 +322,7 @@ async def get_participants(
         query = await db.execute(
             select(
                 Match.id,
+                Match.name,
                 Match.start_datetime,
                 Match.end_datetime,
                 SportType.name.label("sport_name"),
@@ -420,6 +421,7 @@ async def create_match(
     nominal_time = match_nominal_time * 60
 
     new_match = Match(
+        name=match_data.name,
         event_id=event_id,
         combat_type_id=match_category_type_id,
         start_datetime=match_data.start_datetime,

@@ -51,6 +51,7 @@ class MatchRead(BaseModel):
 
 
 class MatchCreate(BaseModel):
+    name: Optional[str] = None
     sport_type: str = "Дзюдо"
     combat_type: str = "Олимпийская система"
     grade: str = "1-й юношеский разряд"
