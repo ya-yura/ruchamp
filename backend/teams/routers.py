@@ -527,7 +527,6 @@ async def get_team_results(
     if not team_members:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    #users = []
     winner_info = []
 
     for member in team_members:
