@@ -74,9 +74,9 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
   const session = await getSession();
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
-  const teamInfo = testTeam.Team;
-  const members = testTeam.Members;
-  const captainId = testTeam.Captain.user_id;
+  const teamInfo = team.Team;
+  const members = team.Members;
+  const captainId = team.Captain.user_id;
 
   const captain: TeamMember | undefined = members.find(
     (member) => member.id === captainId,
