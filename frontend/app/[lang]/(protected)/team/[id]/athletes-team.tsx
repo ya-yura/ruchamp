@@ -40,7 +40,7 @@ export function AthletesTeam({
     (filterId: string, value: string | number[], checked: boolean) => {
       setFilters((prevVal) => {
         const newFilterValues = checked
-          ? [...(prevVal[filterId] || []), value]
+          ? [...new Set([...(prevVal[filterId] || []), value])]
           : (prevVal[filterId] || []).filter((i) => i !== value);
 
         return {
@@ -53,22 +53,24 @@ export function AthletesTeam({
   );
 
   const filtredAthletes = useMemo(() => {
-    const { gender, weight, grade, age } = filters;
+    const { genders, weights, grades, ages } = filters;
 
     return athletes.filter((member) => {
       const memberGender = member.gender ? 'male' : 'female';
       const memberAge = calculateAge(member.birthdate);
       // Check gender
-      const isGenderMatch = gender.includes(memberGender);
+      const isGenderMatch = genders.includes(memberGender);
       // Check weight
-      const isWeightMatch = weight.some((range) => {
+      const isWeightMatch = weights.some((range) => {
         const [min, max] = range as [number, number];
         return member.weight > min && member.weight <= max;
       });
       // Check grade
-      const isGradeMatch = true; // fix later
+      const isGradeMatch = grades.some((grade) =>
+        member.grade_types.includes(grade as string),
+      );
       // Check age
-      const isAgeMatch = age.some((range) => {
+      const isAgeMatch = ages.some((range) => {
         const [min, max] = range as [number, number];
         return memberAge > min && memberAge <= max;
       });

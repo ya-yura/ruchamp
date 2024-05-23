@@ -8,7 +8,10 @@ import { Country, Region } from '@/lib/definitions';
 import { Badge } from '../ui/badge';
 
 interface AthleteCardProps
-  extends Omit<TeamMember, 'height' | 'sport_types' | 'coaches' | 'gender'> {
+  extends Omit<
+    TeamMember,
+    'height' | 'sport_types' | 'coaches' | 'gender' | 'grade_types'
+  > {
   captainId?: number;
   isApproved?: boolean;
 }
@@ -29,13 +32,13 @@ export function AthleteCard({
 }: AthleteCardProps) {
   const athleteAge = calculateAge(birthdate);
   return (
-    <TextCard className="relative cursor-default flex-row gap-4 transition-colors hover:bg-card-hoverGray lg:px-4 lg:py-3">
-      <div className="flex w-2/3 items-center gap-4">
-        <div className="relative h-10 w-10">
-          <Avatar className="row-span-4 h-10 w-10 text-foreground duration-300 group-hover:text-primary-mainAccent sm:mt-5 md:mt-3 lg:mt-0">
+    <TextCard className="relative cursor-default flex-col gap-4 transition-colors hover:bg-card-hoverGray sm:flex-row lg:px-4 lg:py-3">
+      <div className="flex w-full flex-row-reverse justify-between sm:justify-start gap-4 sm:w-2/3 sm:flex-row xl:items-center">
+        <div className="relative h-14 w-14 sm:h-10 sm:w-10">
+          <Avatar className="row-span-4 h-14 w-14 text-foreground duration-300 group-hover:text-primary-mainAccent sm:h-10 sm:w-10">
             <AvatarImage src={image_field} alt="" />
             <AvatarFallback className="text-base font-medium">
-              {getInitials('asf', 'asdf') || ''}
+              {getInitials(name, sirname) || ''}
             </AvatarFallback>
           </Avatar>
           {isApproved && (
@@ -61,7 +64,7 @@ export function AthleteCard({
           </PersonDescriptionOnCard>
         </div>
       </div>
-      <div className="w-1/3">
+      <div className="w-full sm:w-1/3">
         <H4 className="text-white">{weight} кг</H4>
         <PersonDescriptionOnCard className="text-neutralForeground3">
           {'Уровень атлета не указан'}
@@ -71,7 +74,7 @@ export function AthleteCard({
         </PersonDescriptionOnCard>
       </div>
       {captainId === id && (
-        <Badge className="absolute right-3 top-3 bg-primary-mainAccent hover:cursor-default hover:bg-primary-mainAccent">
+        <Badge className="absolute bottom-[120px] right-3 flex h-6 bg-primary-mainAccent px-2 py-1 hover:cursor-default hover:bg-primary-mainAccent sm:top-3">
           Капитан
         </Badge>
       )}
