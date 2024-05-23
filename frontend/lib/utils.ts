@@ -90,6 +90,21 @@ export function calculateGender(
   return '';
 }
 
+export function getRussianAgeWord(age: number): string {
+  const lastDigit = age % 10;
+  const lastTwoDigits = age % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+    return age + ' лет';
+  } else if (lastDigit === 1) {
+    return age + ' год';
+  } else if (lastDigit >= 2 && lastDigit <= 4) {
+    return age + ' года';
+  } else {
+    return age + ' лет';
+  }
+}
+
 export function calculateAge(birthDate: string): number {
   const today: Date = new Date();
   const dob: Date = parse(birthDate, 'yyyy-MM-dd', new Date());
@@ -117,4 +132,20 @@ export function filterDuplicates<T extends Record<string, any>>(
   });
 
   return Array.from(uniqueDataMap.values());
+}
+
+export function roundToBase(
+  num: number,
+  base: number,
+  direction: 'up' | 'down' | 'nearest',
+): number {
+  switch (direction) {
+    case 'up':
+      return Math.ceil(num / base) * base;
+    case 'down':
+      return Math.floor(num / base) * base;
+    case 'nearest':
+    default:
+      return Math.round(num / base) * base;
+  }
 }

@@ -1,4 +1,4 @@
-import { TextCard } from "@/app/[lang]/(unprotected)/event/[id]/text-card";
+import { TextCard } from "@/components/cards/text-card";
 
 type TypeMockData = {
   title?: string;

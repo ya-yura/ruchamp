@@ -1,4 +1,4 @@
-import { TextCard } from './text-card';
+import { TextCard } from '../../../../../components/cards/text-card';
 
 type TypeMockData = {
   title?: string;

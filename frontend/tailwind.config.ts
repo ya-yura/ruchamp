@@ -29,6 +29,7 @@ const config = {
         foreground: 'hsl(var(--foreground))',
         neutralForeground1Rest: '#242424',
         neutralForeground3Rest: '#616161',
+        neutralForeground3: '#ADADAD',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -61,6 +62,7 @@ const config = {
           foreground: 'hsl(var(--card-foreground))',
           background: '#292929',
           backgroundDark: '#000000',
+          hoverGray: '#4A4A4A',
         },
         text: {
           muted: '#616161',
