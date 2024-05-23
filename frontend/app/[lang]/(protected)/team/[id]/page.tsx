@@ -8,9 +8,22 @@ import { InfoTeam } from './info-team';
 import { AthletesTeam } from './athletes-team';
 import { MatchesTeam } from './matches-team';
 import { ResultsTeam } from './results-team';
-import { filterDuplicates } from '@/lib/utils';
+import { calculateAge, filterDuplicates, roundToBase } from '@/lib/utils';
+import { testTeam } from '@/lib/constants';
 
-export interface TeamById {
+export interface ValueOption {
+  value: string | number[];
+  displayedValue: string;
+}
+
+export interface FilterData {
+  id: string;
+  title: string;
+  type?: 'value' | 'range' | 'array';
+  options: ValueOption[];
+}
+
+export interface TeamInfo {
   id: number;
   name: string;
   image_field: string;
@@ -22,162 +35,149 @@ export interface TeamById {
   region: number;
 }
 
-export interface Captain {
-  sirname: string;
-  name: string;
-  fathername: string;
+export interface CaptainId {
+  user_id: number;
 }
 
-interface MemberPersonalDetails {
-  id: number;
-  sirname: string;
-  name: string;
-  fathername: string;
-  birthdate: string;
-  gender: boolean;
-}
-
-interface MemberPhysicalDetails {
-  height: number;
-  weight: number;
-  image_field: string | null;
-  country: number;
-  city: string;
-  region: number;
-}
-
-export interface CoachDetails {
+export interface Coach {
   sirname: string;
   name: string;
   fathername: string;
   qualification_level: number;
 }
 
-type Member = [
-  MemberPersonalDetails,
-  MemberPhysicalDetails,
-  string[],
-  CoachDetails,
-];
-
-export interface TeamByIdFromServer {
-  Team: TeamById;
-  Captain: Captain;
-  Members: Member[];
+export interface TeamMember {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender: boolean;
+  height: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  sport_types: string[];
+  grade_types: string[];
+  coaches: Coach[];
 }
 
-const testTeam: TeamByIdFromServer = {
-  Team: {
-    id: 98,
-    name: 'Соболева Лтд',
-    image_field: 'https://dummyimage.com/164x520',
-    description: 'Грудь встать отдел опасность постоянный угодный страсть.',
-    invite_link: 'ad1e7767-ee4c-4eaf-8f51-4f0e4dd687ad',
-    slug: '',
-    country: 3,
-    city: 'ст. Кош-Агач',
-    region: 18,
-  },
-  Captain: {
-    sirname: 'Абрамов',
-    name: 'Аверьян',
-    fathername: 'Платон',
-  },
-  Members: [
-    [
-      {
-        id: 322,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба'],
-      {
-        sirname: 'Шарапова',
-        name: 'Ладимир',
-        fathername: 'Лариса',
-        qualification_level: 1,
-      },
-    ],
-    [
-      {
-        id: 213,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба', 'test', 'test', 'test1'],
-      {
-        sirname: 'Шарапова',
-        name: 'Ладимир',
-        fathername: 'Лариса',
-        qualification_level: 1,
-      },
-    ],
-    [
-      {
-        id: 213,
-        sirname: 'Абрамов',
-        name: 'Аверьян',
-        fathername: 'Платон',
-        birthdate: '2011-09-27',
-        gender: false,
-      },
-      {
-        height: 139,
-        weight: 62.0,
-        image_field: 'https://picsum.photos/202/22',
-        country: 1,
-        city: 'д. Майкоп',
-        region: 20,
-      },
-      ['Самбо', 'Греко-римская борьба', 'test', 'test', 'test1'],
-      {
-        sirname: 'Жеглов',
-        name: 'Володя',
-        fathername: 'Донатович',
-        qualification_level: 2,
-      },
-    ],
-  ],
-};
+export interface TeamByIdFromServer {
+  Team: TeamInfo;
+  Captain: CaptainId;
+  Members: TeamMember[];
+}
 
 export default async function TeamPage({ params }: { params: { id: string } }) {
   const session = await getSession();
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
   const teamInfo = team.Team;
-  const captain = team.Captain;
-  const coaches = filterDuplicates<CoachDetails>(
-    team.Members.map((member) => member[3]),
+  const members = team.Members;
+  const captainId = team.Captain.user_id;
+
+  const captain: TeamMember | undefined = members.find(
+    (member) => member.id === captainId,
   );
-  const sportTypes = [...new Set(team.Members.flatMap((member) => member[2]))];
+
+  const coaches = filterDuplicates<Coach>(
+    members.flatMap((member) => member.coaches),
+  );
+
+  const sportTypes: string[] = [
+    ...new Set(members.flatMap((member) => member.sport_types)),
+  ];
+
+  const rangesFromArray = (array: number[], step: number): ValueOption[] => {
+    let res: number[][] = [];
+    array.forEach((i) => {
+      const min = roundToBase(i, step, 'down');
+      const max = roundToBase(i, step, 'up');
+      let range: number[] = [];
+      if (min === max) {
+        range = [max - step, max];
+      } else range = [min, max];
+      const stringifyedRes = res.map((i) => JSON.stringify(i));
+      const stringifyedRange = JSON.stringify(range);
+      !stringifyedRes.includes(stringifyedRange) && res.push(range);
+    });
+    return res.map((i) => ({
+      value: i,
+      displayedValue: i.join(' – '),
+    }));
+  };
+
+  const weights = members
+    .map((member) => member.weight)
+    .sort((a, b) => +a - +b);
+
+  const grades = (): ValueOption[] => {
+    const memberGrades = [
+      ...new Set(members.flatMap((member) => member.grade_types)),
+    ].sort();
+    return memberGrades.map((grade) => ({
+      value: grade,
+      displayedValue: grade,
+    }));
+  };
+
+  const ages = members
+    .map((member) => calculateAge(member.birthdate))
+    .sort((a, b) => +a - +b);
+
+  const genderFilterData: FilterData = {
+    id: 'genders',
+    title: 'Пол',
+    type: 'value',
+    options: [
+      {
+        value: 'male',
+        displayedValue: 'Мужской',
+      },
+      {
+        value: 'female',
+        displayedValue: 'Женский',
+      },
+    ],
+  };
+
+  const weightFilterData: FilterData = {
+    id: 'weights',
+    title: 'Вес, кг',
+    type: 'range',
+    options: rangesFromArray(weights, 5),
+  };
+
+  const gradeFilterData: FilterData = {
+    id: 'grades',
+    title: 'Уровень спортсмена',
+    type: 'array',
+    options: grades(),
+  };
+
+  const ageFilterData: FilterData = {
+    id: 'ages',
+    title: 'Возраст, лет',
+    type: 'range',
+    options: rangesFromArray(ages, 5),
+  };
 
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
       <InfoTeam teamInfo={teamInfo} captain={captain} coaches={coaches} />
     ),
-    [TeamTabs['athletes']]: <AthletesTeam />,
+    [TeamTabs['athletes']]: (
+      <AthletesTeam
+        athletes={members}
+        captainId={captainId}
+        genderFilterData={genderFilterData}
+        weightFilterData={weightFilterData}
+        gradeFilterData={gradeFilterData}
+        ageFilterData={ageFilterData}
+      />
+    ),
     [TeamTabs['matches']]: <MatchesTeam />,
     [TeamTabs['results']]: <ResultsTeam />,
   };
