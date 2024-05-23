@@ -16,13 +16,18 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from auth.auth import auth_backend
 from auth.manager import UserManager, get_user_manager
 from auth.models import (User, Athlete, athlete_coach_association, Coach,
-                         SportType, athlete_sport_type_association)
+                         SportType, athlete_sport_type_association,
+                         athlete_grade_association)
 # from auth.routes import router as auth_router
 from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
 from teams.models import Team, TeamMember
 from teams.schemas import TeamCreate, TeamUpdate, Participant
-from event.models import MatchParticipant
+from event.models import (MatchParticipant, Match, MatchAge,
+                          MatchCategory, MatchGender, MatchSport,
+                          MatchWeights, EventOrganizer, Event,
+                          CategoryType, CombatType, AllWeightClass,
+                          WinnerTable, Medal)
 
 
 router = APIRouter(prefix="/team", tags=["Teams"])
@@ -382,7 +387,7 @@ async def get_team(
     for member in members:
         query = await db.execute(select(Athlete.user_id)
                                  .where(Athlete.id == member))
-        athlete_id = query.scalar_one_or_none()
+        user_id = query.scalar_one_or_none()
 
         query = await db.execute(
             select(
@@ -399,20 +404,31 @@ async def get_team(
                 Athlete.region,
                 Athlete.city,
             )
-            .join(Athlete, Athlete.user_id == athlete_id)
-            .where(User.id == athlete_id)
+            .join(Athlete, Athlete.user_id == user_id)
+            .where(User.id == user_id)
         )
         user = query.mappings().all()
 
-        query = await db.execute(select(
-            SportType.name
-        ).join(
-            athlete_sport_type_association
-        ).where(athlete_sport_type_association.c.athlete_id == member))
+        query = await db.execute(
+            select(
+                SportType.name
+            )
+            .join(athlete_sport_type_association)
+            .where(athlete_sport_type_association.c.athlete_id == member)
+        )
         sport_types = query.scalars().all()
 
         user_info = {key: value for key, value in user[0].items()}
         user_info['sport_types'] = sport_types
+        query = await db.execute(
+            select(
+                CategoryType.name
+            )
+            .join(athlete_grade_association)
+            .where(athlete_grade_association.c.athlete_id == member)
+        )
+        grade_types = query.scalars().all()
+        user_info['grade_types'] = grade_types
 
         query = await db.execute(select(
             Coach.sirname,
@@ -432,22 +448,179 @@ async def get_team(
     return result
 
 
-@router.get("/get-team-members/{team_id}")
-# Участники команды
-async def get_team_members(
+@router.get("/{team_id}/matches")
+async def get_team_matches(
     team_id: int,
-    current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    query = await db.execute(select(TeamMember).where(
-        TeamMember.team == team_id))
-    team_members = query.mappings().all()
+    result = []
+    if not team_id:
+        raise HTTPException(status_code=404, detail="Team not found")
 
-    return team_members
+    query = await db.execute(
+        select(TeamMember.member).where(TeamMember.team == team_id)
+    )
+    team_members = query.scalars().all()
+
+    if not team_members:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    for athlete_id in team_members:
+        query = await db.execute(
+            select(MatchParticipant.match_id)
+            .where(MatchParticipant.player_id == athlete_id)
+        )
+        matches = query.scalars().all()
+        if matches is None:
+            continue
+        for match in matches:
+            query = await db.execute(
+                select(
+                    Match.id.label("match_id"),
+                    Match.event_id,
+                    Event.location,
+                    EventOrganizer.organization_name.label("org_name"),
+                    SportType.name.label("sport_type"),
+                    CategoryType.name.label("grade"),
+                    Match.start_datetime,
+                    Match.end_datetime,
+                    Match.nominal_time,
+                    Match.mat_vol,
+                    MatchAge.age_from.label("age_min"),
+                    MatchAge.age_till.label("age_max"),
+                    AllWeightClass.name.label("weight_class"),
+                )
+                .join(Event, Event.id == Match.event_id)
+                .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
+                .join(MatchSport, MatchSport.match_id == Match.id)
+                .join(SportType, SportType.id == MatchSport.sport_id)
+                .join(MatchCategory, MatchCategory.match_id == Match.id)
+                .join(
+                    CategoryType, CategoryType.id == MatchCategory.category_id
+                )
+                .join(MatchAge, MatchAge.match_id == Match.id)
+                .join(MatchWeights, MatchWeights.match_id == Match.id)
+                .join(
+                    AllWeightClass, AllWeightClass.id == MatchWeights.weight_id
+                )
+                .where(Match.id == match)
+            )
+            match_info = query.mappings().all()
+            result.append(match_info[0])
+
+    return result
+
+
+@router.get("/{team_id}/results")
+async def get_team_results(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    if not team_id:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    query = await db.execute(
+        select(TeamMember.member).where(TeamMember.team == team_id)
+    )
+    team_members = query.scalars().all()
+
+    if not team_members:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    winner_info = []
+
+    for member in team_members:
+        query = await db.execute(select(Athlete.user_id)
+                                 .where(Athlete.id == member))
+        user_id = query.scalar_one_or_none()
+
+        query = await db.execute(
+            select(
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+            )
+            .join(Athlete, Athlete.user_id == user_id)
+            .where(User.id == user_id)
+        )
+        users = query.mappings().all()
+
+        user = users[0]
+        user_info = {key: value for key, value in user.items()}
+
+        query = await db.execute(
+            select(MatchParticipant.match_id)
+            .where(MatchParticipant.player_id == member)
+        )
+        matches = query.scalars().all()
+
+        user_info['matches'] = matches if matches else []
+        if matches is None:
+            raise HTTPException(status_code=404, detail="Matches not found")
+
+        # Получаем медали для каждого матча
+        total_medals = {
+            "golden": 0,
+            "silver": 0,
+            "bronze": 0
+        }
+        total_points = 0
+
+        for match in matches:
+            query = await db.execute(
+                select(MatchParticipant.id)
+                .where(MatchParticipant.player_id == member)
+                .where(MatchParticipant.match_id == match)
+            )
+            participant = query.scalars().first()
+            if participant is None:
+                continue
+
+            query = await db.execute(
+                select(WinnerTable.medal)
+                .where(WinnerTable.winner_id == participant)
+            )
+            medals = query.scalars().all()
+
+            query = await db.execute(
+                select(WinnerTable.winner_score)
+                .where(WinnerTable.winner_id == participant)
+            )
+            scores = query.scalars().one_or_none()
+            total_points = total_points + int(scores) if scores else 0
+
+            for medal_id in medals:
+                query = await db.execute(
+                    select(Medal.medal_type).where(Medal.id == medal_id)
+                )
+                medal_type = query.scalar_one_or_none()
+
+                if medal_type == "Золото":
+                    total_medals["golden"] += 1
+                elif medal_type == "Серебро":
+                    total_medals["silver"] += 1
+                elif medal_type == "Бронза":
+                    total_medals["bronze"] += 1
+
+        user_info['medals'] = total_medals
+        user_info['points'] = total_points
+        winner_info.append(user_info)
+
+    return winner_info
 
 
 @router.post("/join-team/{team_id}")
 async def join_team(
+
     team_id: int,
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
@@ -604,5 +777,3 @@ async def all_teams_rating(
     # print(all_members)
     # print(all_users)
     return teams_info
-
-

@@ -13,14 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import (SportType, Athlete)
+from auth.models import (SportType, Athlete, User)
 # from auth.models import User, athlete_sport_type_association
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
                           ApplicationStatusHistory, MatchAge, MatchSport,
-                          MatchGender, MatchCategory,
-                          MatchWeights)  # MatchParticipant
+                          MatchGender, MatchCategory, WinnerTable,
+                          MatchWeights, MatchParticipant, Medal)
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplicationTeam,
                           CreateTournamentApplicationAthlete,
@@ -322,6 +322,7 @@ async def get_participants(
         query = await db.execute(
             select(
                 Match.id,
+                Match.name,
                 Match.start_datetime,
                 Match.end_datetime,
                 SportType.name.label("sport_name"),
@@ -343,6 +344,114 @@ async def get_participants(
 
     result = matches
     return result
+
+
+@router.get("/{event_id}/matches-results")
+async def get_event_matches_results(
+    event_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    # Получаем все матчи для данного мероприятия
+    query = await db.execute(
+        select(Match.id).where(Match.event_id == event_id)
+    )
+    match_ids = query.scalars().all()
+
+    if not match_ids:
+        raise HTTPException(
+            status_code=404,
+            detail="No matches found for the event"
+        )
+
+    # Получаем всех участников матчей
+    query = await db.execute(
+        select(MatchParticipant.player_id)
+        .where(MatchParticipant.match_id.in_(match_ids))
+    )
+    participant_ids = query.scalars().all()
+
+    if not participant_ids:
+        raise HTTPException(
+            status_code=404,
+            detail="No participants found for the event"
+        )
+
+    results = []
+
+    for participant_id in participant_ids:
+        # Получаем ID пользователя спортсмена
+        query = await db.execute(
+            select(Athlete.user_id).where(Athlete.id == participant_id)
+        )
+        user_id = query.scalar_one_or_none()
+        if user_id is None:
+            continue
+
+        # Получаем информацию о пользователе и спортсмене
+        query = await db.execute(
+            select(
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+            )
+            .join(Athlete, Athlete.user_id == user_id)
+            .where(User.id == user_id)
+        )
+        users = query.mappings().all()
+        if not users:
+            continue
+
+        user = users[0]
+        user_info = {key: value for key, value in user.items()}
+
+        # Инициализируем медаль и очки
+        user_info['medal'] = 'none'
+        user_info['points'] = 0
+
+        query = await db.execute(
+            select(MatchParticipant.id)
+            .where(MatchParticipant.player_id == participant_id)
+        )
+        winners_ids = query.scalars().all()
+
+        for winner_id in winners_ids:
+            # Получаем медали для каждого участника
+            query = await db.execute(
+                select(WinnerTable.medal)
+                .where(WinnerTable.winner_id == winner_id)
+            )
+            medal_id = query.scalars().first()
+
+            query = await db.execute(
+                select(Medal.medal_type).where(Medal.id == medal_id)
+            )
+            medal_type = query.scalar_one_or_none()
+            if medal_type == "Золото":
+                user_info['medal'] = 'gold'
+            elif medal_type == "Серебро":
+                user_info['medal'] = 'silver'
+            elif medal_type == "Бронза":
+                user_info['medal'] = 'bronze'
+
+            query = await db.execute(
+                select(WinnerTable.winner_score)
+                .where(WinnerTable.winner_id == winner_id)
+            )
+            scores = query.scalars().one_or_none()
+            user_info['points'] += int(scores) if scores else 0
+
+        results.append(user_info)
+
+    return results
 
 
 # Здесь надо переделать, узнать от фронта в каком формате приходят данные
@@ -420,6 +529,7 @@ async def create_match(
     nominal_time = match_nominal_time * 60
 
     new_match = Match(
+        name=match_data.name,
         event_id=event_id,
         combat_type_id=match_category_type_id,
         start_datetime=match_data.start_datetime,

@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, insert, select, update, join
@@ -13,7 +14,7 @@ from connection import get_db
 from event.models import (Event, EventOrganizer, Match, MatchAge,
                           MatchGender, MatchSport, MatchWeights,
                           MatchResult, MatchParticipant, CombatType,
-                          MatchCategory, Medal)
+                          MatchCategory, Medal, WinnerTable)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
 from match.schemas import MatchDB
 from match.utils import pairs_generator, split_pairs
@@ -75,7 +76,7 @@ async def get_all_participants(
                     User.gender.label("gender"),
                 )
                 .join(Athlete, Athlete.user_id == User.id)
-                .join(MatchParticipant, MatchParticipant.match_id == match)
+                .join(MatchParticipant)
                 .join(Team, Team.id == MatchParticipant.team_id)
                 .join(MatchCategory, MatchCategory.match_id == match)
                 .join(
@@ -475,6 +476,7 @@ async def get_matches_results(
         query = await db.execute(
             select(
                 Match.id.label('match_id'),
+                Match.name,
                 CombatType.name.label('combat_type'),
                 Match.start_datetime,
                 Match.end_datetime,
@@ -553,7 +555,7 @@ async def get_matches_results(
     return result
 
 
-@router.post("/matchs-results/{match_id}")
+'''@router.post("/matchs-results/{match_id}")
 async def post_matchs_results(
     match_id: int,
     db: AsyncSession = Depends(get_db)
@@ -575,21 +577,35 @@ async def post_matchs_results(
     )
     db.add(new_result)
     await db.commit()
-    return {"ok"}
+    return {"ok"}'''
 
 
-@router.post("/matchs-results/{match_id}/{participant_id}/{medal_type}")
+@router.post("/matchs-results/{match_id}")
 async def post_matchs_results_medal(
     match_id: int,
-    participant_id: int,
-    medal_type: str,
     db: AsyncSession = Depends(get_db)
 ):
-    new_medal = Medal(
-        match_id=match_id,
-        recipient_id=participant_id,
-        medal_type=medal_type
+    query = await db.execute(
+        select(
+            MatchParticipant.id
+        )
+        .where(MatchParticipant.match_id == match_id)
     )
-    db.add(new_medal)
-    await db.commit()
+    match_participant_id = query.scalars().all()
+    randoms_id = random.sample(match_participant_id, len(match_participant_id))
+    query = await db.execute(select(Medal.id))
+    medal_id = query.scalars().all()
+    i = 0
+    for id in randoms_id:
+        new_winer = WinnerTable(
+            match_id=match_id,
+            winner_id=id,
+            winner_score='100'+str(i),
+            medal=medal_id[i]
+        )
+        i += 1
+        db.add(new_winer)
+        await db.commit()
+       
+
     return {"ok"}

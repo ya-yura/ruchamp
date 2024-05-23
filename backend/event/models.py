@@ -234,7 +234,6 @@ class MatchResult(Base):
 class Prize(Base):
     __tablename__ = "Prize"
     id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     amount = Column(Integer, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
@@ -244,12 +243,7 @@ class Prize(Base):
 class Medal(Base):
     __tablename__ = "Medal"
     id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    recipient_id = Column(
-        Integer,
-        ForeignKey(MatchParticipant.id, ondelete="CASCADE")
-    )
-    medal_type = Column(String, nullable=False)
+    medal_type = Column(String, nullable=False)  # id: 999999 - без медали
 
 
 # Владельцы наград
