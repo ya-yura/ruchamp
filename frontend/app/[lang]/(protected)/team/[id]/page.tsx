@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getSession, getTeam } from '@/lib/actions';
+import { getSession, getTeam, getTeamMatches } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
@@ -10,6 +10,7 @@ import { MatchesTeam } from './matches-team';
 import { ResultsTeam } from './results-team';
 import { calculateAge, filterDuplicates, roundToBase } from '@/lib/utils';
 import { testTeam } from '@/lib/constants';
+import { Locale } from '@/i18n.config';
 
 export interface ValueOption {
   value: string | number[];
@@ -70,10 +71,32 @@ export interface TeamByIdFromServer {
   Members: TeamMember[];
 }
 
-export default async function TeamPage({ params }: { params: { id: string } }) {
+export interface TeamMatch {
+  match_id: number;
+  event_id: number;
+  location: string;
+  org_name: string;
+  sport_type: string;
+  grade: string;
+  start_datetime: string;
+  end_datetime: string;
+  nominal_time: number;
+  mat_vol: number;
+  age_min: number;
+  age_max: number;
+  weight_class: string;
+}
+
+export default async function TeamPage({
+  params,
+}: {
+  params: { id: string; lang: Locale };
+}) {
   const session = await getSession();
+  const lang = params.lang;
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
+  const matches: TeamMatch[] = await getTeamMatches(id);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;
@@ -166,7 +189,12 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
 
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
-      <InfoTeam teamInfo={teamInfo} captain={captain} coaches={coaches} />
+      <InfoTeam
+        teamInfo={teamInfo}
+        captain={captain}
+        coaches={coaches}
+        lang={lang}
+      />
     ),
     [TeamTabs['athletes']]: (
       <AthletesTeam
@@ -176,9 +204,10 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
         weightFilterData={weightFilterData}
         gradeFilterData={gradeFilterData}
         ageFilterData={ageFilterData}
+        lang={lang}
       />
     ),
-    [TeamTabs['matches']]: <MatchesTeam />,
+    [TeamTabs['matches']]: <MatchesTeam lang={lang} />,
     [TeamTabs['results']]: <ResultsTeam />,
   };
 
@@ -192,6 +221,7 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
         buttons={<TeamActionButtons />}
         tabsContent={tabsContent}
         tabsObj={TeamTabs}
+        lang={lang}
       />
     </Container>
   );

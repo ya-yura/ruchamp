@@ -9,14 +9,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
 import { Country, Region } from '@/lib/definitions';
+import { Locale } from '@/i18n.config';
 
 interface InfoTeamProps {
   teamInfo: TeamInfo;
   captain: TeamMember | undefined;
   coaches: Coach[];
+  lang: Locale;
 }
 
-export function InfoTeam({ teamInfo, captain, coaches }: InfoTeamProps) {
+export function InfoTeam({ teamInfo, captain, coaches, lang }: InfoTeamProps) {
   return (
     <TextCardFieldWithTwoLists
       firstList={<MainTeamInfo teamInfo={teamInfo} />}

@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { calculateAge } from '@/lib/utils';
+import { Locale } from '@/i18n.config';
 
 interface AthletesTeamProps {
   athletes: TeamMember[];
@@ -17,6 +18,7 @@ interface AthletesTeamProps {
   weightFilterData: FilterData;
   gradeFilterData: FilterData;
   ageFilterData: FilterData;
+  lang: Locale;
 }
 
 export function AthletesTeam({
@@ -26,6 +28,7 @@ export function AthletesTeam({
   weightFilterData,
   gradeFilterData,
   ageFilterData,
+  lang,
 }: AthletesTeamProps) {
   const [filters, setFilters] = useState<Record<string, (string | number[])[]>>(
     {
@@ -131,7 +134,9 @@ function AthletesList({
           />
         ))
       ) : (
-        <PersonDescriptionOnCard>Никого не найдено</PersonDescriptionOnCard>
+        <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
+          Никого не найдено
+        </PersonDescriptionOnCard>
       )}
     </>
   );

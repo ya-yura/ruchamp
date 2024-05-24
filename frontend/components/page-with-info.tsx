@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { H1 } from '@/components/text';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ContentWraper } from '@/components/content-wraper';
+import { Locale } from '@/i18n.config';
 
 interface PageWithInfoProps<T extends string> {
   id: number;
@@ -19,6 +20,7 @@ interface PageWithInfoProps<T extends string> {
   buttons: ReactNode;
   tabsContent: Record<T, ReactNode>;
   tabsObj: Record<string, T>;
+  lang: Locale;
 }
 
 export function PageWithInfo<T extends string>({
@@ -29,6 +31,7 @@ export function PageWithInfo<T extends string>({
   buttons,
   tabsContent,
   tabsObj,
+  lang,
 }: PageWithInfoProps<T>) {
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();

@@ -75,6 +75,7 @@ export async function updateSession(request: NextRequest) {
   return res;
 }
 
+// Teams
 export async function getTeams() {
   return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
 }
@@ -90,5 +91,13 @@ export async function getTeam(id: string, token: string) {
     .then(checkResponse)
     .catch((err) => {
       console.log('getTeam error', err);
+    });
+}
+
+export async function getTeamMatches(id: string) {
+  return fetch(`${baseUrl}/team/${id}/matches`, {})
+    .then(checkResponse)
+    .catch((err) => {
+      console.log('getTeamMatches error', err);
     });
 }
