@@ -207,6 +207,15 @@ class Athlete(Base):
     )
 
 
+# Отношение атлет - спорт - грейд
+class AthleteSport(Base):
+    __tablename__ = "AthleteSport"
+    id = Column(Integer, primary_key=True)
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    grade_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
+
+
 # организатор
 class EventOrganizer(Base):
     __tablename__ = "EventOrganizer"

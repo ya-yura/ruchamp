@@ -478,6 +478,7 @@ async def get_team_matches(
                 select(
                     Match.id.label("match_id"),
                     Match.event_id,
+                    Event.name,
                     Event.location,
                     EventOrganizer.organization_name.label("org_name"),
                     SportType.name.label("sport_type"),
