@@ -7,7 +7,6 @@ import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
 import { AthletesTeam } from './athletes-team';
 import { MatchesTeam } from './matches-team';
-import { ResultsTeam } from './results-team';
 import {
   calculateAge,
   filterDuplicates,
@@ -16,6 +15,7 @@ import {
 } from '@/lib/utils';
 import { testMatches, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
+import { Results } from '@/components/results/results';
 
 export interface ValueOption {
   value: string | number[];
@@ -260,7 +260,7 @@ export default async function TeamPage({
         lang={lang}
       />
     ),
-    [TeamTabs['results']]: <ResultsTeam />,
+    [TeamTabs['results']]: <Results />,
   };
 
   return (
