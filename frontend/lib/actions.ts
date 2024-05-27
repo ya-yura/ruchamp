@@ -32,12 +32,11 @@ export async function authenticate(
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   try {
-    // const user = { email: 'users email', name: 'users name' };
     const token = await auth.login(username, password);
     if (token) {
       const user = await auth.getCurrentUser(token);
       // Create the session
-      const expires = new Date(Date.now() + 10 * 1000);
+      const expires = new Date(Date.now() + 604800 * 1000); // 604800 - seconds in the week
       const session = await encrypt({ user, token, expires });
       // Save the session in a cookie
       cookies().set('session', session, { expires, httpOnly: true });
