@@ -256,7 +256,7 @@ export default async function TeamPage({
     [TeamTabs['matches']]: (
       <MatchesTeam
         groupedMatches={sortedAndGroupedMatches}
-        length={testMatches.length || 0}
+        length={matches.length || 0}
         lang={lang}
       />
     ),
