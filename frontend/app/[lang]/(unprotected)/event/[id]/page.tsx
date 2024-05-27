@@ -12,12 +12,14 @@ import { Matches } from './matches';
 import { Grid } from './grid';
 import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
+import { Locale } from '@/i18n.config';
 
 export default async function EventPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: string; lang: Locale };
 }) {
+  const lang = params.lang;
   const id = params.id;
   let events: Event[];
   let expectedEvents: Event[];
@@ -60,6 +62,7 @@ export default async function EventPage({
         buttons={<EventActionButtons />}
         tabsContent={tabsContent}
         tabsObj={EventTabs}
+        lang={lang}
       />
       <AddressSection event={event} />
       <ExpectedEvents events={expectedEvents} />

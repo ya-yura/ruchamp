@@ -1,11 +1,16 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { TeamsListing } from './teams-listing';
-import { getTeams } from '@/lib/actions';
 import { Locale } from '@/i18n.config';
-import { calculateAge, calculateGender } from '@/lib/utils';
-import { Country, Region } from '@/lib/definitions';
+import {
+  calculateAge,
+  calculateGender,
+  defineDefaultRange,
+  expandRange,
+} from '@/lib/utils';
+import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
+import { getTeams } from '@/lib/actions';
 
 interface TeamInfo {
   id: number;
@@ -57,16 +62,16 @@ export interface Team extends TeamInfo {
   weights: number[];
   ages: number[];
   location: string;
-  sportTypes: string[]
+  sportTypes: string[];
 }
 
-type TeamDataFromServer = [
+export type TeamDataFromServer = [
   TeamInfo,
   CaptainInfo,
   [MemberPersonalInfo, MemberAthleteInfo, MemberSportTypes][],
 ];
 
-const testTeam: TeamDataFromServer = [
+const testTeamInTeams: TeamDataFromServer = [
   {
     id: 0,
     name: 'Тестовая команда',
@@ -90,7 +95,7 @@ const testTeam: TeamDataFromServer = [
         sirname: 'Наумова',
         name: 'Филипп',
         fathername: 'Федор',
-        birthdate: '1980-11-10',
+        birthdate: '2020-11-10',
         gender: true,
       },
       {
@@ -107,40 +112,6 @@ const testTeam: TeamDataFromServer = [
         'Спортивное метание ножа',
       ],
     ],
-    [
-      {
-        sirname: 'Мамонтов',
-        name: 'Лука',
-        fathername: 'Андроник',
-        birthdate: '1984-02-22',
-        gender: true,
-      },
-      {
-        height: 129,
-        weight: 104.0,
-        country: 2,
-        region: 17,
-        city: 'с. Щелково',
-      },
-      ['Сумо', 'Бокс', 'Самбо', 'Спортивное метание ножа'],
-    ],
-    [
-      {
-        sirname: 'Мамонтов',
-        name: 'Лука',
-        fathername: 'Андроник',
-        birthdate: '1984-02-22',
-        gender: true,
-      },
-      {
-        height: 129,
-        weight: 110.0,
-        country: 2,
-        region: 17,
-        city: 'с. Щелково',
-      },
-      ['Сумо', 'Бокс', 'Самбо', 'Спортивное метание ножа'],
-    ],
   ],
 ];
 
@@ -151,22 +122,25 @@ export default async function Teams({
 }) {
   const { page } = await getDictionary(lang);
   const dictionary = page.teams;
-  const teamData: TeamDataFromServer[] = await getTeams();
-  const teams: Team[] = [testTeam, ...teamData].map((team) => {
+
+  let teams: Team[] = [];
+  const weightRange = [250, 1];
+  const ageRange = [100, 1];
+
+  const transformTeamData = (team: TeamDataFromServer): Team => {
     const [teamInfo, captainInfo, members] = team;
-    const sportTypes: MemberSportTypes = [
-      ...new Set(members.flatMap((member) => member[2])),
-    ];
-    const gender: Gender = calculateGender(
-      members.map((member) => member[0].gender),
+
+    const sportTypes = Array.from(
+      new Set(members.flatMap((member) => member[2])),
     );
+    const gender = calculateGender(members.map((member) => member[0].gender));
     const weights = members
       .map((member) => member[1].weight)
-      .sort((a, b) => +a - +b);
+      .sort((a, b) => a - b);
     const ages = members
       .map((member) => calculateAge(member[0].birthdate))
-      .sort((a, b) => +a - +b);
-    const location = `${team[0].city}, ${Region[team[0].region]}, ${Country[team[0].country]}`;
+      .sort((a, b) => a - b);
+    const location = `${teamInfo.city}, ${AllRegions[teamInfo.region]}, ${Country[teamInfo.country]}`;
 
     return {
       ...teamInfo,
@@ -177,11 +151,47 @@ export default async function Teams({
       ages,
       location,
     };
-  });
+  };
+
+  const updateRanges = (
+    teams: Team[],
+    range: number[],
+    property: keyof Team,
+  ) => {
+    teams.forEach((team) => {
+      const values = team[property] as number[];
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      range[0] = Math.min(range[0], minValue);
+      range[1] = Math.max(range[1], maxValue);
+    });
+  };
+
+  try {
+    const teamData: TeamDataFromServer[] = await getTeams();
+    teams = [testTeamInTeams, ...teamData].map(transformTeamData);
+    updateRanges(teams, weightRange, 'weights');
+    updateRanges(teams, ageRange, 'ages');
+  } catch (err) {
+    console.error('Failed to fetch teams data:', err);
+  }
+
+  const weightRangeWithExpad = expandRange(weightRange, 10);
+  const ageRangeWithExpand = expandRange(ageRange, 5);
+  const weightDefaults = defineDefaultRange(weightRangeWithExpad);
+  const ageDefaults = defineDefaultRange(ageRangeWithExpand);
 
   return (
     <Container>
-      <TeamsListing teams={teams} lang={lang} dictionary={dictionary} />
+      <TeamsListing
+        teams={teams}
+        weightRange={weightRangeWithExpad}
+        ageRange={ageRangeWithExpand}
+        weightDefaults={weightDefaults}
+        ageDefaults={ageDefaults}
+        lang={lang}
+        dictionary={dictionary}
+      />
     </Container>
   );
 }

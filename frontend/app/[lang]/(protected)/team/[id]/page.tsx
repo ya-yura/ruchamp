@@ -1,15 +1,21 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getSession, getTeam } from '@/lib/actions';
+import { getSession, getTeam, getTeamMatches } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
 import { AthletesTeam } from './athletes-team';
 import { MatchesTeam } from './matches-team';
-import { ResultsTeam } from './results-team';
-import { calculateAge, filterDuplicates, roundToBase } from '@/lib/utils';
-import { testTeam } from '@/lib/constants';
+import {
+  calculateAge,
+  filterDuplicates,
+  roundToBase,
+  transformDate,
+} from '@/lib/utils';
+import { testMatches, testTeam } from '@/lib/constants';
+import { Locale } from '@/i18n.config';
+import { Results } from '@/components/results/results';
 
 export interface ValueOption {
   value: string | number[];
@@ -70,10 +76,42 @@ export interface TeamByIdFromServer {
   Members: TeamMember[];
 }
 
-export default async function TeamPage({ params }: { params: { id: string } }) {
+export interface TeamMatch {
+  match_id: number;
+  event_id: number;
+  name: string;
+  location: string;
+  org_name: string;
+  sport_type: string;
+  grade: string;
+  start_datetime: string;
+  end_datetime: string;
+  nominal_time: number;
+  mat_vol: number;
+  age_min: number;
+  age_max: number;
+  weight_class: string;
+  gender?: boolean;
+}
+
+export interface GroupedMatch {
+  event_id: number;
+  name: string;
+  location: string;
+  start_datetime: string;
+  matches: TeamMatch[];
+}
+
+export default async function TeamPage({
+  params,
+}: {
+  params: { id: string; lang: Locale };
+}) {
   const session = await getSession();
+  const lang = params.lang;
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
+  const matches: TeamMatch[] = await getTeamMatches(id);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;
@@ -164,9 +202,45 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
     options: rangesFromArray(ages, 5),
   };
 
+  function sortAndGroupMatches(matches: TeamMatch[]) {
+    matches.sort((a, b) => {
+      if (a.start_datetime < b.start_datetime) return -1;
+      if (a.start_datetime > b.start_datetime) return 1;
+      if (a.event_id < b.event_id) return -1;
+      if (a.event_id > b.event_id) return 1;
+      return 0;
+    });
+
+    const groupedMatches = matches.reduce<Record<number, GroupedMatch>>(
+      (acc, match) => {
+        if (!acc[match.event_id]) {
+          acc[match.event_id] = {
+            event_id: match.event_id,
+            name: match.name,
+            location: match.location,
+            start_datetime: transformDate(match.start_datetime),
+            matches: [],
+          };
+        }
+        acc[match.event_id].matches.push(match);
+        return acc;
+      },
+      {},
+    );
+
+    return Object.values(groupedMatches);
+  }
+
+  const sortedAndGroupedMatches = sortAndGroupMatches(matches);
+
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
-      <InfoTeam teamInfo={teamInfo} captain={captain} coaches={coaches} />
+      <InfoTeam
+        teamInfo={teamInfo}
+        captain={captain}
+        coaches={coaches}
+        lang={lang}
+      />
     ),
     [TeamTabs['athletes']]: (
       <AthletesTeam
@@ -176,10 +250,17 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
         weightFilterData={weightFilterData}
         gradeFilterData={gradeFilterData}
         ageFilterData={ageFilterData}
+        lang={lang}
       />
     ),
-    [TeamTabs['matches']]: <MatchesTeam />,
-    [TeamTabs['results']]: <ResultsTeam />,
+    [TeamTabs['matches']]: (
+      <MatchesTeam
+        groupedMatches={sortedAndGroupedMatches}
+        length={matches.length || 0}
+        lang={lang}
+      />
+    ),
+    [TeamTabs['results']]: <Results />,
   };
 
   return (
@@ -192,6 +273,7 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
         buttons={<TeamActionButtons />}
         tabsContent={tabsContent}
         tabsObj={TeamTabs}
+        lang={lang}
       />
     </Container>
   );

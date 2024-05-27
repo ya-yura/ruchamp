@@ -3,7 +3,6 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { sportTypes } from './constants';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
 
@@ -14,15 +13,17 @@ export function cn(...inputs: ClassValue[]) {
 export function transformDate(inputDate: string, isWithTime?: boolean): string {
   const currentDate = new Date();
   const parsedDate = parseISO(inputDate);
-  if (currentDate.getFullYear() === parsedDate.getFullYear()) {
-    return format(parsedDate, `dd MMMM${isWithTime ? ', HH:mm' : ''}`, {
-      locale: ru,
-    });
-  } else {
-    return format(parsedDate, `dd MMMM yyyy${isWithTime ? ', HH:mm' : ''}`, {
-      locale: ru,
-    });
-  }
+  const day = parsedDate.getDate(); // Get the day of the month without leading zero
+  const monthYearFormat =
+    currentDate.getFullYear() === parsedDate.getFullYear()
+      ? 'MMMM'
+      : 'MMMM yyyy';
+  const timeFormat = isWithTime ? ', HH:mm' : '';
+  const formattedDate = format(parsedDate, monthYearFormat + timeFormat, {
+    locale: ru,
+  });
+
+  return `${day} ${formattedDate}`;
 }
 
 export function getRandomInt(max: number): number {
@@ -148,4 +149,17 @@ export function roundToBase(
     default:
       return Math.round(num / base) * base;
   }
+}
+
+export function expandRange(range: number[], expandValue: number): number[] {
+  const [start, end] = range;
+  return start === end
+    ? [Math.max(start - expandValue, 0), end + expandValue]
+    : range;
+}
+
+export function defineDefaultRange(range: number[]): number[] {
+  const [start, end] = range;
+  const middle = (start + end) / 2;
+  return [Math.floor((start + middle) / 2), Math.ceil((end + middle) / 2)];
 }

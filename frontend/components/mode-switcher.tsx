@@ -7,6 +7,7 @@ interface ModeSwitherProps {
   isOnMode: boolean;
   setIsOnMode: Dispatch<SetStateAction<boolean>>;
   label: string;
+  alternativeLabel?: string;
   id: string;
   className?: string;
 }
@@ -15,6 +16,7 @@ export function ModeSwither({
   isOnMode,
   setIsOnMode,
   label,
+  alternativeLabel,
   id,
   className,
 }: ModeSwitherProps) {
@@ -25,6 +27,11 @@ export function ModeSwither({
         className,
       )}
     >
+      {alternativeLabel && (
+        <Label className="text-sm font-normal text-background" htmlFor={id}>
+          {alternativeLabel}
+        </Label>
+      )}
       <Switch
         checked={isOnMode}
         onCheckedChange={() => setIsOnMode(!isOnMode)}

@@ -51,27 +51,27 @@ const regStepThreeFieldset: TypeFieldsetData<TypeRegFormSchema> = {
       label: 'Дата рождения',
       defaultValue: '',
     },
-    {
-      type: 'select',
-      name: 'user_create.country',
-      placeholder: 'Выберите из списка',
-      label: 'Страна',
-      defaultValue: '',
-      selectOptions: [
-        {
-          value: 'ru',
-          option: 'Россия',
-        },
-        {
-          value: 'kz',
-          option: 'Казахстан',
-        },
-        {
-          value: 'by',
-          option: 'Беларусь',
-        },
-      ],
-    },
+    // {
+    //   type: 'select',
+    //   name: 'user_create.country',
+    //   placeholder: 'Выберите из списка',
+    //   label: 'Страна',
+    //   defaultValue: '',
+    //   selectOptions: [
+    //     {
+    //       value: 'ru',
+    //       option: 'Россия',
+    //     },
+    //     {
+    //       value: 'kz',
+    //       option: 'Казахстан',
+    //     },
+    //     {
+    //       value: 'by',
+    //       option: 'Беларусь',
+    //     },
+    //   ],
+    // },
     {
       type: 'radio',
       name: 'user_create.gender',
@@ -116,7 +116,7 @@ export function RegisterStepThree({
           onClick={async () => {
             const output = await form.trigger([
               'user_create.birthdate',
-              'user_create.country',
+              // 'user_create.country',
               'user_create.fathername',
               'user_create.gender',
               'user_create.name',

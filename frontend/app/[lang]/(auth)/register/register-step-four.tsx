@@ -2,7 +2,7 @@ import {
   CustomFieldset,
   TypeFieldsetData,
 } from '@/components/forms/custom-fieldset';
-import { EnumUserRole } from '@/lib/definitions';
+import { Country, EnumUserRole, AllRegions } from '@/lib/definitions';
 import { UseFormReturn } from 'react-hook-form';
 import { TypeRegFormSchema } from './register-form';
 import { Locale } from '@/i18n.config';
@@ -19,8 +19,52 @@ type TypeRegisterStepFourProps = {
   errorMessage: string;
 };
 
+const getCountryOptions = () => {
+  return Object.keys(Country)
+    .filter((key) => isNaN(Number(key))) // Only get the string keys
+    .map((key) => ({
+      value: Country[key as keyof typeof Country].toString(),
+      option: key,
+    }));
+};
+
+const getRegionOptions = () => {
+  return Object.keys(AllRegions)
+    .filter((key) => isNaN(Number(key))) // Only get the string keys
+    .map((key) => ({
+      value: AllRegions[key as keyof typeof AllRegions].toString(),
+      option: key,
+    }));
+};
+
+const countryOptions = getCountryOptions();
+const regionOptions = getRegionOptions();
+
 const regAthleteFieldset: TypeFieldsetData<TypeRegFormSchema> = {
   fields: [
+    {
+      type: 'select',
+      name: 'user_data.info.athlete_country',
+      placeholder: 'Выберите из списка',
+      label: 'Страна',
+      defaultValue: '',
+      selectOptions: countryOptions,
+    },
+    {
+      type: 'select',
+      name: 'user_data.info.athlete_region',
+      placeholder: 'Выберите из списка',
+      label: 'Регион',
+      defaultValue: '',
+      selectOptions: regionOptions,
+    },
+    {
+      type: 'text',
+      name: 'user_data.info.athlete_city',
+      placeholder: 'Ваш город',
+      label: 'Город',
+      defaultValue: '',
+    },
     {
       type: 'text',
       name: 'user_data.info.athlete_height',
@@ -132,7 +176,13 @@ export function RegisterStepFour({
   const isButtonDisabled = (): boolean => {
     switch (userRoleId) {
       case '1':
-        return !(infoValues.athlete_height && infoValues.athlete_weight);
+        return !(
+          infoValues.athlete_country &&
+          infoValues.athlete_region &&
+          infoValues.athlete_city &&
+          infoValues.athlete_height &&
+          infoValues.athlete_weight
+        );
       case '2':
         return !(
           infoValues.event_organizer_organization_contact_email &&
