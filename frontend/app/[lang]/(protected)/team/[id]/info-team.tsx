@@ -8,7 +8,7 @@ import {
 } from '@/components/text';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
-import { Country, Region } from '@/lib/definitions';
+import { Country, AllRegions } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 
 interface InfoTeamProps {
@@ -52,7 +52,7 @@ function CaptainAndCoaches({
             {captain.sirname} {captain.name} {captain.fathername}
           </PersonNameOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
-            {captain.city}, {Region[captain.region]}, {Country[captain.country]}
+            {captain.city}, {AllRegions[captain.region]}, {Country[captain.country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
             <b>{captain.birthdate.split('-')[0]} г.р.</b>,{' '}

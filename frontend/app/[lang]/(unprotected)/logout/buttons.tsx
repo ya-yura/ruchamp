@@ -17,6 +17,7 @@ export function LogoutButtons({ token }: { token: string }) {
         onClick={() => router.back()}
         size="lg"
         variant="ruchampTransparentGreyBorder"
+        type="button"
       >
         Нет
       </Button>

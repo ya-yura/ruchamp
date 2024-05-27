@@ -4,7 +4,7 @@ import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { calculateAge, getInitials, getRussianAgeWord } from '@/lib/utils';
 import { H4, PersonDescriptionOnCard } from '../text';
-import { Country, Region } from '@/lib/definitions';
+import { Country, AllRegions } from '@/lib/definitions';
 import { Badge } from '../ui/badge';
 
 interface AthleteCardProps
@@ -56,7 +56,7 @@ export function AthleteCard({
             {sirname} {name} {fathername}
           </H4>
           <PersonDescriptionOnCard className="text-neutralForeground3">
-            {city}, {Region[region]}, {Country[country]}
+            {city}, {AllRegions[region]}, {Country[country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="text-neutralForeground3">
             <b>{birthdate.split('-')[0]}</b> г.р.,{' '}

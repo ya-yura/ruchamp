@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getSession, getTeam, getTeamMatches } from '@/lib/actions';
+import { getSession } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
@@ -11,6 +11,7 @@ import { ResultsTeam } from './results-team';
 import { calculateAge, filterDuplicates, roundToBase } from '@/lib/utils';
 import { testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
+import { teamsApi } from '@/lib/api/teamsApi';
 
 export interface ValueOption {
   value: string | number[];
@@ -95,8 +96,8 @@ export default async function TeamPage({
   const session = await getSession();
   const lang = params.lang;
   const id = params.id;
-  const team: TeamByIdFromServer = await getTeam(id, session.token);
-  const matches: TeamMatch[] = await getTeamMatches(id);
+  const team: TeamByIdFromServer = await teamsApi.getTeam(id, session.token);
+  const matches: TeamMatch[] = await teamsApi.getTeamMatches(id);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;

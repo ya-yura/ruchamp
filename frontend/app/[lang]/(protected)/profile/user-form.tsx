@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { EnumCountries, EnumUserRole, UserBasicData } from '@/lib/definitions';
+import { EnumUserRole, UserBasicData } from '@/lib/definitions';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -76,7 +76,7 @@ export function UserForm({ user }: { user: UserBasicData }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-foreground relative rounded-xl p-9"
+        className="relative rounded-xl bg-foreground p-9"
       >
         <h2 className="mb-5 text-xl font-bold">Общая информация</h2>
         <fieldset className="mb-5 flex flex-col gap-3">
@@ -189,7 +189,7 @@ export function UserForm({ user }: { user: UserBasicData }) {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="country"
             render={({ field }) => (
@@ -216,7 +216,7 @@ export function UserForm({ user }: { user: UserBasicData }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <FormField
             control={form.control}
             name="role_id"

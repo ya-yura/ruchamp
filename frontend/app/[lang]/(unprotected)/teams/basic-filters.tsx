@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { GenderFilter } from './gender-filter';
 import { RangeSlider } from './range-slider';
 import { Dictionary } from '../../dictionary-provider';
@@ -11,6 +11,10 @@ interface BasicFiltersProps {
   setAges: Dispatch<SetStateAction<number[]>>;
   weights: number[];
   setWeights: Dispatch<SetStateAction<number[]>>;
+  weightRange: number[];
+  ageRange: number[];
+  weightDefaults: number[];
+  ageDefaults: number[];
   dictionary: Dictionary['page']['teams'];
 }
 
@@ -21,6 +25,10 @@ export function BasicFilters({
   setAges,
   weights,
   setWeights,
+  weightRange,
+  ageRange,
+  weightDefaults,
+  ageDefaults,
   dictionary,
 }: BasicFiltersProps) {
   return (
@@ -33,9 +41,9 @@ export function BasicFilters({
       <RangeSlider
         className="px-10 sm:px-0"
         title={'Возраст (лет)'}
-        defaultValue={[18, 30]}
-        minValue={5}
-        maxValue={100}
+        defaultValue={ageDefaults}
+        minValue={ageRange[0]}
+        maxValue={ageRange[1]}
         minStepsBetweenThumbs={1}
         value={ages}
         setValue={setAges}
@@ -43,9 +51,9 @@ export function BasicFilters({
       <RangeSlider
         className="col-span-1 px-10 sm:col-span-2 sm:px-0 lg:col-span-1"
         title={'Вес (кг)'}
-        defaultValue={[50, 90]}
-        minValue={30}
-        maxValue={150}
+        defaultValue={weightDefaults}
+        minValue={weightRange[0]}
+        maxValue={weightRange[1]}
         minStepsBetweenThumbs={1}
         value={weights}
         setValue={setWeights}

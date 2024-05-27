@@ -62,6 +62,9 @@ import { path } from '@/lib/utils';
 // ]);
 
 const userDataSchema = z.object({
+  athlete_country: z.string(),
+  athlete_region: z.string(),
+  athlete_city: z.string(),
   athlete_weight: z.string(),
   athlete_height: z.string(),
   athlete_sport_type: z.array(z.string()),
@@ -106,9 +109,9 @@ const userCreateSchema = z
     gender: z.string().min(1, {
       message: 'Выберите пол',
     }),
-    country: z.string().min(1, {
-      message: 'Выберите страну',
-    }),
+    // country: z.string().min(1, {
+    //   message: 'Выберите страну',
+    // }),
     birthdate: z.string().min(1, {
       message: 'Выберите дату',
     }),
@@ -158,12 +161,15 @@ export function RegisterForm({ lang }: { lang: Locale }) {
         sirname: '',
         fathername: '',
         gender: '',
-        country: '',
+        // country: '',
         birthdate: '',
         role_id: '1',
       },
       user_data: {
         info: {
+          athlete_country: '',
+          athlete_region: '',
+          athlete_city: '',
           athlete_weight: '',
           athlete_height: '',
           athlete_sport_type: [],

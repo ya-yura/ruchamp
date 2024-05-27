@@ -3,7 +3,6 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { sportTypes } from './constants';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
 
@@ -148,4 +147,17 @@ export function roundToBase(
     default:
       return Math.round(num / base) * base;
   }
+}
+
+export function expandRange(range: number[], expandValue: number): number[] {
+  const [start, end] = range;
+  return start === end
+    ? [Math.max(start - expandValue, 0), end + expandValue]
+    : range;
+}
+
+export function defineDefaultRange(range: number[]): number[] {
+  const [start, end] = range;
+  const middle = (start + end) / 2;
+  return [Math.floor((start + middle) / 2), Math.ceil((end + middle) / 2)];
 }
