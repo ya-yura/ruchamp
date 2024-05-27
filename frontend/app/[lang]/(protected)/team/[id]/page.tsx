@@ -1,17 +1,21 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getSession } from '@/lib/actions';
+import { getSession, getTeam, getTeamMatches } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
 import { AthletesTeam } from './athletes-team';
 import { MatchesTeam } from './matches-team';
 import { ResultsTeam } from './results-team';
-import { calculateAge, filterDuplicates, roundToBase } from '@/lib/utils';
-import { testTeam } from '@/lib/constants';
+import {
+  calculateAge,
+  filterDuplicates,
+  roundToBase,
+  transformDate,
+} from '@/lib/utils';
+import { testMatches, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
-import { teamsApi } from '@/lib/api/teamsApi';
 
 export interface ValueOption {
   value: string | number[];
@@ -75,6 +79,7 @@ export interface TeamByIdFromServer {
 export interface TeamMatch {
   match_id: number;
   event_id: number;
+  name: string;
   location: string;
   org_name: string;
   sport_type: string;
@@ -86,6 +91,15 @@ export interface TeamMatch {
   age_min: number;
   age_max: number;
   weight_class: string;
+  gender?: boolean;
+}
+
+export interface GroupedMatch {
+  event_id: number;
+  name: string;
+  location: string;
+  start_datetime: string;
+  matches: TeamMatch[];
 }
 
 export default async function TeamPage({
@@ -96,8 +110,8 @@ export default async function TeamPage({
   const session = await getSession();
   const lang = params.lang;
   const id = params.id;
-  const team: TeamByIdFromServer = await teamsApi.getTeam(id, session.token);
-  const matches: TeamMatch[] = await teamsApi.getTeamMatches(id);
+  const team: TeamByIdFromServer = await getTeam(id, session.token);
+  const matches: TeamMatch[] = await getTeamMatches(id);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;
@@ -188,6 +202,37 @@ export default async function TeamPage({
     options: rangesFromArray(ages, 5),
   };
 
+  function sortAndGroupMatches(matches: TeamMatch[]) {
+    matches.sort((a, b) => {
+      if (a.start_datetime < b.start_datetime) return -1;
+      if (a.start_datetime > b.start_datetime) return 1;
+      if (a.event_id < b.event_id) return -1;
+      if (a.event_id > b.event_id) return 1;
+      return 0;
+    });
+
+    const groupedMatches = matches.reduce<Record<number, GroupedMatch>>(
+      (acc, match) => {
+        if (!acc[match.event_id]) {
+          acc[match.event_id] = {
+            event_id: match.event_id,
+            name: match.name,
+            location: match.location,
+            start_datetime: transformDate(match.start_datetime),
+            matches: [],
+          };
+        }
+        acc[match.event_id].matches.push(match);
+        return acc;
+      },
+      {},
+    );
+
+    return Object.values(groupedMatches);
+  }
+
+  const sortedAndGroupedMatches = sortAndGroupMatches(matches);
+
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
       <InfoTeam
@@ -208,7 +253,13 @@ export default async function TeamPage({
         lang={lang}
       />
     ),
-    [TeamTabs['matches']]: <MatchesTeam lang={lang} />,
+    [TeamTabs['matches']]: (
+      <MatchesTeam
+        groupedMatches={sortedAndGroupedMatches}
+        length={testMatches.length || 0}
+        lang={lang}
+      />
+    ),
     [TeamTabs['results']]: <ResultsTeam />,
   };
 

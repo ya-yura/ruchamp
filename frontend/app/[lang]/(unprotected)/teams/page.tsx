@@ -10,7 +10,7 @@ import {
 } from '@/lib/utils';
 import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
-import { teamsApi } from '@/lib/api/teamsApi';
+import { getTeams } from '@/lib/actions';
 
 interface TeamInfo {
   id: number;
@@ -71,7 +71,7 @@ export type TeamDataFromServer = [
   [MemberPersonalInfo, MemberAthleteInfo, MemberSportTypes][],
 ];
 
-const testTeam: TeamDataFromServer = [
+const testTeamInTeams: TeamDataFromServer = [
   {
     id: 0,
     name: 'Тестовая команда',
@@ -155,26 +155,23 @@ export default async function Teams({
 
   const updateRanges = (
     teams: Team[],
-    weightRange: number[],
-    ageRange: number[],
+    range: number[],
+    property: keyof Team,
   ) => {
     teams.forEach((team) => {
-      const minWeight = Math.min(...team.weights);
-      const maxWeight = Math.max(...team.weights);
-      weightRange[0] = Math.min(weightRange[0], minWeight);
-      weightRange[1] = Math.max(weightRange[1], maxWeight);
-
-      const minAge = Math.min(...team.ages);
-      const maxAge = Math.max(...team.ages);
-      ageRange[0] = Math.min(ageRange[0], minAge);
-      ageRange[1] = Math.max(ageRange[1], maxAge);
+      const values = team[property] as number[];
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      range[0] = Math.min(range[0], minValue);
+      range[1] = Math.max(range[1], maxValue);
     });
   };
 
   try {
-    const teamData: TeamDataFromServer[] = await teamsApi.getTeams();
-    teams = [testTeam, ...teamData].map(transformTeamData);
-    updateRanges(teams, weightRange, ageRange);
+    const teamData: TeamDataFromServer[] = await getTeams();
+    teams = [testTeamInTeams, ...teamData].map(transformTeamData);
+    updateRanges(teams, weightRange, 'weights');
+    updateRanges(teams, ageRange, 'ages');
   } catch (err) {
     console.error('Failed to fetch teams data:', err);
   }

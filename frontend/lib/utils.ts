@@ -13,15 +13,17 @@ export function cn(...inputs: ClassValue[]) {
 export function transformDate(inputDate: string, isWithTime?: boolean): string {
   const currentDate = new Date();
   const parsedDate = parseISO(inputDate);
-  if (currentDate.getFullYear() === parsedDate.getFullYear()) {
-    return format(parsedDate, `dd MMMM${isWithTime ? ', HH:mm' : ''}`, {
-      locale: ru,
-    });
-  } else {
-    return format(parsedDate, `dd MMMM yyyy${isWithTime ? ', HH:mm' : ''}`, {
-      locale: ru,
-    });
-  }
+  const day = parsedDate.getDate(); // Get the day of the month without leading zero
+  const monthYearFormat =
+    currentDate.getFullYear() === parsedDate.getFullYear()
+      ? 'MMMM'
+      : 'MMMM yyyy';
+  const timeFormat = isWithTime ? ', HH:mm' : '';
+  const formattedDate = format(parsedDate, monthYearFormat + timeFormat, {
+    locale: ru,
+  });
+
+  return `${day} ${formattedDate}`;
 }
 
 export function getRandomInt(max: number): number {

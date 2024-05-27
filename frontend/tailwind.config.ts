@@ -30,6 +30,8 @@ const config = {
         neutralForeground1Rest: '#242424',
         neutralForeground3Rest: '#616161',
         neutralForeground3: '#ADADAD',
+        NeutralBackground4Rest: '#F0F0F0',
+        NeutralStroke2Rest: '#E0E0E0',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
