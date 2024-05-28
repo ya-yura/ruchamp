@@ -86,7 +86,7 @@ interface MatchInfo {
   medal_type: string;
 }
 
-interface Medals {
+export interface Medals {
   golden: number;
   silver: number;
   bronze: number;
@@ -288,7 +288,7 @@ export default async function TeamPage({
     medal: 'Золото' | 'Серебро' | 'Бронза',
   ): MedalWinner[] {
     let res: MedalWinner[] = [];
-    testResults.forEach((athlete) =>
+    results.forEach((athlete) =>
       athlete.matches_info.forEach((match) => {
         if (match.medal_type === medal) {
           res.push({
@@ -322,6 +322,8 @@ export default async function TeamPage({
   const silverMedalWinners = getAthletesByMedal('Серебро');
   const bronzeMedalWinners = getAthletesByMedal('Бронза');
 
+  const sortedAthelesResults = results.sort((a, b) => b.points - a.points);
+
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
       <InfoTeam
@@ -354,7 +356,7 @@ export default async function TeamPage({
         goldenMedalWinners={goldenMedalWinners}
         silverMedalWinners={silverMedalWinners}
         bronzeMedalWinners={bronzeMedalWinners}
-        athletes={testResults}
+        athletes={sortedAthelesResults}
       />
     ),
   };

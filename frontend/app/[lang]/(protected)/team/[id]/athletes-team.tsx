@@ -135,7 +135,7 @@ function AthletesList({
         ))
       ) : (
         <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
-          Никого не найдено
+          Ничего не найдено
         </PersonDescriptionOnCard>
       )}
     </>

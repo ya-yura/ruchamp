@@ -5,6 +5,7 @@ import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
+import { Medals } from '@/app/[lang]/(protected)/team/[id]/page';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
