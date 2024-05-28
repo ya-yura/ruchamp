@@ -39,7 +39,7 @@ function CaptainAndCoaches({
     <>
       {captain ? (
         <TextCard className="grid gap-x-3 gap-y-2 bg-card-backgroundDark  sm:grid-cols-2 xl:grid-cols-[1fr_3fr]">
-          <Avatar className="row-span-4 h-32 w-32 text-foreground duration-300 group-hover:text-primary-mainAccent sm:mt-5 md:mt-3 lg:mt-0">
+          <Avatar className="row-span-4 h-32 w-32 text-foreground duration-300 sm:mt-5 md:mt-3 lg:mt-0">
             <AvatarImage src={captain.image_field} alt="" />
             <AvatarFallback className="text-6xl font-black">
               {getInitials(captain.name, captain.sirname) || ''}
@@ -52,7 +52,8 @@ function CaptainAndCoaches({
             {captain.sirname} {captain.name} {captain.fathername}
           </PersonNameOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
-            {captain.city}, {AllRegions[captain.region]}, {Country[captain.country]}
+            {captain.city}, {AllRegions[captain.region]},{' '}
+            {Country[captain.country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
             <b>{captain.birthdate.split('-')[0]} г.р.</b>,{' '}

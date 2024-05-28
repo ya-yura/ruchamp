@@ -49,7 +49,7 @@ export function H4({ children, className }: TextProps) {
   return (
     <h4
       className={cn(
-        'text-xl font-semibold text-background sm:text-base md:text-xl',
+        'text-lg font-semibold text-background sm:text-base md:text-lg',
         className,
       )}
     >

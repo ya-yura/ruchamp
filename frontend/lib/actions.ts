@@ -100,3 +100,11 @@ export async function getTeamMatches(id: string) {
       console.log('getTeamMatches error', err);
     });
 }
+
+export async function getTeamResults(id: string) {
+  return fetch(`${baseUrl}/team/${id}/results`, {})
+    .then(checkResponse)
+    .catch((err) => {
+      console.log('getTeamMatches error', err);
+    });
+}

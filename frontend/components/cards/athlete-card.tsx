@@ -33,9 +33,9 @@ export function AthleteCard({
   const athleteAge = calculateAge(birthdate);
   return (
     <TextCard className="relative cursor-default flex-col gap-4 transition-colors hover:bg-card-hoverGray sm:flex-row lg:px-4 lg:py-3">
-      <div className="flex w-full flex-row-reverse justify-between sm:justify-start gap-4 sm:w-2/3 sm:flex-row xl:items-center">
+      <div className="flex w-full flex-row-reverse justify-between gap-4 sm:w-2/3 sm:flex-row sm:justify-start xl:items-center">
         <div className="relative h-14 w-14 sm:h-10 sm:w-10">
-          <Avatar className="row-span-4 h-14 w-14 text-foreground duration-300 group-hover:text-primary-mainAccent sm:h-10 sm:w-10">
+          <Avatar className="h-14 w-14 text-foreground sm:h-10 sm:w-10">
             <AvatarImage src={image_field} alt="" />
             <AvatarFallback className="text-base font-medium">
               {getInitials(name, sirname) || ''}

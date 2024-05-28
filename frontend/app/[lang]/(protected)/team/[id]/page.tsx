@@ -1,7 +1,12 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getSession, getTeam, getTeamMatches } from '@/lib/actions';
+import {
+  getSession,
+  getTeam,
+  getTeamMatches,
+  getTeamResults,
+} from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
@@ -13,10 +18,9 @@ import {
   roundToBase,
   transformDate,
 } from '@/lib/utils';
-import { testMatches, testTeam } from '@/lib/constants';
+import { testMatches, testResults, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { Results } from '@/components/results/results';
-import { inter } from '@/app/[lang]/ui/fonts';
 
 export interface ValueOption {
   value: string | number[];
@@ -71,8 +75,27 @@ export interface TeamMember {
   coaches: Coach[];
 }
 
-export interface TeamMemberWithResults extends Omit<TeamMember, 'coaches'> {
-  medals: string;
+interface MatchInfo {
+  event_id: number;
+  event_name: string;
+  event_location: string;
+  match_id: number;
+  match_name: string;
+  start_datetime: string;
+  sport_type: string;
+  medal_type: string;
+}
+
+interface Medals {
+  golden: number;
+  silver: number;
+  bronze: number;
+}
+export interface TeamMemberWithResults
+  extends Omit<TeamMember, 'coaches' | 'grade_types' | 'sport_types'> {
+  matches_info: MatchInfo[];
+  medals: Medals;
+  points: number;
 }
 
 export interface TeamByIdFromServer {
@@ -107,6 +130,28 @@ export interface GroupedMatch {
   matches: TeamMatch[];
 }
 
+export interface MedalWinner {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender?: boolean;
+  height: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  event_id: number;
+  event_name: string;
+  match_id: number;
+  match_name?: string;
+  event_location: string;
+  start_datetime: string;
+  sport_type: string;
+}
+
 export default async function TeamPage({
   params,
 }: {
@@ -117,6 +162,7 @@ export default async function TeamPage({
   const id = params.id;
   const team: TeamByIdFromServer = await getTeam(id, session.token);
   const matches: TeamMatch[] = await getTeamMatches(id);
+  const results: TeamMemberWithResults[] = await getTeamResults(id);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;
@@ -238,6 +284,44 @@ export default async function TeamPage({
 
   const sortedAndGroupedMatches = sortAndGroupMatches(matches);
 
+  function getAthletesByMedal(
+    medal: 'Золото' | 'Серебро' | 'Бронза',
+  ): MedalWinner[] {
+    let res: MedalWinner[] = [];
+    testResults.forEach((athlete) =>
+      athlete.matches_info.forEach((match) => {
+        if (match.medal_type === medal) {
+          res.push({
+            id: athlete.id,
+            sirname: athlete.sirname,
+            name: athlete.name,
+            fathername: athlete.fathername,
+            birthdate: athlete.birthdate,
+            gender: athlete.gender,
+            height: athlete.height,
+            weight: athlete.weight,
+            image_field: athlete.image_field,
+            country: athlete.country,
+            region: athlete.region,
+            city: athlete.city,
+            event_id: match.event_id,
+            event_name: match.event_name,
+            match_id: match.match_id,
+            match_name: match.match_name,
+            event_location: match.event_location,
+            start_datetime: match.start_datetime,
+            sport_type: match.sport_type,
+          });
+        }
+      }),
+    );
+    return res;
+  }
+
+  const goldenMedalWinners = getAthletesByMedal('Золото');
+  const silverMedalWinners = getAthletesByMedal('Серебро');
+  const bronzeMedalWinners = getAthletesByMedal('Бронза');
+
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
       <InfoTeam
@@ -265,7 +349,14 @@ export default async function TeamPage({
         lang={lang}
       />
     ),
-    [TeamTabs['results']]: <Results athletes={members} />,
+    [TeamTabs['results']]: (
+      <Results
+        goldenMedalWinners={goldenMedalWinners}
+        silverMedalWinners={silverMedalWinners}
+        bronzeMedalWinners={bronzeMedalWinners}
+        athletes={testResults}
+      />
+    ),
   };
 
   return (

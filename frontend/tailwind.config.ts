@@ -76,10 +76,11 @@ const config = {
         '2000': '2000ms',
       },
       boxShadow: {
-        basic: '0 5px 36px 0 rgba(0, 0, 0, 0.08)', // still unused
+        basic: '0 5px 36px 0 rgba(0, 0, 0, 0.08)',
         input: '0 1px 0 0 lightgray',
         inputFocused: '0 1.5px 0 0 rgba(15,108,189,1)',
         cardShadow: '0 5px 30px 0 rgba(0, 0, 0, 0.5)',
+        darkCardHover: '0 5px 36px 0 rgba(15, 108, 189, 0.5)',
       },
       borderRadius: {
         lg: 'var(--radius)',
