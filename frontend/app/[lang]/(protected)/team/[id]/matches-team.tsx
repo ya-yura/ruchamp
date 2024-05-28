@@ -38,9 +38,15 @@ export function MatchesField({
     <ul className="flex flex-col gap-10 bg-black px-4 py-8">
       {groupedMatches.map((group) => (
         <li className="flex flex-col gap-3" key={group.event_id}>
-          <H4>
-            {group.start_datetime}, {group.name}, {group.location}
-          </H4>
+          <div className="flex gap-2">
+            <H4>
+              {group.name.endsWith('.') ? group.name.slice(0, -1) : group.name}
+            </H4>
+            <H4 className="font-normal">– {group.start_datetime}.</H4>
+            <H4 className="font-light text-neutralForeground3Rest">
+              {group.location}
+            </H4>
+          </div>
           <MatchesList matches={group.matches} />
         </li>
       ))}
@@ -54,7 +60,6 @@ export function MatchesList({ matches }: { matches: TeamMatch[] }) {
       {matches.map((match) => (
         <MatchCard
           key={match.match_id}
-          name={match.name}
           startTime={match.start_datetime}
           endTime={match.end_datetime}
           sportType={match.sport_type}
@@ -68,7 +73,7 @@ export function MatchesList({ matches }: { matches: TeamMatch[] }) {
 }
 
 interface MatchCardProps {
-  name: string;
+  name?: string;
   startTime: string;
   endTime: string;
   sportType: string;
@@ -93,12 +98,12 @@ export function MatchCard({
           {format(startTime, 'HH:mm')} – {format(endTime, 'HH:mm')}
         </H5>
         <H5 className="truncate text-xl font-normal text-neutralForeground3Rest">
-          {name}
+          {sportType}
         </H5>
       </div>
       <div className="flex flex-col justify-between gap-5 md:flex-row">
         <div className="flex flex-wrap gap-2">
-          <Tag>{sportType}</Tag>
+          {/* <Tag>{sportType}</Tag> */}
           <Tag variant={'transparentAccentBorder'}>
             {gender ? gender : 'Пол не указан'}
           </Tag>

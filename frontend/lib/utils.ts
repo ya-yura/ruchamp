@@ -5,6 +5,7 @@ import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { DateRange } from 'react-day-picker';
 import { Locale, i18n } from '@/i18n.config';
+import { Medals } from '@/app/[lang]/(protected)/team/[id]/page';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,7 +18,7 @@ export function transformDate(inputDate: string, isWithTime?: boolean): string {
   const monthYearFormat =
     currentDate.getFullYear() === parsedDate.getFullYear()
       ? 'MMMM'
-      : 'MMMM yyyy';
+      : 'MMMM yyyy' + ' г.';
   const timeFormat = isWithTime ? ', HH:mm' : '';
   const formattedDate = format(parsedDate, monthYearFormat + timeFormat, {
     locale: ru,
@@ -117,7 +118,7 @@ export function getInitials(firstName: string, lastName: string): string {
   if (!firstName || !lastName) return '';
   const firstInitial = firstName.charAt(0);
   const lastInitial = lastName.charAt(0);
-  return `${firstInitial}${lastInitial}`;
+  return `${lastInitial}${firstInitial}`;
 }
 
 export function filterDuplicates<T extends Record<string, any>>(
