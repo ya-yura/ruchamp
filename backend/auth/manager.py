@@ -141,7 +141,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
         return organizer
-    
+
     async def update_referee_profile(
         self,
         user: User,
