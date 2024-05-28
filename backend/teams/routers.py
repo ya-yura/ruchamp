@@ -490,6 +490,7 @@ async def get_team_matches(
                     MatchAge.age_from.label("age_min"),
                     MatchAge.age_till.label("age_max"),
                     AllWeightClass.name.label("weight_class"),
+                    MatchGender.gender.label("gender"),
                 )
                 .join(Event, Event.id == Match.event_id)
                 .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
@@ -504,6 +505,7 @@ async def get_team_matches(
                 .join(
                     AllWeightClass, AllWeightClass.id == MatchWeights.weight_id
                 )
+                .join(MatchGender, MatchGender.match_id == Match.id)
                 .where(Match.id == match)
             )
             match_info = query.mappings().all()
@@ -563,10 +565,35 @@ async def get_team_results(
             .where(MatchParticipant.player_id == member)
         )
         matches = query.scalars().all()
+        matches_info = []
+        for match in matches:
+            query = await db.execute(
+                select(
+                    Event.id.label("event_id"),
+                    Event.name.label("event_name"),
+                    Event.location.label("event_location"),
+                    Match.id.label("match_id"),
+                    Match.name.label("match_name"),
+                    Match.start_datetime,
+                    SportType.name.label("sport_type"),
+                    Medal.medal_type.label("medal_type"),
+                )
+                .join(Event, Event.id == Match.event_id)
+                .join(MatchSport, MatchSport.match_id == Match.id)
+                .join(SportType, SportType.id == MatchSport.sport_id)
+                .join(MatchParticipant)
+                .join(
+                    WinnerTable, WinnerTable.winner_id == MatchParticipant.id
+                )
+                .join(Medal, Medal.id == WinnerTable.medal)
+                .where(Match.id == match)
+                .where(MatchParticipant.match_id == match)
+                .where(MatchParticipant.player_id == member)
+            )
+            match_info = query.mappings().all()
+            matches_info.append(match_info)
 
-        user_info['matches'] = matches if matches else []
-        if matches is None:
-            raise HTTPException(status_code=404, detail="Matches not found")
+        user_info['matches_info'] = matches_info
 
         # Получаем медали для каждого матча
         total_medals = {
@@ -596,7 +623,7 @@ async def get_team_results(
                 select(WinnerTable.winner_score)
                 .where(WinnerTable.winner_id == participant)
             )
-            scores = query.scalars().one_or_none()
+            scores = query.scalars().first()
             total_points = total_points + int(scores) if scores else 0
 
             for medal_id in medals:
