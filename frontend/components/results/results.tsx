@@ -1,14 +1,23 @@
 'use client';
 
+import Image from 'next/image';
 import { TextCard } from '@/components/cards/text-card';
 import { ModeSwither } from '../mode-switcher';
 import { useState } from 'react';
-import Image from 'next/image';
 import { H4, PersonDescriptionOnCard } from '../text';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { getInitials } from '@/lib/utils';
+import { AthleteCard } from '../cards/athlete-card';
+import {
+  TeamMember,
+  TeamMemberWithResults,
+} from '@/app/[lang]/(protected)/team/[id]/page';
 
-export function Results() {
+interface ResultsProps {
+  athletes: TeamMemberWithResults[];
+}
+
+export function Results({ athletes }: ResultsProps) {
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
     <div
@@ -24,23 +33,27 @@ export function Results() {
         setIsOnMode={setIsMedalMode}
         isOnMode={isMedalMode}
       />
-      <ul className="flex w-full justify-between">
-        <WinnersList athletes={[]} medal={'gold'} />
-        <WinnersList athletes={[]} medal={'silver'} />
-        <WinnersList athletes={[]} medal={'bronze'} />
-      </ul>
+      {isMedalMode ? (
+        <ul className="flex w-full justify-between">
+          <WinnersList athletes={[]} medal={'gold'} />
+          <WinnersList athletes={[]} medal={'silver'} />
+          <WinnersList athletes={[]} medal={'bronze'} />
+        </ul>
+      ) : (
+        <AthleteListByPoints athletes={[]} />
+      )}
     </div>
   );
 }
 
 interface WinnersListProps {
-  athletes: any; // fix "any",
+  athletes: TeamMemberWithResults[];
   medal: 'gold' | 'silver' | 'bronze';
 }
 
-export function WinnersList({ athletes, medal }: WinnersListProps) {
+function WinnersList({ athletes, medal }: WinnersListProps) {
   return (
-    <li>
+    <li className="flex flex-col items-center gap-7">
       <Image
         src={`/images/medals/${medal}.svg`}
         alt=""
@@ -65,7 +78,7 @@ interface AthleteCardSmallProps {
   fathername: string;
 }
 
-export function AthleteCardSmall() {
+function AthleteCardSmall() {
   return (
     <TextCard className="relative cursor-default flex-col gap-4 transition-colors hover:bg-card-hoverGray sm:flex-row lg:px-4 lg:py-3">
       <div className="flex w-full flex-row-reverse justify-between gap-4 sm:w-2/3 sm:flex-row sm:justify-start xl:items-center">
@@ -91,5 +104,31 @@ export function AthleteCardSmall() {
         </div>
       </div>
     </TextCard>
+  );
+}
+
+function AthleteListByPoints({
+  athletes,
+}: {
+  athletes: WinnersListProps['athletes'];
+}) {
+  return (
+    <ul>
+      {athletes.map((athlete) => (
+        <AthleteCard
+          key={athlete.id}
+          id={athlete.id}
+          sirname={athlete.sirname}
+          name={athlete.name}
+          fathername={athlete.fathername}
+          birthdate={athlete.birthdate}
+          city={athlete.city}
+          country={athlete.country}
+          region={athlete.region}
+          image_field={athlete.image_field}
+          weight={athlete.weight}
+        />
+      ))}
+    </ul>
   );
 }

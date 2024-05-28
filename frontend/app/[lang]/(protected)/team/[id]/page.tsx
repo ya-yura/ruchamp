@@ -16,6 +16,7 @@ import {
 import { testMatches, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { Results } from '@/components/results/results';
+import { inter } from '@/app/[lang]/ui/fonts';
 
 export interface ValueOption {
   value: string | number[];
@@ -68,6 +69,10 @@ export interface TeamMember {
   sport_types: string[];
   grade_types: string[];
   coaches: Coach[];
+}
+
+export interface TeamMemberWithResults extends Omit<TeamMember, 'coaches'> {
+  medals: string;
 }
 
 export interface TeamByIdFromServer {
@@ -260,7 +265,7 @@ export default async function TeamPage({
         lang={lang}
       />
     ),
-    [TeamTabs['results']]: <Results />,
+    [TeamTabs['results']]: <Results athletes={members} />,
   };
 
   return (
