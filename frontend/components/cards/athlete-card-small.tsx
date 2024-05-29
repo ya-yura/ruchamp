@@ -1,4 +1,4 @@
-import { MedalWinner } from '@/app/[lang]/(protected)/team/[id]/page';
+import { MedalWinner } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import {
   calculateAge,
   getInitials,

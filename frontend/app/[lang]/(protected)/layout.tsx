@@ -4,7 +4,7 @@ import { Header } from '../../../components/header/header';
 import { Footer } from '../../../components/footer/footer';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/actions';
-import { getInitials } from '@/lib/utils';
+import { getInitials, path } from '@/lib/utils';
 
 export default async function ProtectedLayout({
   children,
@@ -31,7 +31,7 @@ export default async function ProtectedLayout({
   }
 
   if (!session) {
-    redirect('/');
+    redirect(path(params.lang, '/login'));
   }
 
   return (

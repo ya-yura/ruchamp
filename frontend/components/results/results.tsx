@@ -8,7 +8,7 @@ import { AthleteCard } from '../cards/athlete-card';
 import {
   MedalWinner,
   TeamMemberWithResults,
-} from '@/app/[lang]/(protected)/team/[id]/page';
+} from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { AthleteCardSmall } from '../cards/athlete-card-small';
 
 interface WinnersListProps {

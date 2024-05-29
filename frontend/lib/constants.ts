@@ -2,8 +2,9 @@ import {
   TeamByIdFromServer,
   TeamMatch,
   TeamMemberWithResults,
-} from '@/app/[lang]/(protected)/team/[id]/page';
+} from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { Event } from './definitions';
+import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 
 export const sportTypes: string[] = [
   'Кикбоксинг',
@@ -159,6 +160,50 @@ export const testData: Event[] = [
     image_field: 'https://example.com/image5.jpg',
     sports_in_matches: ['Айкидо', 'Кайдо', 'Каратэномичи'],
   },
+];
+
+export const testTeamInTeams: TeamDataFromServer = [
+  {
+    id: 0,
+    name: 'Тестовая команда',
+    description:
+      'Описание тестовой команды: четко увеличиваться эффект пропадать зато.',
+    slug: '',
+    invite_link: '2b806bdf-49b3-48c3-ba17-dee2637294ed',
+    image_field: 'https://picsum.photos/374/586',
+    country: 1,
+    city: 'г. Ноглики',
+    region: 8,
+  },
+  {
+    sirname: 'Наумова',
+    name: 'Филипп',
+    fathername: 'Федор',
+  },
+  [
+    [
+      {
+        sirname: 'Наумова',
+        name: 'Филипп',
+        fathername: 'Федор',
+        birthdate: '2020-11-10',
+        gender: true,
+      },
+      {
+        height: 132,
+        weight: 127.0,
+        country: 3,
+        region: 17,
+        city: 'д. Ессентуки',
+      },
+      [
+        'Самбо',
+        'Спортивный ножевой бой',
+        'Практическая стрельба',
+        'Спортивное метание ножа',
+      ],
+    ],
+  ],
 ];
 
 export const testTeam: TeamByIdFromServer = {
