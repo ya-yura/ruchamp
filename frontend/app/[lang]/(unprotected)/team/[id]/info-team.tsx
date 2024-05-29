@@ -21,7 +21,7 @@ interface InfoTeamProps {
 export function InfoTeam({ teamInfo, captain, coaches, lang }: InfoTeamProps) {
   return (
     <TextCardFieldWithTwoLists
-      firstList={<MainTeamInfo teamInfo={teamInfo} />}
+      firstList={<MainTeamInfo desription={teamInfo.description} />}
       secondList={<CaptainAndCoaches captain={captain} coaches={coaches} />}
     />
   );
@@ -89,10 +89,10 @@ function CaptainAndCoaches({
   );
 }
 
-function MainTeamInfo({ teamInfo }: { teamInfo: TeamInfo }) {
+function MainTeamInfo({ desription }: { desription: TeamInfo['description'] }) {
   return (
     <>
-      <TextCard title={'Подзаголовок 1'} text={teamInfo.description} />
+      <TextCard title={'Подзаголовок 1'} text={desription} />
       <TextCard title={'Подзаголовок 2'} text={`Наш капитан - лучший!!!`} />
       <TextCard title={'Подзаголовок 3'} text={`Обожаем наших тренеров!`} />
     </>

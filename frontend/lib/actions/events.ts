@@ -1,3 +1,5 @@
+'use server';
+
 import { Event } from '../definitions';
 import { checkResponse } from '../utils';
 

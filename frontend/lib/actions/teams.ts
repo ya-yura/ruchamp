@@ -1,3 +1,5 @@
+'use server';
+
 import { checkResponse } from '../utils';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
