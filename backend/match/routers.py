@@ -580,7 +580,7 @@ async def post_matchs_results(
     return {"ok"}'''
 
 
-@router.post("/matchs-results/{match_id}")
+@router.post("/matchs-results/{match_id}/random")
 async def post_matchs_results_medal(
     match_id: int,
     db: AsyncSession = Depends(get_db)

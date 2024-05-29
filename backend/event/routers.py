@@ -305,7 +305,7 @@ async def delete_event(
 
 
 @router.get("/{event_id}/matches")
-async def get_participants(
+async def get_matches(
     event_id: int,
     db: AsyncSession = Depends(get_db)
 ):
@@ -528,65 +528,69 @@ async def create_match(
 
     nominal_time = match_nominal_time * 60
 
-    new_match = Match(
-        name=match_data.name,
-        event_id=event_id,
-        combat_type_id=match_category_type_id,
-        start_datetime=match_data.start_datetime,
-        nominal_time=nominal_time,
-        mat_vol=match_data.mat_vol,
-        end_datetime=match_data.start_datetime+timedelta(
-            seconds=nominal_time
+    if match_data.age_min == 0 or match_data.age_max == 0:
+        raise HTTPException(status_code=400, detail="Age is not set")
+    elif match_data.weight == 0:
+        raise HTTPException(status_code=400, detail="Weight is not set")
+    else:
+        new_match = Match(
+            name=match_data.name,
+            event_id=event_id,
+            combat_type_id=match_category_type_id,
+            start_datetime=match_data.start_datetime,
+            nominal_time=nominal_time,
+            mat_vol=match_data.mat_vol,
+            end_datetime=match_data.start_datetime+timedelta(
+                seconds=nominal_time
+            )
         )
-    )
-    db.add(new_match)
-    await db.commit()
+        db.add(new_match)
+        await db.commit()
 
-    match_sport = MatchSport(
-        match_id=new_match.id,
-        sport_id=match_sport_type_id
-    )
-    db.add(match_sport)
+        match_sport = MatchSport(
+            match_id=new_match.id,
+            sport_id=match_sport_type_id
+        )
+        db.add(match_sport)
 
-    match_weight = MatchWeights(
-        match_id=new_match.id,
-        weight_id=match_weights_id
+        match_weight = MatchWeights(
+            match_id=new_match.id,
+            weight_id=match_weights_id
+        )
+        db.add(match_weight)
 
-    )
-    db.add(match_weight)
+        match_age = MatchAge(
+            match_id=new_match.id,
+            age_from=match_data.age_min,
+            age_till=match_data.age_max
+        )
+        db.add(match_age)
 
-    match_age = MatchAge(
-        match_id=new_match.id,
-        age_from=match_data.age_min,
-        age_till=match_data.age_max
-    )
-    db.add(match_age)
+        match_category = MatchCategory(
+            match_id=new_match.id,
+            category_id=match_grade_id
+        )
+        db.add(match_category)
 
-    match_category = MatchCategory(
-        match_id=new_match.id,
-        category_id=match_grade_id
-    )
-    db.add(match_category)
+        match_gender = MatchGender(
+            match_id=new_match.id,
+            gender=match_gender
+        )
+        db.add(match_gender)
 
-    match_gender = MatchGender(
-        match_id=new_match.id,
-        gender=match_gender
-    )
-    db.add(match_gender)
+        match_athlete_price = Engagement(
+            match_id=new_match.id,
+            price=match_data.price_athlete
+        )
+        db.add(match_athlete_price)
 
-    match_athlete_price = Engagement(
-        match_id=new_match.id,
-        price=match_data.price_athlete
-    )
-    db.add(match_athlete_price)
+        match_spectator_price = Ticket(
+            match_id=new_match.id,
+            price=match_data.price
+        )
+        db.add(match_spectator_price)
 
-    match_spectator_price = Ticket(
-        match_id=new_match.id,
-        price=match_data.price
-    )
-    db.add(match_spectator_price)
-
-    await db.commit()
+        await db.commit()
 
     return {f"Match ID {new_match.id} - created"}
 
@@ -688,6 +692,47 @@ async def create_tournament_application_team(
     db.refresh(application)
 
     return {f"Application ID - {application.id} created"}
+
+
+@router.post("/tournament-applications-athlete/create")
+async def create_tournament_application_athlete(
+    tournament_application_athlete_data: CreateTournamentApplicationAthlete,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    query = await db.execute(select(User.id).where(User.id == current_user.id))
+    user_id = query.scalars().first()
+    if user_id is None:
+        raise HTTPException(status_code=400, detail="You are not registered ")
+
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    if athlete_id is None:
+        raise HTTPException(
+            status_code=400, detail="You are not registered as an athlete"
+        )
+
+    query = await db.execute(select(Match.id).where(
+        Match.id == tournament_application_athlete_data.match_id
+    ))
+    match_id = query.scalars().first()
+
+    if match_id is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    application = TournamentApplication(
+        team_id=0,
+        **tournament_application_athlete_data.dict()
+    )
+    db.add(application)
+    await db.commit()
+    db.refresh(application)
+
+    return {f"Application ID - {application.id} created"}
+
 
 
 @router.put("/tournament-applications/{application_id}/update")
