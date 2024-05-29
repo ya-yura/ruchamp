@@ -344,7 +344,6 @@ async def get_all_teams(
 @router.get("/get-team/{team_id}")
 async def get_team(
     team_id: int,
-    current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
     query = await db.execute(select(Team.captain).where(Team.id == team_id))
