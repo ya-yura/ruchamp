@@ -1,12 +1,7 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import {
-  getSession,
-  getTeam,
-  getTeamMatches,
-  getTeamResults,
-} from '@/lib/actions';
+import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
