@@ -74,6 +74,7 @@ async def get_all_participants(
                     Athlete.weight.label("weight"),
                     CategoryType.name.label("grade"),
                     User.gender.label("gender"),
+                    Athlete.image_field,
                 )
                 .join(Athlete, Athlete.user_id == User.id)
                 .join(MatchParticipant)
