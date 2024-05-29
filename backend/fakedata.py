@@ -71,7 +71,7 @@ regions_data = {
         {"name": "Сибирский федеральный округ"},
         {"name": "Дальневосточный федеральный округ"}
     ],
-    "Белоруссия": [
+    "Беларусь": [
         {"name": "Брестская область"},
         {"name": "Витебская область"},
         {"name": "Гомельская область"},
@@ -931,29 +931,29 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-# generate_fake_countries(session)
-# generate_fake_roles(session)
+generate_fake_countries(session)
+generate_fake_roles(session)
 
-# generate_fake_combat_types(session)
-# generate_fake_category_types(session)
-# generate_fake_sport_types(session)
-# generate_fake_weight_classes(session)
-# generate_fake_referee_types(session)
-# generate_fake_coach_types(session)
+generate_fake_combat_types(session)
+generate_fake_category_types(session)
+generate_fake_sport_types(session)
+generate_fake_weight_classes(session)
+generate_fake_referee_types(session)
+generate_fake_coach_types(session)
 
-# generate_fake_users(session, num_users)
-# generate_fake_coaches(session)
-# generate_fake_referees(session)
-# generate_fake_athletes(session)
-# generate_fake_event_organizers(session)
-# generate_fake_spectators(session)
-# generate_fake_system_administrators(session)
+generate_fake_users(session, num_users)
+generate_fake_coaches(session)
+generate_fake_referees(session)
+generate_fake_athletes(session)
+generate_fake_event_organizers(session)
+generate_fake_spectators(session)
+generate_fake_system_administrators(session)
 
 generate_fake_teams_0(session)
-# generate_fake_teams(session)
-# generate_fake_team_member(session)
+generate_fake_teams(session)
+generate_fake_team_member(session)
 
-# generate_fake_events(session)
+generate_fake_events(session)
 # generate_event_w_s_for_each(session)
 # generate_fake_participants(session)
 # generate_fake_matches(session)
