@@ -79,14 +79,8 @@ export async function getTeams() {
   return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
 }
 
-export async function getTeam(id: string, token: string) {
-  return fetch(`${baseUrl}/team/get-team/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  })
+export async function getTeam(id: string) {
+  return fetch(`${baseUrl}/team/get-team/${id}`, {})
     .then(checkResponse)
     .catch((err) => {
       console.log('getTeam error', err);

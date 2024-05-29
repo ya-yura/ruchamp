@@ -157,10 +157,9 @@ export default async function TeamPage({
 }: {
   params: { id: string; lang: Locale };
 }) {
-  const session = await getSession();
   const lang = params.lang;
   const id = params.id;
-  const team: TeamByIdFromServer = await getTeam(id, session.token);
+  const team: TeamByIdFromServer = await getTeam(id);
   const matches: TeamMatch[] = await getTeamMatches(id);
   const results: TeamMemberWithResults[] = await getTeamResults(id);
   const teamInfo = team.Team;
