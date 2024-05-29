@@ -1,12 +1,7 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import {
-  getSession,
-  getTeam,
-  getTeamMatches,
-  getTeamResults,
-} from '@/lib/actions';
+import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
@@ -157,10 +152,9 @@ export default async function TeamPage({
 }: {
   params: { id: string; lang: Locale };
 }) {
-  const session = await getSession();
   const lang = params.lang;
   const id = params.id;
-  const team: TeamByIdFromServer = await getTeam(id, session.token);
+  const team: TeamByIdFromServer = await getTeam(id);
   const matches: TeamMatch[] = await getTeamMatches(id);
   const results: TeamMemberWithResults[] = await getTeamResults(id);
   const teamInfo = team.Team;

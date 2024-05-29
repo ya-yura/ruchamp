@@ -11,6 +11,7 @@ import {
 import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
 import { getTeams } from '@/lib/actions';
+import { testTeamInTeams } from '@/lib/constants';
 
 interface TeamInfo {
   id: number;
@@ -71,50 +72,6 @@ export type TeamDataFromServer = [
   [MemberPersonalInfo, MemberAthleteInfo, MemberSportTypes][],
 ];
 
-const testTeamInTeams: TeamDataFromServer = [
-  {
-    id: 0,
-    name: 'Тестовая команда',
-    description:
-      'Описание тестовой команды: четко увеличиваться эффект пропадать зато.',
-    slug: '',
-    invite_link: '2b806bdf-49b3-48c3-ba17-dee2637294ed',
-    image_field: 'https://picsum.photos/374/586',
-    country: 1,
-    city: 'г. Ноглики',
-    region: 8,
-  },
-  {
-    sirname: 'Наумова',
-    name: 'Филипп',
-    fathername: 'Федор',
-  },
-  [
-    [
-      {
-        sirname: 'Наумова',
-        name: 'Филипп',
-        fathername: 'Федор',
-        birthdate: '2020-11-10',
-        gender: true,
-      },
-      {
-        height: 132,
-        weight: 127.0,
-        country: 3,
-        region: 17,
-        city: 'д. Ессентуки',
-      },
-      [
-        'Самбо',
-        'Спортивный ножевой бой',
-        'Практическая стрельба',
-        'Спортивное метание ножа',
-      ],
-    ],
-  ],
-];
-
 export default async function Teams({
   params: { lang },
 }: {
@@ -169,7 +126,7 @@ export default async function Teams({
 
   try {
     const teamData: TeamDataFromServer[] = await getTeams();
-    teams = [testTeamInTeams, ...teamData].map(transformTeamData);
+    teams = [...teamData].map(transformTeamData); // remove sreading after tests
     updateRanges(teams, weightRange, 'weights');
     updateRanges(teams, ageRange, 'ages');
   } catch (err) {

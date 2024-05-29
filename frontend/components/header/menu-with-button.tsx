@@ -24,24 +24,19 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
       url: '/events',
     },
     {
-      icon: <HomeIcon className="fill-[#E0E0E0]" />,
-      text: 'Пятое',
-      url: '/',
+      icon: <ListIcon className="fill-[#E0E0E0]" />,
+      text: 'Команды',
+      url: '/teams',
     },
     {
-      icon: <HomeIcon className="fill-[#E0E0E0]" />,
-      text: 'Десятое',
-      url: '/',
-    },
-    {
-      icon: <HomeIcon className="fill-[#E0E0E0]" />,
+      icon: <ListIcon className="fill-[#E0E0E0]" />,
       text: 'Общее',
       url: '/',
     },
   ];
   const menuAdditional: TypeMenuItem[] = [
     {
-      icon: <HomeIcon className="fill-[#E0E0E0]" />,
+      icon: <ListIcon className="fill-[#E0E0E0]" />,
       text: 'Профиль',
       url: '/profile',
     },
@@ -51,7 +46,7 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
       url: '/events',
     },
     {
-      icon: <HomeIcon className="fill-[#E0E0E0]" />,
+      icon: <ListIcon className="fill-[#E0E0E0]" />,
       text: 'Прочее',
       url: '/',
     },

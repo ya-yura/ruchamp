@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Medals, TeamMember } from '@/app/[lang]/(protected)/team/[id]/page';
+import { Medals, TeamMember } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { calculateAge, getInitials, getRussianAgeWord } from '@/lib/utils';
