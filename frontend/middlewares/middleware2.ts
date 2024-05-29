@@ -1,7 +1,7 @@
 // withUpdateSessionMiddleware should be the last because it returns not a middleware
 import { NextRequest, NextFetchEvent, NextResponse } from 'next/server';
-import { updateSession } from '@/lib/actions';
 import { CustomMiddleware } from './chain';
+import { updateSession } from '@/lib/actions/auth';
 
 export function withUpdateSessionMiddleware(): CustomMiddleware {
   return async (

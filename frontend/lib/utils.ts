@@ -164,3 +164,15 @@ export function defineDefaultRange(range: number[]): number[] {
   const middle = (start + end) / 2;
   return [Math.floor((start + middle) / 2), Math.ceil((end + middle) / 2)];
 }
+
+export function sortedEventsByDate(events: Event[]) {
+  return events.sort((a, b) => {
+    const dateA = new Date(a.start_datetime);
+    const dateB = new Date(b.start_datetime);
+    return dateA.getTime() - dateB.getTime();
+  });
+}
+
+export function checkResponse(res: any) {
+  return res.ok ? res.json() : Promise.reject(res.status);
+}

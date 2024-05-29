@@ -10,8 +10,8 @@ import {
 } from '@/lib/utils';
 import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
-import { getTeams } from '@/lib/actions';
 import { testTeamInTeams } from '@/lib/constants';
+import { getTeams } from '@/lib/actions/teams';
 
 interface TeamInfo {
   id: number;

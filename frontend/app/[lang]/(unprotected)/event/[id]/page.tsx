@@ -2,7 +2,6 @@ import { AddressSection } from './address-section';
 import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
-import { eventsApi } from '@/lib/api/eventsApi';
 import { Event, EventTabs } from '@/lib/definitions';
 import { getRandomInt } from '@/lib/utils';
 import { testData } from '@/lib/constants';
@@ -13,6 +12,7 @@ import { Grid } from './grid';
 import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
 import { Locale } from '@/i18n.config';
+import { getEvent, getEvents } from '@/lib/actions/events';
 
 export default async function EventPage({
   params,
@@ -23,16 +23,13 @@ export default async function EventPage({
   const id = params.id;
   let events: Event[];
   let expectedEvents: Event[];
-  const event: Event =
-    +id > 1000000
-      ? (testData.find((event) => event.id === +id) as Event)
-      : await eventsApi.getEvent(id);
+  const event: Event = await getEvent(id);
   const randomInt = getRandomInt(100);
 
   try {
-    events = await eventsApi.getEvents();
+    events = await getEvents();
   } catch (err) {
-    console.log('error', err);
+    console.log('Error while loading event info', err);
     events = [];
   }
 

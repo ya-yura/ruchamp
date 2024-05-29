@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container } from '@/components/container';
 import { PageWithInfo } from '@/components/page-with-info';
-import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
@@ -16,6 +15,7 @@ import {
 import { testMatches, testResults, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { Results } from '@/components/results/results';
+import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions/teams';
 
 export interface ValueOption {
   value: string | number[];

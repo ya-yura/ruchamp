@@ -44,7 +44,7 @@ export function EventsTabs({
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  //dictionary
+  // For dictionary
   const labels = {
     [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
     [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,

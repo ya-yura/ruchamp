@@ -1,5 +1,7 @@
+// May be deleted later
+
 import { Event, HttpRequest } from '../definitions';
-import { checkResponse } from './auth';
+import { checkResponse } from '../utils';
 
 class EventsApi {
   private baseUrl: string;
