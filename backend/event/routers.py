@@ -160,22 +160,24 @@ async def get_events_id(
         select(Match.id).where(Match.event_id == event_id)
     )
     matches_id = query.scalars().all()
+    print(matches_id)
     sports_in_matches_info = []
     for match_id in matches_id:
         query = await db.execute(
-            select(MatchSport.id)
+            select(MatchSport.sport_id)
             .where(MatchSport.match_id == match_id)
         )
         match_sport_id = query.scalars().all()
+        print(match_sport_id)
         for sport_id in match_sport_id:
             query = await db.execute(
                 select(SportType.name).where(SportType.id == sport_id)
             )
             sport_name = query.scalars().first()
             sports_in_matches_info.append(sport_name)
-
+    sports_in_matches_info_unique = list(set(sports_in_matches_info))
     event_result = {k: v for k, v in event.items()}
-    event_result["sports_in_matches"] = sports_in_matches_info
+    event_result["sports_in_matches"] = sports_in_matches_info_unique
     result.append(event_result)
 
     return result
