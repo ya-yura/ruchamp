@@ -4,12 +4,12 @@ import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
 import { EventTabs } from '@/lib/definitions';
 import { testData } from '@/lib/constants';
-import { Matches } from './matches';
+import { MatchesEvent } from './matches-event';
 import { Grid } from './grid';
 import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
 import { Locale } from '@/i18n.config';
-import { getEvent, getEvents } from '@/lib/actions/events';
+import { getEvent, getEventMatches, getEvents } from '@/lib/actions/events';
 import { H4 } from '@/components/text';
 import { InfoEvent } from './info-event';
 import { getMatchesParticipants } from '@/lib/actions/matches';
@@ -34,15 +34,27 @@ export interface Participant
   grade: string;
 }
 
+export interface EventMatch {
+  id: number;
+  name: string;
+  start_datetime: string;
+  end_datetime: string;
+  sport_name: string;
+  gender: boolean;
+  weight_category: string;
+  category_type: string;
+}
+
 async function fetchEventData(eventId: string) {
   try {
     const event = await getEvent(eventId);
     const events = await getEvents();
     const participants = await getMatchesParticipants(eventId);
-    return { event, events, participants };
+    const matches = await getEventMatches(eventId);
+    return { event, events, participants, matches };
   } catch (error) {
     console.error('Error fetching event data:', error);
-    return { event: null, events: [], participants: [] };
+    return { event: null, events: [], participants: [], matches: [] };
   }
 }
 
@@ -53,7 +65,7 @@ export default async function EventPage({
 }) {
   const { id, lang } = params;
   const randomInt = getRandomInt(100);
-  const { event, events, participants } = await fetchEventData(id);
+  const { event, events, participants, matches } = await fetchEventData(id);
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
   const weights = participants
     .map((participant) => participant.weight)
@@ -104,7 +116,7 @@ export default async function EventPage({
         lang={lang}
       />
     ),
-    [EventTabs['matches']]: <Matches />,
+    [EventTabs['matches']]: <MatchesEvent matches={matches} />,
     [EventTabs['grid']]: <Grid />,
     [EventTabs['results']]: <Results />,
   };
@@ -115,7 +127,7 @@ export default async function EventPage({
         id={event.id}
         type="event"
         title={event.name}
-        bages={['Убрать', 'Этот', 'Хардкод']}
+        bages={event.sports_in_matches}
         buttons={<EventActionButtons />}
         tabsContent={tabsContent}
         tabsObj={EventTabs}
