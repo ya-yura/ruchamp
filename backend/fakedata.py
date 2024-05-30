@@ -967,8 +967,8 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_team_member(session)
 
 # generate_fake_events(session)
-# generate_fake_matches(session)
-# generate_fake_matches_info(session)
+generate_fake_matches(session)
+generate_fake_matches_info(session)
 generate_fake_match_participants(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)

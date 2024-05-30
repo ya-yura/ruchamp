@@ -69,6 +69,8 @@ async def get_all_participants(
     db: AsyncSession = Depends(get_db)
 ):
     result = []
+    unique_users = set()
+
     query = await db.execute(select(Match.id).where(Match.event_id == event_id))
     matches = query.scalars().all()
     if matches is None:
@@ -88,34 +90,37 @@ async def get_all_participants(
             )
             user_id = query.scalars().first()
 
-            query = await db.execute(
-                select(
-                    User.id.label("user_id"),
-                    User.name,
-                    User.sirname,
-                    User.fathername,
-                    Athlete.country.label("country"),
-                    Athlete.region.label("region"),
-                    Athlete.city.label("city"),
-                    Team.name.label("team"),
-                    User.birthdate,
-                    Athlete.weight.label("weight"),
-                    CategoryType.name.label("grade"),
-                    User.gender.label("gender"),
-                    Athlete.image_field,
+            if user_id not in unique_users:
+                query = await db.execute(
+                    select(
+                        User.id.label("user_id"),
+                        User.name,
+                        User.sirname,
+                        User.fathername,
+                        Athlete.country.label("country"),
+                        Athlete.region.label("region"),
+                        Athlete.city.label("city"),
+                        Team.name.label("team"),
+                        User.birthdate,
+                        Athlete.weight.label("weight"),
+                        CategoryType.name.label("grade"),
+                        User.gender.label("gender"),
+                        Athlete.image_field,
+                    )
+                    .join(Athlete, Athlete.user_id == User.id)
+                    .join(MatchParticipant)
+                    .join(Team, Team.id == MatchParticipant.team_id)
+                    .join(MatchCategory, MatchCategory.match_id == match)
+                    .join(
+                        CategoryType,
+                        CategoryType.id == MatchCategory.category_id
+                    )
+                    .where(User.id == user_id)
                 )
-                .join(Athlete, Athlete.user_id == User.id)
-                .join(MatchParticipant)
-                .join(Team, Team.id == MatchParticipant.team_id)
-                .join(MatchCategory, MatchCategory.match_id == match)
-                .join(
-                    CategoryType,
-                    CategoryType.id == MatchCategory.category_id
-                )
-                .where(User.id == user_id))
-            users_info = query.mappings().all()
+                users_info = query.mappings().all()
 
-            result.append(users_info[0])
+                result.append(users_info[0])
+                unique_users.add(user_id)
 
     return result
 
