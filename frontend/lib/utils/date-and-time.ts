@@ -1,4 +1,12 @@
-import { format, isPast, parseISO, differenceInYears, parse } from 'date-fns';
+import {
+  format,
+  isPast,
+  parseISO,
+  differenceInYears,
+  parse,
+  isToday,
+  isFuture,
+} from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Event } from '../definitions';
 import { DateRange } from 'react-day-picker';
@@ -36,6 +44,22 @@ export function divideEventsByDateTime(events: Event[]): {
   });
 
   return { futureEvents, pastEvents };
+}
+
+export function determineDateStatus(
+  dateStr: string,
+): 'past' | 'present' | 'future' {
+  const date = parseISO(dateStr);
+
+  if (isToday(date)) {
+    return 'present';
+  } else if (isPast(date)) {
+    return 'past';
+  } else if (isFuture(date)) {
+    return 'future';
+  }
+  // In theory, we shouldn't reach this point because isPast and isFuture should cover all cases.
+  throw new Error('Unexpected date comparison result');
 }
 
 export function isCurrentYear(date: Date): boolean {
