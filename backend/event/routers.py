@@ -83,10 +83,13 @@ async def get_events(
                 )
                 sport_name = query.scalars().first()
                 sports_in_matches_info.append(sport_name)
+                unique_sports_in_matches_info = list(
+                    set(sports_in_matches_info)
+                )
 
         event_result = {k: v for k, v in event.items()}
 
-        event_result["sports_in_matches"] = sports_in_matches_info
+        event_result["sports_in_matches"] = unique_sports_in_matches_info
         result.append(event_result)
 
     return result
@@ -329,7 +332,7 @@ async def get_matches(
                 Match.end_datetime,
                 SportType.name.label("sport_name"),
                 MatchGender.gender.label("gender"),
-                AllWeightClass.name.label("weigth_category"),
+                AllWeightClass.name.label("weight_category"),
                 CategoryType.name.label("category_type"),
             )
             .join(CombatType, CombatType.id == Match.combat_type_id)

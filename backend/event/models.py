@@ -196,6 +196,9 @@ class FightWinner(Base):
     __tablename__ = "FightWinner"
     id = Column(Integer, primary_key=True)
     fight_id = Column(Integer, ForeignKey(Fight.id, ondelete="CASCADE"))
+
+    # Добавить пункт для ничьей (draw = bool)
+
     winner_score = Column(Integer, nullable=False)
     loser_score = Column(Integer, nullable=False)
 

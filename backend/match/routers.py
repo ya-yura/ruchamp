@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 import random
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,7 +14,8 @@ from connection import get_db
 from event.models import (Event, EventOrganizer, Match, MatchAge,
                           MatchGender, MatchSport, MatchWeights,
                           MatchResult, MatchParticipant, CombatType,
-                          MatchCategory, Medal, WinnerTable)
+                          MatchCategory, Medal, WinnerTable, Fight, FightCounter,
+                          FightReferee, FightWinner)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
 from match.schemas import MatchDB
 from match.utils import pairs_generator, split_pairs
@@ -24,7 +25,7 @@ from teams.schemas import Participant
 router = APIRouter(prefix="/matches", tags=["Matches"])
 
 
-@router.post("/add-participant")
+'''@router.post("/add-participant")
 async def add_participant(
     participant: Participant,
     db: AsyncSession = Depends(get_db),
@@ -32,7 +33,34 @@ async def add_participant(
     new_participant = MatchParticipant(**participant.dict())
     db.add(new_participant)
     await db.commit()
-    return {f"Participant ID - {participant.player_id} added"}
+    return {f"Participant ID - {participant.player_id} added"}'''
+
+
+@router.post("/draw-participants")
+async def draw_participants(
+    match_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(MatchParticipant.id).where(MatchParticipant.match_id == match_id))
+    participants = query.scalars().all()
+    pairs = split_pairs(participants)
+    i = 1
+    for pair in pairs:
+        query = await db.execute(select(Match).where(Match.id == match_id).where(MatchParticipant.id == pair[0]))
+        match = query.scalars().first()
+        new_fight = Fight(
+            start_datetime=match.start_datetime,
+            end_datetime=match.start_datetime+timedelta(seconds=match.nominal_time),
+            player_one=pair[0],
+            player_two=pair[1],
+            mat=i,
+            round=1
+        )
+        db.add(new_fight)
+        await db.commit()
+        i += 1
+
+    return {"ok"}
 
 
 @router.get("/{event_id}/all-participants")
@@ -581,7 +609,7 @@ async def post_matchs_results(
     return {"ok"}'''
 
 
-@router.post("/matchs-results/{match_id}/random")
+'''@router.post("/matchs-results/{match_id}/random")
 async def post_matchs_results_medal(
     match_id: int,
     db: AsyncSession = Depends(get_db)
@@ -607,6 +635,5 @@ async def post_matchs_results_medal(
         i += 1
         db.add(new_winer)
         await db.commit()
-       
 
-    return {"ok"}
+    return {"ok"}'''
