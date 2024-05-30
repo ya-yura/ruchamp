@@ -134,3 +134,114 @@ for pair in pairs_group_a:
 print("\nПары группы B:")
 for pair in pairs_group_b:
     print(f"Пара: {pair[0]} против {pair[1]}")
+
+
+
+@router.get("/{event_id}/all-participants")
+async def get_all_participants(
+    event_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    result = []
+    query = await db.execute(select(Match.id).where(Match.event_id == event_id))
+    matches = query.scalars().all()
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    for match in matches:
+
+        query = await db.execute(
+            select(MatchParticipant.player_id)
+            .where(MatchParticipant.match_id == match)
+        )
+        participants = query.scalars().all()
+
+        for athelete_id in participants:
+            query = await db.execute(
+                select(Athlete.user_id).where(Athlete.id == athelete_id)
+            )
+            user_id = query.scalars().first()
+
+            query = await db.execute(
+                select(
+                    User.id.label("user_id"),
+                    User.name,
+                    User.sirname,
+                    User.fathername,
+                    Athlete.country.label("country"),
+                    Athlete.region.label("region"),
+                    Athlete.city.label("city"),
+                    Team.name.label("team"),
+                    User.birthdate,
+                    Athlete.weight.label("weight"),
+                    CategoryType.name.label("grade"),
+                    User.gender.label("gender"),
+                    Athlete.image_field,
+                )
+                .join(Athlete, Athlete.user_id == User.id)
+                .join(MatchParticipant)
+                .join(Team, Team.id == MatchParticipant.team_id)
+                .join(MatchCategory, MatchCategory.match_id == match)
+                .join(
+                    CategoryType,
+                    CategoryType.id == MatchCategory.category_id
+                )
+                .where(User.id == user_id))
+            users_info = query.mappings().all()
+
+            result.append(users_info[0])
+
+    return result
+
+
+
+[
+  {
+    "user_id": 343
+  },
+  {
+    "user_id": 343
+  },
+  {
+    "user_id": 827
+  },
+  {
+    "user_id": 605
+  },
+  {
+    "user_id": 343
+  },
+  {
+    "user_id": 343
+  },
+  {
+    "user_id": 827
+  },
+  {
+    "user_id": 827
+  },
+  {
+    "user_id": 827
+  },
+  {
+    "user_id": 923
+  },
+  {
+    "user_id": 185
+  },
+  {
+    "user_id": 251
+  },
+  {
+    "user_id": 526
+  },
+  {
+    "user_id": 343
+  },
+  {
+    "user_id": 964
+  },
+  {
+    "user_id": 961
+  }
+]
