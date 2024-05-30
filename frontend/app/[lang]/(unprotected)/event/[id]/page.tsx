@@ -20,7 +20,7 @@ import {
   genderOptions,
   rangesFromArray,
 } from '@/lib/utils/filters';
-import { calculateAge } from '@/lib/utils/date-and-time';
+import { calculateAge, transformDate } from '@/lib/utils/date-and-time';
 import { getRandomInt } from '@/lib/utils/math-utils';
 import { getExpectedEvents } from '@/lib/utils/other-utils';
 
@@ -99,6 +99,10 @@ export default async function EventPage({
     ageFilterData,
   ];
 
+  const matchDates = matches.map((match) =>
+    transformDate(match.start_datetime),
+  );
+
   if (!event) {
     return (
       <Container>
@@ -116,7 +120,7 @@ export default async function EventPage({
         lang={lang}
       />
     ),
-    [EventTabs['matches']]: <MatchesEvent matches={matches} />,
+    [EventTabs['matches']]: <MatchesEvent matches={matches} matchDates={matchDates} />,
     [EventTabs['grid']]: <Grid />,
     [EventTabs['results']]: <Results />,
   };
