@@ -20,9 +20,13 @@ import {
   genderOptions,
   rangesFromArray,
 } from '@/lib/utils/filters';
-import { calculateAge } from '@/lib/utils/date-and-time';
+import { calculateAge, transformDate } from '@/lib/utils/date-and-time';
 import { getRandomInt } from '@/lib/utils/math-utils';
-import { getExpectedEvents } from '@/lib/utils/other-utils';
+import {
+  filterDuplicates,
+  filterUniqueDisplayedValues,
+  getExpectedEvents,
+} from '@/lib/utils/other-utils';
 
 export interface Participant
   extends Omit<
@@ -99,6 +103,39 @@ export default async function EventPage({
     ageFilterData,
   ];
 
+  const allMatchDates: ValueOption[] = matches
+    .map((match) => ({
+      value: match.start_datetime,
+      displayedValue: transformDate(match.start_datetime),
+    }))
+    .sort((a, b) => {
+      if (a.value < b.value) return -1;
+      if (a.value > b.value) return 1;
+      return 0;
+    });
+
+  const matchDates = filterUniqueDisplayedValues(allMatchDates);
+
+  const regStart: ValueOption = {
+    value: event?.start_request_datetime || '',
+    displayedValue: transformDate(event?.start_request_datetime || ''),
+  };
+  const regEnd: ValueOption = {
+    value: event?.end_request_datetime || '',
+    displayedValue: transformDate(event?.end_datetime || ''),
+  };
+  const matchesStart: ValueOption = {
+    value: matchDates[0].value || '',
+    displayedValue: transformDate((matchDates[0].value as string) || ''),
+  };
+  const matchesEnd: ValueOption = {
+    value: matchDates[matchDates.length - 1].value || '',
+    displayedValue: transformDate(
+      (matchDates[matchDates.length - 1].value as string) || '',
+    ),
+  };
+  const awardingTime: ValueOption = matchesEnd;
+
   if (!event) {
     return (
       <Container>
@@ -116,7 +153,17 @@ export default async function EventPage({
         lang={lang}
       />
     ),
-    [EventTabs['matches']]: <MatchesEvent matches={matches} />,
+    [EventTabs['matches']]: (
+      <MatchesEvent
+        matches={matches}
+        matchDates={matchDates}
+        regStart={regStart}
+        regEnd={regEnd}
+        matchesStart={matchesStart}
+        matchesEnd={matchesEnd}
+        awardingTime={awardingTime}
+      />
+    ),
     [EventTabs['grid']]: <Grid />,
     [EventTabs['results']]: <Results />,
   };

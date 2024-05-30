@@ -101,11 +101,7 @@ export function EventsTabs({
           <div className="flex h-[164px] w-full sm:h-[64px]">
             <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
-                <TabsTrigger
-                  key={value}
-                  className="rounded-none border-[#115EA3] text-base data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white sm:text-sm"
-                  value={value}
-                >
+                <TabsTrigger key={value} value={value}>
                   {labels[value]}
                 </TabsTrigger>
               ))}

@@ -32,6 +32,7 @@ const config = {
         neutralForeground3: '#ADADAD',
         NeutralBackground4Rest: '#F0F0F0',
         NeutralStroke2Rest: '#E0E0E0',
+        NeutralGrayColor1: '#071623',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',

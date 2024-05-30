@@ -1,5 +1,6 @@
 import { Locale, i18n } from '@/i18n.config';
 import { Event } from '../definitions';
+import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
 
 export const path = (lang: Locale, href: string) => {
   const isDefaultLang = lang === i18n.defaultLocale;
@@ -30,6 +31,18 @@ export function filterDuplicates<T extends Record<string, any>>(
   });
 
   return Array.from(uniqueDataMap.values());
+}
+
+export function filterUniqueDisplayedValues(data: ValueOption[]): ValueOption[] {
+  const seenDisplayedValues = new Set<string>();
+  return data.filter((item) => {
+    if (seenDisplayedValues.has(item.displayedValue)) {
+      return false;
+    } else {
+      seenDisplayedValues.add(item.displayedValue);
+      return true;
+    }
+  });
 }
 
 export function checkResponse(res: any) {

@@ -86,9 +86,6 @@ export function PageWithInfo<T extends string>({
                   <TabsTrigger
                     key={key}
                     className={cn(
-                      'rounded-none border-[#115EA3]',
-                      'data-[state=active]:border-b-4 data-[state=active]:bg-transparent',
-                      'data-[state=active]:font-bold data-[state=active]:text-white',
                       'first-of-type:ml-4 last-of-type:mr-4',
                       'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
                     )}
