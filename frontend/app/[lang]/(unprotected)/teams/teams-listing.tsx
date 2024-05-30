@@ -10,7 +10,7 @@ import { Locale } from '@/i18n.config';
 import { Team } from './page';
 import { BasicFilters } from './basic-filters';
 import { Dictionary } from '../../dictionary-provider';
-import { defineDefaultRange } from '@/lib/utils';
+import { defineDefaultRange } from '@/lib/utils/math-utils';
 
 export enum GenderTabs {
   MALE = 'male',

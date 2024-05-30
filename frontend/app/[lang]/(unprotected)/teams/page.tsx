@@ -2,16 +2,13 @@ import React from 'react';
 import { Container } from '@/components/container';
 import { TeamsListing } from './teams-listing';
 import { Locale } from '@/i18n.config';
-import {
-  calculateAge,
-  calculateGender,
-  defineDefaultRange,
-  expandRange,
-} from '@/lib/utils';
 import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
 import { testTeamInTeams } from '@/lib/constants';
 import { getTeams } from '@/lib/actions/teams';
+import { calculateGender } from '@/lib/utils/other-utils';
+import { calculateAge } from '@/lib/utils/date-and-time';
+import { defineDefaultRange, expandRange } from '@/lib/utils/math-utils';
 
 interface TeamInfo {
   id: number;
@@ -126,7 +123,7 @@ export default async function Teams({
 
   try {
     const teamData: TeamDataFromServer[] = await getTeams();
-    teams = [...teamData].map(transformTeamData); // remove sreading after tests
+    teams = [...teamData].map(transformTeamData); // remove spreading after tests
     updateRanges(teams, weightRange, 'weights');
     updateRanges(teams, ageRange, 'ages');
   } catch (err) {

@@ -3,8 +3,9 @@ import { Locale, i18n } from '@/i18n.config';
 import { Header } from '../../../components/header/header';
 import { Footer } from '../../../components/footer/footer';
 import { redirect } from 'next/navigation';
-import { getInitials, path } from '@/lib/utils';
 import { getSession } from '@/lib/actions/auth';
+import { getInitials } from '@/lib/utils/text-utils';
+import { path } from '@/lib/utils/other-utils';
 
 export default async function ProtectedLayout({
   children,

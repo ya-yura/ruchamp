@@ -1,11 +1,12 @@
 import { EventsTabs } from './events-tabs';
-import { eventsApi } from '@/lib/api/eventsApi';
 import { Event } from '@/lib/definitions';
 import { Container } from '@/components/container';
 import { testData } from '@/lib/constants';
-import { divideEventsByDateTime, sortedEventsByDate } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { getEvents } from '@/lib/actions/events';
+import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
+import { sortedEventsByDate } from '@/lib/utils/filters';
 
 export default async function Events({
   params: { lang },
@@ -16,7 +17,7 @@ export default async function Events({
   const dictionary = page.events;
   let events: Event[];
   try {
-    events = await eventsApi.getEvents();
+    events = await getEvents();
   } catch (err) {
     events = [];
   }

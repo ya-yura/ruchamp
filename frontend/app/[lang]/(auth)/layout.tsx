@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Locale } from '@/i18n.config';
-import { path } from '@/lib/utils';
+import { path } from '@/lib/utils/other-utils';
 import { getSession } from '@/lib/actions/auth';
 
 export default async function AuthLayout({

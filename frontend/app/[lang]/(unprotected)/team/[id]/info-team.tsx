@@ -1,4 +1,3 @@
-import { calculateAge, getInitials, getRussianAgeWord } from '@/lib/utils';
 import { Coach, TeamInfo, TeamMember } from './page';
 import { TextCard } from '@/components/cards/text-card';
 import {
@@ -10,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
 import { Country, AllRegions } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
+import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
+import { getInitials } from '@/lib/utils/text-utils';
 
 interface InfoTeamProps {
   teamInfo: TeamInfo;
@@ -21,6 +22,7 @@ interface InfoTeamProps {
 export function InfoTeam({ teamInfo, captain, coaches, lang }: InfoTeamProps) {
   return (
     <TextCardFieldWithTwoLists
+      ariaLabelledby="info"
       firstList={<MainTeamInfo desription={teamInfo.description} />}
       secondList={<CaptainAndCoaches captain={captain} coaches={coaches} />}
     />

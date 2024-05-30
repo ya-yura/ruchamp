@@ -19,8 +19,8 @@ import {
 import { CustomForm } from '@/components/forms/custom-form';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
 import { CustomLink } from '@/components/custom-link';
-import { path } from '@/lib/utils';
 import { authenticate } from '@/lib/actions/auth';
+import { path } from '@/lib/utils/other-utils';
 
 const formSchema = z.object({
   username: z

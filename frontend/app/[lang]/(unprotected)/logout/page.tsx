@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { LogoutButtons } from './buttons';
-import { path } from '@/lib/utils';
+import { path } from '@/lib/utils/other-utils';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/actions/auth';
 

@@ -1,7 +1,7 @@
 // May be deleted later
 
 import { Event, HttpRequest } from '../definitions';
-import { checkResponse } from '../utils';
+import { checkResponse } from '../utils/other-utils';
 
 class EventsApi {
   private baseUrl: string;

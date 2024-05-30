@@ -4,18 +4,21 @@ import { PageWithInfo } from '@/components/page-with-info';
 import { TeamActionButtons } from './team-action-buttons';
 import { TeamTabs } from '@/lib/definitions';
 import { InfoTeam } from './info-team';
-import { AthletesTeam } from './athletes-team';
+import { AthletesCardsWithFilters } from '@/components/cards/athletes-cards-with-filters';
 import { MatchesTeam } from './matches-team';
-import {
-  calculateAge,
-  filterDuplicates,
-  roundToBase,
-  transformDate,
-} from '@/lib/utils';
 import { testMatches, testResults, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { Results } from '@/components/results/results';
 import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions/teams';
+import {
+  createFilter,
+  genderOptions,
+  getAthletesByMedal,
+  rangesFromArray,
+  sortAndGroupMatches,
+} from '@/lib/utils/filters';
+import { calculateAge } from '@/lib/utils/date-and-time';
+import { filterDuplicates } from '@/lib/utils/other-utils';
 
 export interface ValueOption {
   value: string | number[];
@@ -173,30 +176,15 @@ export default async function TeamPage({
     ...new Set(members.flatMap((member) => member.sport_types)),
   ];
 
-  const rangesFromArray = (array: number[], step: number): ValueOption[] => {
-    let res: number[][] = [];
-    array.forEach((i) => {
-      const min = roundToBase(i, step, 'down');
-      const max = roundToBase(i, step, 'up');
-      let range: number[] = [];
-      if (min === max) {
-        range = [max - step, max];
-      } else range = [min, max];
-      const stringifyedRes = res.map((i) => JSON.stringify(i));
-      const stringifyedRange = JSON.stringify(range);
-      !stringifyedRes.includes(stringifyedRange) && res.push(range);
-    });
-    return res.map((i) => ({
-      value: i,
-      displayedValue: i.join(' – '),
-    }));
-  };
-
   const weights = members
     .map((member) => member.weight)
     .sort((a, b) => +a - +b);
 
-  const grades = (): ValueOption[] => {
+  const ages = members
+    .map((member) => calculateAge(member.birthdate))
+    .sort((a, b) => +a - +b);
+
+  function getGradesOptions(): ValueOption[] {
     const memberGrades = [
       ...new Set(members.flatMap((member) => member.grade_types)),
     ].sort();
@@ -204,117 +192,32 @@ export default async function TeamPage({
       value: grade,
       displayedValue: grade,
     }));
-  };
-
-  const ages = members
-    .map((member) => calculateAge(member.birthdate))
-    .sort((a, b) => +a - +b);
-
-  const genderFilterData: FilterData = {
-    id: 'genders',
-    title: 'Пол',
-    type: 'value',
-    options: [
-      {
-        value: 'male',
-        displayedValue: 'Мужской',
-      },
-      {
-        value: 'female',
-        displayedValue: 'Женский',
-      },
-    ],
-  };
-
-  const weightFilterData: FilterData = {
-    id: 'weights',
-    title: 'Вес, кг',
-    type: 'range',
-    options: rangesFromArray(weights, 5),
-  };
-
-  const gradeFilterData: FilterData = {
-    id: 'grades',
-    title: 'Уровень спортсмена',
-    type: 'array',
-    options: grades(),
-  };
-
-  const ageFilterData: FilterData = {
-    id: 'ages',
-    title: 'Возраст, лет',
-    type: 'range',
-    options: rangesFromArray(ages, 5),
-  };
-
-  function sortAndGroupMatches(matches: TeamMatch[]) {
-    matches.sort((a, b) => {
-      if (a.start_datetime < b.start_datetime) return -1;
-      if (a.start_datetime > b.start_datetime) return 1;
-      if (a.event_id < b.event_id) return -1;
-      if (a.event_id > b.event_id) return 1;
-      return 0;
-    });
-
-    const groupedMatches = matches.reduce<Record<number, GroupedMatch>>(
-      (acc, match) => {
-        if (!acc[match.event_id]) {
-          acc[match.event_id] = {
-            event_id: match.event_id,
-            name: match.name,
-            location: match.location,
-            start_datetime: transformDate(match.start_datetime),
-            matches: [],
-          };
-        }
-        acc[match.event_id].matches.push(match);
-        return acc;
-      },
-      {},
-    );
-
-    return Object.values(groupedMatches);
   }
+
+  const gradesOptions = getGradesOptions();
+  const weightOptions = rangesFromArray(weights, 5);
+  const ageOptions = rangesFromArray(ages, 5);
+
+  const genderFilterData: FilterData = createFilter(
+    'genders',
+    'Пол',
+    genderOptions,
+  );
+  const weightFilterData = createFilter('weights', 'Вес, кг', weightOptions);
+  const gradeFilterData = createFilter('grades', 'Уровень', gradesOptions);
+  const ageFilterData = createFilter('ages', 'Возраст, лет', ageOptions);
+  const filtersData: FilterData[] = [
+    genderFilterData,
+    weightFilterData,
+    gradeFilterData,
+    ageFilterData,
+  ];
 
   const sortedAndGroupedMatches = sortAndGroupMatches(matches);
 
-  function getAthletesByMedal(
-    medal: 'Золото' | 'Серебро' | 'Бронза',
-  ): MedalWinner[] {
-    let res: MedalWinner[] = [];
-    results.forEach((athlete) =>
-      athlete.matches_info.forEach((match) => {
-        if (match.medal_type === medal) {
-          res.push({
-            id: athlete.id,
-            sirname: athlete.sirname,
-            name: athlete.name,
-            fathername: athlete.fathername,
-            birthdate: athlete.birthdate,
-            gender: athlete.gender,
-            height: athlete.height,
-            weight: athlete.weight,
-            image_field: athlete.image_field,
-            country: athlete.country,
-            region: athlete.region,
-            city: athlete.city,
-            event_id: match.event_id,
-            event_name: match.event_name,
-            match_id: match.match_id,
-            match_name: match.match_name,
-            event_location: match.event_location,
-            start_datetime: match.start_datetime,
-            sport_type: match.sport_type,
-          });
-        }
-      }),
-    );
-    return res;
-  }
-
-  const goldenMedalWinners = getAthletesByMedal('Золото');
-  const silverMedalWinners = getAthletesByMedal('Серебро');
-  const bronzeMedalWinners = getAthletesByMedal('Бронза');
+  const goldenMedalWinners = getAthletesByMedal(results, 'Золото');
+  const silverMedalWinners = getAthletesByMedal(results, 'Серебро');
+  const bronzeMedalWinners = getAthletesByMedal(results, 'Бронза');
 
   const sortedAthelesResults = results.sort((a, b) => b.points - a.points);
 
@@ -328,13 +231,10 @@ export default async function TeamPage({
       />
     ),
     [TeamTabs['athletes']]: (
-      <AthletesTeam
+      <AthletesCardsWithFilters
         athletes={members}
         captainId={captainId}
-        genderFilterData={genderFilterData}
-        weightFilterData={weightFilterData}
-        gradeFilterData={gradeFilterData}
-        ageFilterData={ageFilterData}
+        filtersData={filtersData}
         lang={lang}
       />
     ),

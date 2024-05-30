@@ -7,7 +7,6 @@ import { UseFormReturn } from 'react-hook-form';
 import { TypeRegFormSchema } from './register-form';
 import { CustomLink } from '@/components/custom-link';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
 
 type TypeRegisterStepOneProps = {

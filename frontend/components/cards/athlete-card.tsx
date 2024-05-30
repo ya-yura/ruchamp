@@ -2,10 +2,11 @@ import Image from 'next/image';
 import { Medals, TeamMember } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { calculateAge, getInitials, getRussianAgeWord } from '@/lib/utils';
 import { H4, PersonDescriptionOnCard } from '../text';
 import { Country, AllRegions } from '@/lib/definitions';
 import { Badge } from '../ui/badge';
+import { getInitials } from '@/lib/utils/text-utils';
+import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
 
 interface AthleteCardProps
   extends Omit<
@@ -17,6 +18,8 @@ interface AthleteCardProps
   points?: number;
   medals?: Medals;
   isWithResults?: boolean;
+  grade?: string;
+  grade_types?: string[];
 }
 
 export function AthleteCard({
@@ -30,6 +33,8 @@ export function AthleteCard({
   region,
   image_field,
   weight,
+  grade_types,
+  grade,
   captainId = 0,
   isApproved = true,
   points,
@@ -106,7 +111,9 @@ export function AthleteCard({
         ) : (
           <>
             <PersonDescriptionOnCard className="text-neutralForeground3">
-              {'Уровень атлета не указан'}
+              {!!grade_types?.length || grade
+                ? grade || grade_types?.join(', ')
+                : 'Уровень атлета не указан'}
             </PersonDescriptionOnCard>
             <PersonDescriptionOnCard className="text-neutralForeground3">
               {'Клуб не указан'}

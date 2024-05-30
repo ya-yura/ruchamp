@@ -1,6 +1,6 @@
 import { TypeRegFormSchema } from '@/app/[lang]/(auth)/register/register-form';
 import { HttpRequest, UserData } from '../definitions';
-import { checkResponse } from '../utils';
+import { checkResponse } from '../utils/other-utils';
 
 class Auth {
   private baseUrl: string;

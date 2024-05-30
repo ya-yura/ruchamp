@@ -1,7 +1,7 @@
 import { TextCard } from '@/components/cards/text-card';
 import { Event } from '@/lib/definitions';
-import { transformDate } from '@/lib/utils';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
+import { transformDate } from '@/lib/utils/date-and-time';
 
 export function InfoEvent({ event }: { event: Event }) {
   const eventStartTime = transformDate(event.start_datetime, true);
@@ -9,6 +9,7 @@ export function InfoEvent({ event }: { event: Event }) {
 
   return (
     <TextCardFieldWithTwoLists
+      ariaLabelledby="info"
       firstList={<MainEventInfo description={event.description} />}
       secondList={
         <DateAndOrganizer

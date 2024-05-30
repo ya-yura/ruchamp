@@ -7,7 +7,7 @@ import { FeaturesMain } from '@/components/home-page/features-main';
 import { FeaturesAdditional } from '@/components/home-page/features-additional';
 import { SecondHero } from '@/components/home-page/second-hero';
 import { TrustedSection } from '@/components/home-page/trusted-section';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/text-utils';
 import { getSession } from '@/lib/actions/auth';
 
 export default async function Home({

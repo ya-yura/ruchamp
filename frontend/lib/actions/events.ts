@@ -1,11 +1,11 @@
 'use server';
 
 import { Event } from '../definitions';
-import { checkResponse } from '../utils';
+import { checkResponse } from '../utils/other-utils';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-export async function getEvents(): Promise<Array<Event>> {
+export async function getEvents(): Promise<Event[]> {
   return fetch(`${baseUrl}/event/events`, {}).then(checkResponse);
 }
 
