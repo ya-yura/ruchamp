@@ -1,6 +1,5 @@
 import { Locale } from '@/i18n.config';
 import { Container } from '@/components/container';
-import { getSession } from '@/lib/actions';
 import { Footer } from '@/components/footer/footer';
 import { Header } from '@/components/header/header';
 import { HomeHero } from '@/components/home-page/home-hero';
@@ -8,7 +7,8 @@ import { FeaturesMain } from '@/components/home-page/features-main';
 import { FeaturesAdditional } from '@/components/home-page/features-additional';
 import { SecondHero } from '@/components/home-page/second-hero';
 import { TrustedSection } from '@/components/home-page/trusted-section';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/text-utils';
+import { getSession } from '@/lib/actions/auth';
 
 export default async function Home({
   params: { lang },

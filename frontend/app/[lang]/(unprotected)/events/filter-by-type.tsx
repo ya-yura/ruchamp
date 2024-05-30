@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth';
 import { Badge } from '@/components/ui/badge';
-import { ModeSwither } from '@/components/mode-switcher';
 
 interface FilterByTypeProps {
   options: string[];

@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { isValidPhoneNumber } from 'react-phone-number-input';
-import { path } from '@/lib/utils';
+import { path } from '@/lib/utils/other-utils';
 
 // const athleteSchema = z.object({
 //   athlete_weight: z.number(),

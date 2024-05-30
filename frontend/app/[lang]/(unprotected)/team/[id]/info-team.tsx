@@ -1,4 +1,3 @@
-import { calculateAge, getInitials, getRussianAgeWord } from '@/lib/utils';
 import { Coach, TeamInfo, TeamMember } from './page';
 import { TextCard } from '@/components/cards/text-card';
 import {
@@ -10,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
 import { Country, AllRegions } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
+import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
+import { getInitials } from '@/lib/utils/text-utils';
 
 interface InfoTeamProps {
   teamInfo: TeamInfo;
@@ -21,7 +22,8 @@ interface InfoTeamProps {
 export function InfoTeam({ teamInfo, captain, coaches, lang }: InfoTeamProps) {
   return (
     <TextCardFieldWithTwoLists
-      firstList={<MainTeamInfo teamInfo={teamInfo} />}
+      ariaLabelledby="info"
+      firstList={<MainTeamInfo desription={teamInfo.description} />}
       secondList={<CaptainAndCoaches captain={captain} coaches={coaches} />}
     />
   );
@@ -89,10 +91,10 @@ function CaptainAndCoaches({
   );
 }
 
-function MainTeamInfo({ teamInfo }: { teamInfo: TeamInfo }) {
+function MainTeamInfo({ desription }: { desription: TeamInfo['description'] }) {
   return (
     <>
-      <TextCard title={'Подзаголовок 1'} text={teamInfo.description} />
+      <TextCard title={'Подзаголовок 1'} text={desription} />
       <TextCard title={'Подзаголовок 2'} text={`Наш капитан - лучший!!!`} />
       <TextCard title={'Подзаголовок 3'} text={`Обожаем наших тренеров!`} />
     </>

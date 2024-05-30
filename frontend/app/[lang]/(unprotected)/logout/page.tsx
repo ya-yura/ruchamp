@@ -1,8 +1,8 @@
 import { Locale } from '@/i18n.config';
 import { LogoutButtons } from './buttons';
-import { getSession } from '@/lib/actions';
-import { path } from '@/lib/utils';
+import { path } from '@/lib/utils/other-utils';
 import { redirect } from 'next/navigation';
+import { getSession } from '@/lib/actions/auth';
 
 export default async function LogoutPage({
   params: { lang },

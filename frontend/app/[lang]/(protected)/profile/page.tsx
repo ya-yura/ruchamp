@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Container } from '../../../../components/container';
+import { Container } from '@/components/container';
 import { UserForm } from './user-form';
 import { UserFormAthlete } from './user-form-athlete';
 import { UserFormOrganizer } from './user-form-organizer';
@@ -7,7 +7,6 @@ import { EnumUserRole } from '@/lib/definitions';
 import { UserFormSpectator } from './user-form-spectator';
 import { UserFormSysadmin } from './user-form-sysadmin';
 import { UserFormReferee } from './user-form-referee';
-import { getSession } from '@/lib/actions';
 import { H4 } from '@/components/text';
 
 export default async function Profile() {

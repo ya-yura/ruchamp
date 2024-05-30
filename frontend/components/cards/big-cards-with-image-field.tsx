@@ -2,10 +2,11 @@ import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
-import { cn, transformDate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { Event } from '@/lib/definitions';
 import { Team } from '@/app/[lang]/(unprotected)/teams/page';
+import { transformDate } from '@/lib/utils/date-and-time';
 
 interface BigCardsWithImageFieldProps {
   cards: Event[] | Team[];

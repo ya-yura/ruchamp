@@ -10,11 +10,11 @@ import { Event } from '@/lib/definitions';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
-import { isDateInRange } from '@/lib/utils';
 import { Dictionary } from '../../dictionary-provider';
 import { YandexMap } from '@/components/yandex-map';
 import { Locale } from '@/i18n.config';
 import { ModeSwither } from '@/components/mode-switcher';
+import { isDateInRange } from '@/lib/utils/date-and-time';
 
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
@@ -44,7 +44,7 @@ export function EventsTabs({
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  //dictionary
+  // For dictionary
   const labels = {
     [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
     [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,

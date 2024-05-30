@@ -11,7 +11,7 @@ import { Event } from '@/lib/definitions';
 import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
-import { transformDate } from '@/lib/utils';
+import { transformDate } from '@/lib/utils/date-and-time';
 
 export function EventsCarousel({ events }: { events: Event[] }) {
   const plugin = React.useRef(

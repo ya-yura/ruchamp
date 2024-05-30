@@ -2,9 +2,9 @@ import '@/app/[lang]/ui/global.css';
 import { Locale } from '@/i18n.config';
 import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
-import { getSession } from '@/lib/actions';
 import Image from 'next/image';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/text-utils';
+import { getSession } from '@/lib/actions/auth';
 
 export default async function UnprotectedLayout({
   children,

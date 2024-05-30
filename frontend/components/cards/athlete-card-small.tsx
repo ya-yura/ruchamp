@@ -1,16 +1,12 @@
 import { MedalWinner } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import {
-  calculateAge,
-  getInitials,
-  getRussianAgeWord,
-  transformDate,
-} from '@/lib/utils';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { H4, PersonDescriptionOnCard } from '../text';
 import { AllRegions, Country } from '@/lib/definitions';
 import { Separator } from '../ui/separator';
 import { Tag } from '../tag';
+import { calculateAge, getRussianAgeWord, transformDate } from '@/lib/utils/date-and-time';
+import { getInitials } from '@/lib/utils/text-utils';
 
 export function AthleteCardSmall({
   sirname,

@@ -1,9 +1,6 @@
 import { TypeRegFormSchema } from '@/app/[lang]/(auth)/register/register-form';
 import { HttpRequest, UserData } from '../definitions';
-
-export function checkResponse(res: any) {
-  return res.ok ? res.json() : Promise.reject(res.status);
-}
+import { checkResponse } from '../utils/other-utils';
 
 class Auth {
   private baseUrl: string;

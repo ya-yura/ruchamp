@@ -156,6 +156,7 @@ export interface Event {
   id: number;
   end_request_datetime: string;
   organizer_id: number;
+  organizer_name: string;
   event_system: string;
   image_field: string;
   sports_in_matches: string[];

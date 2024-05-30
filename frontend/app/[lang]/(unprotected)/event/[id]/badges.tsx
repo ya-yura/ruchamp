@@ -1,6 +1,5 @@
 'use client';
 
-import { sportTypes } from '@/lib/constants';
 import { BadgeButton } from '@/components/badge-button';
 import { cn } from '@/lib/utils';
 

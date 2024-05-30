@@ -1,12 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { addDays, format } from 'date-fns';
+import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { ru } from 'date-fns/locale';
 
-import { cn, isCurrentYear } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { isCurrentYear } from '@/lib/utils/date-and-time';
 
 interface DatePickerProps {
   date: DateRange | undefined;

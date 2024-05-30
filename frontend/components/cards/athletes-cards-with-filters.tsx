@@ -2,41 +2,54 @@
 
 import { TextCard } from '@/components/cards/text-card';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
-import { FilterData, TeamMember, ValueOption } from './page';
+import {
+  FilterData,
+  ValueOption,
+} from '../../app/[lang]/(unprotected)/team/[id]/page';
 import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { AthleteCard } from '@/components/cards/athlete-card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckedState } from '@radix-ui/react-checkbox';
-import { calculateAge } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
+import { calculateAge } from '@/lib/utils/date-and-time';
 
-interface AthletesTeamProps {
-  athletes: TeamMember[];
-  captainId: number;
-  genderFilterData: FilterData;
-  weightFilterData: FilterData;
-  gradeFilterData: FilterData;
-  ageFilterData: FilterData;
+interface AthleteCardData {
+  id?: number;
+  user_id?: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender: boolean;
+  height?: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  grade_types?: string[];
+  grade?: string;
+}
+
+interface AthletesCardsWithFiltersProps {
+  athletes: AthleteCardData[];
+  captainId?: number;
+  filtersData: FilterData[];
   lang: Locale;
 }
 
-export function AthletesTeam({
+export function AthletesCardsWithFilters({
   athletes,
   captainId,
-  genderFilterData,
-  weightFilterData,
-  gradeFilterData,
-  ageFilterData,
+  filtersData,
   lang,
-}: AthletesTeamProps) {
+}: AthletesCardsWithFiltersProps) {
   const [filters, setFilters] = useState<Record<string, (string | number[])[]>>(
-    {
-      [genderFilterData.id]: [],
-      [weightFilterData.id]: [],
-      [gradeFilterData.id]: [],
-      [ageFilterData.id]: [],
-    },
+    filtersData.reduce<Record<string, (string | number[])[]>>((acc, filter) => {
+      acc[filter.id] = [];
+      return acc;
+    }, {}),
   );
 
   const updateFilters = useCallback(
@@ -69,8 +82,10 @@ export function AthletesTeam({
         return member.weight > min && member.weight <= max;
       });
       // Check grade
-      const isGradeMatch = grades.some((grade) =>
-        member.grade_types.includes(grade as string),
+      const isGradeMatch = grades.some(
+        (grade) =>
+          member.grade_types?.includes(grade as string) ||
+          member.grade?.includes(grade as string),
       );
       // Check age
       const isAgeMatch = ages.some((range) => {
@@ -80,28 +95,18 @@ export function AthletesTeam({
 
       return isGenderMatch && isWeightMatch && isGradeMatch && isAgeMatch;
     });
-  }, [
-    filters,
-    athletes,
-    genderFilterData.id,
-    weightFilterData.id,
-    gradeFilterData.id,
-    ageFilterData.id,
-  ]);
+  }, [filters, athletes, filtersData]);
 
   return (
     <TextCardFieldWithTwoLists
+      ariaLabelledby="athletes"
       firstList={
         <AthletesList athletes={filtredAthletes} captainId={captainId} />
       }
       secondList={
-        <Filters
-          genderFilterData={genderFilterData}
-          weightFilterData={weightFilterData}
-          gradeFilterData={gradeFilterData}
-          ageFilterData={ageFilterData}
-          updateFilters={updateFilters}
-        />
+        !!athletes.length && (
+          <Filters filtersData={filtersData} updateFilters={updateFilters} />
+        )
       }
     />
   );
@@ -111,16 +116,16 @@ function AthletesList({
   athletes,
   captainId,
 }: {
-  athletes: TeamMember[];
-  captainId: number;
+  athletes: AthleteCardData[];
+  captainId?: number;
 }) {
   return (
     <>
       {!!athletes.length ? (
-        athletes.map((athlete) => (
+        athletes.map((athlete, index) => (
           <AthleteCard
-            key={athlete.id}
-            id={athlete.id}
+            key={athlete.id || athlete.user_id || index}
+            id={athlete.id || athlete.user_id || index}
             sirname={athlete.sirname}
             name={athlete.name}
             fathername={athlete.fathername}
@@ -130,6 +135,8 @@ function AthletesList({
             region={athlete.region}
             image_field={athlete.image_field}
             weight={athlete.weight}
+            grade_types={athlete.grade_types}
+            grade={athlete.grade}
             captainId={captainId}
           />
         ))
@@ -143,10 +150,7 @@ function AthletesList({
 }
 
 interface FiltersProps {
-  genderFilterData: FilterData;
-  weightFilterData: FilterData;
-  gradeFilterData: FilterData;
-  ageFilterData: FilterData;
+  filtersData: FilterData[];
   updateFilters: (
     filterId: string,
     value: string | number[],
@@ -154,40 +158,19 @@ interface FiltersProps {
   ) => void;
 }
 
-function Filters({
-  genderFilterData,
-  weightFilterData,
-  gradeFilterData,
-  ageFilterData,
-  updateFilters,
-}: FiltersProps) {
+function Filters({ filtersData, updateFilters }: FiltersProps) {
   return (
     <TextCard className="bg-card-backgroundDark">
       <ul className="flex flex-col gap-6">
-        <FilterItem
-          id={genderFilterData.id}
-          title={genderFilterData.title}
-          options={genderFilterData.options}
-          updateFilters={updateFilters}
-        />
-        <FilterItem
-          id={weightFilterData.id}
-          title={weightFilterData.title}
-          options={weightFilterData.options}
-          updateFilters={updateFilters}
-        />
-        <FilterItem
-          id={gradeFilterData.id}
-          title={gradeFilterData.title}
-          options={gradeFilterData.options}
-          updateFilters={updateFilters}
-        />
-        <FilterItem
-          id={ageFilterData.id}
-          title={ageFilterData.title}
-          options={ageFilterData.options}
-          updateFilters={updateFilters}
-        />
+        {filtersData.map((filter) => (
+          <FilterItem
+            key={filter.id}
+            id={filter.id}
+            title={filter.title}
+            options={filter.options}
+            updateFilters={updateFilters}
+          />
+        ))}
       </ul>
     </TextCard>
   );

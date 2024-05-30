@@ -3,10 +3,9 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, checkResponse } from './api/auth';
+import { auth } from '../api/auth';
 
 const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 const key = new TextEncoder().encode(secretKey);
 
@@ -72,33 +71,4 @@ export async function updateSession(request: NextRequest) {
     expires: parsed.expires,
   });
   return res;
-}
-
-// Teams
-export async function getTeams() {
-  return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
-}
-
-export async function getTeam(id: string) {
-  return fetch(`${baseUrl}/team/get-team/${id}`, {})
-    .then(checkResponse)
-    .catch((err) => {
-      console.log('getTeam error', err);
-    });
-}
-
-export async function getTeamMatches(id: string) {
-  return fetch(`${baseUrl}/team/${id}/matches`, {})
-    .then(checkResponse)
-    .catch((err) => {
-      console.log('getTeamMatches error', err);
-    });
-}
-
-export async function getTeamResults(id: string) {
-  return fetch(`${baseUrl}/team/${id}/results`, {})
-    .then(checkResponse)
-    .catch((err) => {
-      console.log('getTeamMatches error', err);
-    });
 }
