@@ -23,10 +23,10 @@ import {
 import { calculateAge, transformDate } from '@/lib/utils/date-and-time';
 import { getRandomInt } from '@/lib/utils/math-utils';
 import {
-  filterDuplicates,
   filterUniqueDisplayedValues,
   getExpectedEvents,
 } from '@/lib/utils/other-utils';
+import { getSession } from '@/lib/actions/auth';
 
 export interface Participant
   extends Omit<
@@ -51,14 +51,21 @@ export interface EventMatch {
 
 async function fetchEventData(eventId: string) {
   try {
+    const session = await getSession();
     const event = await getEvent(eventId);
     const events = await getEvents();
     const participants = await getMatchesParticipants(eventId);
     const matches = await getEventMatches(eventId);
-    return { event, events, participants, matches };
+    return { event, events, participants, matches, session };
   } catch (error) {
     console.error('Error fetching event data:', error);
-    return { event: null, events: [], participants: [], matches: [] };
+    return {
+      event: null,
+      events: [],
+      participants: [],
+      matches: [],
+      session: null,
+    };
   }
 }
 
@@ -69,7 +76,8 @@ export default async function EventPage({
 }) {
   const { id, lang } = params;
   const randomInt = getRandomInt(100);
-  const { event, events, participants, matches } = await fetchEventData(id);
+  const { event, events, participants, matches, session } =
+    await fetchEventData(id);
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
   const weights = participants
     .map((participant) => participant.weight)
@@ -77,16 +85,6 @@ export default async function EventPage({
   const ages = participants
     .map((participant) => calculateAge(participant.birthdate))
     .sort((a, b) => +a - +b);
-
-  function getGradesOptions(): ValueOption[] {
-    const participantGrades = [
-      ...new Set(participants.flatMap((participant) => participant.grade)),
-    ].sort();
-    return participantGrades.map((grade) => ({
-      value: grade,
-      displayedValue: grade,
-    }));
-  }
 
   const gradesOptions = getGradesOptions();
   const weightOptions = rangesFromArray(weights, 5);
@@ -135,6 +133,18 @@ export default async function EventPage({
     ),
   };
   const awardingTime: ValueOption = matchesEnd;
+
+  function getGradesOptions(): ValueOption[] {
+    const participantGrades = [
+      ...new Set(participants.flatMap((participant) => participant.grade)),
+    ].sort();
+    return participantGrades.map((grade) => ({
+      value: grade,
+      displayedValue: grade,
+    }));
+  }
+
+  console.log(session)
 
   if (!event) {
     return (
