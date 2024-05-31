@@ -142,6 +142,7 @@ async def get_events_id(
         Event.id,
         Event.name,
         EventOrganizer.organization_name.label("organizer_name"),
+        EventOrganizer.id.label("organizer_id"),
         Event.description,
         Event.location,
         Event.start_request_datetime,
