@@ -2,11 +2,10 @@ import { AddressSection } from './address-section';
 import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
-import { EventTabs } from '@/lib/definitions';
+import { EventOwnerTabs, EventTabs, UserInfo } from '@/lib/definitions';
 import { testData } from '@/lib/constants';
 import { MatchesEvent } from './matches-event';
 import { Grid } from './grid';
-import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
 import { Locale } from '@/i18n.config';
 import { getEvent, getEventMatches, getEvents } from '@/lib/actions/events';
@@ -27,6 +26,10 @@ import {
   getExpectedEvents,
 } from '@/lib/utils/other-utils';
 import { getSession } from '@/lib/actions/auth';
+import { OwnerMain } from './owner-main';
+import { OwnerTeams } from './owner-teams';
+import { OwnerDocs } from './owner-docs';
+import { Results } from '@/components/results/results';
 
 export interface Participant
   extends Omit<
@@ -78,6 +81,13 @@ export default async function EventPage({
   const randomInt = getRandomInt(100);
   const { event, events, participants, matches, session } =
     await fetchEventData(id);
+  const user: UserInfo | null = session
+    ? {
+        basicInfo: session.user[1],
+        roleInfo: session.user[0],
+      }
+    : null;
+  const isOwner = user?.roleInfo.id === event?.organizer_id;
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
   const weights = participants
     .map((participant) => participant.weight)
@@ -144,12 +154,10 @@ export default async function EventPage({
     }));
   }
 
-  console.log(session)
-
   if (!event) {
     return (
       <Container>
-        <H4 className="relative">Такого мероприятия не найдено</H4>
+        <H4 className="relative">Такого события не найдено</H4>
       </Container>
     );
   }
@@ -175,21 +183,58 @@ export default async function EventPage({
       />
     ),
     [EventTabs['grid']]: <Grid />,
-    [EventTabs['results']]: <Results />,
+    [EventTabs['results']]: (
+      <Results
+        athletes={[]}
+        goldenMedalWinners={[]}
+        silverMedalWinners={[]}
+        bronzeMedalWinners={[]}
+      />
+    ),
+  };
+
+  const tabsOwnerContent = {
+    [EventOwnerTabs['main']]: (
+      <OwnerMain matches={matches} matchDates={matchDates} />
+    ),
+    [EventOwnerTabs['teams']]: <OwnerTeams />,
+    [EventOwnerTabs['results']]: (
+      <Results
+        athletes={[]}
+        goldenMedalWinners={[]}
+        silverMedalWinners={[]}
+        bronzeMedalWinners={[]}
+      />
+    ),
+    [EventOwnerTabs['docs']]: <OwnerDocs />,
   };
 
   return (
     <Container>
-      <PageWithInfo<EventTabs>
-        id={event.id}
-        type="event"
-        title={event.name}
-        bages={event.sports_in_matches}
-        buttons={<EventActionButtons />}
-        tabsContent={tabsContent}
-        tabsObj={EventTabs}
-        lang={lang}
-      />
+      {isOwner ? (
+        <PageWithInfo<EventOwnerTabs>
+          id={event.id}
+          type="event"
+          title={event.name}
+          bages={event.sports_in_matches}
+          buttons={<EventActionButtons isOwner={isOwner} />}
+          tabsContent={tabsOwnerContent}
+          tabsObj={EventOwnerTabs}
+          isOwner={isOwner}
+          lang={lang}
+        />
+      ) : (
+        <PageWithInfo<EventTabs>
+          id={event.id}
+          type="event"
+          title={event.name}
+          bages={event.sports_in_matches}
+          buttons={<EventActionButtons />}
+          tabsContent={tabsContent}
+          tabsObj={EventTabs}
+          lang={lang}
+        />
+      )}
       <AddressSection event={event} />
       {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
     </Container>

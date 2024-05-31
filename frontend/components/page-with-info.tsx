@@ -11,6 +11,7 @@ import { H1 } from '@/components/text';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ContentWraper } from '@/components/content-wraper';
 import { Locale } from '@/i18n.config';
+import { Button } from './ui/button';
 
 interface PageWithInfoProps<T extends string> {
   id: number;
@@ -20,6 +21,7 @@ interface PageWithInfoProps<T extends string> {
   buttons: ReactNode;
   tabsContent: Record<T, ReactNode>;
   tabsObj: Record<string, T>;
+  isOwner?: boolean;
   lang: Locale;
 }
 
@@ -31,6 +33,7 @@ export function PageWithInfo<T extends string>({
   buttons,
   tabsContent,
   tabsObj,
+  isOwner,
   lang,
 }: PageWithInfoProps<T>) {
   const refContainer = useRef<HTMLDivElement | null>(null);
@@ -69,7 +72,20 @@ export function PageWithInfo<T extends string>({
         <ContentWraper className="h-[590px] justify-between">
           <Badges types={bages} />
           <div className="relative flex flex-col gap-10">
-            <H1>{title}</H1>
+            <div>
+              <H1 className="inline">{title}</H1>
+              {isOwner && (
+                <Button variant={'ghost'}>
+                  <Image
+                    className="ml- inline"
+                    src={'/images/icons/pencil.svg'}
+                    alt=""
+                    width={32}
+                    height={32}
+                  />
+                </Button>
+              )}
+            </div>
             {buttons}
           </div>
         </ContentWraper>

@@ -1,7 +1,7 @@
 import { H4 } from '@/components/text';
 import { cn } from '@/lib/utils';
 
-interface TextCardProps {
+export interface TextCardProps {
   title?: string;
   text?: string;
   className?: string;
@@ -16,9 +16,9 @@ export function TextCard({ title, text, className, children }: TextCardProps) {
         className,
       )}
     >
-      {title && <H4 className="mb-3">{title}</H4>}
+      {title && <H4 className={cn('mb-3')}>{title}</H4>}
       {text && (
-        <p className="whitespace-pre-line text-sm text-text-mutedCard">
+        <p className={cn('whitespace-pre-line text-sm text-text-mutedCard')}>
           {text}
         </p>
       )}

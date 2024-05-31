@@ -37,14 +37,14 @@ export function Header({
               <HeaderNavigation lang={lang} isLoggedIn={isLoggedIn} />
             </div>
           </div>
-          <SearchBar className="mx-3 hidden lg:block" />
-          <Button
+          {/* <SearchBar className="mx-3 hidden lg:block" /> */}
+          {/* <Button
             className="ml-auto mr-2 h-9 lg:hidden"
             variant="ruchampTransparentGreyBorder"
             size="icon"
           >
             <MagniglassIcon />
-          </Button>
+          </Button> */}
           {isLoggedIn ? (
             <>
               {/* Не удалять */}
