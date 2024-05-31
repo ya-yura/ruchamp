@@ -83,65 +83,109 @@ export type HttpRequest = {
   headers: { 'Content-Type': string; Authorization: string };
 };
 
-export interface UserBasicData {
+// User
+
+export interface BasicInfo {
   id: number;
-  registered_at: string;
+  username: string;
+  email: string;
+  sirname: string;
   name: string;
   fathername: string;
-  country: string;
-  hashed_password: string;
-  is_superuser: boolean;
-  verification_token: string;
-  role_id: number;
-  email: string;
-  username: string;
-  sirname: string;
-  gender: boolean;
   birthdate: string;
-  is_active: boolean;
-  is_verified: boolean;
+  gender: boolean;
+  role_id: number;
 }
 
-export interface AtleteData {
+export interface AthleteInfo {
   id: number;
-  height: number;
   user_id: number;
   weight: number;
+  height: number;
+  country: number;
+  region: number;
+  city: string;
   image_field: string | null;
+  sport_types: string[];
+  coaches: string[];
+  grades: string[];
 }
 
-export interface OrganizerData {
-  organization_name: string;
-  contact_email: string;
+export interface OrganizerInfo {
+  id: number;
   user_id: number;
-  description: string | null;
   website: string;
-  id: number;
+  contact_email: string;
   contact_phone: string;
+  organization_name: string;
+  description: string | null;
   image_field: string | null;
 }
 
-export interface SpectatorData {
-  image_field: string | null;
-  user_id: number;
-  id: number;
-  phone_number: string;
+export interface UserInfo {
+  basicInfo: BasicInfo;
+  roleInfo: AthleteInfo | OrganizerInfo;
 }
 
-export interface RefereeData {
-  user_id: number;
-  qualification_level: number;
-  id: number;
-  image_field: string | null;
-}
+// export interface UserBasicData {
+//   id: number;
+//   registered_at: string;
+//   name: string;
+//   fathername: string;
+//   country: string;
+//   hashed_password: string;
+//   is_superuser: boolean;
+//   verification_token: string;
+//   role_id: number;
+//   email: string;
+//   username: string;
+//   sirname: string;
+//   gender: boolean;
+//   birthdate: string;
+//   is_active: boolean;
+//   is_verified: boolean;
+// }
 
-export interface UserData {
-  Athlete?: AtleteData;
-  EventOrganizer?: OrganizerData;
-  Spectator?: SpectatorData;
-  Referee?: RefereeData;
-  User: UserBasicData;
-}
+// export interface AtleteData {
+//   id: number;
+//   height: number;
+//   user_id: number;
+//   weight: number;
+//   image_field: string | null;
+// }
+
+// export interface OrganizerData {
+//   organization_name: string;
+//   contact_email: string;
+//   user_id: number;
+//   description: string | null;
+//   website: string;
+//   id: number;
+//   contact_phone: string;
+//   image_field: string | null;
+// }
+
+// export interface SpectatorData {
+//   image_field: string | null;
+//   user_id: number;
+//   id: number;
+//   phone_number: string;
+// }
+
+// export interface RefereeData {
+//   user_id: number;
+//   qualification_level: number;
+//   id: number;
+//   image_field: string | null;
+// }
+
+// export interface UserData {
+//   Athlete?: AtleteData;
+//   EventOrganizer?: OrganizerData;
+//   Spectator?: SpectatorData;
+//   Referee?: RefereeData;
+//   User: UserBasicData;
+// }
 
 // *** Events ***
 export interface Event {
@@ -165,9 +209,16 @@ export interface Event {
 export enum EventTabs {
   'info' = 'Информация',
   'athletes' = 'Спортсмены',
-  'matches' = 'Матчи',
+  'matches' = 'Мероприятия',
   'grid' = 'Турнирная сетка',
   'results' = 'Результаты',
+}
+
+export enum EventOwnerTabs {
+  'main' = 'Главное',
+  'teams' = 'Команды',
+  'results' = 'Результаты',
+  'docs' = 'Документы',
 }
 
 // *** Teams ***
@@ -175,6 +226,6 @@ export enum EventTabs {
 export enum TeamTabs {
   'info' = 'Информация',
   'athletes' = 'Спортсмены',
-  'matches' = 'Матчи',
+  'matches' = 'Мероприятия',
   'results' = 'Результаты',
 }

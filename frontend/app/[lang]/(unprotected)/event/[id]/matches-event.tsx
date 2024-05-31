@@ -37,8 +37,6 @@ export function MatchesEvent({
     );
   }, [selectedDate, matches]);
 
-  console.log(selectedDate)
-
   function handleTabChange(value: string): void {
     setSelectedDate(value);
   }

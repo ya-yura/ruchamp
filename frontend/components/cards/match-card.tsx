@@ -25,7 +25,7 @@ export function MatchCard({
   buttonText,
 }: MatchCardProps) {
   return (
-    <li className="flex flex-col gap-3 rounded-lg bg-card-background px-4 py-4 cursor-default">
+    <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
       <div className="flex gap-7">
         <H5 className="whitespace-nowrap text-xl font-semibold text-white">
           {format(startTime, 'HH:mm')} – {format(endTime, 'HH:mm')}

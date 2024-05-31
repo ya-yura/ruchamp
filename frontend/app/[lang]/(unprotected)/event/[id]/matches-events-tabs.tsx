@@ -11,6 +11,7 @@ interface MatchesEventTabsProps {
   matchDates: ValueOption[];
   value: string;
   handleTabChange: ((value: string) => void) | undefined;
+  isOwner?: boolean;
 }
 
 export function MatchesEventTabs({
@@ -18,6 +19,7 @@ export function MatchesEventTabs({
   matchDates,
   value,
   handleTabChange,
+  isOwner,
 }: MatchesEventTabsProps) {
   return (
     <ContentWraper className="min-h-44">

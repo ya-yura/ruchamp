@@ -2,11 +2,10 @@ import { AddressSection } from './address-section';
 import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
-import { EventTabs } from '@/lib/definitions';
+import { EventOwnerTabs, EventTabs, UserInfo } from '@/lib/definitions';
 import { testData } from '@/lib/constants';
 import { MatchesEvent } from './matches-event';
 import { Grid } from './grid';
-import { Results } from './results';
 import { EventActionButtons } from './event-action-buttons';
 import { Locale } from '@/i18n.config';
 import { getEvent, getEventMatches, getEvents } from '@/lib/actions/events';
@@ -23,10 +22,14 @@ import {
 import { calculateAge, transformDate } from '@/lib/utils/date-and-time';
 import { getRandomInt } from '@/lib/utils/math-utils';
 import {
-  filterDuplicates,
   filterUniqueDisplayedValues,
   getExpectedEvents,
 } from '@/lib/utils/other-utils';
+import { getSession } from '@/lib/actions/auth';
+import { OwnerMain } from './owner-main';
+import { OwnerTeams } from './owner-teams';
+import { OwnerDocs } from './owner-docs';
+import { Results } from '@/components/results/results';
 
 export interface Participant
   extends Omit<
@@ -51,14 +54,21 @@ export interface EventMatch {
 
 async function fetchEventData(eventId: string) {
   try {
+    const session = await getSession();
     const event = await getEvent(eventId);
     const events = await getEvents();
     const participants = await getMatchesParticipants(eventId);
     const matches = await getEventMatches(eventId);
-    return { event, events, participants, matches };
+    return { event, events, participants, matches, session };
   } catch (error) {
     console.error('Error fetching event data:', error);
-    return { event: null, events: [], participants: [], matches: [] };
+    return {
+      event: null,
+      events: [],
+      participants: [],
+      matches: [],
+      session: null,
+    };
   }
 }
 
@@ -69,7 +79,15 @@ export default async function EventPage({
 }) {
   const { id, lang } = params;
   const randomInt = getRandomInt(100);
-  const { event, events, participants, matches } = await fetchEventData(id);
+  const { event, events, participants, matches, session } =
+    await fetchEventData(id);
+  const user: UserInfo | null = session
+    ? {
+        basicInfo: session.user[1],
+        roleInfo: session.user[0],
+      }
+    : null;
+  const isOwner = user?.roleInfo.id === event?.organizer_id;
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
   const weights = participants
     .map((participant) => participant.weight)
@@ -77,16 +95,6 @@ export default async function EventPage({
   const ages = participants
     .map((participant) => calculateAge(participant.birthdate))
     .sort((a, b) => +a - +b);
-
-  function getGradesOptions(): ValueOption[] {
-    const participantGrades = [
-      ...new Set(participants.flatMap((participant) => participant.grade)),
-    ].sort();
-    return participantGrades.map((grade) => ({
-      value: grade,
-      displayedValue: grade,
-    }));
-  }
 
   const gradesOptions = getGradesOptions();
   const weightOptions = rangesFromArray(weights, 5);
@@ -136,10 +144,20 @@ export default async function EventPage({
   };
   const awardingTime: ValueOption = matchesEnd;
 
+  function getGradesOptions(): ValueOption[] {
+    const participantGrades = [
+      ...new Set(participants.flatMap((participant) => participant.grade)),
+    ].sort();
+    return participantGrades.map((grade) => ({
+      value: grade,
+      displayedValue: grade,
+    }));
+  }
+
   if (!event) {
     return (
       <Container>
-        <H4 className="relative">Такого мероприятия не найдено</H4>
+        <H4 className="relative">Такого события не найдено</H4>
       </Container>
     );
   }
@@ -165,21 +183,58 @@ export default async function EventPage({
       />
     ),
     [EventTabs['grid']]: <Grid />,
-    [EventTabs['results']]: <Results />,
+    [EventTabs['results']]: (
+      <Results
+        athletes={[]}
+        goldenMedalWinners={[]}
+        silverMedalWinners={[]}
+        bronzeMedalWinners={[]}
+      />
+    ),
+  };
+
+  const tabsOwnerContent = {
+    [EventOwnerTabs['main']]: (
+      <OwnerMain matches={matches} matchDates={matchDates} />
+    ),
+    [EventOwnerTabs['teams']]: <OwnerTeams />,
+    [EventOwnerTabs['results']]: (
+      <Results
+        athletes={[]}
+        goldenMedalWinners={[]}
+        silverMedalWinners={[]}
+        bronzeMedalWinners={[]}
+      />
+    ),
+    [EventOwnerTabs['docs']]: <OwnerDocs />,
   };
 
   return (
     <Container>
-      <PageWithInfo<EventTabs>
-        id={event.id}
-        type="event"
-        title={event.name}
-        bages={event.sports_in_matches}
-        buttons={<EventActionButtons />}
-        tabsContent={tabsContent}
-        tabsObj={EventTabs}
-        lang={lang}
-      />
+      {isOwner ? (
+        <PageWithInfo<EventOwnerTabs>
+          id={event.id}
+          type="event"
+          title={event.name}
+          bages={event.sports_in_matches}
+          buttons={<EventActionButtons isOwner={isOwner} />}
+          tabsContent={tabsOwnerContent}
+          tabsObj={EventOwnerTabs}
+          isOwner={isOwner}
+          lang={lang}
+        />
+      ) : (
+        <PageWithInfo<EventTabs>
+          id={event.id}
+          type="event"
+          title={event.name}
+          bages={event.sports_in_matches}
+          buttons={<EventActionButtons />}
+          tabsContent={tabsContent}
+          tabsObj={EventTabs}
+          lang={lang}
+        />
+      )}
       <AddressSection event={event} />
       {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
     </Container>
