@@ -37,6 +37,7 @@ templates = Jinja2Templates(directory='templates')
 async def get_events(
     db: AsyncSession = Depends(get_db)
 ):
+    unique_sports_in_matches_info = []
     sports_in_matches_info = []
     query = await db.execute(select(Event.id))
     events_id = query.scalars().all()
@@ -193,6 +194,12 @@ async def create_event(
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
+    query = await db.execute(
+        select(EventOrganizer.id)
+        .where(EventOrganizer.user_id == current_user.id)
+    )
+    org_id = query.scalars().one_or_none()
+
     query = await db.execute(select(EventOrganizer.user_id))
     all_organizer_id = query.scalars().all()
 
@@ -203,7 +210,18 @@ async def create_event(
 
     if current_user.id not in all_organizer_id:
         raise HTTPException(status_code=400, detail="You are not an organizer")
-    new_event = Event(**event_data.dict())
+    new_event = Event(
+        name=event_data.name,
+        start_datetime=event_data.start_datetime,
+        end_datetime=event_data.end_datetime,
+        start_request_datetime=event_data.start_request_datetime,
+        end_request_datetime=event_data.end_request_datetime,
+        location=event_data.location,
+        organizer_id=org_id,
+        event_order=event_data.event_order,
+        event_system=event_data.event_system,
+        description=event_data.description,
+    )
     db.add(new_event)
     await db.commit()
 

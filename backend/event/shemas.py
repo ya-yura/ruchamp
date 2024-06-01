@@ -26,10 +26,8 @@ class EventCreate(BaseModel):
     start_request_datetime: datetime = datetime.now()
     end_request_datetime: datetime = (datetime.now() + timedelta(days=30))
     location: str
-    organizer_id: Optional[int]
     event_order: Optional[str] = None
     event_system: Optional[str] = None
-    geo: Optional[str] = None
     description: Optional[str] = None
 
 
