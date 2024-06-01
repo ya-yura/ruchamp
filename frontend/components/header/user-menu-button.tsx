@@ -47,7 +47,7 @@ export function UserMenuButton({
               <ListItem
                 className="text-right"
                 title="Выйти"
-                href="/ru/logout"
+                href="/logout"
                 lang={lang}
               />
             </ul>
