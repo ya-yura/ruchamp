@@ -43,7 +43,7 @@ export interface Participant
 
 export interface EventMatch {
   id: number;
-  name: string;
+  name: string | null;
   start_datetime: string;
   end_datetime: string;
   sport_name: string;
@@ -52,24 +52,77 @@ export interface EventMatch {
   category_type: string;
 }
 
-async function fetchEventData(eventId: string) {
+// async function fetchEventData(eventId: string) {
+//   try {
+//     const session = await getSession();
+//     const event = await getEvent(eventId);
+//     const events = await getEvents();
+//     const participants = await getMatchesParticipants(eventId);
+//     const matches = await getEventMatches(eventId);
+//     return { event, events, participants, matches, session };
+//   } catch (error) {
+//     console.error('Error fetching event data:', error);
+//     return {
+//       event: null,
+//       events: [],
+//       participants: [],
+//       matches: [],
+//       session: null,
+//     };
+//   }
+// }
+
+async function fetchData(fetchFn: any, errorText: string) {
   try {
-    const session = await getSession();
-    const event = await getEvent(eventId);
-    const events = await getEvents();
-    const participants = await getMatchesParticipants(eventId);
-    const matches = await getEventMatches(eventId);
-    return { event, events, participants, matches, session };
+    const data = await fetchFn();
+    return { data, error: null };
   } catch (error) {
-    console.error('Error fetching event data:', error);
-    return {
-      event: null,
-      events: [],
-      participants: [],
-      matches: [],
-      session: null,
-    };
+    console.error(`Error fetching ${errorText}:`, error);
+    return { data: [], error };
   }
+}
+
+async function fetchEventData(eventId: string) {
+  const sessionPromise = fetchData(getSession, 'user');
+  const eventPromise = fetchData(() => getEvent(eventId), 'event');
+  const eventsPromise = fetchData(getEvents, 'events');
+  const participantsPromise = fetchData(
+    () => getMatchesParticipants(eventId),
+    'participants',
+  );
+  const fetchedMatchesPromise = fetchData(
+    () => getEventMatches(eventId),
+    'matches',
+  );
+
+  const [
+    sessionResult,
+    eventResult,
+    eventsResult,
+    participantsResult,
+    fetchedMatchesResult,
+  ] = await Promise.all([
+    sessionPromise,
+    eventPromise,
+    eventsPromise,
+    participantsPromise,
+    fetchedMatchesPromise,
+  ]);
+
+  return {
+    session: sessionResult.data,
+    event: eventResult.data,
+    events: eventsResult.data,
+    participants: participantsResult.data,
+    fetchedMatches: fetchedMatchesResult.data,
+    errors: {
+      session: sessionResult.error,
+      event: eventResult.error,
+      events: eventsResult.error,
+      participants: participantsResult.error,
+      fetchedMatches: fetchedMatchesResult.error,
+    },
+  };
 }
 
 export default async function EventPage({
@@ -79,7 +132,7 @@ export default async function EventPage({
 }) {
   const { id, lang } = params;
   const randomInt = getRandomInt(100);
-  const { event, events, participants, matches, session } =
+  const { event, events, participants, fetchedMatches, session } =
     await fetchEventData(id);
   const user: UserInfo | null = session
     ? {
@@ -90,11 +143,36 @@ export default async function EventPage({
   const isOwner = user?.roleInfo.id === event?.organizer_id;
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
   const weights = participants
-    .map((participant) => participant.weight)
-    .sort((a, b) => +a - +b);
+    .map((participant: Participant) => participant.weight)
+    .sort((a: Participant, b: Participant) => +a - +b);
   const ages = participants
-    .map((participant) => calculateAge(participant.birthdate))
-    .sort((a, b) => +a - +b);
+    .map((participant: Participant) => calculateAge(participant.birthdate))
+    .sort((a: Participant, b: Participant) => +a - +b);
+
+  let matches: EventMatch[] = !!fetchedMatches.length
+    ? fetchedMatches
+    : [
+        {
+          id: 1,
+          name: null,
+          start_datetime: '2024-05-21T10:29:12.818092',
+          end_datetime: '2024-05-21T10:39:12.818092',
+          sport_name: 'Дзюдо',
+          gender: true,
+          weight_category: 'Тяжёлый',
+          category_type: '1-й юношеский разряд',
+        },
+        {
+          id: 2,
+          name: 'Соревнования за выход на улицу',
+          start_datetime: '2024-05-21T10:29:12.818092',
+          end_datetime: '2024-05-21T10:39:12.818092',
+          sport_name: 'Самбо',
+          gender: true,
+          weight_category: 'Тяжёлый',
+          category_type: '1-й юношеский разряд',
+        },
+      ];
 
   const gradesOptions = getGradesOptions();
   const weightOptions = rangesFromArray(weights, 5);
@@ -112,11 +190,11 @@ export default async function EventPage({
   ];
 
   const allMatchDates: ValueOption[] = matches
-    .map((match) => ({
+    .map((match: EventMatch) => ({
       value: match.start_datetime,
       displayedValue: transformDate(match.start_datetime),
     }))
-    .sort((a, b) => {
+    .sort((a: ValueOption, b: ValueOption) => {
       if (a.value < b.value) return -1;
       if (a.value > b.value) return 1;
       return 0;
@@ -146,11 +224,13 @@ export default async function EventPage({
 
   function getGradesOptions(): ValueOption[] {
     const participantGrades = [
-      ...new Set(participants.flatMap((participant) => participant.grade)),
+      ...new Set(
+        participants.flatMap((participant: Participant) => participant.grade),
+      ),
     ].sort();
     return participantGrades.map((grade) => ({
-      value: grade,
-      displayedValue: grade,
+      value: grade as string,
+      displayedValue: grade as string,
     }));
   }
 
