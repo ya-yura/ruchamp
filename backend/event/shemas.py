@@ -29,6 +29,7 @@ class EventCreate(BaseModel):
     event_order: Optional[str] = None
     event_system: Optional[str] = None
     description: Optional[str] = None
+    geo: Optional[str] = None
 
 
 class EventUpdate(EventCreate):

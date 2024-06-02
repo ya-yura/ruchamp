@@ -304,11 +304,12 @@ async def update_event(
     event.end_request_datetime = event_data.end_request_datetime
     event.location = event_data.location
     event.description = event_data.description
+    event.geo = event_data.geo
     await db.commit()
     return {f"Event ID - {event_id} updated"}
 
 
-@router.post("/delete/{event_id}")
+@router.delete("/delete/{event_id}")
 async def delete_event(
     event_id: int,
     db: AsyncSession = Depends(get_db),
@@ -323,6 +324,24 @@ async def delete_event(
     event = query.scalars().one_or_none()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
+
+    query = await db.execute(
+        select(Event.organizer_id)
+        .where(Event.id == event_id)
+    )
+    org_id = query.scalars().one_or_none()
+    query = await db.execute(
+        select(EventOrganizer.user_id)
+        .where(EventOrganizer.id == org_id)
+    )
+    org_user_id = query.scalars().one_or_none()
+
+    if org_user_id != current_user.id:
+        raise HTTPException(
+            status_code=404,
+            detail="You not organizer this Event"
+        )
+
     await db.delete(event)
     await db.commit()
     return {f"Event ID - {event_id} deleted"}
@@ -661,7 +680,7 @@ async def update_match(
     return {f"Match ID - {match_id} updated"}
 
 
-@router.post("/matches/delete/{match_id}")
+@router.delete("/matches/delete/{match_id}")
 async def delete_match(
     match_id: int,
     db: AsyncSession = Depends(get_db),
