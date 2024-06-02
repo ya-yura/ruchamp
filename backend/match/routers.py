@@ -25,7 +25,7 @@ from teams.schemas import Participant
 router = APIRouter(prefix="/matches", tags=["Matches"])
 
 
-'''@router.post("/add-participant")
+@router.post("/add-participant")
 async def add_participant(
     participant: Participant,
     db: AsyncSession = Depends(get_db),
@@ -33,7 +33,7 @@ async def add_participant(
     new_participant = MatchParticipant(**participant.dict())
     db.add(new_participant)
     await db.commit()
-    return {f"Participant ID - {participant.player_id} added"}'''
+    return {f"Participant ID - {participant.player_id} added"}
 
 
 @router.post("/draw-participants")
