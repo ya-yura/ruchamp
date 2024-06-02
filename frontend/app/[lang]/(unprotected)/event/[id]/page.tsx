@@ -208,7 +208,7 @@ export default async function EventPage({
   };
   const regEnd: ValueOption = {
     value: event?.end_request_datetime || '',
-    displayedValue: transformDate(event?.end_datetime || ''),
+    displayedValue: transformDate(event?.end_request_datetime || ''),
   };
   const matchesStart: ValueOption = {
     value: matchDates[0].value || '',
