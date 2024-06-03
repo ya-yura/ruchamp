@@ -7,7 +7,7 @@ from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select, update, and_
+from sqlalchemy import select, update, and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from auth.models import SystemAdministrator
@@ -221,6 +221,7 @@ async def create_event(
         event_order=event_data.event_order,
         event_system=event_data.event_system,
         description=event_data.description,
+        geo=event_data.geo,
     )
     db.add(new_event)
     await db.commit()
@@ -325,6 +326,11 @@ async def delete_event(
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
 
+    query = await db.execute(select(Match.id).where(Event.id == event_id))
+    matches_in_event = query.scalars().all()
+    if matches_in_event != []:
+        raise HTTPException(status_code=404, detail="Event has matches")
+
     query = await db.execute(
         select(Event.organizer_id)
         .where(Event.id == event_id)
@@ -385,8 +391,7 @@ async def get_matches(
         match_info = query.mappings().all()
         matches.append(match_info[0])
 
-    result = matches
-    return result
+    return matches
 
 
 @router.get("/{event_id}/matches-results")
@@ -554,11 +559,27 @@ async def create_match(
         match_gender = False
 
     # Весовая категория участников
+    min_weight_id_subquery = select(func.min(AllWeightClass.id)).scalar_subquery()
+    max_weight_id_subquery = select(func.max(AllWeightClass.id)).scalar_subquery()
+
     query = await db.execute(
-        select(AllWeightClass.id).where(
-            and_(
-                AllWeightClass.min_weight <= match_data.weight,
-                AllWeightClass.max_weight >= match_data.weight
+        select(
+            case(
+                    (
+                        and_(
+                            AllWeightClass.min_weight <= match_data.weight,
+                            AllWeightClass.max_weight >= match_data.weight
+                        ),
+                        AllWeightClass.id
+                    ),
+                    (
+                        match_data.weight < AllWeightClass.min_weight,
+                        max_weight_id_subquery
+                    ),
+                    (
+                        match_data.weight > AllWeightClass.max_weight,
+                        min_weight_id_subquery
+                    )
                 )
             )
         )
