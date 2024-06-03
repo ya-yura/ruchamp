@@ -5,10 +5,10 @@ import { Locale } from '@/i18n.config';
 import { Country, AllRegions } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
 import { testTeamInTeams } from '@/lib/constants';
-import { getTeams } from '@/lib/actions/teams';
 import { calculateGender } from '@/lib/utils/other-utils';
 import { calculateAge } from '@/lib/utils/date-and-time';
 import { defineDefaultRange, expandRange } from '@/lib/utils/math-utils';
+import { fetchTeams } from '@/lib/data';
 
 interface TeamInfo {
   id: number;
@@ -75,6 +75,7 @@ export default async function Teams({
   params: { lang: Locale };
 }) {
   const { page } = await getDictionary(lang);
+  const teamData = await fetchTeams();
   const dictionary = page.teams;
 
   let teams: Team[] = [];
@@ -121,14 +122,9 @@ export default async function Teams({
     });
   };
 
-  try {
-    const teamData: TeamDataFromServer[] = await getTeams();
-    teams = [...teamData].map(transformTeamData); // remove spreading after tests
-    updateRanges(teams, weightRange, 'weights');
-    updateRanges(teams, ageRange, 'ages');
-  } catch (err) {
-    console.error('Failed to fetch teams data:', err);
-  }
+  teams = [...teamData].map(transformTeamData); // remove spreading after tests
+  updateRanges(teams, weightRange, 'weights');
+  updateRanges(teams, ageRange, 'ages');
 
   const weightRangeWithExpad = expandRange(weightRange, 10);
   const ageRangeWithExpand = expandRange(ageRange, 5);

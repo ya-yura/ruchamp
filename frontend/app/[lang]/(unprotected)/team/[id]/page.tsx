@@ -9,7 +9,6 @@ import { MatchesTeam } from './matches-team';
 import { testMatches, testResults, testTeam } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { Results } from '@/components/results/results';
-import { getTeam, getTeamMatches, getTeamResults } from '@/lib/actions/teams';
 import {
   createFilter,
   genderOptions,
@@ -19,6 +18,7 @@ import {
 } from '@/lib/utils/filters';
 import { calculateAge } from '@/lib/utils/date-and-time';
 import { filterDuplicates } from '@/lib/utils/other-utils';
+import { fetchTeam, fetchTeamMatches, fetchTeamResults } from '@/lib/data';
 
 export interface ValueOption {
   value: string | number[];
@@ -157,9 +157,11 @@ export default async function TeamPage({
 }) {
   const lang = params.lang;
   const id = params.id;
-  const team: TeamByIdFromServer = await getTeam(id);
-  const matches: TeamMatch[] = await getTeamMatches(id);
-  const results: TeamMemberWithResults[] = await getTeamResults(id);
+  const [team, matches, results] = await Promise.all([
+    fetchTeam(id),
+    fetchTeamMatches(id),
+    fetchTeamResults(id),
+  ]);
   const teamInfo = team.Team;
   const members = team.Members;
   const captainId = team.Captain.user_id;

@@ -4,9 +4,9 @@ import { Container } from '@/components/container';
 import { testData } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { getEvents } from '@/lib/actions/events';
 import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
 import { sortedEventsByDate } from '@/lib/utils/filters';
+import { fetchEvents } from '@/lib/data';
 
 export default async function Events({
   params: { lang },
@@ -14,19 +14,13 @@ export default async function Events({
   params: { lang: Locale };
 }) {
   const { page } = await getDictionary(lang);
+  const events: Event[] = await fetchEvents();
+  const usersEvents: Event[] = []; // make this logic later
   const dictionary = page.events;
-  let events: Event[];
-  try {
-    events = await getEvents();
-  } catch (err) {
-    events = [];
-  }
 
-  const { futureEvents, pastEvents } = divideEventsByDateTime([...events]); // remove spreading after testing
+  const { futureEvents, pastEvents } = divideEventsByDateTime(events);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
   const sortedPastEvents = sortedEventsByDate(pastEvents);
-
-  const usersEvents: Event[] = [];
 
   return (
     <Container>
