@@ -9,13 +9,18 @@ import {
   TeamMatch,
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { revalidatePath } from 'next/cache';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function fetchEvents(): Promise<Event[]> {
   // noStore();
   try {
-    const res = await fetch(`${baseUrl}/event/events`, {});
+    const res = await fetch(`${baseUrl}/event/events`, {
+      cache: 'force-cache',
+      // next: {revalidate: }
+    });
+    // revalidatePath('/events');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error('Error while fetching events:', error);
