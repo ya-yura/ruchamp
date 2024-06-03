@@ -19,7 +19,7 @@ export async function fetchEvents(): Promise<Event[]> {
       // cache: 'force-cache',
       next: { revalidate: 300 },
     });
-    // revalidatePath('/events');
+    revalidatePath('/events');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error('Error while fetching events:', error);
@@ -69,6 +69,8 @@ export async function fetchTeams(): Promise<TeamDataFromServer[]> {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
       next: { revalidate: 300 },
     });
+    revalidatePath('/teams');
+
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);
