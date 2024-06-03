@@ -37,11 +37,12 @@ export function MatchesField({
       {groupedMatches.map((group) => (
         <li className="flex flex-col gap-3" key={group.event_id}>
           <div className="flex gap-2">
-            <H4>
+            <H4 className="max-w-[35%] truncate">
               {group.name.endsWith('.') ? group.name.slice(0, -1) : group.name}
             </H4>
+
             <H4 className="font-normal">– {group.start_datetime}.</H4>
-            <H4 className="font-light text-neutralForeground3Rest">
+            <H4 className="max-w-[35%] truncate font-light text-neutralForeground3Rest">
               {group.location}
             </H4>
           </div>

@@ -18,10 +18,14 @@ export async function encrypt(payload: any) {
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ['HS256'],
-  });
-  return payload;
+  try {
+    const { payload } = await jwtVerify(input, key, {
+      algorithms: ['HS256'],
+    });
+    return payload;
+  } catch (err) {
+    console.log('Error, jwt expired: ', err);
+  }
 }
 
 export async function authenticate(
@@ -52,7 +56,9 @@ export async function logout() {
 
 export async function getSession() {
   const session = cookies().get('session')?.value;
-  if (!session) return null;
+  if (!session) {
+    return null;
+  }
   return await decrypt(session);
 }
 

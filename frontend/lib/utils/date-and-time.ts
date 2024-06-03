@@ -12,6 +12,7 @@ import { Event } from '../definitions';
 import { DateRange } from 'react-day-picker';
 
 export function transformDate(inputDate: string, isWithTime?: boolean): string {
+  if (!inputDate) return '';
   const currentDate = new Date();
   const parsedDate = parseISO(inputDate);
   const day = parsedDate.getDate(); // Get the day of the month without leading zero

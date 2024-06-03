@@ -4,7 +4,7 @@ import {
   TextCardColored,
   TextCardColoredProps,
 } from '@/components/cards/text-card-colored';
-import { H4 } from '@/components/text';
+import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { Separator } from '@/components/ui/separator';
 import React, { useMemo, useState } from 'react';
 import { MatchesEventTabs } from './matches-events-tabs';
@@ -20,13 +20,15 @@ interface OwnerMainProps {
 
 export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
-    matchDates[0].displayedValue,
+    matchDates[0]?.displayedValue || '',
   );
 
   const filteredMatches = useMemo(() => {
-    return matches.filter(
-      (match) => transformDate(match.start_datetime) === selectedDate,
-    );
+    return !!matches.length
+      ? matches.filter(
+          (match) => transformDate(match.start_datetime) === selectedDate,
+        )
+      : [];
   }, [selectedDate, matches]);
 
   function handleTabChange(value: string): void {
@@ -45,13 +47,19 @@ export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
           Добавить мероприятие
         </Button>
       </div>
-      <MatchesEventTabs
-        matches={filteredMatches}
-        matchDates={matchDates}
-        value={selectedDate}
-        handleTabChange={handleTabChange}
-        isOwner={true}
-      />
+      {!!matches.length ? (
+        <MatchesEventTabs
+          matches={filteredMatches}
+          matchDates={matchDates}
+          value={selectedDate}
+          handleTabChange={handleTabChange}
+          isOwner={true}
+        />
+      ) : (
+        <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
+          Мероприятий пока что не создано
+        </PersonDescriptionOnCard>
+      )}
     </div>
   );
 }

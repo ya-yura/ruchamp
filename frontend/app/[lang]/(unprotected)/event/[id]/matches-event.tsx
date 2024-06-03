@@ -7,6 +7,7 @@ import { ValueOption } from '../../team/[id]/page';
 import { MatchesEventTabs } from './matches-events-tabs';
 import { EventTiming } from './event-timing';
 import { transformDate } from '@/lib/utils/date-and-time';
+import { PersonDescriptionOnCard } from '@/components/text';
 
 interface MatchesEventProps {
   matches: EventMatch[];
@@ -28,7 +29,7 @@ export function MatchesEvent({
   awardingTime,
 }: MatchesEventProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
-    matchDates[0].displayedValue,
+    matchDates[0]?.displayedValue || '',
   );
 
   const filteredMatches = useMemo(() => {
@@ -43,19 +44,27 @@ export function MatchesEvent({
 
   return (
     <ContentWraper className="min-h-44 gap-16">
-      <EventTiming
-        regStart={regStart}
-        regEnd={regEnd}
-        matchesStart={matchesStart}
-        matchesEnd={matchesEnd}
-        awardingTime={awardingTime}
-      />
-      <MatchesEventTabs
-        matches={filteredMatches}
-        matchDates={matchDates}
-        value={selectedDate}
-        handleTabChange={handleTabChange}
-      />
+      {!!matches.length ? (
+        <>
+          <EventTiming
+            regStart={regStart}
+            regEnd={regEnd}
+            matchesStart={matchesStart}
+            matchesEnd={matchesEnd}
+            awardingTime={awardingTime}
+          />
+          <MatchesEventTabs
+            matches={filteredMatches}
+            matchDates={matchDates}
+            value={selectedDate}
+            handleTabChange={handleTabChange}
+          />
+        </>
+      ) : (
+        <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
+          Мероприятий пока что не создано
+        </PersonDescriptionOnCard>
+      )}
     </ContentWraper>
   );
 }

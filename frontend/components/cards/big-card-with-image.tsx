@@ -1,12 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { path } from '@/lib/utils/other-utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
+import { CustomLink } from '../custom-link';
 
 interface BigCardWithImage {
   type: 'event' | 'team';
@@ -94,12 +94,17 @@ export function BigCardWithImage({
             />
           </svg>
         </Button>
-        <Button
-          variant="ruchampDefault"
-          onClick={() => router.push(path(lang, `/${type}/${id}`))}
+        <CustomLink
+          className={cn(
+            'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+            'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+            'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          )}
+          lang={lang}
+          href={`/${type}/${id}`}
         >
           Подробнее
-        </Button>
+        </CustomLink>
       </div>
     </li>
   );
