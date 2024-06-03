@@ -14,11 +14,10 @@ import { revalidatePath } from 'next/cache';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function fetchEvents(): Promise<Event[]> {
-  // noStore();
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
-      cache: 'force-cache',
-      // next: {revalidate: }
+      // cache: 'force-cache',
+      next: { revalidate: 300 },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : [];
@@ -67,7 +66,9 @@ export async function fetchParticipants(id: string): Promise<Participant[]> {
 
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
-    const res = await fetch(`${baseUrl}/team/get-all-teams`);
+    const res = await fetch(`${baseUrl}/team/get-all-teams`, {
+      next: { revalidate: 300 },
+    });
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);

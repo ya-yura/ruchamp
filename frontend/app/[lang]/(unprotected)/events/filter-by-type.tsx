@@ -45,7 +45,7 @@ export function FilterByType({
   setSelected,
   children,
 }: FilterByTypeProps) {
-  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>([]);
+  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>(options);
   const [unPoularSportsTypes, setUnPopularSportTypes] = useState<string[]>([]);
   const [windowWidth] = useWindowWidth(500);
 

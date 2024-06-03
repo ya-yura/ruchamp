@@ -7,6 +7,9 @@ import { getDictionary } from '@/lib/dictionary';
 import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
 import { sortedEventsByDate } from '@/lib/utils/filters';
 import { fetchEvents } from '@/lib/data';
+import { Suspense } from 'react';
+import { EventsPageSkeleton } from '@/components/skeletons';
+import Loading from './loading';
 
 export default async function Events({
   params: { lang },
@@ -24,13 +27,15 @@ export default async function Events({
 
   return (
     <Container>
-      <EventsTabs
-        dictionary={dictionary}
-        lang={lang}
-        futureEvents={sortedFutureEvents}
-        pastEvents={sortedPastEvents}
-        usersEvents={usersEvents}
-      />
+      <Suspense fallback={<Loading />}>
+        <EventsTabs
+          dictionary={dictionary}
+          lang={lang}
+          futureEvents={sortedFutureEvents}
+          pastEvents={sortedPastEvents}
+          usersEvents={usersEvents}
+        />
+      </Suspense>
     </Container>
   );
 }
