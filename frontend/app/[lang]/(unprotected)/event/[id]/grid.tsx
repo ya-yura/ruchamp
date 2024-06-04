@@ -38,9 +38,10 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
   const mtVariants: Record<string, string> = {
     0: 'mt-[0]',
     1: 'mt-[36px]',
-    2: 'mt-[108px]',
-    3: 'mt-[252px]',
-    4: 'mt-[540px]',
+    2: 'mt-[90px]',
+    3: 'mt-[198px]',
+    4: 'mt-[414px]',
+    5: 'mt-[846px]',
   };
 
   return (
@@ -70,7 +71,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                 player_1={fight.player_1}
                 player_2={fight.player_2}
                 isFirstCol={index === 0}
-                isLastCol={index === round.fights.length}
+                isLastCol={index === rounds.length - 1}
                 roundIndex={index}
               />
             ))}
@@ -135,16 +136,18 @@ export function GridCard({
   const arrowHeight: Record<string, string> = {
     0: 'h-[0]',
     1: 'h-[18px]',
-    2: 'h-[108px]',
-    3: 'h-[252px]',
-    4: 'h-[324px]',
+    2: 'h-[72px]',
+    3: 'h-[180px]',
+    4: 'h-[396px]',
+    5: 'h-[828px]',
   };
   const spaceHeight: Record<string, string> = {
     0: 'h-[36px]',
-    1: 'h-[144px]',
-    2: 'h-[288px]',
-    3: 'h-[288px]',
-    4: 'h-[360px]',
+    1: 'h-[108px]',
+    2: 'h-[216px]',
+    3: 'h-[432px]',
+    4: 'h-[864px]',
+    5: 'h-[0]',
   };
 
   return (
@@ -200,20 +203,21 @@ export function GridCard({
           </div>
         </div>
       </div>
-      <div className="relative flex h-1/2 w-full items-end">
-        <div className="border-Grey102 w-full border-b border-dashed"></div>
-        {/* <div className="border-Grey102 h-0 w-full border border-dashed"></div> */}
-        <p className="relative bottom-[-8px] mt-[10px] text-nowrap px-1 text-xs font-semibold text-text-muted">
-          <span className={cn(isPlayerFirstWinner ? 'text-white' : '')}>
-            {player_1.points}
-          </span>{' '}
-          :{' '}
-          <span className={cn(!isPlayerFirstWinner ? 'text-white' : '')}>
-            {player_2.points}
-          </span>
-        </p>
-        {/* <div className="border-Grey102 h-0 w-full border border-dashed"></div> */}
-      </div>
+      {!isLastCol && (
+        <div className="relative flex h-1/2 w-full items-end">
+          <div className="border-Grey102 w-full border-b border-dashed"></div>
+          <p className="relative bottom-[-8px] mt-[10px] text-nowrap px-1 text-xs font-semibold text-text-muted">
+            <span className={cn(isPlayerFirstWinner ? 'text-white' : '')}>
+              {player_1.points}
+            </span>{' '}
+            :{' '}
+            <span className={cn(!isPlayerFirstWinner ? 'text-white' : '')}>
+              {player_2.points}
+            </span>
+          </p>
+        </div>
+      )}
+
       <div className={cn(spaceHeight[roundIndex])}></div>
     </li>
   );
