@@ -58,12 +58,15 @@ async def get_events(
                 Event.image_field,
                 Event.description,
                 Event.geo
-            ).join(
+            )
+            .join(
                 EventOrganizer, EventOrganizer.id == Event.organizer_id
-            ).where(Event.id == event_id)
+            )
+            .where(Event.id == event_id)
         )
         event_info = query.mappings().all()
         event = event_info[0]
+
         query = await db.execute(
             select(Match.id)
             .where(Match.event_id == event_id)
