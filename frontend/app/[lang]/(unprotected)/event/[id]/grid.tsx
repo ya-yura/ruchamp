@@ -1,45 +1,245 @@
-import { TextCard } from '../../../../../components/cards/text-card';
+import { ContentWraper } from '@/components/content-wraper';
+import { GridFight, GridInfo, GridPlayer, GridRound } from './page';
+import { Tag } from '@/components/tag';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { H4 } from '@/components/text';
+import { format } from 'date-fns';
+import { Separator } from '@/components/ui/separator';
 
-type TypeMockData = {
-  title?: string;
-  text: string;
-};
+interface GridProps {
+  info: GridInfo;
+  rounds: GridRound[];
+}
 
-const mockData1: TypeMockData[] = [
-  {
-    title: 'Информация про Турнирую сетку',
-    text: 'Банальные, но неопровержимые выводы, а также некоторые особенности внутренней политики указаны как претенденты на роль ключевых факторов. Современные технологии достигли такого уровня, что сплочённость команды профессионалов требует определения и уточнения соответствующих условий активизации. Разнообразный и богатый опыт говорит нам, что современная методология разработки однозначно фиксирует необходимость экспериментов, поражающих по своей масштабности и грандиозности.',
-  },
-];
-
-const mockData2: TypeMockData[] = [
-  {
-    title: '12 июня, 14:00',
-    text: 'Начало мероприятия',
-  },
-  {
-    title: '1 марта — 10 июня',
-    text: 'Приём заявок на участие',
-  },
-  {
-    title: 'Министерство спорта Калининградской области',
-    text: 'Организатор',
-  },
-];
-
-export function Grid() {
+export function Grid({ info, rounds }: GridProps) {
   return (
-    <div className="flex gap-4" role="tabpanel" aria-labelledby="grid">
-      <div className="flex w-2/3 flex-col gap-[18px]">
-        {mockData1.map((item) => (
-          <TextCard key={item.title} title={item.title} text={item.text} />
-        ))}
+    <ContentWraper className="min-h-44 gap-12">
+      <div className="flex gap-2">
+        <Tag variant={'default'}>{info.sport_name}</Tag>
+        <Tag variant={'transparentAccentBorder'}>{info.gender}</Tag>
+        <Tag variant={'transparentGrayBorder'}>{info.weight_category}</Tag>
+        <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>
-      <div className="flex w-1/3 flex-col gap-[18px]">
-        {mockData2.map((item) => (
-          <TextCard key={item.title} title={item.title} text={item.text} />
+      <GridField rounds={rounds} />
+    </ContentWraper>
+  );
+}
+
+function GridField({ rounds }: { rounds: GridRound[] }) {
+  const colVariants: Record<number, string> = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5',
+    6: 'grid-cols-6',
+  };
+  const mtVariants: Record<string, string> = {
+    0: 'mt-[0]',
+    1: 'mt-[36px]',
+    2: 'mt-[108px]',
+    3: 'mt-[252px]',
+    4: 'mt-[540px]',
+  };
+
+  return (
+    <div className="flex flex-col gap-5">
+      <ul className={cn('grid', colVariants[rounds.length])}>
+        {rounds.map((round) => (
+          <li key={round.name}>
+            <p className="text-center text-4xl font-bold text-card-background">
+              {round.name}
+            </p>
+          </li>
         ))}
+      </ul>
+      <ul
+        className={cn(
+          'grid rounded-lg bg-black p-4',
+          colVariants[rounds.length],
+        )}
+      >
+        {rounds.map((round, index) => (
+          <ul key={round.name} className={cn(mtVariants[index])}>
+            {round.fights.map((fight) => (
+              <GridCard
+                key={fight.fight_info.fight_id}
+                time={fight.fight_info.start_time}
+                mat_number={fight.fight_info.mat_number}
+                player_1={fight.player_1}
+                player_2={fight.player_2}
+                isFirstCol={index === 0}
+                isLastCol={index === round.fights.length}
+                roundIndex={index}
+              />
+            ))}
+          </ul>
+        ))}
+
+        {/* <GridCol fights={rounds[0].fights} isFirstCol={true} />
+        {rounds.slice(1).map((round) => (
+          <GridCol key={round.name} fights={round.fights} />
+        ))} */}
+      </ul>
+    </div>
+  );
+}
+
+// interface GridColProps {
+//   fights: GridFight[];
+//   isFirstCol?: boolean;
+//   isLastCol?: boolean;
+// }
+
+// function GridCol({ fights, isFirstCol, isLastCol }: GridColProps) {
+//   return (
+//     <ul className={cn(isFirstCol ? 'mt-0' : 'mt-[36px]')}>
+//       {fights.map((fight) => (
+//         <GridCard
+//           key={fight.fight_info.fight_id}
+//           time={fight.fight_info.start_time}
+//           mat_number={fight.fight_info.mat_number}
+//           player_1={fight.player_1}
+//           player_2={fight.player_2}
+//           isFirstCol={isFirstCol}
+//           isLastCol={isLastCol}
+//         />
+//       ))}
+//     </ul>
+//   );
+// }
+
+interface GridCardProps {
+  time: string;
+  mat_number: number;
+  player_1: GridPlayer;
+  player_2: GridPlayer;
+  isFirstCol?: boolean;
+  isLastCol?: boolean;
+  roundIndex: number;
+  className?: string;
+}
+
+export function GridCard({
+  time,
+  mat_number,
+  player_1,
+  player_2,
+  isFirstCol,
+  isLastCol,
+  roundIndex,
+  className,
+}: GridCardProps) {
+  const isPlayerFirstWinner = player_1.points > player_2.points;
+  const arrowHeight: Record<string, string> = {
+    0: 'h-[0]',
+    1: 'h-[18px]',
+    2: 'h-[108px]',
+    3: 'h-[252px]',
+    4: 'h-[324px]',
+  };
+  const spaceHeight: Record<string, string> = {
+    0: 'h-[36px]',
+    1: 'h-[144px]',
+    2: 'h-[288px]',
+    3: 'h-[288px]',
+    4: 'h-[360px]',
+  };
+
+  return (
+    <li className="grid grid-cols-[122px_1fr]">
+      <div className="flex flex-col">
+        {!isFirstCol && (
+          <>
+            <div
+              className={cn(
+                'border-Grey102 relative order-first w-1/2 border-e border-t border-dashed',
+                arrowHeight[roundIndex],
+              )}
+            >
+              <Image
+                className="absolute bottom-[-1px] right-[-6px] h-3 w-3"
+                src={'/ru/images/icons/triangle.svg'}
+                alt=""
+                width={10}
+                height={10}
+              />
+            </div>
+            <div
+              className={cn(
+                'border-Grey102 relative order-last w-1/2 border-b border-e border-dashed',
+                arrowHeight[roundIndex],
+              )}
+            >
+              <Image
+                className="absolute right-[-6px] top-[-1px] h-3 w-3 rotate-180"
+                src={'/ru/images/icons/triangle.svg'}
+                alt=""
+                width={10}
+                height={10}
+              />
+            </div>
+          </>
+        )}
+        <div
+          className={cn(
+            'flex h-[72px] justify-between rounded-lg bg-card-background px-3 py-2',
+            className,
+          )}
+        >
+          <div>
+            <H4>{format(time, 'HH:mm')}</H4>
+            <p className="text-ColorsGrey26 whitespace-pre-line text-sm">
+              Мат № {mat_number}
+            </p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <GridCardPlayerId player={player_1} isWinner={true} />
+            <GridCardPlayerId player={player_2} isWinner={true} />
+          </div>
+        </div>
       </div>
+      <div className="relative flex h-1/2 w-full items-end">
+        <div className="border-Grey102 w-full border-b border-dashed"></div>
+        {/* <div className="border-Grey102 h-0 w-full border border-dashed"></div> */}
+        <p className="relative bottom-[-8px] mt-[10px] text-nowrap px-1 text-xs font-semibold text-text-muted">
+          <span className={cn(isPlayerFirstWinner ? 'text-white' : '')}>
+            {player_1.points}
+          </span>{' '}
+          :{' '}
+          <span className={cn(!isPlayerFirstWinner ? 'text-white' : '')}>
+            {player_2.points}
+          </span>
+        </p>
+        {/* <div className="border-Grey102 h-0 w-full border border-dashed"></div> */}
+      </div>
+      <div className={cn(spaceHeight[roundIndex])}></div>
+    </li>
+  );
+}
+
+function GridCardPlayerId({
+  player,
+  isWinner,
+}: {
+  player: GridPlayer;
+  isWinner: boolean;
+}) {
+  return (
+    <div className="bg-Grey100 relative flex justify-center rounded-md p-[6px]">
+      {isWinner && (
+        <Image
+          className="absolute left-0 top-[calc(50%-5px)]"
+          src={'/images/icons/winner-marker.svg'}
+          alt=""
+          width={2}
+          height={10}
+        />
+      )}
+      <p className="text-Grey101 text-[10px] font-semibold">
+        {player.player_id}
+      </p>
     </div>
   );
 }
