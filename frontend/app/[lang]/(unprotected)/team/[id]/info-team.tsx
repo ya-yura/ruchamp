@@ -94,9 +94,7 @@ function CaptainAndCoaches({
 function MainTeamInfo({ desription }: { desription: TeamInfo['description'] }) {
   return (
     <>
-      <TextCard title={'Подзаголовок 1'} text={desription} />
-      <TextCard title={'Подзаголовок 2'} text={`Наш капитан - лучший!!!`} />
-      <TextCard title={'Подзаголовок 3'} text={`Обожаем наших тренеров!`} />
+      <TextCard title={'Описание'} text={desription} />
     </>
   );
 }

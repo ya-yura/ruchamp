@@ -25,15 +25,7 @@ export function InfoEvent({ event }: { event: Event }) {
 function MainEventInfo({ description }: { description: string }) {
   return (
     <>
-      <TextCard title={'Подзаголовок 1'} text={description} />
-      <TextCard
-        title={'Подзаголовок 2'}
-        text={`От массовости – к мастерству!`}
-      />
-      <TextCard
-        title={'Подзаголовок 3'}
-        text={`Приглашаем принять участие в нашем мероприятии!`}
-      />
+      <TextCard title={'Описание'} text={description} />
     </>
   );
 }

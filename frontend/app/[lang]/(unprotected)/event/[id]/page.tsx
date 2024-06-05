@@ -3,7 +3,7 @@ import { Container } from '@/components/container';
 import { ExpectedEvents } from './expected-events';
 import { PageWithInfo } from '@/components/page-with-info';
 import { EventOwnerTabs, EventTabs, UserInfo } from '@/lib/definitions';
-import { testData } from '@/lib/constants';
+import { testData, testGridData } from '@/lib/constants';
 import { MatchesEvent } from './matches-event';
 import { Grid } from './grid';
 import { EventActionButtons } from './event-action-buttons';
@@ -55,6 +55,48 @@ export interface EventMatch {
   weight_category: string;
   category_type: string;
 }
+
+export interface GridInfo {
+  method: string;
+  age_grade: number;
+  sport_name: string;
+  weight_category: string;
+  gender: string;
+}
+
+interface GridFightInfo {
+  fight_id: number;
+  mat_number: number;
+  start_time: string;
+}
+
+export interface GridPlayer {
+  player_id: number;
+  first_name: string;
+  last_name: string;
+  birthdate: string;
+  team_name: string;
+  team_id: number;
+  points: number;
+}
+
+export interface GridFight {
+  fight_info: GridFightInfo;
+  player_1: GridPlayer;
+  player_2: GridPlayer;
+}
+
+export interface GridRound {
+  name: string;
+  fights: GridFight[];
+}
+
+export interface GridData {
+  grid_info: GridInfo;
+  rounds: GridRound[];
+}
+
+
 
 export default async function EventPage({
   params,
@@ -173,7 +215,12 @@ export default async function EventPage({
         awardingTime={awardingTime}
       />
     ),
-    [EventTabs['grid']]: <Grid />,
+    [EventTabs['grid']]: (
+      <Grid
+        info={testGridData.grid_info}
+        rounds={testGridData.rounds}
+      />
+    ),
     [EventTabs['results']]: (
       <Results
         athletes={[]}
@@ -226,8 +273,8 @@ export default async function EventPage({
           lang={lang}
         />
       )}
-      <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
+      {/* <AddressSection event={event} />
+      {events.length > 0 && <ExpectedEvents events={expectedEvents} />} */}
     </Container>
   );
 }
