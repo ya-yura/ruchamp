@@ -20,7 +20,8 @@ from event.models import (Event, EventOrganizer, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
                           ApplicationStatusHistory, MatchAge, MatchSport,
                           MatchGender, MatchCategory, WinnerTable,
-                          MatchWeights, MatchParticipant, Medal)
+                          MatchWeights, MatchParticipant, Medal,
+                          SportType)
 from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplicationTeam,
                           CreateTournamentApplicationAthlete,
@@ -31,6 +32,14 @@ from geo.geo import get_geo
 
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')
+
+
+@router.get("/sports")
+async def get_sports(
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(select(SportType.name))
+    return query.scalars().all()
 
 
 @router.get("/events")
