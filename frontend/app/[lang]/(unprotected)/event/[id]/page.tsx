@@ -96,8 +96,6 @@ export interface GridData {
   rounds: GridRound[];
 }
 
-
-
 export default async function EventPage({
   params,
 }: {
@@ -216,10 +214,7 @@ export default async function EventPage({
       />
     ),
     [EventTabs['grid']]: (
-      <Grid
-        info={testGridData.grid_info}
-        rounds={testGridData.rounds}
-      />
+      <Grid info={testGridData.grid_info} rounds={testGridData.rounds} />
     ),
     [EventTabs['results']]: (
       <Results
@@ -273,8 +268,8 @@ export default async function EventPage({
           lang={lang}
         />
       )}
-      {/* <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} />} */}
+      <AddressSection event={event} />
+      {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
     </Container>
   );
 }
