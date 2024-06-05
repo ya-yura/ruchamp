@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Container } from '@/components/container';
 import { TeamsListing } from './teams-listing';
 import { Locale } from '@/i18n.config';
@@ -9,6 +9,7 @@ import { calculateGender } from '@/lib/utils/other-utils';
 import { calculateAge } from '@/lib/utils/date-and-time';
 import { defineDefaultRange, expandRange } from '@/lib/utils/math-utils';
 import { fetchTeams } from '@/lib/data';
+import Loading from './loading';
 
 interface TeamInfo {
   id: number;
@@ -133,15 +134,17 @@ export default async function Teams({
 
   return (
     <Container>
-      <TeamsListing
-        teams={teams}
-        weightRange={weightRangeWithExpad}
-        ageRange={ageRangeWithExpand}
-        weightDefaults={weightDefaults}
-        ageDefaults={ageDefaults}
-        lang={lang}
-        dictionary={dictionary}
-      />
+      <Suspense fallback={<Loading />}>
+        <TeamsListing
+          teams={teams}
+          weightRange={weightRangeWithExpad}
+          ageRange={ageRangeWithExpand}
+          weightDefaults={weightDefaults}
+          ageDefaults={ageDefaults}
+          lang={lang}
+          dictionary={dictionary}
+        />
+      </Suspense>
     </Container>
   );
 }

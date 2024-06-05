@@ -95,12 +95,11 @@ export function TeamsListing({
           selected={selectedSportTypes}
           setSelected={setSelectedSportTypes}
         />
-
-        <p className="mb-5 mr-auto text-base text-background">
+        {/* <p className="mb-5 mr-auto text-base text-background">
           {!!filteredTeams.length
             ? `Найдено: ${filteredTeams.length}`
             : 'Ничего не найдено'}
-        </p>
+        </p> */}
         <BigCardsWithImageField
           cards={filteredTeams}
           type="team"
