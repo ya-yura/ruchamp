@@ -38,18 +38,18 @@ export function BigCardWithImage({
     <li
       className={cn(
         'group flex h-[450px] w-full cursor-default flex-col overflow-hidden pb-3',
-        'rounded-xl bg-[#292929] transition-all hover:scale-[101%] hover:shadow-cardShadow',
+        'rounded-xl bg-card-background transition-all hover:scale-[101%] hover:shadow-cardShadow',
         className,
       )}
     >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
-          className="opacity-30"
           src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
           alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}
         />
+        <div className="absolute left-0 top-0 h-full w-full bg-card-background opacity-70"></div>
         <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
           {name}
         </h3>

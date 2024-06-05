@@ -18,7 +18,9 @@ export function rangesFromArray(array: number[], step: number): ValueOption[] {
     const min = roundToBase(i, step, 'down');
     const max = roundToBase(i, step, 'up');
     let range: number[] = [];
-    if (min === max) {
+    if (i === 0) {
+      range = [0, 0];
+    } else if (min === max) {
       range = [max - step, max];
     } else range = [min, max];
     const stringifyedRes = res.map((i) => JSON.stringify(i));
@@ -27,7 +29,7 @@ export function rangesFromArray(array: number[], step: number): ValueOption[] {
   });
   return res.map((i) => ({
     value: i,
-    displayedValue: i.join(' – '),
+    displayedValue: i[0] === 0 && i[1] === 0 ? 'не указан' : i.join(' – '),
   }));
 }
 

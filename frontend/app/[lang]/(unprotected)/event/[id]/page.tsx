@@ -109,6 +109,7 @@ export default async function EventPage({
     fetchMatches(id),
     fetchParticipants(id),
   ]);
+
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],
@@ -268,8 +269,8 @@ export default async function EventPage({
           lang={lang}
         />
       )}
-      {/* <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} />} */}
+      <AddressSection event={event} />
+      {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
     </Container>
   );
 }
