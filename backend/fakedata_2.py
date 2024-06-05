@@ -43,7 +43,7 @@ num_teams = int(num_athletes * 0.5)
 num_team_members = 20
 team_size = 200
 
-num_events = int(num_teams * 3)
+num_events = 170
 num_participants = int(num_athletes * num_events / 10)
 num_matches = int(num_events * 3)
 num_results = int(num_events * num_matches)
@@ -337,17 +337,24 @@ locations = [
     "УрФО", "СФО", "ДВФО"
 ]
 
-sports = [
-    "рукопашному бою", "тайскому боксу", "дзюдо", "ушу", "тхэквондо", "боксу",
-    "самбо", "боевому самбо", "армейскому рукопашному бою", "вольной борьбе",
-    "греко-римской борьбе", "каратэ"
+sports_for_events = [
+    "Рукопашному бою", "Тайскому боксу", "Дзюдо", "Ушу", "Тхэквондо", "Боксу",
+    "Самбо", "Боевому самбо", "Армейскому рукопашному бою", "Вольной борьбе",
+    "Греко-римской борьбе", "Каратэ"
 ]
 
+sports = [
+    "Рукопашный бой", "Тайский бокс", "Дзюдо", "Ушу", "Тхэквондо", "Бокс",
+    "Самбо", "Боевое самбо", "Армейский рукопашный бой", "Вольная борьба",
+    "Греко-римская борьба", "Каратэ"
+]
+
+
 # Функция генерации названий спортивных мероприятий
-def generate_event_name(event_types, locations, sports):
+def generate_event_name(event_types, locations, sports_for_events):
     event_type = random.choice(event_types)
     location = random.choice(locations)
-    sport = random.choice(sports)
+    sport = random.choice(sports_for_events)
     return f"{event_type} {location} по {sport}"
 
 
@@ -371,6 +378,7 @@ nouns = [
     "грифоны", "витязи", "титаны"
 ]
 
+
 def generate_team_name(cities, adjectives, nouns):
     city = random.choice(cities)
     adjective = random.choice(adjectives)
@@ -382,14 +390,15 @@ def generate_team_name(cities, adjectives, nouns):
 event_types = ["Турнир", "Чемпионат", "Соревнования"]
 martial_arts = ["Кэмпо", "дзюдо", "тхэквондо", "самбо", "боевое самбо", "рукопашный бой"]
 disciplines = ["Gi", "NoGi", "MMA", "K-1"]
-cities = ["Москва", "Санкт-Петербург", "Казань", "Новосибирск", "Екатеринбург", "Челябинск", "Ростов-на-Дону"]
+local = ["Москва", "Санкт-Петербург", "Казань", "Новосибирск", "Екатеринбург", "Челябинск", "Ростов-на-Дону"]
 venues = ["ул. Барбюса 79б", "пр-т Ленина 50", "ул. Мира 22", "ул. Пушкина 18"]
+
 
 def generate_event_description():
     event_type = random.choice(event_types)
     martial_art = random.choice(martial_arts)
     discipline_list = random.sample(disciplines, k=random.randint(2, 4))
-    city = random.choice(cities)
+    city = random.choice(local)
     venue = random.choice(venues)
     date = f"{random.randint(1, 28)} {random.choice(['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'])}"
 
@@ -545,21 +554,18 @@ def generate_fake_coaches(session, num_coaches=num_coaches):
     session.commit()
 
 
-def generate_fake_users(session, num_users=num_users):
-    users_data = []
-
+def generate_fake_users_0(session):
     user_data = {
         'id': 0,
         'email': fake.email(),
         'username': 'Empty user',
         'registered_at': fake.date_time_this_decade(),
-        'role_id': fake.random_int(min=1, max=5),
+        'role_id': 1,
 
         'name': "Нет игрока",
         'sirname': '',
         'fathername': '',
         'gender': fake.boolean(chance_of_getting_true=75),
-        'country': fake.random_element(elements=[random_country.name for random_country in session.query(Country).all()]),
         'birthdate': fake.date_of_birth(minimum_age=12, maximum_age=80),
 
         'hashed_password': fake.password(length=12),
@@ -568,6 +574,14 @@ def generate_fake_users(session, num_users=num_users):
         'is_verified': fake.boolean(),
         'verification_token': str(fake.uuid4()),
     }
+
+    user = User(**user_data)
+    session.add(user)
+    session.commit()
+
+
+def generate_fake_users(session, num_users=num_users):
+    users_data = []
 
     for _ in range(num_users):
         user_data = {
@@ -580,7 +594,6 @@ def generate_fake_users(session, num_users=num_users):
             'sirname': fake.last_name(),
             'fathername': fake.first_name_male() if fake.boolean(chance_of_getting_true=50) else fake.first_name_female(),
             'gender': fake.boolean(chance_of_getting_true=75),
-            'country': fake.random_element(elements=[random_country.name for random_country in session.query(Country).all()]),
             'birthdate': fake.date_of_birth(minimum_age=12, maximum_age=80),
 
             'hashed_password': fake.password(length=12),
@@ -622,6 +635,16 @@ def generate_fake_referees(session, num_referees=num_referees):
     session.commit()
 
 
+def generate_fake_athlete_0(session):
+    athlete_data = {
+        'id': 0,
+        'user_id': 0,
+    }
+    athlete = Athlete(**athlete_data)
+    session.add(athlete)
+    session.commit()
+
+
 # Генерация данных для спортсменов
 def generate_fake_athletes(session, num_athletes=num_athletes):
     athletes_data = []
@@ -632,32 +655,6 @@ def generate_fake_athletes(session, num_athletes=num_athletes):
     if len(athlete_users) < num_athletes:
         additional_users = random.sample(users, num_athletes - len(athlete_users))
         athlete_users.extend(additional_users)
-
-    athlete_data = {
-        'id': 0,
-        'user_id': 0,
-        'weight': fake.random_int(min=30, max=180),
-        'height': fake.random_int(min=120, max=200),
-        'image_field': fake.image_url() if fake.boolean(chance_of_getting_true=80) else None,
-        'country': fake.random_element(elements=[random_country.id for random_country in session.query(Country).all()]),
-        'region': fake.random_element(elements=[random_region.id for random_region in session.query(Region).all()]),
-        'city': fake.city(),
-        'sport_types': fake.random_elements(
-            elements=session.query(SportType).all(),
-            length=fake.random_int(min=1, max=4),
-            unique=True
-        ),
-        'coaches': fake.random_elements(
-            elements=session.query(Coach).all(),
-            length=fake.random_int(min=1, max=4),
-            unique=True
-        ),
-        'grades': fake.random_elements(
-            elements=session.query(CategoryType).all(),
-            length=fake.random_int(min=1, max=3),
-            unique=True
-        ),
-    }
 
     for user in athlete_users:
 
@@ -781,21 +778,22 @@ def generate_fake_system_administrators(session, num_administrators=num_administ
 
 
 # Генерация данных для команд
+def generate_fake_teams_0(session):
+    team_data = {
+            'id': 0,
+            'name': "Нет команды",
+            'captain': 0,
+    }
+
+    # Создаем команду
+    team = Team(**team_data)
+    session.add(team)
+    session.commit()
+
+
+# Генерация данных для команд
 def generate_fake_teams(session, num_teams=num_teams):
     athletes = session.query(Athlete).all()
-
-    team_data = {
-        'id': 0,
-        'name': 'Нет команды',
-        'invite_link': str(fake.uuid4()),
-        'description': fake.sentence(),
-        'captain': 0,
-        'slug': fake.slug(),
-        'image_field': fake.image_url(),
-        'country': fake.random_element(elements=[random_country.id for random_country in session.query(Country).all()]),
-        'city': fake.city(),
-        'region': fake.random_element(elements=[random_region.id for random_region in session.query(Region).all()]),
-    }
 
     for _ in range(num_teams):
 
@@ -858,7 +856,7 @@ def generate_fake_events(session, num_events=num_events):
     for _ in range(num_events):
         organizer = random.choice(organizers)
         event_data = {
-            'name': generate_event_name(event_types, locations, sports),
+            'name': generate_event_name(event_types, locations, sports_for_events),
             'start_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(1, 30)),
             'end_request_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(31, 60)),
             'start_datetime': datetime.datetime.utcnow() + datetime.timedelta(days=random.randint(61, 90)),
@@ -1184,14 +1182,17 @@ generate_fake_weight_classes(session)
 generate_fake_referee_types(session)
 generate_fake_coach_types(session)
 
+generate_fake_users_0(session)
 generate_fake_users(session, num_users)
 generate_fake_coaches(session)
 generate_fake_referees(session)
+generate_fake_athlete_0(session)
 generate_fake_athletes(session)
 generate_fake_event_organizers(session)
 generate_fake_spectators(session)
 generate_fake_system_administrators(session)
 
+generate_fake_teams_0(session)
 generate_fake_teams(session)
 generate_fake_team_member(session)
 

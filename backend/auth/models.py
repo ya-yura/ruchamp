@@ -157,7 +157,6 @@ class User(Base):
     sirname = Column(String, nullable=True)
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
-    country = Column(String, nullable=True)
     birthdate = Column(Date, nullable=True)
 
     hashed_password = Column(String(length=1024), nullable=False)

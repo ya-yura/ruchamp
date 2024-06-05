@@ -962,7 +962,7 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_spectators(session)
 # generate_fake_system_administrators(session)
 
-# generate_fake_teams_0(session)
+generate_fake_teams_0(session)
 # generate_fake_teams(session)
 # generate_fake_team_member(session)
 
