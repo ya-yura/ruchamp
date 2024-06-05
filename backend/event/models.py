@@ -162,7 +162,7 @@ class Fight(Base):
         ForeignKey(MatchParticipant.id, ondelete="CASCADE")
     )
     mat = Column(Integer, nullable=False)
-    # round = Column(Integer, nullable=False)
+    round = Column(Integer, nullable=False)
 
 
 # Судьи боя

@@ -132,7 +132,8 @@ async def draw_participants(
             ),
             player_one=pair[0],
             player_two=pair[1],
-            mat=(mat_counter % mat_vol) + 1
+            mat=(mat_counter % mat_vol) + 1,
+            round=1,
         )
         # Увеличиваем счетчик мата
         mat_counter += 1
