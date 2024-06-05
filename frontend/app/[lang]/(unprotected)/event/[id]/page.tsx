@@ -268,8 +268,8 @@ export default async function EventPage({
           lang={lang}
         />
       )}
-      <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
+      {/* <AddressSection event={event} />
+      {events.length > 0 && <ExpectedEvents events={expectedEvents} />} */}
     </Container>
   );
 }

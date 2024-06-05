@@ -15,6 +15,7 @@ import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
 import { TextCard } from '@/components/cards/text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils/text-utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface GridProps {
   info: GridInfo;
@@ -54,46 +55,49 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <ul className={cn('grid', colVariants[rounds.length])}>
-        {rounds.map((round) => (
-          <li key={round.name}>
-            <p className="text-center text-4xl font-bold text-card-background">
-              {round.name}
-            </p>
-          </li>
-        ))}
-      </ul>
-      <ul
-        className={cn(
-          'grid rounded-lg bg-black p-4',
-          colVariants[rounds.length],
-        )}
-      >
-        {rounds.map((round, index) => (
-          <ul
-            key={round.name}
-            className={cn(
-              mtVariants[index],
-              index === rounds.length - 1 ? 'flex' : '',
-            )}
-          >
-            {round.fights.map((fight) => (
-              <GridCard
-                key={fight.fight_info.fight_id}
-                time={fight.fight_info.start_time}
-                mat_number={fight.fight_info.mat_number}
-                player_1={fight.player_1}
-                player_2={fight.player_2}
-                isFirstCol={index === 0}
-                isLastCol={index === rounds.length - 1}
-                roundIndex={index}
-              />
-            ))}
-          </ul>
-        ))}
-      </ul>
-    </div>
+    <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+      <div className="flex w-[1300px] flex-col gap-5 xl:w-full">
+        <ul className={cn('grid', colVariants[rounds.length])}>
+          {rounds.map((round) => (
+            <li key={round.name}>
+              <p className="text-center text-4xl font-bold text-card-background">
+                {round.name}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <ul
+          className={cn(
+            'grid rounded-lg bg-black p-4',
+            colVariants[rounds.length],
+          )}
+        >
+          {rounds.map((round, index) => (
+            <ul
+              key={round.name}
+              className={cn(
+                mtVariants[index],
+                index === rounds.length - 1 ? 'flex' : '',
+              )}
+            >
+              {round.fights.map((fight) => (
+                <GridCard
+                  key={fight.fight_info.fight_id}
+                  time={fight.fight_info.start_time}
+                  mat_number={fight.fight_info.mat_number}
+                  player_1={fight.player_1}
+                  player_2={fight.player_2}
+                  isFirstCol={index === 0}
+                  isLastCol={index === rounds.length - 1}
+                  roundIndex={index}
+                />
+              ))}
+            </ul>
+          ))}
+        </ul>
+      </div>
+      <ScrollBar className="hidden" orientation="horizontal" />
+    </ScrollArea>
   );
 }
 
@@ -182,13 +186,32 @@ export function GridCard({
         )}
         <div
           className={cn(
-            'flex h-[72px] justify-between rounded-lg bg-card-background px-3 py-2',
+            'relative flex h-[72px] justify-between rounded-lg bg-card-background px-3 py-2',
             isLastCol
               ? 'group-first:rounded-e-none group-last:rounded-s-none'
               : '',
             className,
           )}
         >
+          {isLastCol && (
+            <>
+              <Image
+                className="absolute left-[calc(50%-20px)] top-[-40px] h-10 w-10 group-last:hidden"
+                src={`/images/medals/bronze.svg`}
+                alt=""
+                width={213}
+                height={241}
+              />
+              <Image
+                className="absolute left-[calc(50%-20px)] top-[-40px] h-10 w-10 group-first:hidden"
+                src={`/images/medals/gold.svg`}
+                alt=""
+                width={213}
+                height={241}
+              />
+            </>
+          )}
+
           <div>
             <H4>{format(time, 'HH:mm')}</H4>
             <p className="text-ColorsGrey26 whitespace-pre-line text-sm">
