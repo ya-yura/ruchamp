@@ -27,21 +27,21 @@ const regStepTwoFieldset: TypeFieldsetData<TypeRegFormSchema> = {
           option: 'Спортсмен',
           icon: '/ru/images/icons/roles/athlete.svg',
         },
-        {
-          value: '3',
-          option: 'Зритель',
-          icon: '/ru/images/icons/roles/spectator.svg',
-        },
+        // {
+        //   value: '3',
+        //   option: 'Зритель',
+        //   icon: '/ru/images/icons/roles/spectator.svg',
+        // },
         {
           value: '2',
           option: 'Организатор',
           icon: '/ru/images/icons/roles/organizer.svg',
         },
-        {
-          value: '5',
-          option: 'Судья',
-          icon: '/ru/images/icons/roles/referee.svg',
-        },
+        // {
+        //   value: '5',
+        //   option: 'Судья',
+        //   icon: '/ru/images/icons/roles/referee.svg',
+        // },
       ],
     },
   ],

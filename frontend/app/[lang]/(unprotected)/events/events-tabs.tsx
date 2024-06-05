@@ -135,11 +135,11 @@ export function EventsTabs({
 
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
-              <p className="mb-5 text-base text-background">
+              {/* <p className="mb-5 text-base text-background">
                 {!!filteredEvents.length
                   ? `Найдено: ${filteredEvents.length}`
                   : 'Ничего не найдено'}
-              </p>
+              </p> */}
               {isMapMode ? (
                 <YandexMap
                   key={mapKey} // This key is to reload map with new data

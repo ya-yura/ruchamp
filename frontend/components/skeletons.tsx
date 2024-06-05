@@ -27,8 +27,8 @@ export function EventsPageSkeleton() {
             ))}
           </div>
         </div>
-        <Skeleton className="h-5 w-[120px] rounded-full"></Skeleton>
-        <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* <Skeleton className="h-5 w-[120px] rounded-full"></Skeleton> */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <Skeleton
               key={index}
