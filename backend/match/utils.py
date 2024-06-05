@@ -157,13 +157,13 @@ def round_name(players_count):
     elif players_count == 4:
         return 'Полуфинал'
     elif players_count == 8:
-        return '1/8'
+        return '1/4'
     elif players_count == 16:
-        return '1/16'
+        return '1/8'
     elif players_count == 32:
-        return '1/32'
+        return '1/16'
     elif players_count == 64:
-        return '1/64'
+        return '1/32'
     else:
         players_count == 128
-        return '1/128'
+        return '1/64'

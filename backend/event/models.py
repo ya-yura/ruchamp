@@ -184,8 +184,7 @@ class FightCounter(Base):
     id = Column(Integer, primary_key=True)
     fight_id = Column(Integer, ForeignKey(Fight.id, ondelete="CASCADE"))
     player = Column(
-        Integer,
-        ForeignKey(MatchParticipant.id, ondelete="CASCADE")
+        Integer, ForeignKey(MatchParticipant.id, ondelete="CASCADE")
     )
     player_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
@@ -196,6 +195,9 @@ class FightWinner(Base):
     __tablename__ = "FightWinner"
     id = Column(Integer, primary_key=True)
     fight_id = Column(Integer, ForeignKey(Fight.id, ondelete="CASCADE"))
+    winner_id = Column(
+        Integer, ForeignKey(MatchParticipant.id, ondelete="CASCADE")
+    )
 
     # Добавить пункт для ничьей (draw = bool)
 
