@@ -80,6 +80,8 @@ function MatchesField({ matches }: { matches: EventMatch[] }) {
             grade={match.category_type}
             gender={match.gender}
             weightClass={match.weight_category}
+            ageMin={match.age_min}
+            ageMax={match.age_max}
             buttonText={'Турнирная сетка'}
           />
         ))}

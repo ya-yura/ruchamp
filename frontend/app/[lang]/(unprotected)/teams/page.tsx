@@ -8,7 +8,7 @@ import { testTeamInTeams } from '@/lib/constants';
 import { calculateGender } from '@/lib/utils/other-utils';
 import { calculateAge } from '@/lib/utils/date-and-time';
 import { defineDefaultRange, expandRange } from '@/lib/utils/math-utils';
-import { fetchTeams } from '@/lib/data';
+import { fetchSportTypes, fetchTeams } from '@/lib/data';
 import Loading from './loading';
 
 interface TeamInfo {
@@ -76,7 +76,10 @@ export default async function Teams({
   params: { lang: Locale };
 }) {
   const { page } = await getDictionary(lang);
-  const teamData = await fetchTeams();
+  const [teamData, sportTypes] = await Promise.all([
+    fetchTeams(),
+    fetchSportTypes(),
+  ]);
   const dictionary = page.teams;
 
   let teams: Team[] = [];
@@ -136,6 +139,7 @@ export default async function Teams({
     <Container>
       <Suspense fallback={<Loading />}>
         <TeamsListing
+          sportTypes={sportTypes}
           teams={teams}
           weightRange={weightRangeWithExpad}
           ageRange={ageRangeWithExpand}

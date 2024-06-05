@@ -38,7 +38,6 @@ export function Grid({ info, rounds }: GridProps) {
           )}
         </div>
       )}
-
       <div className="mb-12 flex gap-2">
         <Tag variant={'default'}>{info.sport_name}</Tag>
         <Tag variant={'transparentAccentBorder'}>

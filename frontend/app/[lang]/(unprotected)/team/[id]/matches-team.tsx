@@ -65,6 +65,8 @@ export function MatchesList({ matches }: { matches: TeamMatch[] }) {
           grade={match.grade}
           gender={match.gender || false}
           weightClass={match.weight_class}
+          ageMin={match.age_min}
+          ageMax={match.age_max}
           buttonText={'Результаты'}
         />
       ))}

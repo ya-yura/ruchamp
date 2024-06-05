@@ -47,10 +47,12 @@ export interface Participant
 
 export interface EventMatch {
   id: number;
-  name: string | null;
+  name: string;
   start_datetime: string;
   end_datetime: string;
   sport_name: string;
+  age_min: number;
+  age_max: number;
   gender: boolean;
   weight_category: string;
   category_type: string;

@@ -134,7 +134,13 @@ export const regFormSchema = z
 
 export type TypeRegFormSchema = z.infer<typeof regFormSchema>;
 
-export function RegisterForm({ lang }: { lang: Locale }) {
+export function RegisterForm({
+  lang,
+  sportTypes,
+}: {
+  lang: Locale;
+  sportTypes: string[];
+}) {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -264,6 +270,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
               switchStep={switchStep}
               isLoading={isLoading}
               errorMessage={errorMessage}
+              sportTypes={sportTypes}
             />
           )}
         </CustomForm>
