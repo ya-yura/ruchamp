@@ -10,8 +10,11 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
-import { AthleteCard } from '@/components/cards/athlete-card';
-import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
+import {
+  calculateAge,
+  getRussianAgeWord,
+  transformDate,
+} from '@/lib/utils/date-and-time';
 import { TextCard } from '@/components/cards/text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils/text-utils';
@@ -24,10 +27,29 @@ interface GridProps {
 
 export function Grid({ info, rounds }: GridProps) {
   return (
-    <ContentWraper className="min-h-44 gap-12">
-      <div className="flex gap-2">
+    <ContentWraper className="min-h-44">
+      {info.start_time && info.match_name && (
+        <div className="mb-4 flex">
+          {info.start_time && (
+            <H4 className="mr-4">{transformDate(info.start_time, true)}</H4>
+          )}
+          {info.match_name && (
+            <H4 className="text-Grey101 font-normal">{info.match_name}</H4>
+          )}
+        </div>
+      )}
+
+      <div className="mb-12 flex gap-2">
         <Tag variant={'default'}>{info.sport_name}</Tag>
-        <Tag variant={'transparentAccentBorder'}>{info.gender}</Tag>
+        <Tag variant={'transparentAccentBorder'}>
+          {info.gender ? 'Муж' : 'Жен'}
+        </Tag>
+        {info.age_from && info.age_till && (
+          <Tag variant={'transparentGrayBorder'}>
+            {info.age_from} – {info.age_till} лет
+          </Tag>
+        )}
+
         <Tag variant={'transparentGrayBorder'}>{info.weight_category}</Tag>
         <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>

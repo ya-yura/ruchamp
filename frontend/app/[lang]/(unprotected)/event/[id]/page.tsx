@@ -57,11 +57,16 @@ export interface EventMatch {
 }
 
 export interface GridInfo {
+  match_id: number;
+  match_name: string;
+  start_time: string;
+  end_time: string;
   method: string;
-  age_grade: number;
+  age_from: number;
+  age_till: number;
   sport_name: string;
   weight_category: string;
-  gender: string;
+  gender: boolean;
 }
 
 interface GridFightInfo {
