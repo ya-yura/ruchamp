@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
 import { FilterByType } from './filter-by-type';
-import { sportTypes } from '@/lib/constants';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Event } from '@/lib/definitions';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
@@ -19,6 +18,7 @@ import { isDateInRange } from '@/lib/utils/date-and-time';
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
   lang: Locale;
+  sportTypes: string[];
   futureEvents: Event[];
   pastEvents: Event[];
   usersEvents: Event[];
@@ -33,6 +33,7 @@ enum EventTabs {
 export function EventsTabs({
   dictionary,
   lang,
+  sportTypes,
   futureEvents,
   pastEvents,
   usersEvents,
@@ -135,11 +136,11 @@ export function EventsTabs({
 
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
-              <p className="mb-5 text-base text-background">
+              {/* <p className="mb-5 text-base text-background">
                 {!!filteredEvents.length
                   ? `Найдено: ${filteredEvents.length}`
                   : 'Ничего не найдено'}
-              </p>
+              </p> */}
               {isMapMode ? (
                 <YandexMap
                   key={mapKey} // This key is to reload map with new data

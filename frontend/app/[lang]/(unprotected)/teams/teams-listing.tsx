@@ -2,7 +2,6 @@
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FilterByType } from '../events/filter-by-type';
-import { sportTypes } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
 import { ContentWraper } from '@/components/content-wraper';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
@@ -19,6 +18,7 @@ export enum GenderTabs {
 }
 
 interface TeamsListingProps {
+  sportTypes: string[];
   teams: Team[];
   weightRange: number[];
   ageRange: number[];
@@ -29,6 +29,7 @@ interface TeamsListingProps {
 }
 
 export function TeamsListing({
+  sportTypes,
   teams,
   weightRange,
   ageRange,
@@ -95,12 +96,11 @@ export function TeamsListing({
           selected={selectedSportTypes}
           setSelected={setSelectedSportTypes}
         />
-
-        <p className="mb-5 mr-auto text-base text-background">
+        {/* <p className="mb-5 mr-auto text-base text-background">
           {!!filteredTeams.length
             ? `Найдено: ${filteredTeams.length}`
             : 'Ничего не найдено'}
-        </p>
+        </p> */}
         <BigCardsWithImageField
           cards={filteredTeams}
           type="team"

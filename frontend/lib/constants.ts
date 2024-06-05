@@ -7,38 +7,6 @@ import { Event } from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/page';
 
-export const sportTypes: string[] = [
-  'Кикбоксинг',
-  'Бокс',
-  'Каратэ',
-  'Самбо',
-  'Дзюдо',
-  'Джиу-джитсу',
-  'Греко-римская борьба',
-  'Вольная борьба',
-  'Рукопашный бой',
-  'Ушу',
-  'Тхэквондо',
-  'Айкидо',
-  'Сумо',
-  'Тайский бокс',
-  'Кудо',
-  'Кайдо',
-  'Каратэномичи',
-  'Кендо',
-  'Киокусинкай',
-  'Кобудо',
-  'Комбат самооборона',
-  'Комплексное единоборство',
-  'Ориентал',
-  'Панкратион',
-  'Практическая стрельба',
-  'Русское боевое искусство',
-  'Современный мечевой бой',
-  'Спортивное метание ножа',
-  'Спортивный ножевой бой',
-];
-
 export const testData: Event[] = [
   {
     name: 'Турнир чемпионов.',
@@ -1230,11 +1198,16 @@ export const testResults: TeamMemberWithResults[] = [
 
 export const testGridData: GridData = {
   grid_info: {
-    method: 'Олимпийская',
-    age_grade: 24,
-    sport_name: 'Название спорта',
-    weight_category: 'Легкий',
-    gender: 'Мужской',
+    match_id: 200,
+    match_name: 'Зрелищный бой до первой крови',
+    start_time: '2024-03-19T16:25:19.871154',
+    end_time: '2024-03-19T18:25:19.871154',
+    method: 'Олимпийская система',
+    age_from: 20,
+    age_till: 22,
+    sport_name: 'Бокс',
+    weight_category: 'Сверхтяжёлый',
+    gender: false,
   },
   rounds: [
     {

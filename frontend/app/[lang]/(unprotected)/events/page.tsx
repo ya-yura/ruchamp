@@ -6,9 +6,8 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
 import { sortedEventsByDate } from '@/lib/utils/filters';
-import { fetchEvents } from '@/lib/data';
+import { fetchEvents, fetchSportTypes } from '@/lib/data';
 import { Suspense } from 'react';
-import { EventsPageSkeleton } from '@/components/skeletons';
 import Loading from './loading';
 
 export default async function Events({
@@ -17,7 +16,10 @@ export default async function Events({
   params: { lang: Locale };
 }) {
   const { page } = await getDictionary(lang);
-  const events: Event[] = await fetchEvents();
+  const [events, sportTypes] = await Promise.all([
+    fetchEvents(),
+    fetchSportTypes(),
+  ]);
   const usersEvents: Event[] = []; // make this logic later
   const dictionary = page.events;
 
@@ -31,6 +33,7 @@ export default async function Events({
         <EventsTabs
           dictionary={dictionary}
           lang={lang}
+          sportTypes={sportTypes}
           futureEvents={sortedFutureEvents}
           pastEvents={sortedPastEvents}
           usersEvents={usersEvents}

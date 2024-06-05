@@ -105,6 +105,7 @@ export function getRussianAgeWord(age: number): string {
 }
 
 export function calculateAge(birthDate: string): number {
+  if (!birthDate) return 0;
   const today: Date = new Date();
   const dob: Date = parse(birthDate, 'yyyy-MM-dd', new Date());
   const age: number = differenceInYears(today, dob);

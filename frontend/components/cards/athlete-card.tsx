@@ -90,8 +90,14 @@ export function AthleteCard({
             {city}, {AllRegions[region]}, {Country[country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="text-neutralForeground3">
-            <b>{birthdate.split('-')[0]}</b> г.р.,{' '}
-            <i>(возраст: {getRussianAgeWord(athleteAge)})</i>
+            {birthdate ? (
+              <>
+                <b>{birthdate.split('-')[0]}</b> г.р.,{' '}
+                <i>(возраст: {getRussianAgeWord(athleteAge)})</i>
+              </>
+            ) : (
+              <b>возраст не указан</b>
+            )}
           </PersonDescriptionOnCard>
         </div>
       </div>

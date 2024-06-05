@@ -12,6 +12,8 @@ export interface MatchCardProps {
   gender?: boolean;
   weightClass: string;
   buttonText?: string;
+  ageMin: number;
+  ageMax: number;
 }
 
 export function MatchCard({
@@ -23,6 +25,8 @@ export function MatchCard({
   gender,
   weightClass,
   buttonText,
+  ageMin,
+  ageMax,
 }: MatchCardProps) {
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
@@ -40,6 +44,11 @@ export function MatchCard({
           <Tag variant={'transparentAccentBorder'}>
             {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
           </Tag>
+          {ageMin && ageMax && (
+            <Tag variant={'transparentGrayBorder'}>
+              {ageMin} – {ageMax} лет
+            </Tag>
+          )}
           {weightClass && (
             <Tag variant={'transparentGrayBorder'}>{weightClass}</Tag>
           )}

@@ -13,6 +13,20 @@ import { revalidatePath } from 'next/cache';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+export async function fetchSportTypes(): Promise<string[]> {
+  try {
+    const res = await fetch(`${baseUrl}/event/sports`, {
+      // cache: 'force-cache',
+      next: { revalidate: 3600 },
+    });
+    // revalidatePath('/events');
+    return res.ok ? await res.json() : [];
+  } catch (error) {
+    console.error('Error while fetching sport types:', error);
+    throw new Error('Failed to fetch sport types.');
+  }
+}
+
 export async function fetchEvents(): Promise<Event[]> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {

@@ -47,21 +47,28 @@ export interface Participant
 
 export interface EventMatch {
   id: number;
-  name: string | null;
+  name: string;
   start_datetime: string;
   end_datetime: string;
   sport_name: string;
+  age_min: number;
+  age_max: number;
   gender: boolean;
   weight_category: string;
   category_type: string;
 }
 
 export interface GridInfo {
+  match_id: number;
+  match_name: string;
+  start_time: string;
+  end_time: string;
   method: string;
-  age_grade: number;
+  age_from: number;
+  age_till: number;
   sport_name: string;
   weight_category: string;
-  gender: string;
+  gender: boolean;
 }
 
 interface GridFightInfo {
@@ -109,6 +116,7 @@ export default async function EventPage({
     fetchMatches(id),
     fetchParticipants(id),
   ]);
+
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],
