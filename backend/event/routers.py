@@ -387,6 +387,8 @@ async def get_matches(
                 Match.start_datetime,
                 Match.end_datetime,
                 SportType.name.label("sport_name"),
+                MatchAge.age_from.label("age_min"),
+                MatchAge.age_till.label("age_max"),
                 MatchGender.gender.label("gender"),
                 AllWeightClass.name.label("weight_category"),
                 CategoryType.name.label("category_type"),
@@ -394,6 +396,7 @@ async def get_matches(
             .join(CombatType, CombatType.id == Match.combat_type_id)
             .join(MatchSport, MatchSport.match_id == Match.id)
             .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchAge, MatchAge.match_id == Match.id)
             .join(MatchGender, MatchGender.match_id == Match.id)
             .join(MatchWeights, MatchWeights.match_id == Match.id)
             .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
