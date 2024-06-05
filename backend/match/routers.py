@@ -219,7 +219,10 @@ async def get_grid(
     result = {}
     query = await db.execute(
         select(
-            Match.id,
+            Match.id.label("match_id"),
+            Match.name.label("match_name"),
+            Match.start_datetime.label("match_start_time"),
+            Match.end_datetime.label("match_end_time"),
             CombatType.name.label("method"),
             MatchAge.age_from,
             MatchAge.age_till,
@@ -238,6 +241,10 @@ async def get_grid(
     )
     grid_info = query.mappings().first()
     result["grid_info"] = {
+        "match_id": grid_info["match_id"],
+        "match_name": grid_info["match_name"],
+        "start_time": grid_info["match_start_time"],
+        "end_time": grid_info["match_end_time"],
         "method": grid_info["method"],
         "age_from": grid_info["age_from"],
         "age_till": grid_info["age_till"],
@@ -284,6 +291,7 @@ async def get_grid(
                 User.name.label("first_name"),
                 User.sirname.label("last_name"),
                 User.birthdate,
+                Athlete.image_field,
                 Team.name.label("team_name"),
                 Team.id.label("team_id"),
             )
@@ -313,6 +321,7 @@ async def get_grid(
                 User.name.label("first_name"),
                 User.sirname.label("last_name"),
                 User.birthdate,
+                Athlete.image_field,
                 Team.name.label("team_name"),
                 Team.id.label("team_id"),
             )

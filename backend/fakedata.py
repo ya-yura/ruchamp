@@ -813,6 +813,15 @@ def generate_fake_matches_info(session):
     session.commit()
 
 
+def generate_fake_match_participant_0(session):
+    match_participants = MatchParticipant(
+        id=0,
+        player_id=0,
+        team_id=0
+    )
+    session.add(match_participants)
+
+
 # Генерация участников матчей
 def generate_fake_match_participants(session):
     matches = session.query(Match).all()
@@ -962,13 +971,14 @@ def generate_fake_medals(session, num_medals=num_medals):
 # generate_fake_spectators(session)
 # generate_fake_system_administrators(session)
 
-generate_fake_teams_0(session)
+# generate_fake_teams_0(session)
 # generate_fake_teams(session)
 # generate_fake_team_member(session)
 
 # generate_fake_events(session)
-generate_fake_matches(session)
-generate_fake_matches_info(session)
+# generate_fake_matches(session)
+# generate_fake_matches_info(session)
+generate_fake_match_participant_0(session)
 generate_fake_match_participants(session)
 # generate_fake_match_results(session)
 # generate_fake_match_periods(session)
