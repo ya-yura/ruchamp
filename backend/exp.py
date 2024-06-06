@@ -286,3 +286,141 @@ for fight in fights:
  File "C:\1\ruchamp\backend\match\routers.py", line 308, in get_grid
     "player_id": player_1["player_id"],
 TypeError: list indices must be integers or slices, not str
+
+
+
+@router.post("/all-next-round/{match_id}")
+async def create_next_round(
+    match_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    while True:
+        # Получаем текущий раунд
+        query = await db.execute(
+            select(func.max(Fight.round))
+            .where(Fight.match_id == match_id)
+        )
+        current_round = query.scalars().first()
+
+        if current_round is None:
+            raise HTTPException(
+                status_code=404, detail="No fights found for this match"
+            )
+
+        next_round = current_round + 1
+
+        # Получаем победителей текущего раунда
+        winner_alias = aliased(FightWinner)
+        query = await db.execute(
+            select(winner_alias.winner_id)
+            .join(Fight, Fight.id == winner_alias.fight_id)
+            .where(Fight.match_id == match_id)
+            .where(Fight.round == current_round)
+        )
+        winners = query.scalars().all()
+
+        if len(winners) == 1:
+            # Если остался только один победитель, завершаем турнир
+            final_winner = winners[0]
+            return {"winner": final_winner}
+        elif len(winners) == 2:
+            # Если осталось два победителя, то это финал
+            query = await db.execute(
+                select(Match.mat_vol)
+                .where(Match.id == match_id)
+            )
+            mat_vol = query.scalars().first()
+
+            if mat_vol is None:
+                raise HTTPException(status_code=404, detail="Match not found")
+
+            final_fight = await create_fight(db, match_id, winners, next_round, mat_vol, 0)
+            await db.commit()
+
+            # Определяем проигравших финального боя
+            query = await db.execute(
+                select(FightWinner.winner_id)
+                .where(FightWinner.fight_id == final_fight.id)
+                .where(FightWinner.winner_score == 0)
+            )
+            losers = query.scalars().all()
+
+            # Если есть два проигравших, создаем бой за третье место
+            if len(losers) == 2:
+                third_place_fight = await create_fight(db, match_id, losers, next_round, mat_vol, 1)
+                await db.commit()
+            else:
+                third_place_fight = None
+
+            return {
+                "final_fight": final_fight.id,
+                "third_place_fight": third_place_fight.id if third_place_fight else None
+            }
+
+        if len(winners) < 2:
+            raise HTTPException(
+                status_code=400, detail="Not enough players for the next round"
+            )
+
+        # Получаем количество матов
+        query = await db.execute(
+            select(Match.mat_vol)
+            .where(Match.id == match_id)
+        )
+        mat_vol = query.scalars().first()
+
+        if mat_vol is None:
+            raise HTTPException(status_code=404, detail="Match not found")
+
+        mat_counter = 0
+        pairs = [
+            (winners[i], winners[i + 1]) for i in range(0, len(winners), 2)
+        ]
+
+        for pair in pairs:
+            fight = await create_fight(db, match_id, pair, next_round, mat_vol, mat_counter)
+            mat_counter += 1
+            await db.commit()
+
+
+async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter):
+    random_winner = random.choice(pair)
+    random_loser = pair[0] if random_winner == pair[1] else pair[1]
+
+    fight = Fight(
+        match_id=match_id,
+        player_one=pair[0],
+        player_two=pair[1],
+        start_datetime=func.now(),
+        end_datetime=func.now() + timedelta(minutes=5),
+        mat=(mat_counter % mat_vol) + 1,
+        round=round_number,
+    )
+    db.add(fight)
+    await db.commit()
+
+    # Создаем записи о результатах боя
+    winner_counter = FightCounter(
+        fight_id=fight.id,
+        player=random_winner,
+        player_score='5',
+        set_datetime=func.now(),
+    )
+    loser_counter = FightCounter(
+        fight_id=fight.id,
+        player=random_loser,
+        player_score='0',
+        set_datetime=func.now(),
+    )
+    db.add(winner_counter)
+    db.add(loser_counter)
+
+    winner = FightWinner(
+        fight_id=fight.id,
+        winner_id=random_winner,
+        winner_score=5,
+        loser_score=0
+    )
+    db.add(winner)
+
+    return fight

@@ -231,7 +231,6 @@ async def create_next_round(
     db: AsyncSession = Depends(get_db)
 ):
     while True:
-
         # Получаем текущий раунд
         query = await db.execute(
             select(func.max(Fight.round))
@@ -260,6 +259,55 @@ async def create_next_round(
             # Если остался только один победитель, завершаем турнир
             final_winner = winners[0]
             return {"winner": final_winner}
+        elif len(winners) == 2:
+            # Если осталось два победителя, то это финал
+            query = await db.execute(
+                select(Match.mat_vol)
+                .where(Match.id == match_id)
+            )
+            mat_vol = query.scalars().first()
+
+            if mat_vol is None:
+                raise HTTPException(status_code=404, detail="Match not found")
+
+            final_fight = await create_fight(
+                db, match_id, winners, next_round, mat_vol, 0
+            )
+            await db.commit()
+
+            # Определяем участников боя за третье место
+            query = await db.execute(
+                select(Fight.player_one, Fight.player_two)
+                .where(Fight.match_id == match_id)
+                .where(Fight.round == current_round)
+            )
+            previous_round_fights = query.all()
+
+            # Получаем всех участников предпоследнего раунда
+            all_previous_round_participants = set()
+            for fight in previous_round_fights:
+                all_previous_round_participants.add(fight.player_one)
+                all_previous_round_participants.add(fight.player_two)
+
+            # Определяем проигравших в предпоследнем раунде
+            third_place_participants = list(
+                all_previous_round_participants - set(winners)
+            )
+
+            if len(third_place_participants) >= 2:
+                third_place_fight = await create_fight(
+                    db, match_id, third_place_participants[:2],
+                    next_round + 1, mat_vol, 1
+                )
+                await db.commit()
+            else:
+                third_place_fight = None
+
+            return {
+                "final_fight": final_fight.id,
+                "third_place_fight": third_place_fight.id if third_place_fight else None
+            }
+
         if len(winners) < 2:
             raise HTTPException(
                 status_code=400, detail="Not enough players for the next round"
@@ -281,47 +329,54 @@ async def create_next_round(
         ]
 
         for pair in pairs:
-            random_winner = random.choice(pair)
-            random_loser = pair[0] if random_winner == pair[1] else pair[1]
-
-            fight = Fight(
-                match_id=match_id,
-                player_one=pair[0],
-                player_two=pair[1],
-                start_datetime=func.now(),
-                end_datetime=func.now() + timedelta(minutes=5),
-                mat=(mat_counter % mat_vol) + 1,
-                round=next_round,
+            fight = await create_fight(
+                db, match_id, pair, next_round, mat_vol, mat_counter
             )
             mat_counter += 1
-            db.add(fight)
             await db.commit()
 
-            # Создаем записи о результатах боя
-            winner_counter = FightCounter(
-                fight_id=fight.id,
-                player=random_winner,
-                player_score='5',
-                set_datetime=func.now(),
-            )
-            loser_counter = FightCounter(
-                fight_id=fight.id,
-                player=random_loser,
-                player_score='0',
-                set_datetime=func.now(),
-            )
-            db.add(winner_counter)
-            db.add(loser_counter)
 
-            winner = FightWinner(
-                fight_id=fight.id,
-                winner_id=random_winner,
-                winner_score=5,
-                loser_score=0
-            )
-            db.add(winner)
+async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter):
+    random_winner = random.choice(pair)
+    random_loser = pair[0] if random_winner == pair[1] else pair[1]
 
-        await db.commit()
+    fight = Fight(
+        match_id=match_id,
+        player_one=pair[0],
+        player_two=pair[1],
+        start_datetime=func.now(),
+        end_datetime=func.now() + timedelta(minutes=5),
+        mat=(mat_counter % mat_vol) + 1,
+        round=round_number,
+    )
+    db.add(fight)
+    await db.commit()
+
+    # Создаем записи о результатах боя
+    winner_counter = FightCounter(
+        fight_id=fight.id,
+        player=random_winner,
+        player_score='5',
+        set_datetime=func.now(),
+    )
+    loser_counter = FightCounter(
+        fight_id=fight.id,
+        player=random_loser,
+        player_score='0',
+        set_datetime=func.now(),
+    )
+    db.add(winner_counter)
+    db.add(loser_counter)
+
+    winner = FightWinner(
+        fight_id=fight.id,
+        winner_id=random_winner,
+        winner_score=5,
+        loser_score=0
+    )
+    db.add(winner)
+
+    return fight
 
 
 @router.get("/tournament-grid/{match_id}")
@@ -378,6 +433,11 @@ async def get_grid(
 
     result["rounds"] = rounds
 
+    # Получаем информацию о бое за третье место
+    third_place_info = await get_round_info(db, match_id, current_round)
+    if third_place_info["fights"]:
+        result["third_place_fight"] = third_place_info
+
     return result
 
 
@@ -401,40 +461,60 @@ async def get_round_info(db, match_id, round_number):
     fight_infos = []
 
     for fight in fights:
-        player_1 = await get_player_info(db, fight.player_one)
-        player_1_score = await get_player_score(db, fight.player_one)
-        player_2 = await get_player_info(db, fight.player_two)
-        player_2_score = await get_player_score(db, fight.player_two)
-
-        fight_info = {
-            "fight_info": {
-                "fight_id": fight.id,
-                "mat_number": fight.mat_number,
-                "start_time": fight.start_time,
-            },
-            "player_1": {
-                "player_id": player_1["player_id"],
-                "first_name": player_1["first_name"],
-                "last_name": player_1["last_name"],
-                "birthdate": player_1["birthdate"],
-                "team_name": player_1["team_name"],
-                "team_id": player_1["team_id"],
-                "points": player_1_score,
-            },
-            "player_2": {
-                "player_id": player_2["player_id"],
-                "first_name": player_2["first_name"],
-                "last_name": player_2["last_name"],
-                "birthdate": player_2["birthdate"],
-                "team_name": player_2["team_name"],
-                "team_id": player_2["team_id"],
-                "points": player_2_score,
-            },
-        }
+        fight_info = await get_fight_info(db, fight)
         fight_infos.append(fight_info)
 
     players_count = len(fight_infos) * 2
+
+    # Проверяем, является ли текущий раунд боем за третье место
+    if round_number > 1:
+        previous_round_query = await db.execute(
+            select(func.count())
+            .where(Fight.match_id == match_id)
+            .where(Fight.round == round_number - 1)
+        )
+        previous_round_fights = previous_round_query.scalar_one()
+
+        # Если в предыдущем раунде был только один бой (финал),
+        # то текущий раунд - бой за третье место
+        if previous_round_fights == 1:
+            return {"name": "Бой за третье место", "fights": fight_infos}
+
     return {"name": round_name(players_count), "fights": fight_infos}
+
+
+async def get_fight_info(db, fight):
+    player_1 = await get_player_info(db, fight.player_one)
+    player_1_score = await get_player_score(db, fight.player_one)
+    player_2 = await get_player_info(db, fight.player_two)
+    player_2_score = await get_player_score(db, fight.player_two)
+
+    fight_info = {
+        "fight_info": {
+            "fight_id": fight.id,
+            "mat_number": fight.mat_number,
+            "start_time": fight.start_time,
+        },
+        "player_1": {
+            "player_id": player_1["player_id"],
+            "first_name": player_1["first_name"],
+            "last_name": player_1["last_name"],
+            "birthdate": player_1["birthdate"],
+            "team_name": player_1["team_name"],
+            "team_id": player_1["team_id"],
+            "points": player_1_score,
+        },
+        "player_2": {
+            "player_id": player_2["player_id"],
+            "first_name": player_2["first_name"],
+            "last_name": player_2["last_name"],
+            "birthdate": player_2["birthdate"],
+            "team_name": player_2["team_name"],
+            "team_id": player_2["team_id"],
+            "points": player_2_score,
+        },
+    }
+    return fight_info
 
 
 async def get_player_info(db, player_id):
@@ -464,115 +544,6 @@ async def get_player_score(db, player_id):
     player_scores = query.scalars().all()
     total_score = sum(int(score) for score in player_scores)
     return total_score
-
-    '''# Получаем информацию о раундах и поединках
-    query = await db.execute(
-        select(
-            Fight.id,
-            Fight.mat.label("mat_number"),
-            Fight.start_datetime.label("start_time"),
-            Fight.player_one,
-            Fight.player_two
-        ).where(Fight.match_id == match_id)
-    )
-    fights = query.mappings().all()
-
-    for fight in fights:
-        # Получаем информацию об игроке 1
-        query = await db.execute(
-            select(
-                MatchParticipant.id.label("player_id"),
-                User.name.label("first_name"),
-                User.sirname.label("last_name"),
-                User.birthdate,
-                Athlete.image_field,
-                Team.name.label("team_name"),
-                Team.id.label("team_id"),
-            )
-            .select_from(Fight)
-            .join(MatchParticipant, MatchParticipant.id == fight.player_one)
-            .join(Athlete, Athlete.id == MatchParticipant.player_id)
-            .join(User, User.id == Athlete.user_id)
-            .join(Team, Team.id == MatchParticipant.team_id)
-            .where(Fight.id == fight.id)
-        )
-        player_1 = query.mappings().first()
-        query = await db.execute(
-            select(
-                FightCounter.player_score
-            )
-            .where(FightCounter.player == player_1["player_id"])
-        )
-        player_1_score = query.scalars().all()
-        points_player_1 = 0
-        for score in player_1_score:
-            points_player_1 = points_player_1 + int(score)
-
-        # Получаем информацию об игроке 2
-        query = await db.execute(
-            select(
-                MatchParticipant.id.label("player_id"),
-                User.name.label("first_name"),
-                User.sirname.label("last_name"),
-                User.birthdate,
-                Athlete.image_field,
-                Team.name.label("team_name"),
-                Team.id.label("team_id"),
-            )
-            .select_from(Fight)
-            .join(MatchParticipant, MatchParticipant.id == fight.player_two)
-            .join(Athlete, Athlete.id == MatchParticipant.player_id)
-            .join(User, User.id == Athlete.user_id)
-            .join(Team, Team.id == MatchParticipant.team_id)
-            .where(Fight.id == fight.id)
-        )
-        player_2 = query.mappings().first()
-        query = await db.execute(
-            select(
-                FightCounter.player_score
-            )
-            .where(FightCounter.player == player_2["player_id"])
-        )
-        player_2_score = query.scalars().all()
-        points_player_2 = 0
-        for score in player_2_score:
-            points_player_2 = points_player_2 + int(score)
-
-        fight_info = {
-            "fight_info": {
-                "fight_id": fight.id,
-                "mat_number": fight.mat_number,
-                "start_time": fight.start_time,
-            },
-            "player_1": {
-                "player_id": player_1["player_id"],
-                "first_name": player_1["first_name"],
-                "last_name": player_1["last_name"],
-                "birthdate": player_1["birthdate"],
-                "team_name": player_1["team_name"],
-                "team_id": player_1["team_id"],
-                "points": points_player_1,
-            },
-            "player_2": {
-                "player_id": player_2["player_id"],
-                "first_name": player_2["first_name"],
-                "last_name": player_2["last_name"],
-                "birthdate": player_2["birthdate"],
-                "team_name": player_2["team_name"],
-                "team_id": player_2["team_id"],
-                "points": points_player_2,
-            },
-        }
-        # print(player_1)
-        # print(points_player_1)
-        # print(player_2)
-        # print(points_player_2)
-
-        rounds["fights"].append(fight_info)
-
-    result["rounds"] = [rounds]
-
-    return result'''
 
 
 @router.get("/{event_id}/all-participants")
