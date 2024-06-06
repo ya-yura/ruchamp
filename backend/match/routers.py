@@ -485,9 +485,9 @@ async def get_round_info(db, match_id, round_number):
 
 async def get_fight_info(db, fight):
     player_1 = await get_player_info(db, fight.player_one)
-    player_1_score = await get_player_score(db, fight.player_one)
+    player_1_score = await get_player_score(db, fight.player_one, fight.id)
     player_2 = await get_player_info(db, fight.player_two)
-    player_2_score = await get_player_score(db, fight.player_two)
+    player_2_score = await get_player_score(db, fight.player_two, fight.id)
 
     fight_info = {
         "fight_info": {
@@ -536,13 +536,14 @@ async def get_player_info(db, player_id):
     return query.mappings().first()
 
 
-async def get_player_score(db, player_id):
-    query = await db.execute(
-        select(FightCounter.player_score)
-        .where(FightCounter.player == player_id)
-    )
-    player_scores = query.scalars().all()
-    total_score = sum(int(score) for score in player_scores)
+async def get_player_score(db, player_id, fight_id=None):
+    query = select(FightCounter.player_score).where(FightCounter.player == player_id)
+    if fight_id:
+        query = query.where(FightCounter.fight_id == fight_id)
+
+    result = await db.execute(query)
+    score = result.scalars().all()
+    total_score = sum(int(num) for num in score)
     return total_score
 
 
