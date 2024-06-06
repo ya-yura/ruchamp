@@ -57,6 +57,7 @@ class EventParticipant(Base):
 class Match(Base):
     __tablename__ = "Match"
     id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=True, default=None)
     event_id = Column(Integer, ForeignKey(Event.id, ondelete="CASCADE"))
 
     # тип заполнения турнирной сетки
@@ -127,9 +128,14 @@ class MatchParticipant(Base):
     player_id = Column(
         Integer,
         ForeignKey(Athlete.id, ondelete="CASCADE"),
-        nullable=True
     )
-    team_member = Column(Boolean, default=True, nullable=False)
+    '''Здесь надо переделать, на булевый флаг, чтоб передавать
+      состоит в команде спортсмен или нет'''
+    team_id = Column(
+        Integer,
+        ForeignKey(Team.id, ondelete="CASCADE"),
+        default=0,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -156,6 +162,7 @@ class Fight(Base):
         ForeignKey(MatchParticipant.id, ondelete="CASCADE")
     )
     mat = Column(Integer, nullable=False)
+    round = Column(Integer, nullable=False)
 
 
 # Судьи боя
@@ -177,8 +184,7 @@ class FightCounter(Base):
     id = Column(Integer, primary_key=True)
     fight_id = Column(Integer, ForeignKey(Fight.id, ondelete="CASCADE"))
     player = Column(
-        Integer,
-        ForeignKey(MatchParticipant.id, ondelete="CASCADE")
+        Integer, ForeignKey(MatchParticipant.id, ondelete="CASCADE")
     )
     player_score = Column(String, nullable=False)
     set_datetime = Column(TIMESTAMP, nullable=False)
@@ -189,6 +195,12 @@ class FightWinner(Base):
     __tablename__ = "FightWinner"
     id = Column(Integer, primary_key=True)
     fight_id = Column(Integer, ForeignKey(Fight.id, ondelete="CASCADE"))
+    winner_id = Column(
+        Integer, ForeignKey(MatchParticipant.id, ondelete="CASCADE")
+    )
+
+    # Добавить пункт для ничьей (draw = bool)
+
     winner_score = Column(Integer, nullable=False)
     loser_score = Column(Integer, nullable=False)
 
@@ -227,7 +239,6 @@ class MatchResult(Base):
 class Prize(Base):
     __tablename__ = "Prize"
     id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     amount = Column(Integer, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
@@ -237,12 +248,7 @@ class Prize(Base):
 class Medal(Base):
     __tablename__ = "Medal"
     id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    recipient_id = Column(
-        Integer,
-        ForeignKey(MatchParticipant.id, ondelete="CASCADE")
-    )
-    medal_type = Column(String, nullable=False)
+    medal_type = Column(String, nullable=False)  # id: 999999 - без медали
 
 
 # Владельцы наград
@@ -274,7 +280,13 @@ class WinnerTable(Base):
 class TournamentApplication(Base):
     __tablename__ = "TournamentApplication"
     id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey(Team.id, ondelete="CASCADE"))
+    team_id = Column(
+        Integer,
+        ForeignKey(Team.id, ondelete="CASCADE"),
+        nullable=True,
+        default=None
+    )
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
     status = Column(Enum(
         "accepted",
@@ -322,62 +334,5 @@ class ApplicationStatusHistory(Base):
 
     application = relationship(
         "TournamentApplication",
-        back_populates="status_history"
-    )
-
-
-# Заявки на участие от спортсменов
-class AthleteApplication(Base):
-    __tablename__ = "AthleteApplication"
-    id = Column(Integer, primary_key=True)
-    match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
-    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
-    status = Column(
-        Enum(
-            "accepted",
-            "approved",
-            "rejected",
-            "paid",
-            name="application_status"
-        ), nullable=False
-    )
-    # Время создания заявки
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    # Время обновления статуса
-    updated_at = Column(
-        DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
-    )
-    status_history = relationship(
-        "AthleteApplicationStatusHistory",
-        back_populates="application",
-        cascade="all, delete-orphan"
-    )
-
-
-# Тут храним историю изменения статусов заявок
-class AthleteApplicationStatusHistory(Base):
-    __tablename__ = "AthleteApplicationStatusHistory"
-    id = Column(Integer, primary_key=True)
-    application_id = Column(
-        Integer,
-        ForeignKey(AthleteApplication.id, ondelete="CASCADE")
-    )
-    status = Column(
-        Enum(
-            "accepted",
-            "approved",
-            "rejected",
-            "paid",
-            name="application_status"
-        ), nullable=False
-    )
-    # Время обновления статуса
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    application = relationship(
-        "AthleteApplication",
         back_populates="status_history"
     )

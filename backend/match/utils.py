@@ -9,30 +9,30 @@ def split_pairs(users):
     # TODO оптимизировать
     if len(users) <= 2:
         for i in range(len(users), 2):
-            users.append('')
+            users.append(0)
     elif len(users) <= 4:
         for i in range(len(users), 4):
-            users.append('')
+            users.append(0)
     # до 8 участников
     elif len(users) <= 8:
         for i in range(len(users), 8):
-            users.append('')
+            users.append(0)
     # до 16 участников
     elif len(users) > 8 and len(users) <= 16:
         for i in range(len(users), 16):
-            users.append('')
+            users.append(0)
     # до 32 участников
     elif len(users) > 16 and len(users) <= 32:
         for i in range(len(users), 32):
-            users.append('')
+            users.append(0)
     # до 64 участников
     elif len(users) > 32 and len(users) <= 64:
         for i in range(len(users), 64):
-            users.append('')
+            users.append(0)
     # до 128 участников
     elif len(users) > 64 and len(users) <= 128:
         for i in range(len(users), 128):
-            users.append('')
+            users.append(0)
 
     for i in range(0, len(users)):
         if i < len(users) / 2:
@@ -147,3 +147,23 @@ win5.append(los5[0])
 print(f'Пара для финала: {win5}')
 winer = [random.choice(win5)]
 print(f'Победитель финала: {winer}')'''
+
+
+def round_name(players_count):
+    if players_count == 0:
+        return 'Нет боев'
+    elif players_count == 2:
+        return 'Финал'
+    elif players_count == 4:
+        return 'Полуфинал'
+    elif players_count == 8:
+        return '1/4'
+    elif players_count == 16:
+        return '1/8'
+    elif players_count == 32:
+        return '1/16'
+    elif players_count == 64:
+        return '1/32'
+    else:
+        players_count == 128
+        return '1/64'

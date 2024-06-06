@@ -1,9 +1,6 @@
 import { TypeRegFormSchema } from '@/app/[lang]/(auth)/register/register-form';
-import { HttpRequest, UserData } from '../definitions';
-
-export function checkResponse(res: any) {
-  return res.ok ? res.json() : Promise.reject(res.status);
-}
+import { HttpRequest } from '../definitions';
+import { checkResponse } from '../utils/other-utils';
 
 class Auth {
   private baseUrl: string;
@@ -46,7 +43,8 @@ class Auth {
     }).then(checkResponse);
   }
 
-  getCurrentUser(token: string): Promise<UserData> {
+  getCurrentUser(token: string): Promise<any> {
+    // fix "any"
     return fetch(`${this.baseUrl}/users/me`, {
       method: 'GET',
       headers: {

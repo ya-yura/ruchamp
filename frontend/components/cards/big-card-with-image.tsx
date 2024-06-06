@@ -1,26 +1,24 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { chooseTypes, path } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Event } from '@/lib/definitions';
+import { Locale } from '@/i18n.config';
+import { CustomLink } from '../custom-link';
 
-// fix "any"
-// export interface BigCardWithImage {
-//   type: string;
-//   id: number;
-//   name: string;
-//   title?: string;
-//   subtitle?: string;
-//   description?: string;
-//   className?: string;
-//   geo?: string;
-//   location?: string;
-//   start_datetime?: string;
-// }
+interface BigCardWithImage {
+  type: 'event' | 'team';
+  id: number;
+  name: string;
+  tags: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  lang: Locale;
+  className?: string;
+}
 
 export function BigCardWithImage({
   type,
@@ -32,8 +30,7 @@ export function BigCardWithImage({
   description,
   lang,
   className,
-}: any) {
-  // fix "any"
+}: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const router = useRouter();
 
@@ -41,18 +38,18 @@ export function BigCardWithImage({
     <li
       className={cn(
         'group flex h-[450px] w-full cursor-default flex-col overflow-hidden pb-3',
-        'rounded-xl bg-[#292929] transition-all hover:scale-[101%] hover:shadow-cardShadow',
+        'rounded-xl bg-card-background transition-all hover:scale-[101%] hover:shadow-cardShadow',
         className,
       )}
     >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
-          className="opacity-30"
           src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
           alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}
         />
+        <div className="absolute left-0 top-0 h-full w-full bg-card-background opacity-70"></div>
         <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
           {name}
         </h3>
@@ -97,12 +94,17 @@ export function BigCardWithImage({
             />
           </svg>
         </Button>
-        <Button
-          variant="ruchampDefault"
-          onClick={() => router.push(path(lang, `/${type}/${id}`))}
+        <CustomLink
+          className={cn(
+            'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+            'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+            'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          )}
+          lang={lang}
+          href={`/${type}/${id}`}
         >
           Подробнее
-        </Button>
+        </CustomLink>
       </div>
     </li>
   );

@@ -26,11 +26,10 @@ class EventCreate(BaseModel):
     start_request_datetime: datetime = datetime.now()
     end_request_datetime: datetime = (datetime.now() + timedelta(days=30))
     location: str
-    organizer_id: Optional[int]
     event_order: Optional[str] = None
     event_system: Optional[str] = None
-    geo: Optional[str] = None
     description: Optional[str] = None
+    geo: Optional[str] = None
 
 
 class EventUpdate(EventCreate):
@@ -51,6 +50,7 @@ class MatchRead(BaseModel):
 
 
 class MatchCreate(BaseModel):
+    name: Optional[str] = None
     sport_type: str = "Дзюдо"
     combat_type: str = "Олимпийская система"
     grade: str = "1-й юношеский разряд"

@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useWindowWidth } from '@/lib/hooks/useWindowWidth';
 import { Badge } from '@/components/ui/badge';
-import { ModeSwither } from '@/components/mode-switcher';
 
 interface FilterByTypeProps {
   options: string[];
@@ -46,7 +45,7 @@ export function FilterByType({
   setSelected,
   children,
 }: FilterByTypeProps) {
-  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>([]);
+  const [poularSportsTypes, setPopularSportTypes] = useState<string[]>(options);
   const [unPoularSportsTypes, setUnPopularSportTypes] = useState<string[]>([]);
   const [windowWidth] = useWindowWidth(500);
 

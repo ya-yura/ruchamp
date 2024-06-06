@@ -26,6 +26,7 @@ export function RangeSlider({
   className,
 }: RangeSliderProps) {
   const range = value.length ? value : defaultValue;
+
   return (
     <div className={cn('flex flex-col items-center gap-2', className)}>
       <div className="flex gap-2 text-sm text-text-mutedLight">

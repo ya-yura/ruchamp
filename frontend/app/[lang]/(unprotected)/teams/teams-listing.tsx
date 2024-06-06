@@ -2,7 +2,6 @@
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FilterByType } from '../events/filter-by-type';
-import { sportTypes } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
 import { ContentWraper } from '@/components/content-wraper';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
@@ -10,6 +9,7 @@ import { Locale } from '@/i18n.config';
 import { Team } from './page';
 import { BasicFilters } from './basic-filters';
 import { Dictionary } from '../../dictionary-provider';
+import { defineDefaultRange } from '@/lib/utils/math-utils';
 
 export enum GenderTabs {
   MALE = 'male',
@@ -18,16 +18,30 @@ export enum GenderTabs {
 }
 
 interface TeamsListingProps {
+  sportTypes: string[];
   teams: Team[];
+  weightRange: number[];
+  ageRange: number[];
+  weightDefaults: number[];
+  ageDefaults: number[];
   lang: Locale;
   dictionary: Dictionary['page']['teams'];
 }
 
-export function TeamsListing({ teams, lang, dictionary }: TeamsListingProps) {
+export function TeamsListing({
+  sportTypes,
+  teams,
+  weightRange,
+  ageRange,
+  weightDefaults,
+  ageDefaults,
+  lang,
+  dictionary,
+}: TeamsListingProps) {
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
   const [genderValue, setGenderValue] = useState<GenderTabs>(GenderTabs.MALE);
-  const [ages, setAges] = useState<number[]>([18, 30]); //don't forget to change default in RangeSlider props
-  const [weights, setWeights] = useState<number[]>([50, 90]); //don't forget to change default in RangeSlider props
+  const [ages, setAges] = useState<number[]>(defineDefaultRange(ageDefaults));
+  const [weights, setWeights] = useState<number[]>(weightDefaults);
   const topRef = useRef<HTMLDivElement | null>(null);
 
   // Filtring logic
@@ -71,6 +85,10 @@ export function TeamsListing({ teams, lang, dictionary }: TeamsListingProps) {
           setAges={setAges}
           weights={weights}
           setWeights={setWeights}
+          weightRange={weightRange}
+          ageRange={ageRange}
+          weightDefaults={weightDefaults}
+          ageDefaults={ageDefaults}
           dictionary={dictionary}
         />
         <FilterByType
@@ -78,12 +96,11 @@ export function TeamsListing({ teams, lang, dictionary }: TeamsListingProps) {
           selected={selectedSportTypes}
           setSelected={setSelectedSportTypes}
         />
-
-        <p className="mb-5 mr-auto text-base text-background">
+        {/* <p className="mb-5 mr-auto text-base text-background">
           {!!filteredTeams.length
             ? `Найдено: ${filteredTeams.length}`
             : 'Ничего не найдено'}
-        </p>
+        </p> */}
         <BigCardsWithImageField
           cards={filteredTeams}
           type="team"

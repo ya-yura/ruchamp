@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { isValidPhoneNumber } from 'react-phone-number-input';
-import { path } from '@/lib/utils';
+import { path } from '@/lib/utils/other-utils';
 
 // const athleteSchema = z.object({
 //   athlete_weight: z.number(),
@@ -62,6 +62,9 @@ import { path } from '@/lib/utils';
 // ]);
 
 const userDataSchema = z.object({
+  athlete_country: z.string(),
+  athlete_region: z.string(),
+  athlete_city: z.string(),
   athlete_weight: z.string(),
   athlete_height: z.string(),
   athlete_sport_type: z.array(z.string()),
@@ -106,9 +109,9 @@ const userCreateSchema = z
     gender: z.string().min(1, {
       message: 'Выберите пол',
     }),
-    country: z.string().min(1, {
-      message: 'Выберите страну',
-    }),
+    // country: z.string().min(1, {
+    //   message: 'Выберите страну',
+    // }),
     birthdate: z.string().min(1, {
       message: 'Выберите дату',
     }),
@@ -131,7 +134,13 @@ export const regFormSchema = z
 
 export type TypeRegFormSchema = z.infer<typeof regFormSchema>;
 
-export function RegisterForm({ lang }: { lang: Locale }) {
+export function RegisterForm({
+  lang,
+  sportTypes,
+}: {
+  lang: Locale;
+  sportTypes: string[];
+}) {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -158,12 +167,15 @@ export function RegisterForm({ lang }: { lang: Locale }) {
         sirname: '',
         fathername: '',
         gender: '',
-        country: '',
+        // country: '',
         birthdate: '',
         role_id: '1',
       },
       user_data: {
         info: {
+          athlete_country: '',
+          athlete_region: '',
+          athlete_city: '',
           athlete_weight: '',
           athlete_height: '',
           athlete_sport_type: [],
@@ -258,6 +270,7 @@ export function RegisterForm({ lang }: { lang: Locale }) {
               switchStep={switchStep}
               isLoading={isLoading}
               errorMessage={errorMessage}
+              sportTypes={sportTypes}
             />
           )}
         </CustomForm>

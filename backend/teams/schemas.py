@@ -36,3 +36,12 @@ class TeamDB(TeamCreate):
 
     class Config:
         from_attributes = True
+
+
+class Participant(BaseModel):
+    match_id: int
+    player_id: int
+    team_id: Optional[int]
+
+    class Config:
+        from_attributes = True

@@ -3,10 +3,9 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, checkResponse } from './api/auth';
+import { auth } from '../api/auth';
 
 const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 const key = new TextEncoder().encode(secretKey);
 
@@ -19,10 +18,14 @@ export async function encrypt(payload: any) {
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ['HS256'],
-  });
-  return payload;
+  try {
+    const { payload } = await jwtVerify(input, key, {
+      algorithms: ['HS256'],
+    });
+    return payload;
+  } catch (err) {
+    console.log('Error, jwt expired: ', err);
+  }
 }
 
 export async function authenticate(
@@ -32,12 +35,11 @@ export async function authenticate(
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   try {
-    // const user = { email: 'users email', name: 'users name' };
     const token = await auth.login(username, password);
     if (token) {
       const user = await auth.getCurrentUser(token);
       // Create the session
-      const expires = new Date(Date.now() + 10 * 1000);
+      const expires = new Date(Date.now() + 604800 * 1000); // 604800 - seconds in the week
       const session = await encrypt({ user, token, expires });
       // Save the session in a cookie
       cookies().set('session', session, { expires, httpOnly: true });
@@ -54,7 +56,9 @@ export async function logout() {
 
 export async function getSession() {
   const session = cookies().get('session')?.value;
-  if (!session) return null;
+  if (!session) {
+    return null;
+  }
   return await decrypt(session);
 }
 
@@ -73,22 +77,4 @@ export async function updateSession(request: NextRequest) {
     expires: parsed.expires,
   });
   return res;
-}
-
-export async function getTeams() {
-  return fetch(`${baseUrl}/team/get-all-teams`).then(checkResponse);
-}
-
-export async function getTeam(id: string, token: string) {
-  return fetch(`${baseUrl}/team/get-team/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(checkResponse)
-    .catch((err) => {
-      console.log('getTeam error', err);
-    });
 }

@@ -5,16 +5,13 @@ import { useDictionary } from '../../dictionary-provider';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n.config';
 import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '@/lib/actions';
 import { AuthSwitcher } from '@/components/auth/auth-switcher';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/spinner';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
-import Link from 'next/link';
 import {
   CustomFieldset,
   TypeFieldsetData,
@@ -22,7 +19,8 @@ import {
 import { CustomForm } from '@/components/forms/custom-form';
 import { ButtonsBlock } from '@/components/auth/buttons-block';
 import { CustomLink } from '@/components/custom-link';
-import { path } from '@/lib/utils';
+import { authenticate } from '@/lib/actions/auth';
+import { path } from '@/lib/utils/other-utils';
 
 const formSchema = z.object({
   username: z

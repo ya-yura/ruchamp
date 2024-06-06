@@ -9,27 +9,32 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { UserBasicData } from '@/lib/definitions';
 import { ListItem } from './list-item';
 import { Locale } from '@/i18n.config';
 
-export function UserMenuButton({
-  user,
-  lang,
-}: {
-  user: UserBasicData | undefined;
+interface UserMenuButtonProps {
+  userEmail: string;
+  userAvatar: string;
+  initials: string;
   lang: Locale;
-}) {
+}
+
+export function UserMenuButton({
+  userEmail,
+  userAvatar,
+  initials,
+  lang,
+}: UserMenuButtonProps) {
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="data-[active]:text-primary-mainAccent data-[state=open]:text-primary-mainAccent flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold text-background hover:bg-transparent hover:text-background data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=open]:bg-transparent data-[state=closed]:text-background">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
+          <NavigationMenuTrigger className="group flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold hover:bg-transparent hover:text-background data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=open]:bg-transparent data-[active]:text-primary-mainAccent data-[state=closed]:text-background data-[state=open]:text-primary-mainAccent">
+            <Avatar className="h-8 w-8 text-foreground duration-300 group-hover:text-primary-mainAccent">
+              <AvatarImage src={userAvatar} alt="" />
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
-            <p className="hidden sm:block">{user?.email}</p>
+            <p className="hidden sm:block">{userEmail}</p>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="flex w-[100px] flex-col gap-1 p-1 ">
@@ -42,7 +47,7 @@ export function UserMenuButton({
               <ListItem
                 className="text-right"
                 title="Выйти"
-                href="/ru/logout"
+                href="/logout"
                 lang={lang}
               />
             </ul>

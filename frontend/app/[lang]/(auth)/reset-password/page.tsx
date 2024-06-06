@@ -1,4 +1,4 @@
-import { Greetings } from '../../../../components/greetings';
+import { Greetings } from '@/components/greetings';
 import { Locale } from '@/i18n.config';
 import { ResetPasswordForm } from './reset-password-form';
 

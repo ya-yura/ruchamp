@@ -4,21 +4,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ContentWraper } from '@/components/content-wraper';
 import { DatePicker } from './date-picker';
 import { FilterByType } from './filter-by-type';
-import { sportTypes } from '@/lib/constants';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Event } from '@/lib/definitions';
 import { BigCardsWithImageField } from '@/components/cards/big-cards-with-image-field';
 import { DateRange } from 'react-day-picker';
 import { CustomSection } from '@/components/custom-section';
-import { isDateInRange } from '@/lib/utils';
 import { Dictionary } from '../../dictionary-provider';
 import { YandexMap } from '@/components/yandex-map';
 import { Locale } from '@/i18n.config';
 import { ModeSwither } from '@/components/mode-switcher';
+import { isDateInRange } from '@/lib/utils/date-and-time';
 
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
   lang: Locale;
+  sportTypes: string[];
   futureEvents: Event[];
   pastEvents: Event[];
   usersEvents: Event[];
@@ -33,6 +33,7 @@ enum EventTabs {
 export function EventsTabs({
   dictionary,
   lang,
+  sportTypes,
   futureEvents,
   pastEvents,
   usersEvents,
@@ -44,7 +45,7 @@ export function EventsTabs({
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  //dictionary
+  // For dictionary
   const labels = {
     [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
     [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,
@@ -101,11 +102,7 @@ export function EventsTabs({
           <div className="flex h-[164px] w-full sm:h-[64px]">
             <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
               {Object.entries(EventTabs).map(([key, value]) => (
-                <TabsTrigger
-                  key={value}
-                  className="rounded-none border-[#115EA3] text-base data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white sm:text-sm"
-                  value={value}
-                >
+                <TabsTrigger key={value} value={value}>
                   {labels[value]}
                 </TabsTrigger>
               ))}
@@ -139,11 +136,11 @@ export function EventsTabs({
 
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
-              <p className="mb-5 text-base text-background">
+              {/* <p className="mb-5 text-base text-background">
                 {!!filteredEvents.length
                   ? `Найдено: ${filteredEvents.length}`
                   : 'Ничего не найдено'}
-              </p>
+              </p> */}
               {isMapMode ? (
                 <YandexMap
                   key={mapKey} // This key is to reload map with new data

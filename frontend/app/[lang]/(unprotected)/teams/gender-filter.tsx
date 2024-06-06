@@ -30,14 +30,10 @@ export function GenderFilter({
       value={tabValue}
       onValueChange={handleTabChange}
     >
-      <div className="flex justify-center sm:justify-start sm:h-[64px]">
-        <TabsList className="flex h-auto w-fit justify-between gap-0 xl:gap-3 bg-transparent text-text-mutedLight sm:flex-row lg:w-[500px]">
+      <div className="flex justify-center sm:h-[64px] sm:justify-start">
+        <TabsList className="flex h-auto w-fit justify-between gap-0 bg-transparent text-text-mutedLight sm:flex-row lg:w-[500px] xl:gap-3">
           {Object.entries(GenderTabs).map(([key, value]) => (
-            <TabsTrigger
-              key={value}
-              className="rounded-none border-[#115EA3] text-base data-[state=active]:border-b-4 data-[state=active]:bg-transparent data-[state=active]:font-bold data-[state=active]:text-white sm:text-sm"
-              value={value}
-            >
+            <TabsTrigger key={value} value={value}>
               {labels[value]}
             </TabsTrigger>
           ))}

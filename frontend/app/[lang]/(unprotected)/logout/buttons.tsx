@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { logout } from '@/lib/actions';
+import { logout } from '@/lib/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 
@@ -17,6 +17,7 @@ export function LogoutButtons({ token }: { token: string }) {
         onClick={() => router.back()}
         size="lg"
         variant="ruchampTransparentGreyBorder"
+        type="button"
       >
         Нет
       </Button>

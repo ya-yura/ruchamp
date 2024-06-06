@@ -49,7 +49,7 @@ export function H4({ children, className }: TextProps) {
   return (
     <h4
       className={cn(
-        'text-sm font-semibold text-foreground sm:text-xl sm:font-bold md:text-2xl',
+        'text-lg font-semibold text-background sm:text-base md:text-lg',
         className,
       )}
     >
@@ -65,5 +65,26 @@ export function H5({ children, className }: TextProps) {
     >
       {children}
     </h4>
+  );
+}
+
+export function PersonNameOnCard({ children, className }: TextProps) {
+  return (
+    <p
+      className={cn(
+        'text-neutralForeground3Rest text-base font-semibold',
+        className,
+      )}
+    >
+      {children}
+    </p>
+  );
+}
+
+export function PersonDescriptionOnCard({ children, className }: TextProps) {
+  return (
+    <p className={cn('text-neutralForeground3Rest text-sm', className)}>
+      {children}
+    </p>
   );
 }

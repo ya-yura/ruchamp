@@ -157,7 +157,6 @@ class User(Base):
     sirname = Column(String, nullable=True)
     fathername = Column(String, nullable=True)
     gender = Column(Boolean, default=True, nullable=True)
-    country = Column(String, nullable=True)
     birthdate = Column(Date, nullable=True)
 
     hashed_password = Column(String(length=1024), nullable=False)
@@ -205,6 +204,15 @@ class Athlete(Base):
         secondary=athlete_grade_association,
         back_populates='athletes'
     )
+
+
+# Отношение атлет - спорт - грейд
+class AthleteSport(Base):
+    __tablename__ = "AthleteSport"
+    id = Column(Integer, primary_key=True)
+    athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
+    sport_id = Column(Integer, ForeignKey(SportType.id, ondelete="CASCADE"))
+    grade_id = Column(Integer, ForeignKey(CategoryType.id, ondelete="CASCADE"))
 
 
 # организатор

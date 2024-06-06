@@ -11,7 +11,7 @@ import { Event } from '@/lib/definitions';
 import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
-import { transformDate } from '@/lib/utils';
+import { transformDate } from '@/lib/utils/date-and-time';
 
 export function EventsCarousel({ events }: { events: Event[] }) {
   const plugin = React.useRef(
@@ -35,9 +35,11 @@ export function EventsCarousel({ events }: { events: Event[] }) {
               type="event"
               id={event.id}
               name={event.name}
+              tags={event.sports_in_matches.join(', ')}
               title={transformDate(event.start_datetime)}
               subtitle={event.location}
               description={event.description}
+              lang={'ru'} // fix hardcode
             />
           </CarouselItem>
         ))}
