@@ -425,13 +425,15 @@ async def get_event_matches_results(
             status_code=404,
             detail="No matches found for the event"
         )
-
-    # Получаем всех участников матчей
-    query = await db.execute(
-        select(MatchParticipant.player_id)
-        .where(MatchParticipant.match_id.in_(match_ids))
-    )
-    participant_ids = query.scalars().all()
+    participants = []
+    # Получаем всех участников матчей в ивенте
+    for match_id in match_ids:
+        query = await db.execute(
+            select(MatchParticipant.player_id)
+            .where(MatchParticipant.match_id == match_id)
+        )
+        participant_ids = query.scalars().all()
+        participants.extend(participant_ids)
 
     if not participant_ids:
         raise HTTPException(
@@ -441,7 +443,7 @@ async def get_event_matches_results(
 
     results = []
 
-    for participant_id in participant_ids:
+    for participant_id in participants:
         # Получаем ID пользователя спортсмена
         query = await db.execute(
             select(Athlete.user_id).where(Athlete.id == participant_id)
@@ -484,9 +486,9 @@ async def get_event_matches_results(
             select(MatchParticipant.id)
             .where(MatchParticipant.player_id == participant_id)
         )
-        winners_ids = query.scalars().all()
+        match_participant_ids = query.scalars().all()
 
-        for winner_id in winners_ids:
+        for winner_id in match_participant_ids:
             # Получаем медали для каждого участника
             query = await db.execute(
                 select(WinnerTable.medal)
