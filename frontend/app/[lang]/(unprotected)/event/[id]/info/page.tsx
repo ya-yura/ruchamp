@@ -1,6 +1,7 @@
 import { TextCard } from '@/components/cards/text-card';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
 import { Container } from '@/components/container';
+import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { H4 } from '@/components/text';
 import { Locale } from '@/i18n.config';
@@ -30,17 +31,19 @@ export default async function EventInfoPage({
 
   return (
     <CustomSection className="relative mb-10">
-      <TextCardFieldWithTwoLists
-        ariaLabelledby="info"
-        firstList={<MainEventInfo description={event.description} />}
-        secondList={
-          <DateAndOrganizer
-            eventStartTime={eventStartTime}
-            applicationTime={applicationTime}
-            organizer={event.organizer_name}
-          />
-        }
-      />
+      <ContentWraper>
+        <TextCardFieldWithTwoLists
+          ariaLabelledby="info"
+          firstList={<MainEventInfo description={event.description} />}
+          secondList={
+            <DateAndOrganizer
+              eventStartTime={eventStartTime}
+              applicationTime={applicationTime}
+              organizer={event.organizer_name}
+            />
+          }
+        />
+      </ContentWraper>
     </CustomSection>
   );
 }

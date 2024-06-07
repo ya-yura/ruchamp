@@ -5,6 +5,7 @@ import { CustomSection } from '@/components/custom-section';
 import { fetchTournamentGrid } from '@/lib/data';
 import { Locale } from '@/i18n.config';
 import { H4 } from '@/components/text';
+import { BackButton } from '@/components/back-button';
 
 export interface GridInfo {
   match_id: number;

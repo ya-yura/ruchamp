@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import { FilterData, TeamMember, ValueOption } from '../../../team/[id]/page';
 import { CustomSection } from '@/components/custom-section';
+import { ContentWraper } from '@/components/content-wraper';
 
 export interface Participant
   extends Omit<
@@ -63,11 +64,13 @@ export default async function EventParticipantsPage({
 
   return (
     <CustomSection className="relative mb-10">
-      <AthletesCardsWithFilters
-        athletes={participants}
-        filtersData={filtersData}
-        lang={lang}
-      />
+      <ContentWraper>
+        <AthletesCardsWithFilters
+          athletes={participants}
+          filtersData={filtersData}
+          lang={lang}
+        />
+      </ContentWraper>
     </CustomSection>
   );
 }

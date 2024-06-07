@@ -1,3 +1,4 @@
+import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { Results } from '@/components/results/results';
 import { Locale } from '@/i18n.config';
@@ -31,12 +32,14 @@ export default async function EventResultsPage({
 
   return (
     <CustomSection className="relative mb-10">
-      <Results
-        athletes={[]}
-        goldenMedalWinners={[]}
-        silverMedalWinners={[]}
-        bronzeMedalWinners={[]}
-      />
+      <ContentWraper>
+        <Results
+          athletes={[]}
+          goldenMedalWinners={[]}
+          silverMedalWinners={[]}
+          bronzeMedalWinners={[]}
+        />
+      </ContentWraper>
     </CustomSection>
   );
 }

@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils/text-utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { GridInfo, GridPlayer, GridRound } from './matches/[matchId]/page';
+import { BackButton } from '@/components/back-button';
 
 interface GridProps {
   info: GridInfo;
@@ -36,6 +37,7 @@ export function Grid({ info, rounds }: GridProps) {
           {info.match_name && (
             <H4 className="text-Grey101 font-normal">{info.match_name}</H4>
           )}
+          <BackButton className="ml-auto" />
         </div>
       )}
       <div className="mb-12 flex gap-2">
@@ -240,7 +242,7 @@ export function GridCard({
         <div
           className={cn(
             'relative flex h-[72px] justify-between rounded-lg bg-card-background px-3 py-2',
-            isPreLastCol ? "mr-2 -ml-2": '',
+            isPreLastCol ? '-ml-2 mr-2' : '',
             className,
           )}
         >
