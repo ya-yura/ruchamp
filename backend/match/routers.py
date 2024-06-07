@@ -388,6 +388,7 @@ async def get_grid(
     result = {}
     query = await db.execute(
         select(
+            Match.event_id.label("event_id"),
             Match.id.label("match_id"),
             Match.name.label("match_name"),
             Match.start_datetime.label("match_start_time"),
@@ -410,6 +411,7 @@ async def get_grid(
     )
     grid_info = query.mappings().first()
     result["grid_info"] = {
+        "event_id": grid_info["event_id"],
         "match_id": grid_info["match_id"],
         "match_name": grid_info["match_name"],
         "start_time": grid_info["match_start_time"],
