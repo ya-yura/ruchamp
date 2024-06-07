@@ -38,7 +38,6 @@ This project is licensed under the GPL-3.0 license.
 - **TypeScript**: Used for type checking.
 - **Python**: Used for backend development.
 
-## Badges
 [![GPL-3.0 license](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Open Source Project
