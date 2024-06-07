@@ -101,7 +101,7 @@ export function BigCardWithImage({
             'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           )}
           lang={lang}
-          href={`/${type}/${id}`}
+          href={`/${type}/${id}${type === 'event' ? '/info' : ''}`}
         >
           Подробнее
         </CustomLink>

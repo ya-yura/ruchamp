@@ -1,15 +1,29 @@
 'use client';
 
 import { ContentWraper } from '@/components/content-wraper';
-import { EventMatch } from './page';
 import { useMemo, useState } from 'react';
 import { ValueOption } from '../../team/[id]/page';
 import { MatchesEventTabs } from './matches-events-tabs';
 import { EventTiming } from './event-timing';
 import { transformDate } from '@/lib/utils/date-and-time';
 import { PersonDescriptionOnCard } from '@/components/text';
+import { Locale } from '@/i18n.config';
+
+export interface EventMatch {
+  id: number;
+  name: string;
+  start_datetime: string;
+  end_datetime: string;
+  sport_name: string;
+  age_min: number;
+  age_max: number;
+  gender: boolean;
+  weight_category: string;
+  category_type: string;
+}
 
 interface MatchesEventProps {
+  eventId: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
   regStart: ValueOption;
@@ -17,9 +31,11 @@ interface MatchesEventProps {
   matchesStart: ValueOption;
   matchesEnd: ValueOption;
   awardingTime: ValueOption;
+  lang: Locale;
 }
 
 export function MatchesEvent({
+  eventId,
   matches,
   matchDates,
   regStart,
@@ -27,6 +43,7 @@ export function MatchesEvent({
   matchesStart,
   matchesEnd,
   awardingTime,
+  lang,
 }: MatchesEventProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
     matchDates[0]?.displayedValue || '',
@@ -54,10 +71,12 @@ export function MatchesEvent({
             awardingTime={awardingTime}
           />
           <MatchesEventTabs
+            eventId={eventId}
             matches={filteredMatches}
             matchDates={matchDates}
             value={selectedDate}
             handleTabChange={handleTabChange}
+            lang={lang}
           />
         </>
       ) : (

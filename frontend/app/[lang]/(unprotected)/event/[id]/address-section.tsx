@@ -8,7 +8,7 @@ import { Event } from '@/lib/definitions';
 
 export function AddressSection({ event }: { event: Event }) {
   return (
-    <CustomSection>
+    <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start gap-6 pb-10">
         <H3 className="m text-text-muted">Адрес</H3>
         <YandexMap places={[event]} />

@@ -253,6 +253,8 @@ export default async function TeamPage({
         silverMedalWinners={silverMedalWinners}
         bronzeMedalWinners={bronzeMedalWinners}
         athletes={sortedAthelesResults}
+        isWithEvent={true}
+        isWithResults={true}
       />
     ),
   };
