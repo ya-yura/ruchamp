@@ -40,3 +40,9 @@ This project is licensed under the GPL-3.0 license.
 
 ## Badges
 [![GPL-3.0 license](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+## Open Source Project
+Ruchamp is an open source project, and we welcome contributions from the community. If you are interested in contributing to this project, please open an issue or submit a pull request. We are always looking for new ideas and perspectives to improve the project.
+
+## Join the Community
+We are actively seeking contributors to help shape the future of Ruchamp. If you are passionate about open source software and want to be part of a collaborative community, join us today.
