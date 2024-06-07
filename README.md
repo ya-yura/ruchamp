@@ -1,5 +1,4 @@
 # Ruchamp: Tournaments CRM by FastAPI
-================================================
 
 Ruchamp is a comprehensive CRM system designed specifically for managing tournaments. Built using FastAPI, this project aims to provide a robust and efficient platform for tournament organizers and participants.
 
