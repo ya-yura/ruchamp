@@ -153,7 +153,7 @@ def round_name(players_count):
     if players_count == 0:
         return 'Нет боев'
     elif players_count == 2:
-        return 'Финал'
+        return 'Бой за третье место'
     elif players_count == 4:
         return 'Полуфинал'
     elif players_count == 8:
