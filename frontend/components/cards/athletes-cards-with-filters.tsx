@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { Locale } from '@/i18n.config';
 import { calculateAge } from '@/lib/utils/date-and-time';
+import { cn } from '@/lib/utils';
 
 interface AthleteCardData {
   id?: number;
@@ -36,6 +37,7 @@ interface AthletesCardsWithFiltersProps {
   athletes: AthleteCardData[];
   captainId?: number;
   filtersData: FilterData[];
+  className?: string;
   lang: Locale;
 }
 
@@ -43,6 +45,7 @@ export function AthletesCardsWithFilters({
   athletes,
   captainId,
   filtersData,
+  className,
   lang,
 }: AthletesCardsWithFiltersProps) {
   const [filters, setFilters] = useState<Record<string, (string | number[])[]>>(
@@ -99,6 +102,7 @@ export function AthletesCardsWithFilters({
 
   return (
     <TextCardFieldWithTwoLists
+      className={cn('w-full', className)}
       ariaLabelledby="athletes"
       firstList={
         <AthletesList athletes={filtredAthletes} captainId={captainId} />

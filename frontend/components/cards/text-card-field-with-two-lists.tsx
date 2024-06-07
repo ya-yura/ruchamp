@@ -16,7 +16,7 @@ export function TextCardFieldWithTwoLists({
 }: TextCardFieldWithTwoListsProps) {
   return (
     <div
-      className={cn('grid min-h-44 grid-cols-12 gap-4', className)}
+      className={cn('grid min-h-44 grid-cols-12 gap-4 w-full', className)}
       role="tabpanel"
       aria-labelledby={ariaLabelledby}
     >

@@ -11,7 +11,10 @@ import { ru } from 'date-fns/locale';
 import { Event } from '../definitions';
 import { DateRange } from 'react-day-picker';
 
-export function transformDate(inputDate: string, isWithTime?: boolean): string {
+export function transformDate(
+  inputDate: string | undefined | null,
+  isWithTime?: boolean,
+): string {
   if (!inputDate) return '';
   const currentDate = new Date();
   const parsedDate = parseISO(inputDate);

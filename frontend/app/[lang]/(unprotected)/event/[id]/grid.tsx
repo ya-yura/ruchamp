@@ -1,5 +1,4 @@
 import { ContentWraper } from '@/components/content-wraper';
-import { GridInfo, GridPlayer, GridRound } from './page';
 import { Tag } from '@/components/tag';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -19,6 +18,7 @@ import { TextCard } from '@/components/cards/text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils/text-utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { GridInfo, GridPlayer, GridRound } from './matches/[matchId]/page';
 
 interface GridProps {
   info: GridInfo;
@@ -60,11 +60,12 @@ export function Grid({ info, rounds }: GridProps) {
 function GridField({ rounds }: { rounds: GridRound[] }) {
   const colVariants: Record<number, string> = {
     1: 'grid-cols-1',
-    2: 'grid-cols-[repeat(2,_1fr)]',
-    3: 'grid-cols-[repeat(3,_1fr)]',
-    4: 'grid-cols-[repeat(4,_1fr)]',
-    5: 'grid-cols-[repeat(5,_1fr)]',
-    6: 'grid-cols-[repeat(6,_1fr)]',
+    2: 'grid-cols-[repeat(2,_2fr)]',
+    3: 'grid-cols-[repeat(1,_2fr)_1fr_1fr]',
+    4: 'grid-cols-[repeat(2,_2fr)_1fr_1fr]',
+    5: 'grid-cols-[repeat(3,_2fr)_1fr_1fr]',
+    6: 'grid-cols-[repeat(4,_2fr)_1fr_1fr]',
+    7: 'grid-cols-[repeat(5,_2fr)_1fr_1fr]',
   };
   const mtVariants: Record<string, string> = {
     0: 'mt-[0]',
@@ -73,17 +74,38 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
     3: 'mt-[198px]',
     4: 'mt-[414px]',
     5: 'mt-[846px]',
+    6: 'mt-[846px]',
   };
 
   return (
     <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
       <div className="flex w-[1300px] flex-col gap-5 xl:w-full">
         <ul className={cn('grid', colVariants[rounds.length])}>
-          {rounds.map((round) => (
+          {rounds.map((round, index) => (
             <li key={round.name}>
-              <p className="text-center text-4xl font-bold text-card-background">
-                {round.name}
-              </p>
+              {index === rounds.length - 1 || index === rounds.length - 2 ? (
+                index === rounds.length - 1 ? (
+                  <Image
+                    className="mx-auto h-10 w-10"
+                    src={`/images/medals/gold.svg`}
+                    alt=""
+                    width={213}
+                    height={241}
+                  />
+                ) : (
+                  <Image
+                    className="mx-auto h-10 w-10"
+                    src={`/images/medals/bronze.svg`}
+                    alt=""
+                    width={213}
+                    height={241}
+                  />
+                )
+              ) : (
+                <p className="text-center text-4xl font-bold text-card-background">
+                  {round.name}
+                </p>
+              )}
             </li>
           ))}
         </ul>
@@ -97,8 +119,9 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
             <ul
               key={round.name}
               className={cn(
-                mtVariants[index],
-                index === rounds.length - 1 ? 'flex' : '',
+                index === rounds.length - 1
+                  ? mtVariants[index - 1]
+                  : mtVariants[index],
               )}
             >
               {round.fights.map((fight) => (
@@ -110,6 +133,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                   player_2={fight.player_2}
                   isFirstCol={index === 0}
                   isLastCol={index === rounds.length - 1}
+                  isPreLastCol={index === rounds.length - 2}
                   roundIndex={index}
                 />
               ))}
@@ -129,6 +153,7 @@ interface GridCardProps {
   player_2: GridPlayer;
   isFirstCol?: boolean;
   isLastCol?: boolean;
+  isPreLastCol?: boolean;
   roundIndex: number;
   className?: string;
 }
@@ -140,6 +165,7 @@ export function GridCard({
   player_2,
   isFirstCol,
   isLastCol,
+  isPreLastCol,
   roundIndex,
   className,
 }: GridCardProps) {
@@ -152,6 +178,7 @@ export function GridCard({
     3: 'h-[180px]',
     4: 'h-[396px]',
     5: 'h-[828px]',
+    6: 'h-[828px]',
   };
   const spaceHeight: Record<string, string> = {
     0: 'h-[36px]',
@@ -160,25 +187,27 @@ export function GridCard({
     3: 'h-[432px]',
     4: 'h-[864px]',
     5: 'h-[0]',
+    6: 'h-[0]',
   };
 
   return (
-    <li className={cn('group grid cursor-default', 'grid-cols-[122px_1fr]')}>
+    <li className={cn('group grid cursor-default', 'grid-cols-[135px_1fr]')}>
       <div className={cn('flex flex-col')}>
         {!isFirstCol && (
           <>
             <div
               className={cn(
-                'border-Grey102 relative order-first rounded-e-md border-e border-t border-dashed',
-                isLastCol ? 'w-full group-last:border-none' : 'w-1/2',
-                arrowHeight[roundIndex],
+                'border-Grey102 relative order-first w-1/2 rounded-e-md border-e border-t border-dashed',
+                isLastCol
+                  ? 'relative bottom-0 right-[90%] w-[calc(100%+40%)]'
+                  : '',
+                isLastCol
+                  ? arrowHeight[roundIndex - 1]
+                  : arrowHeight[roundIndex],
               )}
             >
               <Image
-                className={cn(
-                  'absolute bottom-[-1px] right-[-6px] h-3 w-3',
-                  isLastCol ? 'group-last:hidden' : '',
-                )}
+                className={cn('absolute bottom-[-1px] right-[-6px] h-3 w-3')}
                 src={'/ru/images/icons/triangle.svg'}
                 alt=""
                 width={10}
@@ -188,14 +217,17 @@ export function GridCard({
             <div
               className={cn(
                 'border-Grey102 relative order-last w-1/2 rounded-e-md border-b border-e border-dashed',
-                isLastCol ? 'w-full group-last:border-none' : 'w-1/2',
-                arrowHeight[roundIndex],
+                isLastCol
+                  ? 'relative bottom-0 right-[90%] w-[calc(100%+40%)]'
+                  : '',
+                isLastCol
+                  ? arrowHeight[roundIndex - 1]
+                  : arrowHeight[roundIndex],
               )}
             >
               <Image
                 className={cn(
                   'absolute right-[-6px] top-[-1px] h-3 w-3 rotate-180',
-                  isLastCol ? 'group-last:hidden' : '',
                 )}
                 src={'/ru/images/icons/triangle.svg'}
                 alt=""
@@ -208,34 +240,13 @@ export function GridCard({
         <div
           className={cn(
             'relative flex h-[72px] justify-between rounded-lg bg-card-background px-3 py-2',
-            isLastCol
-              ? 'group-first:rounded-e-none group-last:rounded-s-none'
-              : '',
+            isPreLastCol ? "mr-2 -ml-2": '',
             className,
           )}
         >
-          {isLastCol && (
-            <>
-              <Image
-                className="absolute left-[calc(50%-20px)] top-[-40px] h-10 w-10 group-last:hidden"
-                src={`/images/medals/bronze.svg`}
-                alt=""
-                width={213}
-                height={241}
-              />
-              <Image
-                className="absolute left-[calc(50%-20px)] top-[-40px] h-10 w-10 group-first:hidden"
-                src={`/images/medals/gold.svg`}
-                alt=""
-                width={213}
-                height={241}
-              />
-            </>
-          )}
-
           <div>
             <H4>{format(time, 'HH:mm')}</H4>
-            <p className="text-ColorsGrey26 whitespace-pre-line text-sm">
+            <p className="text-ColorsGrey26 text-nowrap text-sm">
               Мат № {mat_number}
             </p>
           </div>
@@ -251,7 +262,7 @@ export function GridCard({
           </div>
         </div>
       </div>
-      {!isLastCol && (
+      {!(isLastCol || isPreLastCol) && (
         <div className="relative flex h-1/2 w-full items-end">
           <div className="border-Grey102 w-full border-b border-dashed"></div>
           <p className="relative bottom-[-8px] mt-[10px] text-nowrap px-1 text-xs font-semibold text-text-muted">
@@ -271,7 +282,12 @@ export function GridCard({
           </p>
         </div>
       )}
-      <div className={cn(spaceHeight[roundIndex], 'group-last:h-0')}></div>
+      <div
+        className={cn(
+          'group-last:h-0',
+          isLastCol ? spaceHeight[roundIndex - 1] : spaceHeight[roundIndex],
+        )}
+      ></div>
     </li>
   );
 }
@@ -286,7 +302,12 @@ function GridCardPlayerId({
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <div className="bg-Grey100 relative flex cursor-pointer justify-center rounded-md p-[6px]">
+        <div
+          className={cn(
+            'bg-Grey100 relative flex justify-center rounded-md p-[6px]',
+            player.first_name ? 'cursor-pointer' : '',
+          )}
+        >
           {isWinner && (
             <Image
               className="absolute left-0 top-[calc(50%-5px)]"
@@ -302,16 +323,18 @@ function GridCardPlayerId({
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-auto rounded-lg border-none bg-transparent p-0">
-        <AthleteSmallCard
-          id={player.player_id}
-          sirname={player.last_name}
-          name={player.first_name}
-          birthdate={player.birthdate}
-          image_field={''} // add later
-          points={player.points}
-          team_id={player.team_id}
-          team_name={player.team_name}
-        />
+        {player.first_name && (
+          <AthleteSmallCard
+            id={player.player_id}
+            sirname={player.last_name}
+            name={player.first_name}
+            birthdate={player.birthdate}
+            image_field={''} // add later
+            points={player.points}
+            team_id={player.team_id}
+            team_name={player.team_name}
+          />
+        )}
       </HoverCardContent>
     </HoverCard>
   );
@@ -319,11 +342,11 @@ function GridCardPlayerId({
 
 interface AthleteSmallCardProps {
   id: number;
-  name: string;
-  sirname: string;
+  name: string | null;
+  sirname: string | null;
   image_field: string;
-  birthdate: string;
-  team_name: string;
+  birthdate: string | null;
+  team_name: string | null;
   team_id: number;
   points: number;
 }
@@ -338,7 +361,10 @@ function AthleteSmallCard({
   team_id,
   points,
 }: AthleteSmallCardProps) {
-  const athleteAge = calculateAge(birthdate);
+  if (!name && !birthdate) {
+    return;
+  }
+  const athleteAge = birthdate ? calculateAge(birthdate) : 0;
   return (
     <TextCard className="relative cursor-default flex-col gap-4 shadow-cardShadow transition-colors sm:flex-row lg:px-4 lg:py-3">
       <div className="flex w-full flex-row-reverse justify-between gap-4 sm:w-2/3 sm:flex-row sm:justify-start xl:items-center">
@@ -346,7 +372,7 @@ function AthleteSmallCard({
           <Avatar className="h-14 w-14 text-foreground sm:h-10 sm:w-10">
             <AvatarImage src={image_field} alt="" />
             <AvatarFallback className="text-base font-medium">
-              {getInitials(name, sirname) || ''}
+              {name && sirname ? getInitials(name, sirname) : ''}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -355,8 +381,14 @@ function AthleteSmallCard({
             {id} {sirname} {name}
           </H4>
           <PersonDescriptionOnCard className="text-neutralForeground3">
-            <b>{birthdate.split('-')[0]}</b> г.р.,{' '}
-            <i>(возраст: {getRussianAgeWord(athleteAge)})</i>
+            {birthdate ? (
+              <>
+                <b>{birthdate.split('-')[0]}</b> г.р.,{' '}
+                <i>(возраст: {getRussianAgeWord(athleteAge)})</i>
+              </>
+            ) : (
+              <i>возраст не указан</i>
+            )}
           </PersonDescriptionOnCard>
         </div>
       </div>

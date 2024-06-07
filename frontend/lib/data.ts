@@ -1,7 +1,3 @@
-import {
-  EventMatch,
-  Participant,
-} from '@/app/[lang]/(unprotected)/event/[id]/page';
 import { Event } from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import {
@@ -10,6 +6,10 @@ import {
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { revalidatePath } from 'next/cache';
+import { EventResultFromSever } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
+import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
+import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches-event';
+import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -19,7 +19,6 @@ export async function fetchSportTypes(): Promise<string[]> {
       // cache: 'force-cache',
       next: { revalidate: 3600 },
     });
-    // revalidatePath('/events');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error('Error while fetching sport types:', error);
@@ -33,7 +32,7 @@ export async function fetchEvents(): Promise<Event[]> {
       // cache: 'force-cache',
       next: { revalidate: 300 },
     });
-    revalidatePath('/events');
+    // revalidatePath('/events');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error('Error while fetching events:', error);
@@ -78,13 +77,37 @@ export async function fetchParticipants(id: string): Promise<Participant[]> {
   }
 }
 
+export async function fetchResults(
+  id: string,
+): Promise<EventResultFromSever[]> {
+  try {
+    const res = await fetch(`${baseUrl}/event/${id}/matches-results`, {});
+    return res.ok ? await res.json() : [];
+  } catch (error) {
+    console.error(`Error while fetching event results with id ${id}: `, error);
+    throw new Error(`Failed to fetch event results with id ${id}`);
+  }
+}
+
+export async function fetchTournamentGrid(id: string): Promise<GridData> {
+  try {
+    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {});
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error(
+      `Error while fetching tournament grid with id ${id}: `,
+      error,
+    );
+    throw new Error(`Failed to fetch tournament grid with id ${id}`);
+  }
+}
+
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
       next: { revalidate: 300 },
     });
-    revalidatePath('/teams');
-
+    // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);

@@ -32,7 +32,7 @@ export function Results({
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
     <div
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-4 w-full"
       role="tabpanel"
       aria-labelledby="results"
     >

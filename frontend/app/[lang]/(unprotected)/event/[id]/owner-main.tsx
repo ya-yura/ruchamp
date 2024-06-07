@@ -8,10 +8,10 @@ import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { Separator } from '@/components/ui/separator';
 import React, { useMemo, useState } from 'react';
 import { MatchesEventTabs } from './matches-events-tabs';
-import { EventMatch } from './page';
 import { ValueOption } from '../../team/[id]/page';
 import { transformDate } from '@/lib/utils/date-and-time';
 import { Button } from '@/components/ui/button';
+import { EventMatch } from './matches-event';
 
 interface OwnerMainProps {
   matches: EventMatch[];
@@ -49,11 +49,13 @@ export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
       </div>
       {!!matches.length ? (
         <MatchesEventTabs
+          eventId={'1'}
           matches={filteredMatches}
           matchDates={matchDates}
           value={selectedDate}
           handleTabChange={handleTabChange}
           isOwner={true}
+          lang={'ru'} //fix later
         />
       ) : (
         <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
