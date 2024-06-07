@@ -7,20 +7,35 @@ import { PersonDescriptionOnCard } from '../text';
 import { AthleteCard } from '../cards/athlete-card';
 import {
   MedalWinner,
+  Medals,
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { AthleteCardSmall } from '../cards/athlete-card-small';
 
-interface WinnersListProps {
-  athletes: MedalWinner[];
-  medal: 'gold' | 'silver' | 'bronze';
+export interface AthleteWithPoints {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender?: boolean;
+  height?: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  points?: number;
+  medals?: Medals;
+  medal?: 'gold' | 'silver' | 'bronze' | 'none';
+  isWithResults?: boolean;
 }
 
 interface ResultsProps {
   goldenMedalWinners: MedalWinner[];
   silverMedalWinners: MedalWinner[];
   bronzeMedalWinners: MedalWinner[];
-  athletes: TeamMemberWithResults[];
+  athletes: AthleteWithPoints[];
 }
 
 export function Results({
@@ -32,7 +47,7 @@ export function Results({
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
     <div
-      className="flex flex-col gap-4 w-full"
+      className="flex w-full flex-col gap-4"
       role="tabpanel"
       aria-labelledby="results"
     >
@@ -55,6 +70,11 @@ export function Results({
       )}
     </div>
   );
+}
+
+interface WinnersListProps {
+  athletes: MedalWinner[];
+  medal: 'gold' | 'silver' | 'bronze';
 }
 
 function WinnersList({ athletes, medal }: WinnersListProps) {
@@ -101,7 +121,7 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
 function AthleteListByPoints({
   athletes,
 }: {
-  athletes: TeamMemberWithResults[];
+  athletes: AthleteWithPoints[];
 }) {
   return (
     <>
@@ -122,6 +142,7 @@ function AthleteListByPoints({
               weight={athlete.weight}
               points={athlete.points}
               medals={athlete.medals}
+              medal={athlete.medal}
               isWithResults={true}
             />
           ))}

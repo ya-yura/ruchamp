@@ -5,7 +5,7 @@ import { Locale } from '@/i18n.config';
 import { fetchResults } from '@/lib/data';
 import React from 'react';
 
-export interface EventResultFromSever {
+export interface EventResult {
   id: number;
   sirname: string;
   name: string;
@@ -18,7 +18,7 @@ export interface EventResultFromSever {
   country: number;
   region: number;
   city: string;
-  medal: string;
+  medal: 'gold' | 'silver' | 'bronze' | 'none';
   points: number;
 }
 
@@ -34,7 +34,7 @@ export default async function EventResultsPage({
     <CustomSection className="relative mb-10">
       <ContentWraper>
         <Results
-          athletes={[]}
+          athletes={results}
           goldenMedalWinners={[]}
           silverMedalWinners={[]}
           bronzeMedalWinners={[]}

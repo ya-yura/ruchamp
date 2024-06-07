@@ -6,7 +6,7 @@ import {
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { revalidatePath } from 'next/cache';
-import { EventResultFromSever } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
+import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
@@ -79,7 +79,7 @@ export async function fetchParticipants(id: string): Promise<Participant[]> {
 
 export async function fetchResults(
   id: string,
-): Promise<EventResultFromSever[]> {
+): Promise<EventResult[]> {
   try {
     const res = await fetch(`${baseUrl}/event/${id}/matches-results`, {});
     return res.ok ? await res.json() : [];
