@@ -1,11 +1,12 @@
 import React from 'react';
-import { Grid } from '../../grid';
 import { initialGrid } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
 import { fetchTournamentGrid } from '@/lib/data';
 import { Locale } from '@/i18n.config';
 import { H4 } from '@/components/text';
 import { BackButton } from '@/components/back-button';
+import { Grid } from './grid';
+import { ContentWraper } from '@/components/content-wraper';
 
 export interface GridInfo {
   match_id: number;
@@ -64,10 +65,13 @@ export default async function TournamentGrid({
   if (!tournamentGrid || +id !== tournamentGrid.grid_info.event_id) {
     return (
       <CustomSection className="relative mb-10">
-        <H4>
-          Информация об этом мероприятии отсутствует или мероприятие находится в
-          другом событии
-        </H4>
+        <ContentWraper className='flex-row justify-between'>
+          <H4>
+            Информация об этом мероприятии отсутствует или мероприятие находится
+            в другом событии
+          </H4>
+          <BackButton />
+        </ContentWraper>
       </CustomSection>
     );
   }

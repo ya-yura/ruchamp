@@ -29,15 +29,26 @@ export default async function EventResultsPage({
 }) {
   const { id, lang } = params;
   const results = await fetchResults(id);
+  const goldenMedalWinners = results.filter(
+    (athlete) => athlete.medal === 'gold',
+  );
+  const silverMedalWinners = results.filter(
+    (athlete) => athlete.medal === 'silver',
+  );
+  const bronzeMedalWinners = results.filter(
+    (athlete) => athlete.medal === 'bronze',
+  );
 
   return (
     <CustomSection className="relative mb-10">
       <ContentWraper>
         <Results
           athletes={results}
-          goldenMedalWinners={[]}
-          silverMedalWinners={[]}
-          bronzeMedalWinners={[]}
+          goldenMedalWinners={goldenMedalWinners}
+          silverMedalWinners={silverMedalWinners}
+          bronzeMedalWinners={bronzeMedalWinners}
+          isWithEvent={false}
+          isWithResults={true}
         />
       </ContentWraper>
     </CustomSection>

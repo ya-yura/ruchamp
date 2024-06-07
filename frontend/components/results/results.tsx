@@ -5,11 +5,7 @@ import { ModeSwither } from '../mode-switcher';
 import { useState } from 'react';
 import { PersonDescriptionOnCard } from '../text';
 import { AthleteCard } from '../cards/athlete-card';
-import {
-  MedalWinner,
-  Medals,
-  TeamMemberWithResults,
-} from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { AthleteCardSmall } from '../cards/athlete-card-small';
 
 export interface AthleteWithPoints {
@@ -32,10 +28,12 @@ export interface AthleteWithPoints {
 }
 
 interface ResultsProps {
-  goldenMedalWinners: MedalWinner[];
-  silverMedalWinners: MedalWinner[];
-  bronzeMedalWinners: MedalWinner[];
+  goldenMedalWinners: AthleteCardSmall[];
+  silverMedalWinners: AthleteCardSmall[];
+  bronzeMedalWinners: AthleteCardSmall[];
   athletes: AthleteWithPoints[];
+  isWithEvent?: boolean;
+  isWithResults?: boolean;
 }
 
 export function Results({
@@ -43,6 +41,8 @@ export function Results({
   silverMedalWinners,
   bronzeMedalWinners,
   athletes,
+  isWithEvent,
+  isWithResults,
 }: ResultsProps) {
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
@@ -61,23 +61,39 @@ export function Results({
       />
       {isMedalMode ? (
         <ul className="grid w-full grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-3">
-          <WinnersList athletes={goldenMedalWinners} medal={'gold'} />
-          <WinnersList athletes={silverMedalWinners} medal={'silver'} />
-          <WinnersList athletes={bronzeMedalWinners} medal={'bronze'} />
+          <WinnersList
+            athletes={goldenMedalWinners}
+            medal={'gold'}
+            isWithEvent={isWithEvent}
+          />
+          <WinnersList
+            athletes={silverMedalWinners}
+            medal={'silver'}
+            isWithEvent={isWithEvent}
+          />
+          <WinnersList
+            athletes={bronzeMedalWinners}
+            medal={'bronze'}
+            isWithEvent={isWithEvent}
+          />
         </ul>
       ) : (
-        <AthleteListByPoints athletes={athletes} />
+        <AthleteListByPoints
+          athletes={athletes}
+          isWithResults={isWithResults}
+        />
       )}
     </div>
   );
 }
 
 interface WinnersListProps {
-  athletes: MedalWinner[];
+  athletes: AthleteCardSmall[];
   medal: 'gold' | 'silver' | 'bronze';
+  isWithEvent?: boolean;
 }
 
-function WinnersList({ athletes, medal }: WinnersListProps) {
+function WinnersList({ athletes, medal, isWithEvent }: WinnersListProps) {
   return (
     <li className="flex flex-col items-center gap-7">
       <Image
@@ -106,6 +122,7 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
               event_location={athlete.event_location}
               start_datetime={athlete.start_datetime}
               sport_type={athlete.sport_type}
+              isWithEvent={isWithEvent}
             />
           ))}
         </ul>
@@ -120,8 +137,10 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
 
 function AthleteListByPoints({
   athletes,
+  isWithResults,
 }: {
   athletes: AthleteWithPoints[];
+  isWithResults?: boolean;
 }) {
   return (
     <>
@@ -143,7 +162,7 @@ function AthleteListByPoints({
               points={athlete.points}
               medals={athlete.medals}
               medal={athlete.medal}
-              isWithResults={true}
+              isWithResults={isWithResults}
             />
           ))}
         </ul>

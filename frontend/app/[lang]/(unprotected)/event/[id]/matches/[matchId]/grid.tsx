@@ -18,8 +18,8 @@ import { TextCard } from '@/components/cards/text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils/text-utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { GridInfo, GridPlayer, GridRound } from './matches/[matchId]/page';
 import { BackButton } from '@/components/back-button';
+import { GridInfo, GridPlayer, GridRound } from './page';
 
 interface GridProps {
   info: GridInfo;

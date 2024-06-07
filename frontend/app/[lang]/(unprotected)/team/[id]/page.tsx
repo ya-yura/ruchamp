@@ -221,7 +221,7 @@ export default async function TeamPage({
   const silverMedalWinners = getAthletesByMedal(results, 'Серебро');
   const bronzeMedalWinners = getAthletesByMedal(results, 'Бронза');
 
-  const sortedAthelesResults = testResults.sort((a, b) => b.points - a.points);
+  const sortedAthelesResults = results.sort((a, b) => b.points - a.points);
 
   const tabsContent: Record<TeamTabs, React.ReactNode> = {
     [TeamTabs['info']]: (
@@ -253,6 +253,8 @@ export default async function TeamPage({
         silverMedalWinners={silverMedalWinners}
         bronzeMedalWinners={bronzeMedalWinners}
         athletes={sortedAthelesResults}
+        isWithEvent={true}
+        isWithResults={true}
       />
     ),
   };
