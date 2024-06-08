@@ -1,5 +1,5 @@
 import React from 'react';
-import { MatchesEvent } from '../matches-event';
+import { MatchesEvent } from './matches-event';
 import { fetchEvent, fetchMatches } from '@/lib/data';
 import { Locale } from '@/i18n.config';
 import { ValueOption } from '../../../team/[id]/page';

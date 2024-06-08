@@ -7,11 +7,11 @@ import {
 import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { Separator } from '@/components/ui/separator';
 import React, { useMemo, useState } from 'react';
-import { MatchesEventTabs } from './matches-events-tabs';
+import { MatchesEventTabs } from './matches/matches-events-tabs';
 import { ValueOption } from '../../team/[id]/page';
 import { transformDate } from '@/lib/utils/date-and-time';
 import { Button } from '@/components/ui/button';
-import { EventMatch } from './matches-event';
+import { EventMatch } from './matches/matches-event';
 
 interface OwnerMainProps {
   matches: EventMatch[];

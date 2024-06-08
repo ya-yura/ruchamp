@@ -2,7 +2,7 @@
 
 import { ContentWraper } from '@/components/content-wraper';
 import { useMemo, useState } from 'react';
-import { ValueOption } from '../../team/[id]/page';
+import { ValueOption } from '../../../team/[id]/page';
 import { MatchesEventTabs } from './matches-events-tabs';
 import { EventTiming } from './event-timing';
 import { transformDate } from '@/lib/utils/date-and-time';

@@ -1,5 +1,5 @@
 import { ContentWraper } from '@/components/content-wraper';
-import { ValueOption } from '../../team/[id]/page';
+import { ValueOption } from '../../../team/[id]/page';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';

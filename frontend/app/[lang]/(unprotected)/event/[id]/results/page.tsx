@@ -3,7 +3,8 @@ import { CustomSection } from '@/components/custom-section';
 import { Results } from '@/components/results/results';
 import { Locale } from '@/i18n.config';
 import { fetchResults } from '@/lib/data';
-import React from 'react';
+import React, { Suspense } from 'react';
+import Loading from './loading';
 
 export interface EventResult {
   id: number;
@@ -41,15 +42,17 @@ export default async function EventResultsPage({
 
   return (
     <CustomSection className="relative mb-10">
-      <ContentWraper>
-        <Results
-          athletes={results}
-          goldenMedalWinners={goldenMedalWinners}
-          silverMedalWinners={silverMedalWinners}
-          bronzeMedalWinners={bronzeMedalWinners}
-          isWithEvent={false}
-          isWithResults={true}
-        />
+      <ContentWraper className="relative">
+        <Suspense fallback={<Loading />}>
+          <Results
+            athletes={results}
+            goldenMedalWinners={goldenMedalWinners}
+            silverMedalWinners={silverMedalWinners}
+            bronzeMedalWinners={bronzeMedalWinners}
+            isWithEvent={false}
+            isWithResults={true}
+          />
+        </Suspense>
       </ContentWraper>
     </CustomSection>
   );

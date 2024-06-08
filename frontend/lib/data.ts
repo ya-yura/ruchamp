@@ -8,7 +8,7 @@ import {
 import { revalidatePath } from 'next/cache';
 import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
-import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches-event';
+import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

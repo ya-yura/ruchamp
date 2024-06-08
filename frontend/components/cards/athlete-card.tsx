@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Medals, TeamMember } from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { H4, PersonDescriptionOnCard } from '../text';
@@ -62,8 +62,8 @@ export function AthleteCard({
 
   const medalObj: Record<string, string> = {
     gold: 'Золото',
-    silver: 'Золото',
-    bronze: 'Золото',
+    silver: 'Серебро',
+    bronze: 'Бронза',
   };
 
   return (
