@@ -11,7 +11,7 @@ export function Footer({ lang }: { lang: Locale }) {
         <div className="mb-8">
           <Separator className="bg-[#3D3D3D]" />
         </div>
-        <nav className="mb-6 flex flex-col items-start justify-between gap-10 sm:mb-0 sm:flex-row md:justify-start md:gap-36">
+        <nav className="mb-6 flex flex-col items-start justify-between gap-10 sm:mb-0 sm:flex-row md:gap-10">
           <div className="mb-0 flex flex-col gap-5 sm:mb-11">
             <h4 className="text-xl font-bold text-[#616161]">РуЧамп</h4>
             <ul className="flex flex-col gap-2">
@@ -44,6 +44,31 @@ export function Footer({ lang }: { lang: Locale }) {
                   </CustomLink>
                 </li>
               ))}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-5">
+            <h4 className="text-xl font-bold text-[#616161]">ООО «РУЧАМП»</h4>
+            <ul className="flex flex-col gap-2">
+              <li>
+                <p className="text-base font-normal text-[#424242]">
+                  414000, Астрахань
+                </p>
+              </li>
+              <li>
+                <p className="text-base font-normal text-[#424242]">
+                  Костина, 2
+                </p>
+              </li>
+              <li>
+                <p className="text-base font-normal text-[#424242]">
+                  ИНН: 3000011199
+                </p>
+              </li>
+              <li>
+                <p className="text-base font-normal text-[#424242]">
+                  ОГРН: 1243000000264
+                </p>
+              </li>
             </ul>
           </div>
         </nav>
