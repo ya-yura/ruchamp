@@ -489,6 +489,8 @@ async def get_team_matches(
                     MatchAge.age_from.label("age_min"),
                     MatchAge.age_till.label("age_max"),
                     AllWeightClass.name.label("weight_class"),
+                    AllWeightClass.min_weight.label("weight_min"),
+                    AllWeightClass.max_weight.label("weight_max"),
                     MatchGender.gender.label("gender"),
                 )
                 .join(Event, Event.id == Match.event_id)
