@@ -7,10 +7,9 @@ import {
   genderOptions,
   rangesFromArray,
 } from '@/lib/utils/filters';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { FilterData, TeamMember, ValueOption } from '../../../team/[id]/page';
-import { CustomSection } from '@/components/custom-section';
-import { ContentWraper } from '@/components/content-wraper';
+import Loading from './loading';
 
 export interface Participant
   extends Omit<
@@ -63,14 +62,12 @@ export default async function EventParticipantsPage({
   }
 
   return (
-    <CustomSection className="relative mb-10">
-      <ContentWraper>
-        <AthletesCardsWithFilters
-          athletes={participants}
-          filtersData={filtersData}
-          lang={lang}
-        />
-      </ContentWraper>
-    </CustomSection>
+    <Suspense fallback={<Loading />}>
+      <AthletesCardsWithFilters
+        athletes={participants}
+        filtersData={filtersData}
+        lang={lang}
+      />
+    </Suspense>
   );
 }

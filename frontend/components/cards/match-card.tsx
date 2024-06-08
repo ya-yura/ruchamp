@@ -16,6 +16,8 @@ export interface MatchCardProps {
   grade: string;
   gender?: boolean;
   weightClass: string;
+  weightMin: number;
+  weightMax: number;
   buttonText?: string;
   ageMin: number;
   ageMax: number;
@@ -32,6 +34,8 @@ export function MatchCard({
   grade,
   gender,
   weightClass,
+  weightMin,
+  weightMax,
   buttonText,
   ageMin,
   ageMax,
@@ -49,7 +53,6 @@ export function MatchCard({
       </div>
       <div className="flex flex-col justify-between gap-5 md:flex-row">
         <div className="flex flex-wrap gap-2">
-          {/* <Tag>{sportType}</Tag> */}
           <Tag variant={'transparentAccentBorder'}>
             {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
           </Tag>
@@ -59,7 +62,9 @@ export function MatchCard({
             </Tag>
           )}
           {weightClass && (
-            <Tag variant={'transparentGrayBorder'}>{weightClass}</Tag>
+            <Tag variant={'transparentGrayBorder'}>
+              {weightClass}: от {weightMin} кг до {weightMax} кг
+            </Tag>
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>

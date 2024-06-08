@@ -502,6 +502,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 35,
     weight_class: 'Средний',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 51,
@@ -518,6 +520,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 35,
     weight_class: 'Средний',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 52,
@@ -534,6 +538,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 35,
     weight_class: 'Легчайший',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 5,
@@ -550,6 +556,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 12,
     age_max: 20,
     weight_class: 'Легкий',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 6,
@@ -566,6 +574,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 20,
     age_max: 40,
     weight_class: 'Полусредний',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 7,
@@ -582,6 +592,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 16,
     age_max: 35,
     weight_class: 'Легчайший',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 60,
@@ -598,6 +610,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 40,
     weight_class: 'Полутяжелый',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 61,
@@ -614,6 +628,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 40,
     weight_class: 'Тяжёлый',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 62,
@@ -630,6 +646,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 40,
     weight_class: 'Полутяжелый',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 9,
@@ -646,6 +664,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 14,
     age_max: 25,
     weight_class: 'Полулегкий',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 10,
@@ -662,6 +682,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 16,
     age_max: 35,
     weight_class: 'Средний',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 11,
@@ -678,6 +700,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 15,
     age_max: 30,
     weight_class: 'Легкий',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 12,
@@ -694,6 +718,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 18,
     age_max: 40,
     weight_class: 'Тяжелый',
+    weight_max: 70,
+    weight_min: 60,
   },
   {
     match_id: 13,
@@ -710,6 +736,8 @@ export const testMatches: TeamMatch[] = [
     age_min: 20,
     age_max: 35,
     weight_class: 'Полутяжелый',
+    weight_max: 70,
+    weight_min: 60,
   },
 ];
 
@@ -2848,5 +2876,7 @@ export const testGridInfoData: GridInfo = {
   age_till: 22,
   sport_name: 'Бокс',
   weight_category: 'Сверхтяжёлый',
+  weight_max: 100,
+  weight_min: 90,
   gender: false,
 };

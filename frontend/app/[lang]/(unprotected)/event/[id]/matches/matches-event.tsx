@@ -2,7 +2,7 @@
 
 import { ContentWraper } from '@/components/content-wraper';
 import { useMemo, useState } from 'react';
-import { ValueOption } from '../../team/[id]/page';
+import { ValueOption } from '../../../team/[id]/page';
 import { MatchesEventTabs } from './matches-events-tabs';
 import { EventTiming } from './event-timing';
 import { transformDate } from '@/lib/utils/date-and-time';
@@ -19,6 +19,8 @@ export interface EventMatch {
   age_max: number;
   gender: boolean;
   weight_category: string;
+  weight_min: number;
+  weight_max: number;
   category_type: string;
 }
 

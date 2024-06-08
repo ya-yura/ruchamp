@@ -75,6 +75,8 @@ export function MatchesList({
           grade={match.grade}
           gender={match.gender || false}
           weightClass={match.weight_class}
+          weightMax={match.weight_max}
+          weightMin={match.weight_min}
           ageMin={match.age_min}
           ageMax={match.age_max}
           buttonText={'Результаты'}

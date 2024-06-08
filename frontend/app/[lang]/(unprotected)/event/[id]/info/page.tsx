@@ -7,7 +7,10 @@ import { H4 } from '@/components/text';
 import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
 import { fetchEvent } from '@/lib/data';
+import { UserInfo } from '@/lib/definitions';
 import { transformDate } from '@/lib/utils/date-and-time';
+import { path } from '@/lib/utils/other-utils';
+import { redirect } from 'next/navigation';
 import React from 'react';
 
 export default async function EventInfoPage({
@@ -17,6 +20,13 @@ export default async function EventInfoPage({
 }) {
   const { id, lang } = params;
   const [session, event] = await Promise.all([getSession(), fetchEvent(id)]);
+  const user: UserInfo | null = session
+    ? {
+        basicInfo: session.user[1],
+        roleInfo: session.user[0],
+      }
+    : null;
+  const isOwner = user?.roleInfo.id === event?.organizer_id;
 
   if (!event) {
     return (
