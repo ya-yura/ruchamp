@@ -35,6 +35,21 @@ export default async function EventPageLayout({
   const randomInt = getRandomInt(100);
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
 
+  const tabsData: Record<string, string> = isOwner
+    ? {
+        info: 'Информация',
+        main: 'Главное',
+        teams: 'Команды',
+        results: 'Результаты',
+        docs: 'Документы',
+      }
+    : {
+        info: 'Информация',
+        participants: 'Спортсмены',
+        matches: 'Мероприятия',
+        results: 'Результаты',
+      };
+
   if (!event) {
     return (
       <Container>
@@ -51,6 +66,7 @@ export default async function EventPageLayout({
         badges={event.sports_in_matches}
         buttons={<EventActionButtons />}
         isOwner={isOwner}
+        tabsData={tabsData}
         lang={lang}
       />
       {children}

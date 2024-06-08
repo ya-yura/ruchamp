@@ -106,7 +106,7 @@ function WinnersList({ athletes, medal, isWithEvent }: WinnersListProps) {
         <ul className="flex flex-col gap-3">
           {athletes.map((athlete) => (
             <AthleteCardSmall
-              key={athlete.match_id}
+              key={athlete.id}
               sirname={athlete.sirname}
               name={athlete.name}
               fathername={athlete.fathername}

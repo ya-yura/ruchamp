@@ -13,6 +13,7 @@ import {
 import { getInitials } from '@/lib/utils/text-utils';
 
 export interface AthleteCardSmall {
+  id?: number;
   sirname: string;
   name: string;
   fathername: string;

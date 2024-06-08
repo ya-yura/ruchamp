@@ -5,7 +5,13 @@ import { CustomSection } from '@/components/custom-section';
 import { useScrollY } from '@/lib/hooks/useScrollY';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import React, { ReactNode, useCallback, useRef, useState } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Badges } from './badges';
 import { H1 } from '@/components/text';
 import { Button } from '@/components/ui/button';
@@ -21,20 +27,22 @@ interface HeroProps {
   badges: string[];
   buttons: ReactNode;
   isOwner: boolean;
+  tabsData: Record<string, string>;
   lang: Locale;
 }
 
-const tabsData: Record<string, string> = {
-  info: 'Информация',
-  participants: 'Спортсмены',
-  matches: 'Мероприятия',
-  results: 'Результаты',
-};
-
-export function Hero({ id, title, badges, buttons, isOwner, lang }: HeroProps) {
+export function Hero({
+  id,
+  title,
+  badges,
+  buttons,
+  isOwner,
+  tabsData,
+  lang,
+}: HeroProps) {
   const pathname = usePathname();
   const [selectedTabValue, setSelectedTabValue] = useState<string>(
-    pathname.split('/')[pathname.split('/').length - 1],
+    pathname.split('/')[3],
   );
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
@@ -46,6 +54,10 @@ export function Hero({ id, title, badges, buttons, isOwner, lang }: HeroProps) {
     progress = Math.min(1, scrollY / elContainer.clientHeight);
   }
 
+  useEffect(() => {
+    setSelectedTabValue(pathname.split('/')[3]);
+  }, [pathname]);
+
   const onTabSelect = useCallback(
     (value: string) => {
       setSelectedTabValue(value);
@@ -53,8 +65,6 @@ export function Hero({ id, title, badges, buttons, isOwner, lang }: HeroProps) {
     },
     [id, lang],
   );
-
-  console.log();
 
   return (
     <div className="w-full">
