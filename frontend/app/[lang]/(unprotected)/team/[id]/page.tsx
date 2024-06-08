@@ -117,6 +117,8 @@ export interface TeamMatch {
   age_min: number;
   age_max: number;
   weight_class: string;
+  weight_min: number;
+  weight_max: number;
   gender?: boolean;
 }
 

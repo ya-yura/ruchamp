@@ -19,6 +19,8 @@ export interface GridInfo {
   age_till: number;
   sport_name: string;
   weight_category: string;
+  weight_min: number;
+  weight_max: number;
   gender: boolean;
 }
 
@@ -65,7 +67,7 @@ export default async function TournamentGrid({
   if (!tournamentGrid || +id !== tournamentGrid.grid_info.event_id) {
     return (
       <CustomSection className="relative mb-10">
-        <ContentWraper className='flex-row justify-between'>
+        <ContentWraper className="flex-row justify-between">
           <H4>
             Информация об этом мероприятии отсутствует или мероприятие находится
             в другом событии

@@ -26,6 +26,7 @@ interface GridProps {
   rounds: GridRound[];
 }
 
+
 export function Grid({ info, rounds }: GridProps) {
   return (
     <ContentWraper className="min-h-44">
@@ -35,13 +36,12 @@ export function Grid({ info, rounds }: GridProps) {
             <H4 className="mr-4">{transformDate(info.start_time, true)}</H4>
           )}
           {info.match_name && (
-            <H4 className="text-Grey101 font-normal">{info.match_name}</H4>
+            <H4 className="text-Grey101 font-normal">{info.sport_name}</H4>
           )}
           <BackButton className="ml-auto" />
         </div>
       )}
       <div className="mb-12 flex gap-2">
-        <Tag variant={'default'}>{info.sport_name}</Tag>
         <Tag variant={'transparentAccentBorder'}>
           {info.gender ? 'Муж' : 'Жен'}
         </Tag>
@@ -51,7 +51,10 @@ export function Grid({ info, rounds }: GridProps) {
           </Tag>
         )}
 
-        <Tag variant={'transparentGrayBorder'}>{info.weight_category}</Tag>
+        <Tag variant={'transparentGrayBorder'}>
+          {info.weight_category}: от {info.weight_min} кг до {info.weight_max}{' '}
+          кг
+        </Tag>
         <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>
       <GridField rounds={rounds} />

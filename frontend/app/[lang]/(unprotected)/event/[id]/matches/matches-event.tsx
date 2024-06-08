@@ -19,6 +19,8 @@ export interface EventMatch {
   age_max: number;
   gender: boolean;
   weight_category: string;
+  weight_min: number;
+  weight_max: number;
   category_type: string;
 }
 

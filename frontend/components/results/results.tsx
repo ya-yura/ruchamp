@@ -7,6 +7,8 @@ import { PersonDescriptionOnCard } from '../text';
 import { AthleteCard } from '../cards/athlete-card';
 import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { AthleteCardSmall } from '../cards/athlete-card-small';
+import { CustomSection } from '../custom-section';
+import { ContentWraper } from '../content-wraper';
 
 export interface AthleteWithPoints {
   id: number;
@@ -46,44 +48,48 @@ export function Results({
 }: ResultsProps) {
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
-    <div
-      className="flex w-full flex-col gap-4"
-      role="tabpanel"
-      aria-labelledby="results"
-    >
-      <ModeSwither
-        className="relative"
-        id={'results'}
-        label={'Медали'}
-        alternativeLabel={'Очки'}
-        setIsOnMode={setIsMedalMode}
-        isOnMode={isMedalMode}
-      />
-      {isMedalMode ? (
-        <ul className="grid w-full grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-3">
-          <WinnersList
-            athletes={goldenMedalWinners}
-            medal={'gold'}
-            isWithEvent={isWithEvent}
+    <CustomSection className="relative mb-10">
+      <ContentWraper className="relative">
+        <div
+          className="flex w-full flex-col gap-4"
+          role="tabpanel"
+          aria-labelledby="results"
+        >
+          <ModeSwither
+            className="relative"
+            id={'results'}
+            label={'Медали'}
+            alternativeLabel={'Очки'}
+            setIsOnMode={setIsMedalMode}
+            isOnMode={isMedalMode}
           />
-          <WinnersList
-            athletes={silverMedalWinners}
-            medal={'silver'}
-            isWithEvent={isWithEvent}
-          />
-          <WinnersList
-            athletes={bronzeMedalWinners}
-            medal={'bronze'}
-            isWithEvent={isWithEvent}
-          />
-        </ul>
-      ) : (
-        <AthleteListByPoints
-          athletes={athletes}
-          isWithResults={isWithResults}
-        />
-      )}
-    </div>
+          {isMedalMode ? (
+            <ul className="grid w-full grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-3">
+              <WinnersList
+                athletes={goldenMedalWinners}
+                medal={'gold'}
+                isWithEvent={isWithEvent}
+              />
+              <WinnersList
+                athletes={silverMedalWinners}
+                medal={'silver'}
+                isWithEvent={isWithEvent}
+              />
+              <WinnersList
+                athletes={bronzeMedalWinners}
+                medal={'bronze'}
+                isWithEvent={isWithEvent}
+              />
+            </ul>
+          ) : (
+            <AthleteListByPoints
+              athletes={athletes}
+              isWithResults={isWithResults}
+            />
+          )}
+        </div>
+      </ContentWraper>
+    </CustomSection>
   );
 }
 

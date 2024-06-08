@@ -41,19 +41,15 @@ export default async function EventResultsPage({
   );
 
   return (
-    <CustomSection className="relative mb-10">
-      <ContentWraper className="relative">
-        <Suspense fallback={<Loading />}>
-          <Results
-            athletes={results}
-            goldenMedalWinners={goldenMedalWinners}
-            silverMedalWinners={silverMedalWinners}
-            bronzeMedalWinners={bronzeMedalWinners}
-            isWithEvent={false}
-            isWithResults={true}
-          />
-        </Suspense>
-      </ContentWraper>
-    </CustomSection>
+    <Suspense fallback={<Loading />}>
+      <Results
+        athletes={results}
+        goldenMedalWinners={goldenMedalWinners}
+        silverMedalWinners={silverMedalWinners}
+        bronzeMedalWinners={bronzeMedalWinners}
+        isWithEvent={false}
+        isWithResults={true}
+      />
+    </Suspense>
   );
 }

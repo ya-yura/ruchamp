@@ -9,8 +9,6 @@ import {
 } from '@/lib/utils/filters';
 import React, { Suspense } from 'react';
 import { FilterData, TeamMember, ValueOption } from '../../../team/[id]/page';
-import { CustomSection } from '@/components/custom-section';
-import { ContentWraper } from '@/components/content-wraper';
 import Loading from './loading';
 
 export interface Participant
@@ -64,16 +62,12 @@ export default async function EventParticipantsPage({
   }
 
   return (
-    <CustomSection className="relative mb-10">
-      <ContentWraper>
-        <Suspense fallback={<Loading />}>
-          <AthletesCardsWithFilters
-            athletes={participants}
-            filtersData={filtersData}
-            lang={lang}
-          />
-        </Suspense>
-      </ContentWraper>
-    </CustomSection>
+    <Suspense fallback={<Loading />}>
+      <AthletesCardsWithFilters
+        athletes={participants}
+        filtersData={filtersData}
+        lang={lang}
+      />
+    </Suspense>
   );
 }

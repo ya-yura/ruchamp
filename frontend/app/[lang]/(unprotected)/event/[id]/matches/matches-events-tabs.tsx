@@ -95,6 +95,8 @@ function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
             grade={match.category_type}
             gender={match.gender}
             weightClass={match.weight_category}
+            weightMin={match.weight_min}
+            weightMax={match.weight_max}
             ageMin={match.age_min}
             ageMax={match.age_max}
             buttonText={'Турнирная сетка'}
