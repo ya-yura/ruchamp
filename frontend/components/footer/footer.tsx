@@ -3,6 +3,7 @@ import { CustomLink } from '../custom-link';
 import { Locale } from '@/i18n.config';
 import { ContentWraper } from '../content-wraper';
 import { Separator } from '../ui/separator';
+import Link from 'next/link';
 
 export function Footer({ lang }: { lang: Locale }) {
   return (
@@ -68,6 +69,21 @@ export function Footer({ lang }: { lang: Locale }) {
                 <p className="text-base font-normal text-[#424242]">
                   ОГРН: 1243000000264
                 </p>
+              </li>
+              <li>
+                <Link href="tel:+79617998899">
+                  <p className="text-base font-normal text-[#424242] transition-colors hover:text-neutral-400">
+                    +7 961 799-88-99
+                  </p>
+                </Link>
+                <p className="text-base font-normal text-[#424242]"></p>
+              </li>
+              <li>
+                <Link href="mailto:support@sportplatform.ru">
+                  <p className="text-base font-normal text-[#424242] transition-colors hover:text-neutral-400">
+                    support@sportplatform.ru
+                  </p>
+                </Link>
               </li>
             </ul>
           </div>
