@@ -57,7 +57,7 @@ export function Footer({ lang }: { lang: Locale }) {
               </li>
               <li>
                 <p className="text-base font-normal text-[#424242]">
-                  Костина, 2
+                  улица Костина, дом 2
                 </p>
               </li>
               <li>
