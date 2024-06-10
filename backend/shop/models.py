@@ -32,6 +32,8 @@ class Place(Base):
     __tablename__ = "Place"
     id = Column(Integer, primary_key=True)
     row_id = Column(Integer, ForeignKey(Row.id), nullable=False)
+
+    # сейчас это количество мест на мероприятии
     number = Column(Integer, nullable=False)
 
 
@@ -51,18 +53,21 @@ class SpectatorTicket(Base):
     spectator_id = Column(
         Integer, ForeignKey(Spectator.id), nullable=False
     )
+    place_id = Column(Integer, ForeignKey(Place.id), nullable=False)
     status = Column(
         Enum(
             "available",
             "reserved",
-            "sold_out",
+            "paid",
             "used",
+            "canceled",
             name="ticket_status"
         ),
         nullable=False,
         default="available"
     )
     uu_key = Column(String, nullable=True)
+    updated_at = Column(TIMESTAMP, default=datetime.utcnow)
 
 
 # Взнос на участие в мероприятии в качестве спортсмена
@@ -83,8 +88,9 @@ class AthleteTicket(Base):
         Enum(
             "available",
             "reserved",
-            "sold_out",
+            "paid",
             "used",
+            "canceled",
             name="ticket_status"
         ),
         nullable=False,

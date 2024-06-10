@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Request
+from fastapi import Depends, HTTPException, Request, BackgroundTasks
 from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions, models,
                            schemas)
 from sqlalchemy import select
@@ -35,6 +35,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user_create: schemas.UC,
         safe: bool = False,
         request: Optional[Request] = None,
+        background_tasks: Optional[BackgroundTasks] = None,
     ) -> models.UP:
         await self.validate_password(user_create.password, user_create)
 
@@ -53,18 +54,29 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         created_user = await self.user_db.create(user_dict)
 
-        await self.on_after_register(created_user, request)
+        # Call the on_after_register method to send the verification email
+        await self.on_after_register(created_user, request, background_tasks)
+        # await self.on_after_register(created_user, request)
 
         return created_user
 
     async def on_after_register(
         self,
         user: User,
-        request: Optional[Request] = None
+        request: Optional[Request] = None,
+        background_tasks: BackgroundTasks = None
     ):
-        send_verification_email(
-            user.username, user.email, user.verification_token
-        )
+        if background_tasks:
+            background_tasks.add_task(
+                send_verification_email,
+                user.username,
+                user.email,
+                user.verification_token
+            )
+        else:
+            send_verification_email(
+                user.username, user.email, user.verification_token
+            )
 
     async def update_athlete_profile(
         self,

@@ -424,3 +424,74 @@ async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter):
     db.add(winner)
 
     return fight
+
+
+
+
+# Стоимость билета на матч для зрителя
+class Ticket(Base):
+    __tablename__ = "Ticket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    price = Column(Float, nullable=False)
+
+    # Билеты зрителей
+class SpectatorTicket(Base):
+    __tablename__ = "SpectatorTicket"
+    id = Column(Integer, primary_key=True)
+    match_id = Column(Integer, ForeignKey(Match.id), nullable=False)
+    spectator_id = Column(
+        Integer, ForeignKey(Spectator.id), nullable=False
+    )
+    place_id = Column(Integer, ForeignKey(Place.id), nullable=False)
+    status = Column(
+        Enum(
+            "available",
+            "reserved",
+            "paid",
+            "used",
+            "canceled",
+            name="ticket_status"
+        ),
+        nullable=False,
+        default="available"
+    )
+    uu_key = Column(String, nullable=True)
+
+
+    # Заказ
+class Order(Base):
+    __tablename__ = "Order"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    status = Column(
+        Enum("pending", "completed", "canceled", name="order_status"),
+        nullable=False,
+        default="pending"
+    )
+
+
+
+    # Перечень товаров заказа
+class OrderItem(Base):
+    __tablename__ = "OrderItem"
+    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, ForeignKey("Order.id"), nullable=False)
+
+    # Может быть "merch", "courses", "engagement" или "ticket"
+    product_type = Column(String, nullable=False)
+
+    product_id = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    total_price = Column(Float, nullable=False)
+
+
+    # Транзакции
+class Transaction(Base):
+    __tablename__ = "Transaction"
+    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, ForeignKey("Order.id"), nullable=False)
+    payment_method = Column(String, nullable=False)
+    transaction_date = Column(DateTime, default=datetime.utcnow)
+    amount = Column(Float, nullable=False)

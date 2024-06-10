@@ -1,40 +1,40 @@
 import smtplib
 from email.message import EmailMessage
-from dotenv import load_dotenv
-import os
 import logging
 
+
+# Настройки SMTP сервера
+SMTP_SERVER = "mail.hosting.reg.ru"
+SMTP_PORT = 587
+SMTP_USER = "mail@sportplatform.ru"
+SMTP_PASSWORD = "qX5yI2cZ9nmE0kC4"  # Убедитесь, что пароль правильный
+
 logging.basicConfig(level=logging.INFO)
-
-load_dotenv()
-
-EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-SMTP_SERVER = os.getenv("SMTP_SERVER")
-SMTP_PORT = int(os.getenv("SMTP_PORT"))
 
 
 def send_email(subject: str, to_email: str, html_content: str):
     message = EmailMessage()
-    message.add_alternative(html_content, subtype="html")
+    message.set_content(html_content, subtype="html")
     message["Subject"] = subject
-    message["From"] = EMAIL_USERNAME
+    message["From"] = SMTP_USER
     message["To"] = to_email
 
     logging.info(f"Connecting to SMTP server: {SMTP_SERVER}:{SMTP_PORT}")
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_USERNAME, to_email, message.as_string())
+            server.ehlo()  # Приветствие с сервером
+            server.starttls()  # Начало TLS-сессии
+            server.ehlo()  # Повторное приветствие для TLS
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, to_email, message.as_string())
             logging.info(f"Email sent to {to_email}")
-    except Exception as e:
+    except smtplib.SMTPException as e:
         logging.error(f"Failed to send email: {e}")
 
 
 def send_verification_email(username: str, email: str, token: str):
-    html_content = f"""/
-<html>
+    html_content = f"""
+    <html>
     <head>
         <style>
             body {{
@@ -105,25 +105,14 @@ def send_verification_email(username: str, email: str, token: str):
     </body>
     </html>
     """
-    send_email("Email verification", email, html_content)
+    send_email("Подтверждение Email", email, html_content)
 
 
-def send_forgot_password_email(username: str, email: str, token: str):
-    html_content = f"""
-    <html>
-    <head>
-        <title>Document</title>
-    </head>
-    <body>
-        <div id="box">
-            <h2>Привет {username},</h2>
-            <p>Для изменения пароля перейдите по
-                <a href="https://sportplatform.ru/reset-forgot-password/{token}">
-                    ссылке
-                </a>. Ссылка действительна в течение 24 часов.
-            </p>
-        </div>
-    </body>
-    </html>
-    """
-    send_email("Password reset", email, html_content)
+def test_send_verification_email():
+    username = "TestUser"
+    email = "3201888@mail.ru"
+    token = "testtoken123"
+    send_verification_email(username, email, token)
+
+if __name__ == "__main__":
+    test_send_verification_email()
