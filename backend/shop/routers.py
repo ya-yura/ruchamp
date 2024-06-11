@@ -15,7 +15,7 @@ from auth.models import Athlete, EventOrganizer
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import Event
+from event.models import Event, Match
 from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
                          Row, Sector, Ticket, SpectatorTicket)
 from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
@@ -48,11 +48,61 @@ async def create_spectator_ticket(
     db: AsyncSession = Depends(get_db)
 ):
     try:
+        query = await db.execute(
+            select(Match.event_id).where(Match.id == match_id)
+        )
+        event_id = query.scalars().one_or_none()
+        if event_id is None:
+            raise HTTPException(status_code=404, detail="Event not found")
+        # Проверка существования записи в таблице Sector
+        sector_id = 1  # Укажите нужный sector_id
+        sector_query = select(Sector).where(Sector.id == sector_id)
+        result = await db.execute(sector_query)
+        sector = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if sector is None:
+            new_sector = Sector(
+                id=sector_id,
+                event_id=event_id,
+                name='Default Sector Name'
+            )
+            db.add(new_sector)
+            await db.commit()
+            sector = new_sector
+
+        # Проверка существования записи в таблице Row
+        row_id = 1  # Укажите нужный row_id
+        row_query = select(Row).where(Row.id == row_id)
+        result = await db.execute(row_query)
+        row = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if row is None:
+            new_row = Row(id=row_id, sector_id=sector.id, number=1)
+            db.add(new_row)
+            await db.commit()
+            row = new_row
+
+        # Проверка существования записи в таблице Place
+        place_id = 2  # Укажите нужный place_id
+        place_query = select(Place).where(Place.id == place_id)
+        result = await db.execute(place_query)
+        place = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if place is None:
+            new_place = Place(id=place_id, row_id=row.id, number=1)
+            db.add(new_place)
+            await db.commit()
+            place = new_place
+
         ticket = SpectatorTicket(
             match_id=match_id,
             spectator_id=1,
-            place_id=2,
-            status=status
+            place_id=place.id,
+            status=status,
+            uu_key=str(uuid.uuid4()),
         )
         db.add(ticket)
         await db.commit()
