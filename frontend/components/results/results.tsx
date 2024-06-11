@@ -5,22 +5,37 @@ import { ModeSwither } from '../mode-switcher';
 import { useState } from 'react';
 import { PersonDescriptionOnCard } from '../text';
 import { AthleteCard } from '../cards/athlete-card';
-import {
-  MedalWinner,
-  TeamMemberWithResults,
-} from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { AthleteCardSmall } from '../cards/athlete-card-small';
+import { CustomSection } from '../custom-section';
+import { ContentWraper } from '../content-wraper';
 
-interface WinnersListProps {
-  athletes: MedalWinner[];
-  medal: 'gold' | 'silver' | 'bronze';
+export interface AthleteWithPoints {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender?: boolean;
+  height?: number;
+  weight: number;
+  image_field: string;
+  country: number;
+  region: number;
+  city: string;
+  points?: number;
+  medals?: Medals;
+  medal?: 'gold' | 'silver' | 'bronze' | 'none';
+  isWithResults?: boolean;
 }
 
 interface ResultsProps {
-  goldenMedalWinners: MedalWinner[];
-  silverMedalWinners: MedalWinner[];
-  bronzeMedalWinners: MedalWinner[];
-  athletes: TeamMemberWithResults[];
+  goldenMedalWinners: AthleteCardSmall[];
+  silverMedalWinners: AthleteCardSmall[];
+  bronzeMedalWinners: AthleteCardSmall[];
+  athletes: AthleteWithPoints[];
+  isWithEvent?: boolean;
+  isWithResults?: boolean;
 }
 
 export function Results({
@@ -28,36 +43,63 @@ export function Results({
   silverMedalWinners,
   bronzeMedalWinners,
   athletes,
+  isWithEvent,
+  isWithResults,
 }: ResultsProps) {
   const [isMedalMode, setIsMedalMode] = useState<boolean>(true);
   return (
-    <div
-      className="flex flex-col gap-4"
-      role="tabpanel"
-      aria-labelledby="results"
-    >
-      <ModeSwither
-        className="relative"
-        id={'results'}
-        label={'Медали'}
-        alternativeLabel={'Очки'}
-        setIsOnMode={setIsMedalMode}
-        isOnMode={isMedalMode}
-      />
-      {isMedalMode ? (
-        <ul className="grid w-full grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-3">
-          <WinnersList athletes={goldenMedalWinners} medal={'gold'} />
-          <WinnersList athletes={silverMedalWinners} medal={'silver'} />
-          <WinnersList athletes={bronzeMedalWinners} medal={'bronze'} />
-        </ul>
-      ) : (
-        <AthleteListByPoints athletes={athletes} />
-      )}
-    </div>
+    <CustomSection className="relative mb-10">
+      <ContentWraper className="relative">
+        <div
+          className="flex w-full flex-col gap-4"
+          role="tabpanel"
+          aria-labelledby="results"
+        >
+          <ModeSwither
+            className="relative"
+            id={'results'}
+            label={'Медали'}
+            alternativeLabel={'Очки'}
+            setIsOnMode={setIsMedalMode}
+            isOnMode={isMedalMode}
+          />
+          {isMedalMode ? (
+            <ul className="grid w-full grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-3">
+              <WinnersList
+                athletes={goldenMedalWinners}
+                medal={'gold'}
+                isWithEvent={isWithEvent}
+              />
+              <WinnersList
+                athletes={silverMedalWinners}
+                medal={'silver'}
+                isWithEvent={isWithEvent}
+              />
+              <WinnersList
+                athletes={bronzeMedalWinners}
+                medal={'bronze'}
+                isWithEvent={isWithEvent}
+              />
+            </ul>
+          ) : (
+            <AthleteListByPoints
+              athletes={athletes}
+              isWithResults={isWithResults}
+            />
+          )}
+        </div>
+      </ContentWraper>
+    </CustomSection>
   );
 }
 
-function WinnersList({ athletes, medal }: WinnersListProps) {
+interface WinnersListProps {
+  athletes: AthleteCardSmall[];
+  medal: 'gold' | 'silver' | 'bronze';
+  isWithEvent?: boolean;
+}
+
+function WinnersList({ athletes, medal, isWithEvent }: WinnersListProps) {
   return (
     <li className="flex flex-col items-center gap-7">
       <Image
@@ -70,7 +112,7 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
         <ul className="flex flex-col gap-3">
           {athletes.map((athlete) => (
             <AthleteCardSmall
-              key={athlete.match_id}
+              key={athlete.id}
               sirname={athlete.sirname}
               name={athlete.name}
               fathername={athlete.fathername}
@@ -86,6 +128,7 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
               event_location={athlete.event_location}
               start_datetime={athlete.start_datetime}
               sport_type={athlete.sport_type}
+              isWithEvent={isWithEvent}
             />
           ))}
         </ul>
@@ -100,8 +143,10 @@ function WinnersList({ athletes, medal }: WinnersListProps) {
 
 function AthleteListByPoints({
   athletes,
+  isWithResults,
 }: {
-  athletes: TeamMemberWithResults[];
+  athletes: AthleteWithPoints[];
+  isWithResults?: boolean;
 }) {
   return (
     <>
@@ -122,7 +167,8 @@ function AthleteListByPoints({
               weight={athlete.weight}
               points={athlete.points}
               medals={athlete.medals}
-              isWithResults={true}
+              medal={athlete.medal}
+              isWithResults={isWithResults}
             />
           ))}
         </ul>

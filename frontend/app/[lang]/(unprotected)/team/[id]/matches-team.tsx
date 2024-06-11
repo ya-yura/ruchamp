@@ -22,15 +22,17 @@ export function MatchesTeam({
       <p className="mb-5 mr-auto text-base text-background">
         {!!length ? `Найдено матчей: ${length}` : 'Ничего не найдено'}
       </p>
-      {length && <MatchesField groupedMatches={groupedMatches} />}
+      {length && <MatchesField groupedMatches={groupedMatches} lang={lang} />}
     </ContentWraper>
   );
 }
 
 export function MatchesField({
   groupedMatches,
+  lang,
 }: {
   groupedMatches: GroupedMatch[];
+  lang: Locale;
 }) {
   return (
     <ul className="flex flex-col gap-10 bg-black px-4 py-8">
@@ -46,18 +48,26 @@ export function MatchesField({
               {group.location}
             </H4>
           </div>
-          <MatchesList matches={group.matches} />
+          <MatchesList matches={group.matches} lang={lang} />
         </li>
       ))}
     </ul>
   );
 }
 
-export function MatchesList({ matches }: { matches: TeamMatch[] }) {
+export function MatchesList({
+  matches,
+  lang,
+}: {
+  matches: TeamMatch[];
+  lang: Locale;
+}) {
   return (
     <ul className="flex flex-col gap-3">
       {matches.map((match) => (
         <MatchCard
+          eventId={match.event_id.toString()}
+          matchId={match.match_id}
           key={match.match_id}
           startTime={match.start_datetime}
           endTime={match.end_datetime}
@@ -65,9 +75,12 @@ export function MatchesList({ matches }: { matches: TeamMatch[] }) {
           grade={match.grade}
           gender={match.gender || false}
           weightClass={match.weight_class}
+          weightMax={match.weight_max}
+          weightMin={match.weight_min}
           ageMin={match.age_min}
           ageMax={match.age_max}
           buttonText={'Результаты'}
+          lang={lang}
         />
       ))}
     </ul>

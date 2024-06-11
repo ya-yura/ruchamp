@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Medals, TeamMember } from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { H4, PersonDescriptionOnCard } from '../text';
@@ -7,12 +7,9 @@ import { Country, AllRegions } from '@/lib/definitions';
 import { Badge } from '../ui/badge';
 import { getInitials } from '@/lib/utils/text-utils';
 import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
+import { AthleteWithPoints } from '../results/results';
 
-interface AthleteCardProps
-  extends Omit<
-    TeamMember,
-    'height' | 'sport_types' | 'coaches' | 'gender' | 'grade_types'
-  > {
+interface AthleteCardProps extends AthleteWithPoints {
   captainId?: number;
   isApproved?: boolean;
   points?: number;
@@ -39,6 +36,7 @@ export function AthleteCard({
   isApproved = true,
   points,
   medals,
+  medal,
   isWithResults,
 }: AthleteCardProps) {
   const athleteAge = calculateAge(birthdate);
@@ -61,6 +59,12 @@ export function AthleteCard({
       <></>
     );
   }
+
+  const medalObj: Record<string, string> = {
+    gold: 'Золото',
+    silver: 'Серебро',
+    bronze: 'Бронза',
+  };
 
   return (
     <TextCard className="relative cursor-default flex-col gap-4 transition-colors hover:bg-card-hoverGray sm:flex-row lg:px-4 lg:py-3">
@@ -111,6 +115,13 @@ export function AthleteCard({
             {(!!medals?.golden || !!medals?.silver || !!medals?.bronze) && (
               <PersonDescriptionOnCard className="text-neutralForeground3">
                 {getMedalsText(medals)}
+              </PersonDescriptionOnCard>
+            )}
+            {medal && medal !== 'none' && (
+              <PersonDescriptionOnCard className="text-neutralForeground3">
+                <span>
+                  <b>Медаль:</b> {medalObj[medal]}
+                </span>
               </PersonDescriptionOnCard>
             )}
           </>

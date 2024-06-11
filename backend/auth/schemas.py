@@ -13,7 +13,6 @@ class UserRead(schemas.BaseUser[int]):
     sirname: str
     fathername: str
     gender: bool
-    country: str
     birthdate: date
     role_id: int
     is_active: bool = True
@@ -31,7 +30,6 @@ class UserCreate(schemas.BaseUserCreate):
     sirname: Optional[str] = None
     fathername: Optional[str] = None
     gender: Optional[bool] = True
-    country: Optional[str] = None
     birthdate: Optional[date] = None
     password: str
     role_id: int

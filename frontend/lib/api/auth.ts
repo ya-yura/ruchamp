@@ -58,21 +58,6 @@ class Auth {
       });
   }
 
-  getAthlete(token: string): Promise<any> {
-    // fix any
-    return fetch(`${this.baseUrl}/users/me/athlete`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(checkResponse)
-      .catch((err) => {
-        console.log('getAthlete error: ', err);
-      });
-  }
-
   logOut(token: string): Promise<void> {
     return fetch(`${this.baseUrl}/auth/jwt/logout`, {
       method: 'POST',

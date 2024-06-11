@@ -1,25 +1,30 @@
 import { ContentWraper } from '@/components/content-wraper';
-import { ValueOption } from '../../team/[id]/page';
-import { EventMatch } from './page';
+import { ValueOption } from '../../../team/[id]/page';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { MatchCard } from '@/components/cards/match-card';
+import { Locale } from '@/i18n.config';
+import { EventMatch } from './matches-event';
 
 interface MatchesEventTabsProps {
+  eventId: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
   value: string;
   handleTabChange: ((value: string) => void) | undefined;
   isOwner?: boolean;
+  lang: Locale;
 }
 
 export function MatchesEventTabs({
+  eventId,
   matches,
   matchDates,
   value,
   handleTabChange,
   isOwner,
+  lang,
 }: MatchesEventTabsProps) {
   return (
     <ContentWraper className="min-h-44">
@@ -54,7 +59,9 @@ export function MatchesEventTabs({
             key={date.value as string}
             value={date.displayedValue as string}
           >
-            {!!matches.length && <MatchesField matches={matches} />}
+            {!!matches.length && (
+              <MatchesField eventId={eventId} matches={matches} lang={lang} />
+            )}
           </TabsContent>
         ))}
       </Tabs>
@@ -62,7 +69,13 @@ export function MatchesEventTabs({
   );
 }
 
-function MatchesField({ matches }: { matches: EventMatch[] }) {
+interface MatchesFieldPops {
+  eventId: string;
+  matches: EventMatch[];
+  lang: Locale;
+}
+
+function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
   return (
     <div className="rounded-lg bg-black px-2 pb-2 pt-4">
       <p className="mb-4 mr-auto text-base text-background">
@@ -74,15 +87,20 @@ function MatchesField({ matches }: { matches: EventMatch[] }) {
         {matches.map((match) => (
           <MatchCard
             key={match.id}
+            eventId={eventId}
+            matchId={match.id}
             startTime={match.start_datetime}
             endTime={match.end_datetime}
             sportType={match.sport_name}
             grade={match.category_type}
             gender={match.gender}
             weightClass={match.weight_category}
+            weightMin={match.weight_min}
+            weightMax={match.weight_max}
             ageMin={match.age_min}
             ageMax={match.age_max}
             buttonText={'Турнирная сетка'}
+            lang={lang}
           />
         ))}
       </ul>

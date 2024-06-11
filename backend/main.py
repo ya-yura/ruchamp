@@ -24,8 +24,8 @@ fastapi_users = FastAPIUsers[User, int](
 
 # Configure CORS
 origins = [
-    # "http://localhost",
-    # "http://localhost:3000",
+    "http://localhost",
+    "http://localhost:3000",
     # "http://emely.myddns.me",
     # "http://emely.myddns.me:3000",
     "http://sportplatform.ru",

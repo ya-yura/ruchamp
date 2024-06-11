@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
@@ -32,7 +31,6 @@ export function BigCardWithImage({
   className,
 }: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  const router = useRouter();
 
   return (
     <li
@@ -50,21 +48,26 @@ export function BigCardWithImage({
           style={{ objectFit: 'cover' }}
         />
         <div className="absolute left-0 top-0 h-full w-full bg-card-background opacity-70"></div>
-        <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
-          {name}
-        </h3>
+        <CustomLink
+          lang={lang}
+          href={`/${type}/${id}${type === 'event' ? '/info' : ''}`}
+        >
+          <h3 className="relative mx-auto mb-3 line-clamp-3 text-4xl font-bold text-background">
+            {name}
+          </h3>
+        </CustomLink>
         <p className="relative line-clamp-2 text-sm text-background">{tags}</p>
       </div>
       <div className="flex flex-col justify-between px-4 py-3">
         <div className="mb-3 flex items-center justify-start gap-5">
-          <div className="m-0 flex h-[30px] w-[30px] items-center justify-center p-0">
+          {/* <div className="m-0 flex h-[30px] w-[30px] items-center justify-center p-0">
             <Image
               src="/ru/images/icon-loop.png"
               alt={'Иконка'}
               width={25}
               height={25}
             />
-          </div>
+          </div> */}
           <div className="flex flex-col">
             <p className="text-sm font-semibold text-background">{title}</p>
             <p className="line-clamp-1 text-muted-foreground">{subtitle}</p>
@@ -101,7 +104,7 @@ export function BigCardWithImage({
             'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           )}
           lang={lang}
-          href={`/${type}/${id}`}
+          href={`/${type}/${id}${type === 'event' ? '/info' : ''}`}
         >
           Подробнее
         </CustomLink>

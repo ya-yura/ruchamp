@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { ValueOption } from '../../team/[id]/page';
+import { ValueOption } from '../../../team/[id]/page';
 import { determineDateStatus } from '@/lib/utils/date-and-time';
 import { H4 } from '@/components/text';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';

@@ -1,7 +1,9 @@
 import uuid
 from typing import Type
 
-from fastapi import APIRouter, Body, Depends, File, HTTPException, UploadFile
+from fastapi import (APIRouter, Body, Depends, File, HTTPException, UploadFile,
+                     BackgroundTasks)
+from fastapi.responses import RedirectResponse
 from fastapi_users import FastAPIUsers
 from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -229,7 +231,7 @@ async def verify_user(token: str, db: AsyncSession = Depends(get_db)):
         User.email == email).values(is_verified=True, verification_token="")
     )
     await db.commit()
-    return {"email": email}
+    return RedirectResponse(url="http://sportplatform.ru", status_code=303)
 
 
 @router.post("/forgot-password/{email}")
@@ -475,10 +477,13 @@ async def get_current_user_referee(
 async def create_user(
     user_create: UserCreate,
     user_data: UserData,
+    background_tasks: BackgroundTasks,
     user_manager: UserManager = Depends(get_user_manager),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
-    user = await user_manager.create(user_create)
+    user = await user_manager.create(
+        user_create, background_tasks=background_tasks
+    )
     user_role = user.role_id
 
     if user_role == 1:

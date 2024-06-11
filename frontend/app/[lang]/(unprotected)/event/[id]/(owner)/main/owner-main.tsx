@@ -7,18 +7,26 @@ import {
 import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { Separator } from '@/components/ui/separator';
 import React, { useMemo, useState } from 'react';
-import { MatchesEventTabs } from './matches-events-tabs';
-import { EventMatch } from './page';
-import { ValueOption } from '../../team/[id]/page';
+import { ValueOption } from '../../../../team/[id]/page';
 import { transformDate } from '@/lib/utils/date-and-time';
 import { Button } from '@/components/ui/button';
+import { EventMatch } from '../../matches/matches-event';
+import { MatchesEventTabs } from '../../matches/matches-events-tabs';
+import { Locale } from '@/i18n.config';
 
 interface OwnerMainProps {
+  eventId: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
+  lang: Locale;
 }
 
-export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
+export function OwnerMain({
+  eventId,
+  matches,
+  matchDates,
+  lang,
+}: OwnerMainProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
     matchDates[0]?.displayedValue || '',
   );
@@ -35,7 +43,7 @@ export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
     setSelectedDate(value);
   }
   return (
-    <div className="flex flex-col gap-9">
+    <div className="flex flex-col gap-9 w-full">
       <ColoredCards />
       <TransparentCards />
       <Separator className="bg-NeutralStroke3Rest" />
@@ -49,11 +57,13 @@ export function OwnerMain({ matches, matchDates }: OwnerMainProps) {
       </div>
       {!!matches.length ? (
         <MatchesEventTabs
+          eventId={eventId}
           matches={filteredMatches}
           matchDates={matchDates}
           value={selectedDate}
           handleTabChange={handleTabChange}
           isOwner={true}
+          lang={lang}
         />
       ) : (
         <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">

@@ -1,7 +1,7 @@
 import os
 import uuid
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -9,6 +9,7 @@ from fastapi import (APIRouter, Depends, File, HTTPException,
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, update, and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
@@ -27,7 +28,7 @@ from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           CreateTournamentApplicationAthlete,
                           UpdateTournamentApplication)
 from teams.models import Team
-from shop.models import Ticket, Engagement
+from shop.models import Ticket, Engagement, Sector, Place, Row, SpectatorTicket
 from geo.geo import get_geo
 
 router = APIRouter(prefix="/event", tags=["Events"])
@@ -143,6 +144,297 @@ async def get_events_me(
     events = query.mappings().all()
 
     return events
+
+
+@router.get("/{event_id}/org-info")
+async def get_event_org_info(
+    event_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user),
+):
+    # Получение идентификатора организатора события
+    query = await db.execute(
+        select(Event.organizer_id)
+        .where(Event.id == event_id)
+    )
+    event_org_id = query.scalars().first()
+
+    if not event_org_id:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Проверка, является ли текущий пользователь организатором события
+    query = await db.execute(
+        select(EventOrganizer.user_id)
+        .where(EventOrganizer.id == event_org_id)
+    )
+    org_user_id = query.scalars().first()
+    if org_user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not an organizer this event"
+        )
+
+    # Получение всех матчей данного события
+    query = await db.execute(
+        select(Match.id)
+        .where(Match.event_id == event_id)
+    )
+    match_ids = query.scalars().all()
+
+    # Получение текущей даты и времени
+    now = datetime.utcnow()
+    today_start = datetime(now.year, now.month, now.day)
+
+    # Добавить заявки от атлетов, не только от команд
+    # Получение информации о командах и билетах
+    query = await db.execute(
+        select(TournamentApplication)
+        .where(TournamentApplication.match_id.in_(match_ids))
+    )
+    total_applications_teams = query.scalars().all()
+
+    PlaceAlias = aliased(Place)
+
+    query = await db.execute(
+        select(PlaceAlias.id)
+        .join(Sector, Sector.event_id == event_id)
+        .join(Row, Row.sector_id == Sector.id)
+        .join(Place, Place.row_id == Row.id)
+        .where(Event.id == event_id)
+    )
+    place_id = query.scalars().first()
+
+    query = await db.execute(
+        select(Ticket.price)
+        .where(Ticket.match_id.in_(match_ids))
+    )
+    ticket_price = query.scalars().first()
+
+    query = await db.execute(
+        select(SpectatorTicket.id)
+        .where(
+            SpectatorTicket.match_id.in_(match_ids),
+        )
+    )
+    tickets = query.scalars().all()
+
+    query = await db.execute(
+        select(Engagement.price)
+        .where(Engagement.match_id.in_(match_ids))
+    )
+    engagement_price = query.scalars().first()
+
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(
+            TournamentApplication.status == 'paid',
+            TournamentApplication.match_id.in_(match_ids)
+        )
+    )
+    paid_application = query.scalars().all()
+
+    # Общая информация
+    total_teams = len(total_applications_teams)
+    total_teams_payed = sum(
+        1 for team in total_applications_teams if team.status == "paid"
+    )
+    total_tickets = len(tickets)
+    total_sold_tickets_price = sum(ticket_price for ticket in tickets)
+    total_gain = sum(engagement_price for application in paid_application)
+
+    # Информация за сегодня
+    today_applications_teams_query = await db.execute(
+        select(TournamentApplication)
+        .where(
+            TournamentApplication.match_id.in_(match_ids),
+            TournamentApplication.created_at >= today_start
+        )
+    )
+    today_applications_teams = today_applications_teams_query.scalars().all()
+
+    query = await db.execute(
+        select(TournamentApplication)
+        .where(
+            TournamentApplication.match_id.in_(match_ids),
+            TournamentApplication.status == "paid",
+            TournamentApplication.updated_at >= today_start
+        )
+    )
+    today_applications_teams_paid = query.scalars().all()
+
+    today_tickets_query = await db.execute(
+        select(SpectatorTicket)
+        .where(
+            SpectatorTicket.match_id.in_(match_ids),
+            SpectatorTicket.status == "paid",
+            SpectatorTicket.updated_at >= today_start
+        )
+    )
+    today_tickets = today_tickets_query.scalars().all()
+
+    today_teams_count = len(today_applications_teams)
+    today_teams_payed = sum(
+        1 for team in today_applications_teams_paid if team.status == "paid"
+    )
+    #today_tickets = [1]  # заглушка надо подумать как взять сколько зрителей оплатило за сегодня
+    today_tickets_count = len(today_tickets)
+    today_sold_tickets_price = sum(ticket_price for ticket in today_tickets)
+
+    org_info = {
+        "total": {
+            "teams": total_teams,
+            "teams_payed": total_teams_payed,
+            "tickets": total_tickets,
+            "sold_tickets_price": total_sold_tickets_price,
+            "total_gain": total_gain
+        },
+        "today": {
+            "teams": today_teams_count,
+            "teams_payed": today_teams_payed,
+            "tickets": today_tickets_count,
+            "sold_tickets_price": today_sold_tickets_price
+        }
+    }
+
+    return org_info
+
+
+@router.get("/{event_id}/org-info/application")
+async def get_event_applications(
+    event_id: int,
+    db: AsyncSession = Depends(get_db),
+    # current_user: UserDB = Depends(current_user)
+):
+
+    '''# Получение идентификатора организатора события
+    query = await db.execute(
+        select(Event.organizer_id)
+        .where(Event.id == event_id)
+    )
+    event_org_id = query.scalars().first()
+
+    if not event_org_id:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Проверка, является ли текущий пользователь организатором события
+    query = await db.execute(
+        select(EventOrganizer.user_id)
+        .where(EventOrganizer.id == event_org_id)
+    )
+    org_user_id = query.scalars().first()
+    if org_user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not an organizer this event"
+        )'''
+    
+
+    # Получение идентификаторов матчей для события
+    query = await db.execute(
+        select(Match.id).where(Match.event_id == event_id)
+    )
+    match_ids = query.scalars().all()
+
+    # Получение заявок на матчи
+    query = await db.execute(
+        select(
+            TournamentApplication.id,
+            TournamentApplication.team_id,
+            TournamentApplication.status,
+            TournamentApplication.athlete_id,
+            Team.name.label("team_name")
+        )
+        .select_from(TournamentApplication)
+        .join(Team, Team.id == TournamentApplication.team_id)
+        .where(TournamentApplication.match_id.in_(match_ids))
+    )
+    applications = query.all()
+
+    application_info = []
+    team_map = {}
+    for application in applications:
+        team_id = application.team_id
+        if team_id not in team_map:
+            team_map[team_id] = {
+                "id": team_id,
+                "name": application.team_name,
+                "payment_status": application.status,
+                "members": []
+            }
+
+        # Получение участников команд
+        query = await db.execute(
+            select(
+                Team.id.label("team_id"),
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+                #GradeType.name.label("grade_type")
+            )
+            .select_from(Team)
+            .join(Athlete, Athlete.id == application.athlete_id)
+            .join(User, User.id == Athlete.user_id)
+            #.outerjoin(GradeType, GradeType.id == Athlete.grade_type_id)
+            .where(Team.id == application.team_id)
+        )
+        members = query.mappings().all()
+
+        for member in members:
+            team_id = member.team_id
+            team_map[team_id]["members"].append({
+                "id": member.id,
+                "sirname": member.sirname,
+                "name": member.name,
+                "fathername": member.fathername,
+                "birthdate": member.birthdate,
+                "gender": member.gender,
+                "height": member.height,
+                "weight": member.weight,
+                "image_field": member.image_field,
+                "country": member.country,
+                "region": member.region,
+                "city": member.city,
+                #"grade_types": [member.grade_type] if member.grade_type else []
+            })
+
+        application_info = list(team_map.values())
+
+    '''query = await db.execute(
+            select(
+                Match.id,
+                Match.name.label("match_name"),
+                User.id.label("user_id"),
+                User.name,
+                User.sirname,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.weight.label("weight"),
+                Athlete.country.label("country"),
+                Athlete.region.label("country"),
+                Athlete.city.label("city"),
+                Athlete.image_field.label("image_field"),
+            )
+            .select_from(TournamentApplication)
+            .join(Athlete, Athlete.id == application.athlete_id)
+            .join(User, User.id == Athlete.user_id)
+            .join(Match, Match.id == application.match_id)
+            
+            .where(TournamentApplication.id == application.id)
+        )
+        application_data = query.mappings().all()
+        application_info.append(application_data)'''
+
+    return application_info
 
 
 @router.get("/{event_id}")
@@ -391,6 +683,8 @@ async def get_matches(
                 MatchAge.age_till.label("age_max"),
                 MatchGender.gender.label("gender"),
                 AllWeightClass.name.label("weight_category"),
+                AllWeightClass.min_weight.label("weight_min"),
+                AllWeightClass.max_weight.label("weight_max"),
                 CategoryType.name.label("category_type"),
             )
             .join(CombatType, CombatType.id == Match.combat_type_id)
@@ -425,13 +719,15 @@ async def get_event_matches_results(
             status_code=404,
             detail="No matches found for the event"
         )
-
-    # Получаем всех участников матчей
-    query = await db.execute(
-        select(MatchParticipant.player_id)
-        .where(MatchParticipant.match_id.in_(match_ids))
-    )
-    participant_ids = query.scalars().all()
+    participants = []
+    # Получаем всех участников матчей в ивенте
+    for match_id in match_ids:
+        query = await db.execute(
+            select(MatchParticipant.player_id)
+            .where(MatchParticipant.match_id == match_id)
+        )
+        participant_ids = query.scalars().all()
+        participants.extend(participant_ids)
 
     if not participant_ids:
         raise HTTPException(
@@ -441,7 +737,7 @@ async def get_event_matches_results(
 
     results = []
 
-    for participant_id in participant_ids:
+    for participant_id in participants:
         # Получаем ID пользователя спортсмена
         query = await db.execute(
             select(Athlete.user_id).where(Athlete.id == participant_id)
@@ -484,9 +780,9 @@ async def get_event_matches_results(
             select(MatchParticipant.id)
             .where(MatchParticipant.player_id == participant_id)
         )
-        winners_ids = query.scalars().all()
+        match_participant_ids = query.scalars().all()
 
-        for winner_id in winners_ids:
+        for winner_id in match_participant_ids:
             # Получаем медали для каждого участника
             query = await db.execute(
                 select(WinnerTable.medal)
@@ -574,8 +870,12 @@ async def create_match(
         match_gender = False
 
     # Весовая категория участников
-    min_weight_id_subquery = select(func.min(AllWeightClass.id)).scalar_subquery()
-    max_weight_id_subquery = select(func.max(AllWeightClass.id)).scalar_subquery()
+    min_weight_id_subquery = select(
+        func.min(AllWeightClass.id)
+    ).scalar_subquery()
+    max_weight_id_subquery = select(
+        func.max(AllWeightClass.id)
+    ).scalar_subquery()
 
     query = await db.execute(
         select(
@@ -656,6 +956,27 @@ async def create_match(
             gender=match_gender
         )
         db.add(match_gender)
+
+        ticket_sector = Sector(
+            event_id=event_id,
+            name="Сектор"
+        )
+        db.add(ticket_sector)
+        await db.flush()
+
+        ticket_row = Row(
+            sector_id=ticket_sector.id,
+            number=1
+        )
+        db.add(ticket_row)
+        await db.flush()
+
+        ticket_place = Place(
+            row_id=ticket_row.id,
+            number=match_data.seat_capacity
+        )
+        db.add(ticket_place)
+        await db.flush()
 
         match_athlete_price = Engagement(
             match_id=new_match.id,
@@ -771,6 +1092,25 @@ async def create_tournament_application_team(
     db.refresh(application)
 
     return {f"Application ID - {application.id} created"}
+
+
+@router.post("/tournament-applications-team/paid/{team_id}")
+async def team_paid_tournament_application(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(TournamentApplication.team_id == team_id)
+    )
+    application_id = query.scalars().first()
+    new_status_history = ApplicationStatusHistory(
+        application_id=application_id,
+        status="paid"
+    )
+    db.add(new_status_history)
+    await db.commit()
+    return {f"Application ID - {application_id} paid"}
 
 
 @router.post("/tournament-applications-athlete/create")

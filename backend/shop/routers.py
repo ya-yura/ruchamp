@@ -1,11 +1,12 @@
 import os
 import uuid
 from datetime import datetime
+import logging
 
 import qrcode
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException, Request,
-                     UploadFile)
+                     UploadFile, Query)
 from fpdf import FPDF
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,13 +15,103 @@ from auth.models import Athlete, EventOrganizer
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import Event
+from event.models import Event, Match
 from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
-                         Row, Sector, Ticket)
+                         Row, Sector, Ticket, SpectatorTicket)
 from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
 from teams.models import TeamMember
+from enum import Enum
+
+
+# Настройка логгера
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/shop", tags=["Shop"])
+
+
+'''Тестовые данные'''
+
+
+class StatusEnum(str, Enum):
+    available = "available"
+    reserved = "reserved"
+    paid = "paid"
+    used = "used"
+    canceled = "canceled"
+
+
+@router.post("/test/spectator-tikest/create")
+async def create_spectator_ticket(
+    match_id: int,
+    status: StatusEnum = Query(...),
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        query = await db.execute(
+            select(Match.event_id).where(Match.id == match_id)
+        )
+        event_id = query.scalars().one_or_none()
+        if event_id is None:
+            raise HTTPException(status_code=404, detail="Event not found")
+        # Проверка существования записи в таблице Sector
+        sector_id = 1  # Укажите нужный sector_id
+        sector_query = select(Sector).where(Sector.id == sector_id)
+        result = await db.execute(sector_query)
+        sector = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if sector is None:
+            new_sector = Sector(
+                id=sector_id,
+                event_id=event_id,
+                name='Default Sector Name'
+            )
+            db.add(new_sector)
+            await db.commit()
+            sector = new_sector
+
+        # Проверка существования записи в таблице Row
+        row_id = 1  # Укажите нужный row_id
+        row_query = select(Row).where(Row.id == row_id)
+        result = await db.execute(row_query)
+        row = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if row is None:
+            new_row = Row(id=row_id, sector_id=sector.id, number=1)
+            db.add(new_row)
+            await db.commit()
+            row = new_row
+
+        # Проверка существования записи в таблице Place
+        place_id = 2  # Укажите нужный place_id
+        place_query = select(Place).where(Place.id == place_id)
+        result = await db.execute(place_query)
+        place = result.scalars().first()
+
+        # Если запись отсутствует, создаем новую
+        if place is None:
+            new_place = Place(id=place_id, row_id=row.id, number=1)
+            db.add(new_place)
+            await db.commit()
+            place = new_place
+
+        ticket = SpectatorTicket(
+            match_id=match_id,
+            spectator_id=1,
+            place_id=place.id,
+            status=status,
+            uu_key=str(uuid.uuid4()),
+        )
+        db.add(ticket)
+        await db.commit()
+    except Exception as e:
+        logger.error(f"Error creating ticket: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Ticket not created: {str(e)}"
+        )
+    return {"ok"}
 
 
 ''' Билеты '''

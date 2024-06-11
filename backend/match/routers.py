@@ -258,6 +258,16 @@ async def create_next_round(
         if len(winners) == 1:
             # Если остался только один победитель, завершаем турнир
             final_winner = winners[0]
+            # Записываем победителя в таблицу WinnerTable
+            await db.execute(
+                insert(WinnerTable).values(
+                    match_id=match_id,
+                    winner_id=final_winner,
+                    winner_score='5',
+                    medal=1  # Золото
+                )
+            )
+            await db.commit()
             return {"winner": final_winner}
         elif len(winners) == 2:
             # Если осталось два победителя, то это финал
@@ -292,7 +302,7 @@ async def create_next_round(
             if len(third_place_participants) >= 2:
                 third_place_fight = await create_fight(
                     db, match_id, third_place_participants[:2],
-                    next_round, mat_vol, 1
+                    next_round, mat_vol, 1, is_third_place=True
                 )
                 await db.commit()
             else:
@@ -300,7 +310,8 @@ async def create_next_round(
 
             # Создаем финальный бой после боя за третье место
             final_fight = await create_fight(
-                db, match_id, winners, next_round + 1, mat_vol, 0
+                db, match_id, winners, next_round + 1, mat_vol, 0,
+                is_final=True
             )
             await db.commit()
 
@@ -337,7 +348,9 @@ async def create_next_round(
             await db.commit()
 
 
-async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter):
+async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter,
+                       is_final=False, is_third_place=False
+                       ):
     random_winner = random.choice(pair)
     random_loser = pair[0] if random_winner == pair[1] else pair[1]
 
@@ -377,6 +390,34 @@ async def create_fight(db, match_id, pair, round_number, mat_vol, mat_counter):
     )
     db.add(winner)
 
+    # Определение медалей и запись в таблицу WinnerTable
+    if is_final:  # Финал
+        await db.execute(
+            insert(WinnerTable).values(
+                match_id=match_id,
+                winner_id=random_winner,
+                winner_score='5',
+                medal=1  # Золото
+            )
+        )
+        await db.execute(
+            insert(WinnerTable).values(
+                match_id=match_id,
+                winner_id=random_loser,
+                winner_score='0',
+                medal=2  # Серебро
+            )
+        )
+    elif is_third_place:  # Бой за третье место
+        await db.execute(
+            insert(WinnerTable).values(
+                match_id=match_id,
+                winner_id=random_winner,
+                winner_score='5',
+                medal=3  # Бронза
+            )
+        )
+
     return fight
 
 
@@ -398,6 +439,8 @@ async def get_grid(
             MatchAge.age_till,
             SportType.name.label("sport_name"),
             AllWeightClass.name.label("weight_category"),
+            AllWeightClass.min_weight.label("weight_min"),
+            AllWeightClass.max_weight.label("weight_max"),
             MatchGender.gender.label("gender"),
         )
         .join(CombatType, CombatType.id == Match.combat_type_id)
@@ -421,6 +464,8 @@ async def get_grid(
         "age_till": grid_info["age_till"],
         "sport_name": grid_info["sport_name"],
         "weight_category": grid_info["weight_category"],
+        "weight_min": grid_info["weight_min"],
+        "weight_max": grid_info["weight_max"],
         "gender": grid_info["gender"]
     }
 
@@ -540,7 +585,9 @@ async def get_player_info(db, player_id):
 
 
 async def get_player_score(db, player_id, fight_id=None):
-    query = select(FightCounter.player_score).where(FightCounter.player == player_id)
+    query = select(FightCounter.player_score).where(
+        FightCounter.player == player_id
+    )
     if fight_id:
         query = query.where(FightCounter.fight_id == fight_id)
 
