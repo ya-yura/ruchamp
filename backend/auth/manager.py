@@ -69,13 +69,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         if background_tasks:
             background_tasks.add_task(
                 send_verification_email,
-                user.username,
+                user.name,
                 user.email,
                 user.verification_token
             )
         else:
             send_verification_email(
-                user.username, user.email, user.verification_token
+                user.name, user.email, user.verification_token
             )
 
     async def update_athlete_profile(

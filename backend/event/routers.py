@@ -213,8 +213,7 @@ async def get_event_org_info(
     query = await db.execute(
         select(SpectatorTicket.id)
         .where(
-            SpectatorTicket.status == "available",
-            SpectatorTicket.place_id == place_id
+            SpectatorTicket.match_id.in_(match_ids),
         )
     )
     tickets = query.scalars().all()
@@ -267,7 +266,7 @@ async def get_event_org_info(
         select(SpectatorTicket)
         .where(
             SpectatorTicket.match_id.in_(match_ids),
-            SpectatorTicket.status == "available",
+            SpectatorTicket.status == "paid",
             SpectatorTicket.updated_at >= today_start
         )
     )
@@ -298,6 +297,78 @@ async def get_event_org_info(
     }
 
     return org_info
+
+
+@router.get("/{event_id}/org-info/application")
+async def get_event_applications(
+    event_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+
+    '''# Получение идентификатора организатора события
+    query = await db.execute(
+        select(Event.organizer_id)
+        .where(Event.id == event_id)
+    )
+    event_org_id = query.scalars().first()
+
+    if not event_org_id:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Проверка, является ли текущий пользователь организатором события
+    query = await db.execute(
+        select(EventOrganizer.user_id)
+        .where(EventOrganizer.id == event_org_id)
+    )
+    org_user_id = query.scalars().first()
+    if org_user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not an organizer this event"
+        )'''
+
+    query = await db.execute(
+        select(Match.id).where(Match.event_id == event_id)
+    )
+    match_ids = query.scalars().all()
+
+    query = await db.execute(
+        select(TournamentApplication)
+        .where(TournamentApplication.match_id.in_(match_ids))
+    )
+    applications = query.scalars().all()
+
+    application_info = []
+
+    for application in applications:
+        query = await db.execute(
+            select(
+                Match.id,
+                Match.name.label("match_name"),
+                User.id.label("user_id"),
+                User.name,
+                User.sirname,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.weight.label("weight"),
+                Athlete.country.label("country"),
+                Athlete.region.label("country"),
+                Athlete.city.label("city"),
+                Athlete.image_field.label("image_field"),
+            )
+            .select_from(TournamentApplication)
+            .join(Athlete, Athlete.id == application.athlete_id)
+            .join(User, User.id == Athlete.user_id)
+            .join(Match, Match.id == application.match_id)
+            
+            .where(TournamentApplication.id == application.id)
+        )
+        application_data = query.mappings().all()
+        application_info.append(application_data)
+
+    return application_info
 
 
 @router.get("/{event_id}")

@@ -2,9 +2,6 @@ import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 import os
-import logging
-
-logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -21,15 +18,10 @@ def send_email(subject: str, to_email: str, html_content: str):
     message["From"] = EMAIL_USERNAME
     message["To"] = to_email
 
-    logging.info(f"Connecting to SMTP server: {SMTP_SERVER}:{SMTP_PORT}")
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_USERNAME, to_email, message.as_string())
-            logging.info(f"Email sent to {to_email}")
-    except Exception as e:
-        logging.error(f"Failed to send email: {e}")
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+        server.starttls()
+        server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_USERNAME, to_email, message.as_string())
 
 
 def send_verification_email(username: str, email: str, token: str):

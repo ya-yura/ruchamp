@@ -1,11 +1,12 @@
 import os
 import uuid
 from datetime import datetime
+import logging
 
 import qrcode
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException, Request,
-                     UploadFile)
+                     UploadFile, Query)
 from fpdf import FPDF
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,11 +17,51 @@ from auth.schemas import UserDB
 from connection import get_db
 from event.models import Event
 from shop.models import (Courses, Engagement, Merch, Order, OrderItem, Place,
-                         Row, Sector, Ticket)
+                         Row, Sector, Ticket, SpectatorTicket)
 from shop.schemas import MerchCreate, MerchUpdate, TicketCreate
 from teams.models import TeamMember
+from enum import Enum
+
+
+# Настройка логгера
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/shop", tags=["Shop"])
+
+
+'''Тестовые данные'''
+
+
+class StatusEnum(str, Enum):
+    available = "available"
+    reserved = "reserved"
+    paid = "paid"
+    used = "used"
+    canceled = "canceled"
+
+
+@router.post("/test/spectator-tikest/create")
+async def create_spectator_ticket(
+    match_id: int,
+    status: StatusEnum = Query(...),
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        ticket = SpectatorTicket(
+            match_id=match_id,
+            spectator_id=1,
+            place_id=2,
+            status=status
+        )
+        db.add(ticket)
+        await db.commit()
+    except Exception as e:
+        logger.error(f"Error creating ticket: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Ticket not created: {str(e)}"
+        )
+    return {"ok"}
 
 
 ''' Билеты '''
