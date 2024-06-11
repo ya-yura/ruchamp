@@ -303,7 +303,7 @@ async def get_event_org_info(
 async def get_event_applications(
     event_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: UserDB = Depends(current_user)
+    # current_user: UserDB = Depends(current_user)
 ):
 
     '''# Получение идентификатора организатора события
@@ -327,22 +327,88 @@ async def get_event_applications(
             status_code=403,
             detail="You are not an organizer this event"
         )'''
+    
 
+    # Получение идентификаторов матчей для события
     query = await db.execute(
         select(Match.id).where(Match.event_id == event_id)
     )
     match_ids = query.scalars().all()
 
+    # Получение заявок на матчи
     query = await db.execute(
-        select(TournamentApplication)
+        select(
+            TournamentApplication.id,
+            TournamentApplication.team_id,
+            TournamentApplication.status,
+            TournamentApplication.athlete_id,
+            Team.name.label("team_name")
+        )
+        .select_from(TournamentApplication)
+        .join(Team, Team.id == TournamentApplication.team_id)
         .where(TournamentApplication.match_id.in_(match_ids))
     )
-    applications = query.scalars().all()
+    applications = query.all()
 
     application_info = []
-
+    team_map = {}
     for application in applications:
+        team_id = application.team_id
+        if team_id not in team_map:
+            team_map[team_id] = {
+                "id": team_id,
+                "name": application.team_name,
+                "payment_status": application.status,
+                "members": []
+            }
+
+        # Получение участников команд
         query = await db.execute(
+            select(
+                Team.id.label("team_id"),
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+                #GradeType.name.label("grade_type")
+            )
+            .select_from(Team)
+            .join(Athlete, Athlete.id == application.athlete_id)
+            .join(User, User.id == Athlete.user_id)
+            #.outerjoin(GradeType, GradeType.id == Athlete.grade_type_id)
+            .where(Team.id == application.team_id)
+        )
+        members = query.mappings().all()
+
+        for member in members:
+            team_id = member.team_id
+            team_map[team_id]["members"].append({
+                "id": member.id,
+                "sirname": member.sirname,
+                "name": member.name,
+                "fathername": member.fathername,
+                "birthdate": member.birthdate,
+                "gender": member.gender,
+                "height": member.height,
+                "weight": member.weight,
+                "image_field": member.image_field,
+                "country": member.country,
+                "region": member.region,
+                "city": member.city,
+                #"grade_types": [member.grade_type] if member.grade_type else []
+            })
+
+        application_info = list(team_map.values())
+
+    '''query = await db.execute(
             select(
                 Match.id,
                 Match.name.label("match_name"),
@@ -366,7 +432,7 @@ async def get_event_applications(
             .where(TournamentApplication.id == application.id)
         )
         application_data = query.mappings().all()
-        application_info.append(application_data)
+        application_info.append(application_data)'''
 
     return application_info
 
