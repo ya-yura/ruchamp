@@ -26,9 +26,9 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      {/* <div className=" absolute z-10 pt-[12px] sm:pl-7 md:pl-10   lg:pl-[72px]">
+      <div className=" absolute z-10 pt-[15px] sm:pl-7 md:pl-10   lg:pl-[72px]">
         <Logo lang={lang} />
-      </div> */}
+      </div>
 
       <div className="relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr]">
         {children}
