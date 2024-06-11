@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Locale } from '@/i18n.config';
 import { path } from '@/lib/utils/other-utils';
 import { getSession } from '@/lib/actions/auth';
+import { Logo } from '@/components/logo';
 
 export default async function AuthLayout({
   children,
@@ -25,6 +26,10 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
+      {/* <div className=" absolute z-10 pt-[12px] sm:pl-7 md:pl-10   lg:pl-[72px]">
+        <Logo lang={lang} />
+      </div> */}
+
       <div className="relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr]">
         {children}
       </div>
