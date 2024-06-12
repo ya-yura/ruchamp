@@ -495,3 +495,42 @@ class Transaction(Base):
     payment_method = Column(String, nullable=False)
     transaction_date = Column(DateTime, default=datetime.utcnow)
     amount = Column(Float, nullable=False)
+
+
+
+
+query = await db.execute(
+            select(
+                Team.id.label("team_id"),
+                User.id,
+                User.sirname,
+                User.name,
+                User.fathername,
+                User.birthdate,
+                User.gender,
+                Athlete.height,
+                Athlete.weight,
+                Athlete.image_field,
+                Athlete.country,
+                Athlete.region,
+                Athlete.city,
+                #GradeType.name.label("grade_type")
+            )
+            .select_from(Team)
+            .join(Athlete, Athlete.id == application.athlete_id)
+            .join(User, User.id == Athlete.user_id)
+            #.outerjoin(GradeType, GradeType.id == Athlete.grade_type_id)
+            .where(Team.id == application.team_id)
+        )
+        members = query.mappings().all()
+
+
+    query = await db.execute(
+            select(
+                CategoryType.name
+            )
+            .join(athlete_grade_association)
+            .where(athlete_grade_association.c.athlete_id == member)
+        )
+        grade_types = query.scalars().all()
+        user_info['grade_types'] = grade_types

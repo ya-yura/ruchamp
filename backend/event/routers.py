@@ -14,7 +14,7 @@ from sqlalchemy.orm import aliased
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import (SportType, Athlete, User)
+from auth.models import (SportType, Athlete, User, athlete_grade_association)
 # from auth.models import User, athlete_sport_type_association
 from connection import get_db
 from event.models import (Event, EventOrganizer, Match, CombatType,
@@ -327,7 +327,6 @@ async def get_event_applications(
             status_code=403,
             detail="You are not an organizer this event"
         )'''
-    
 
     # Получение идентификаторов матчей для события
     query = await db.execute(
@@ -358,7 +357,7 @@ async def get_event_applications(
             team_map[team_id] = {
                 "id": team_id,
                 "name": application.team_name,
-                "payment_status": application.status,
+                "application_status": application.status,
                 "members": []
             }
 
@@ -367,6 +366,7 @@ async def get_event_applications(
             select(
                 Team.id.label("team_id"),
                 User.id,
+                Athlete.id.label("athlete_id"),
                 User.sirname,
                 User.name,
                 User.fathername,
@@ -378,17 +378,35 @@ async def get_event_applications(
                 Athlete.country,
                 Athlete.region,
                 Athlete.city,
-                #GradeType.name.label("grade_type")
+                CategoryType.name.label("grade_type"),
             )
             .select_from(Team)
             .join(Athlete, Athlete.id == application.athlete_id)
             .join(User, User.id == Athlete.user_id)
-            #.outerjoin(GradeType, GradeType.id == Athlete.grade_type_id)
+            .outerjoin(
+                athlete_grade_association,
+                athlete_grade_association.c.athlete_id == Athlete.id
+            )
+            .outerjoin(
+                CategoryType,
+                CategoryType.id == athlete_grade_association.c.category_type_id
+            )
             .where(Team.id == application.team_id)
         )
         members = query.mappings().all()
 
         for member in members:
+            query = await db.execute(
+                select(
+                    CategoryType.name
+                )
+                .join(athlete_grade_association)
+                .where(
+                    athlete_grade_association.c.athlete_id == member.athlete_id
+                )
+            )
+            grade_types = query.scalars().all()
+
             team_id = member.team_id
             team_map[team_id]["members"].append({
                 "id": member.id,
@@ -403,36 +421,10 @@ async def get_event_applications(
                 "country": member.country,
                 "region": member.region,
                 "city": member.city,
-                #"grade_types": [member.grade_type] if member.grade_type else []
+                "grade_types": [grade_type for grade_type in grade_types]
             })
 
         application_info = list(team_map.values())
-
-    '''query = await db.execute(
-            select(
-                Match.id,
-                Match.name.label("match_name"),
-                User.id.label("user_id"),
-                User.name,
-                User.sirname,
-                User.fathername,
-                User.birthdate,
-                User.gender,
-                Athlete.weight.label("weight"),
-                Athlete.country.label("country"),
-                Athlete.region.label("country"),
-                Athlete.city.label("city"),
-                Athlete.image_field.label("image_field"),
-            )
-            .select_from(TournamentApplication)
-            .join(Athlete, Athlete.id == application.athlete_id)
-            .join(User, User.id == Athlete.user_id)
-            .join(Match, Match.id == application.match_id)
-            
-            .where(TournamentApplication.id == application.id)
-        )
-        application_data = query.mappings().all()
-        application_info.append(application_data)'''
 
     return application_info
 
