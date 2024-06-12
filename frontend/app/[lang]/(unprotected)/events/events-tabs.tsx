@@ -17,6 +17,7 @@ import { isDateInRange, transformDate } from '@/lib/utils/date-and-time';
 import { Button } from '@/components/ui/button';
 import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import { usePathname } from 'next/navigation';
+import { CreateEventDialog } from '@/components/dialogs/create-event';
 
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
@@ -124,14 +125,7 @@ export function EventsTabs({
               date={date}
               setDate={setDate}
             />
-            {isOrg && (
-              <Button
-                className="absolute right-0 top-0"
-                variant={'ruchampDefault'}
-              >
-                Создать событие
-              </Button>
-            )}
+            {isOrg && <CreateEventDialog className="absolute right-0 top-0" />}
           </div>
           <FilterByType
             options={sportTypes}
