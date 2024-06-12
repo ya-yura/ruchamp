@@ -13,8 +13,10 @@ import { Dictionary } from '../../dictionary-provider';
 import { YandexMap } from '@/components/yandex-map';
 import { Locale } from '@/i18n.config';
 import { ModeSwither } from '@/components/mode-switcher';
-import { isDateInRange } from '@/lib/utils/date-and-time';
+import { isDateInRange, transformDate } from '@/lib/utils/date-and-time';
 import { Button } from '@/components/ui/button';
+import { BigCardWithImage } from '@/components/cards/big-card-with-image';
+import { usePathname } from 'next/navigation';
 
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
@@ -44,6 +46,11 @@ export function EventsTabs({
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
   const topRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+  const isFirstCardBig =
+    isOrg &&
+    tabValue === EventTabs['FUTURE_EVENTS'] &&
+    pathname.includes('org');
 
   // For dictionary
   const labels = {
@@ -118,7 +125,12 @@ export function EventsTabs({
               setDate={setDate}
             />
             {isOrg && (
-              <Button className='absolute top-0 right-0' variant={'ruchampDefault'}>Создать событие</Button>
+              <Button
+                className="absolute right-0 top-0"
+                variant={'ruchampDefault'}
+              >
+                Создать событие
+              </Button>
             )}
           </div>
           <FilterByType
@@ -149,12 +161,31 @@ export function EventsTabs({
                   size={{ width: '100%', height: '50vh' }}
                 />
               ) : (
-                <BigCardsWithImageField
-                  cards={filteredEvents}
-                  type="event"
-                  scrollToTop={scrollToTop}
-                  lang={lang}
-                />
+                <>
+                  {isFirstCardBig && (
+                    <ul className="mb-10">
+                      <BigCardWithImage
+                        key={filteredEvents[0].id}
+                        type={'event'}
+                        id={filteredEvents[0].id}
+                        name={filteredEvents[0].name}
+                        tags={filteredEvents[0].sports_in_matches.join(', ')}
+                        title={transformDate(filteredEvents[0].start_datetime)}
+                        subtitle={filteredEvents[0].location}
+                        description={filteredEvents[0].description}
+                        lang={lang}
+                      />
+                    </ul>
+                  )}
+                  <BigCardsWithImageField
+                    cards={
+                      isFirstCardBig ? filteredEvents.slice(1) : filteredEvents
+                    }
+                    type="event"
+                    scrollToTop={scrollToTop}
+                    lang={lang}
+                  />
+                </>
               )}
             </TabsContent>
           ))}

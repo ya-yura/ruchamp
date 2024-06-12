@@ -162,7 +162,7 @@ export async function fetchOrgEvents(
   }
 
   try {
-    const res = await fetch(`${baseUrl}/users/me/organizer/events`, {
+    const res = await fetch(`${baseUrl}/users/me/organizer`, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`,
@@ -171,9 +171,7 @@ export async function fetchOrgEvents(
       next: { revalidate: 300 },
     });
     // revalidatePath('/events');
-    if (!res.ok) return [];
-    const events = await res.json();
-    return events.events;
+    return res.ok ? await res.json() : [];
   } catch (error) {
     console.error("Error while fetching org's events: ", error);
     throw new Error("Failed to fetch org's events.");

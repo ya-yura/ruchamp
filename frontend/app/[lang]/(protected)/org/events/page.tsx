@@ -24,8 +24,7 @@ export default async function OrgEventsPage({
   const token = session?.token;
 
   const [orgEvents, sportTypes] = await Promise.all([
-    // fetchOrgEvents(token),
-    fetchEvents(),
+    fetchOrgEvents(token),
     fetchSportTypes(),
   ]);
   const dictionary = page.events;
