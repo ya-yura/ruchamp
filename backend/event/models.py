@@ -288,6 +288,8 @@ class TournamentApplication(Base):
     )
     athlete_id = Column(Integer, ForeignKey(Athlete.id, ondelete="CASCADE"))
     match_id = Column(Integer, ForeignKey(Match.id, ondelete="CASCADE"))
+
+    # Дописать что все заявки после даты приема становятся отклоненными, чтоб не было висяков
     status = Column(Enum(
         "accepted",
         "approved",

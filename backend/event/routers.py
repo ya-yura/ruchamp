@@ -334,97 +334,120 @@ async def get_event_applications(
     )
     match_ids = query.scalars().all()
 
+    if not match_ids:
+        raise HTTPException(
+            status_code=404, detail="No matches found for this event"
+        )
+
     # Получение заявок на матчи
     query = await db.execute(
-        select(
-            TournamentApplication.id,
-            TournamentApplication.team_id,
-            TournamentApplication.status,
-            TournamentApplication.athlete_id,
-            Team.name.label("team_name")
-        )
-        .select_from(TournamentApplication)
-        .join(Team, Team.id == TournamentApplication.team_id)
+        select(TournamentApplication.status)
+        .distinct()
         .where(TournamentApplication.match_id.in_(match_ids))
     )
-    applications = query.all()
+    applications_status = query.scalars().all()
 
-    application_info = []
-    team_map = {}
-    for application in applications:
-        team_id = application.team_id
-        if team_id not in team_map:
-            team_map[team_id] = {
-                "id": team_id,
-                "name": application.team_name,
-                "application_status": application.status,
+    if not applications_status:
+        raise HTTPException(
+            status_code=404, detail="No applications found for this event"
+        )
+
+    application_info = {}
+
+    for status in applications_status:
+        application_info[status] = []
+
+        query = await db.execute(
+            select(
+                TournamentApplication.team_id
+            )
+            .where(TournamentApplication.status == status)
+        )
+        teams = query.scalars().all()
+
+        # Используем множество для удаления повторений
+        unique_teams = set(teams)
+
+        for team_id in unique_teams:
+            team_query = await db.execute(
+                select(Team.id, Team.name)
+                .where(Team.id == team_id)
+            )
+            team = team_query.mappings().first()
+
+            if not team:
+                continue
+
+            team_info = {
+                "id": team["id"],
+                "name": team["name"],
                 "members": []
             }
 
-        # Получение участников команд
-        query = await db.execute(
-            select(
-                Team.id.label("team_id"),
-                User.id,
-                Athlete.id.label("athlete_id"),
-                User.sirname,
-                User.name,
-                User.fathername,
-                User.birthdate,
-                User.gender,
-                Athlete.height,
-                Athlete.weight,
-                Athlete.image_field,
-                Athlete.country,
-                Athlete.region,
-                Athlete.city,
-                CategoryType.name.label("grade_type"),
-            )
-            .select_from(Team)
-            .join(Athlete, Athlete.id == application.athlete_id)
-            .join(User, User.id == Athlete.user_id)
-            .outerjoin(
-                athlete_grade_association,
-                athlete_grade_association.c.athlete_id == Athlete.id
-            )
-            .outerjoin(
-                CategoryType,
-                CategoryType.id == athlete_grade_association.c.category_type_id
-            )
-            .where(Team.id == application.team_id)
-        )
-        members = query.mappings().all()
-
-        for member in members:
-            query = await db.execute(
+            # Получение информации об участниках команды
+            members_query = await db.execute(
                 select(
-                    CategoryType.name
+                    TournamentApplication.athlete_id
                 )
-                .join(athlete_grade_association)
                 .where(
-                    athlete_grade_association.c.athlete_id == member.athlete_id
+                    TournamentApplication.status == status,
+                    TournamentApplication.team_id == team_id
                 )
             )
-            grade_types = query.scalars().all()
+            members = members_query.scalars().all()
 
-            team_id = member.team_id
-            team_map[team_id]["members"].append({
-                "id": member.id,
-                "sirname": member.sirname,
-                "name": member.name,
-                "fathername": member.fathername,
-                "birthdate": member.birthdate,
-                "gender": member.gender,
-                "height": member.height,
-                "weight": member.weight,
-                "image_field": member.image_field,
-                "country": member.country,
-                "region": member.region,
-                "city": member.city,
-                "grade_types": [grade_type for grade_type in grade_types]
-            })
+            for member in members:
 
-        application_info = list(team_map.values())
+                athlete_query = await db.execute(
+                    select(
+                        User.id,
+                        User.sirname,
+                        User.name,
+                        User.fathername,
+                        User.birthdate,
+                        User.gender,
+                        Athlete.height,
+                        Athlete.weight,
+                        Athlete.image_field,
+                        Athlete.country,
+                        Athlete.region,
+                        Athlete.city,
+                        CategoryType.name.label("grade_type"),
+                    )
+                    .join(User, User.id == Athlete.user_id)
+                    .where(Athlete.id == member)
+                )
+                athlete = athlete_query.first()
+
+                query = await db.execute(
+                    select(
+                        CategoryType.name
+                    )
+                    .join(athlete_grade_association)
+                    .where(
+                        athlete_grade_association.c.athlete_id == member
+                    )
+                )
+                grade_types = query.scalars().all()
+
+                member_info = {
+                    "id": athlete.id,
+                    "sirname": athlete.sirname,
+                    "name": athlete.name,
+                    "fathername": athlete.fathername,
+                    "birthdate": str(athlete.birthdate),
+                    "gender": athlete.gender,
+                    "height": athlete.height,
+                    "weight": athlete.weight,
+                    "image_field": athlete.image_field,
+                    "country": athlete.country,
+                    "region": athlete.region,
+                    "city": athlete.city,
+                    "grade_types": [grade_type for grade_type in grade_types]
+                }
+                team_info["members"].append(member_info)
+
+            application_info[status].append(team_info)
 
     return application_info
 
