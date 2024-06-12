@@ -27,7 +27,6 @@ interface EventTabsProps {
 enum EventTabs {
   FUTURE_EVENTS = 'futureEvents',
   PAST_EVENTS = 'pastEvents',
-  USERS_EVENTS = 'usersEvents',
 }
 
 export function EventsTabs({
@@ -49,7 +48,6 @@ export function EventsTabs({
   const labels = {
     [EventTabs.FUTURE_EVENTS]: dictionary.filters.futureEvents,
     [EventTabs.PAST_EVENTS]: dictionary.filters.pastEvents,
-    [EventTabs.USERS_EVENTS]: dictionary.filters.usersEvents,
   };
 
   // Filtering logic
@@ -61,9 +59,6 @@ export function EventsTabs({
         break;
       case EventTabs.PAST_EVENTS:
         events = pastEvents;
-        break;
-      case EventTabs.USERS_EVENTS:
-        events = usersEvents;
         break;
       default:
         events = futureEvents;
@@ -100,7 +95,7 @@ export function EventsTabs({
           onValueChange={handleTabChange}
         >
           <div className="flex h-[164px] w-full sm:h-[64px]">
-            <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-[500px]">
+            <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger key={value} value={value}>
                   {labels[value]}

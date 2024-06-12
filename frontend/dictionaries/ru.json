@@ -20,7 +20,7 @@
     "events": {
       "filters": {
         "futureEvents": "Будущие события",
-        "pastEvents": "Прошлые события",
+        "pastEvents": "Прошедшие события",
         "usersEvents": "Ваши события"
       }
     },
