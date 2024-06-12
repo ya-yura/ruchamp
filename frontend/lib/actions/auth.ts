@@ -4,6 +4,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../api/auth';
+import { SessionData } from '../definitions';
 
 const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
 
@@ -54,7 +55,7 @@ export async function logout() {
   cookies().set('session', '', { expires: new Date(0) });
 }
 
-export async function getSession() {
+export async function getSession(): Promise<SessionData | null> {
   const session = cookies().get('session')?.value;
   if (!session) {
     return null;

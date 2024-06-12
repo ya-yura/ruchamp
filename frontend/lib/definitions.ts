@@ -122,6 +122,8 @@ export interface OrganizerInfo {
   image_field: string | null;
 }
 
+export type UserFromServer = [AthleteInfo | OrganizerInfo, BasicInfo];
+
 export interface UserInfo {
   basicInfo: BasicInfo;
   roleInfo: AthleteInfo | OrganizerInfo;
@@ -186,6 +188,35 @@ export interface UserInfo {
 //   Referee?: RefereeData;
 //   User: UserBasicData;
 // }
+
+// *** Token ***
+
+// interface UserFromToken {
+//   id: number;
+//   user_id?: number;
+//   website?: string;
+//   contact_email?: string;
+//   contact_phone?: string;
+//   organization_name?: string;
+//   description?: string | null;
+//   image_field?: string | null;
+//   username?: string;
+//   email?: string;
+//   sirname?: string;
+//   name?: string;
+//   fathername?: string;
+//   birthdate?: string;
+//   gender?: boolean;
+//   role_id?: number;
+// }
+
+export interface SessionData {
+  user: UserFromServer;
+  token: string;
+  expires: string;
+  iat: number;
+  exp: number;
+}
 
 // *** Events ***
 export interface Event {

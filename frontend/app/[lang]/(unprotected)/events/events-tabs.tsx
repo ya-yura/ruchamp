@@ -14,6 +14,7 @@ import { YandexMap } from '@/components/yandex-map';
 import { Locale } from '@/i18n.config';
 import { ModeSwither } from '@/components/mode-switcher';
 import { isDateInRange } from '@/lib/utils/date-and-time';
+import { Button } from '@/components/ui/button';
 
 interface EventTabsProps {
   dictionary: Dictionary['page']['events'];
@@ -21,7 +22,7 @@ interface EventTabsProps {
   sportTypes: string[];
   futureEvents: Event[];
   pastEvents: Event[];
-  usersEvents: Event[];
+  isOrg?: boolean;
 }
 
 enum EventTabs {
@@ -35,7 +36,7 @@ export function EventsTabs({
   sportTypes,
   futureEvents,
   pastEvents,
-  usersEvents,
+  isOrg,
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
@@ -110,11 +111,16 @@ export function EventsTabs({
               className="hidden lg:flex"
             />
           </div>
-          <DatePicker
-            className="mb-4 flex justify-center"
-            date={date}
-            setDate={setDate}
-          />
+          <div className="relative flex justify-center">
+            <DatePicker
+              className="mb-4 flex justify-center"
+              date={date}
+              setDate={setDate}
+            />
+            {isOrg && (
+              <Button className='absolute top-0 right-0' variant={'ruchampDefault'}>Создать событие</Button>
+            )}
+          </div>
           <FilterByType
             options={sportTypes}
             selected={selectedSportTypes}

@@ -13,6 +13,8 @@ import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+// Sport types
+
 export async function fetchSportTypes(): Promise<string[]> {
   try {
     const res = await fetch(`${baseUrl}/event/sports`, {
@@ -25,6 +27,8 @@ export async function fetchSportTypes(): Promise<string[]> {
     throw new Error('Failed to fetch sport types.');
   }
 }
+
+// Events
 
 export async function fetchEvents(): Promise<Event[]> {
   try {
@@ -77,9 +81,7 @@ export async function fetchParticipants(id: string): Promise<Participant[]> {
   }
 }
 
-export async function fetchResults(
-  id: string,
-): Promise<EventResult[]> {
+export async function fetchResults(id: string): Promise<EventResult[]> {
   try {
     const res = await fetch(`${baseUrl}/event/${id}/matches-results`, {});
     return res.ok ? await res.json() : [];
@@ -101,6 +103,8 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
     throw new Error(`Failed to fetch tournament grid with id ${id}`);
   }
 }
+
+// Teams
 
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
@@ -144,5 +148,34 @@ export async function fetchTeamResults(
   } catch (error) {
     console.error(`Error while fetching team results with id ${id}: `, error);
     throw new Error(`Failed to fetch team results with id ${id}`);
+  }
+}
+
+// For Orgs
+
+export async function fetchOrgEvents(
+  token: string | undefined,
+): Promise<Event[]> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return [];
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/organizer/events`, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${token}`,
+      },
+      // cache: 'force-cache',
+      next: { revalidate: 300 },
+    });
+    // revalidatePath('/events');
+    if (!res.ok) return [];
+    const events = await res.json();
+    return events.events;
+  } catch (error) {
+    console.error("Error while fetching org's events: ", error);
+    throw new Error("Failed to fetch org's events.");
   }
 }
