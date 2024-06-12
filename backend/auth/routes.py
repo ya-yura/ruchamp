@@ -21,7 +21,7 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate)
 from connection import get_db
-from event.models import Match, Event
+from event.models import Match, Event, MatchSport
 from teams.models import TeamMember
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -387,7 +387,7 @@ async def get_current_user(
     return result
 
 
-@router.get("/me/organizer/events")
+@router.get("/me/organizer")
 async def get_organizer_events(
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db)
@@ -400,10 +400,66 @@ async def get_organizer_events(
         raise HTTPException(status_code=400, detail="You are not an organizer")
 
     query = await db.execute(select(
-        Event).where(Event.organizer_id == organizer_id))
+        Event.id).where(Event.organizer_id == organizer_id))
     events = query.scalars().all()
 
-    return {"events": events}
+    result = []
+
+    for event_id in events:
+        query = await db.execute(
+            select(
+                Event.id,
+                Event.name,
+                Event.start_request_datetime,
+                Event.end_request_datetime,
+                Event.start_datetime,
+                Event.end_datetime,
+                EventOrganizer.organization_name.label("organizer_name"),
+                Event.location,
+                Event.event_system,
+                Event.event_order,
+                Event.image_field,
+                Event.description,
+                Event.geo
+            )
+            .join(
+                EventOrganizer, EventOrganizer.id == Event.organizer_id
+            )
+            .where(Event.id == event_id)
+        )
+        event_info = query.mappings().all()
+        event = event_info[0]
+
+        query = await db.execute(
+            select(Match.id)
+            .where(Match.event_id == event_id)
+        )
+        matches_id = query.scalars().all()
+        sports_in_matches_info = []
+        for match_id in matches_id:
+            query = await db.execute(
+                select(MatchSport.sport_id)
+                .where(MatchSport.match_id == match_id)
+            )
+            match_sport_id = query.scalars().all()
+
+            for sport_id in match_sport_id:
+                query = await db.execute(
+                    select(SportType.name)
+                    .where(SportType.id == sport_id)
+                )
+                sport_name = query.scalars().first()
+                sports_in_matches_info.append(sport_name)
+                unique_sports_in_matches_info = list(
+                    set(sports_in_matches_info)
+                )
+
+        event_result = {k: v for k, v in event.items()}
+
+        event_result["sports_in_matches"] = unique_sports_in_matches_info
+        result.append(event_result)
+
+    return result
 
 
 '''@router.get("/me/events")
