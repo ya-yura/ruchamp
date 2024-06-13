@@ -2,14 +2,17 @@ import os
 import uuid
 import re
 from datetime import timedelta, datetime
+import shutil
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
-                     UploadFile)
+                     UploadFile, Form)
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, update, and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
+from sqlalchemy.exc import SQLAlchemyError
 
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
@@ -509,43 +512,85 @@ async def get_events_id(
 
 @router.post("/create")
 async def create_event(
-    event_data: EventCreate,
+    name: str = Form(...),
+    start_datetime: datetime = Form(...),
+    end_datetime: datetime = Form(...),
+    start_request_datetime: datetime = Form(...),
+    end_request_datetime: datetime = Form(...),
+    location: str = Form(...),
+    event_order: str = Form(...),
+    event_system: str = Form(...),
+    description: str = Form(...),
+    geo: str = Form(...),
+    image: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
-    query = await db.execute(
-        select(EventOrganizer.id)
-        .where(EventOrganizer.user_id == current_user.id)
-    )
-    org_id = query.scalars().one_or_none()
+    try:
+        event_data = EventCreate(
+            name=name,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            start_request_datetime=start_request_datetime,
+            end_request_datetime=end_request_datetime,
+            location=location,
+            event_order=event_order,
+            event_system=event_system,
+            description=description,
+            geo=geo,
+        )
 
-    query = await db.execute(select(EventOrganizer.user_id))
-    all_organizer_id = query.scalars().all()
+        query = await db.execute(
+            select(EventOrganizer.id)
+            .where(EventOrganizer.user_id == current_user.id)
+        )
+        org_id = query.scalars().one_or_none()
 
-    # Подумать: почему админ не добавляется в организаторы
-    # query_admin = await db.execute(select(SystemAdministrator.user_id))
-    # all_admin_id = query_admin.scalars().all()
-    # all_organizer_id.extend(all_admin_id)
+        query = await db.execute(select(EventOrganizer.user_id))
+        all_organizer_id = query.scalars().all()
 
-    if current_user.id not in all_organizer_id:
-        raise HTTPException(status_code=400, detail="You are not an organizer")
-    new_event = Event(
-        name=event_data.name,
-        start_datetime=event_data.start_datetime,
-        end_datetime=event_data.end_datetime,
-        start_request_datetime=event_data.start_request_datetime,
-        end_request_datetime=event_data.end_request_datetime,
-        location=event_data.location,
-        organizer_id=org_id,
-        event_order=event_data.event_order,
-        event_system=event_data.event_system,
-        description=event_data.description,
-        geo=event_data.geo,
-    )
-    db.add(new_event)
-    await db.commit()
+        # Подумать: почему админ не добавляется в организаторы
+        # query_admin = await db.execute(select(SystemAdministrator.user_id))
+        # all_admin_id = query_admin.scalars().all()
+        # all_organizer_id.extend(all_admin_id)
 
-    return {f"Event {new_event.name} - created"}
+        if current_user.id not in all_organizer_id:
+            raise HTTPException(status_code=400, detail="You are not an organizer")
+
+        # Создание директории для хранения изображений, если она не существует
+        image_dir = "static/images"
+        os.makedirs(image_dir, exist_ok=True)
+        file_location = os.path.join(image_dir, image.filename)
+
+        # Сохранение изображения на сервере
+        with open(file_location, "wb") as file:
+            shutil.copyfileobj(image.file, file)
+
+        new_event = Event(
+            name=event_data.name,
+            start_datetime=event_data.start_datetime,
+            end_datetime=event_data.end_datetime,
+            start_request_datetime=event_data.start_request_datetime,
+            end_request_datetime=event_data.end_request_datetime,
+            location=event_data.location,
+            organizer_id=org_id,
+            event_order=event_data.event_order,
+            event_system=event_data.event_system,
+            description=event_data.description,
+            geo=event_data.geo,
+            image_field=file_location,
+        )
+        db.add(new_event)
+        await db.commit()
+
+        return {f"Event {new_event.name} - created"}
+
+    except SQLAlchemyError as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 
 @router.post("/update-image/{event_id}")
