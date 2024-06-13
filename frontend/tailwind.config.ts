@@ -31,6 +31,7 @@ const config = {
         neutralForeground3Rest: '#616161',
         neutralForeground3: '#ADADAD',
         NeutralBackground4Rest: '#F0F0F0',
+        NeutralStroke1Rest: '#666666',
         NeutralStroke2Rest: '#E0E0E0',
         NeutralStroke3Rest: '#3D3D3D',
         NeutralGrayColor1: '#071623',

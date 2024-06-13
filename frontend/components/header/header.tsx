@@ -11,7 +11,7 @@ import { MenuWithButton } from './menu-with-button';
 
 interface HeaderProps {
   userEmail: string;
-  userAvatar: string;
+  userAvatar: string | null;
   initials: string;
   isLoggedIn: boolean;
   lang: Locale;

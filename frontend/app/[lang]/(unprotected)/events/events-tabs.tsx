@@ -167,6 +167,7 @@ export function EventsTabs({
                         title={transformDate(filteredEvents[0].start_datetime)}
                         subtitle={filteredEvents[0].location}
                         description={filteredEvents[0].description}
+                        image={filteredEvents[0].image_field}
                         lang={lang}
                       />
                     </ul>

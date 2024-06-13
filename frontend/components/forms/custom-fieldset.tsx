@@ -27,6 +27,7 @@ import {
 } from '../ui/radio-group';
 import { DropdownMenuCheckboxes } from './custom-multiselect';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { Textarea } from '../ui/textarea';
 
 type TypeOptionWithIcon = {
   value: string;
@@ -37,7 +38,9 @@ type TypeOptionWithIcon = {
 export type TypeField<T> = {
   type:
     | 'text'
+    | 'textarea'
     | 'password'
+    | 'file'
     | 'tel'
     | 'number'
     | 'email'
@@ -86,7 +89,9 @@ export function CustomFieldset<T extends FieldValues>({
           render={({ field }) => (
             <FormItem className={`relative col-span-12 flex flex-col`}>
               {item.label && <FormLabel>{item.label}</FormLabel>}
-              {['text', 'email', 'date', 'number'].includes(item.type) && (
+              {['text', 'email', 'date', 'number', 'file'].includes(
+                item.type,
+              ) && (
                 <>
                   <FormControl>
                     <Input
@@ -94,6 +99,13 @@ export function CustomFieldset<T extends FieldValues>({
                       type={item.type}
                       {...field}
                     />
+                  </FormControl>
+                </>
+              )}
+              {item.type === 'textarea' && (
+                <>
+                  <FormControl>
+                    <Textarea placeholder={item.placeholder} {...field} />
                   </FormControl>
                 </>
               )}

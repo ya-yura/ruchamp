@@ -15,6 +15,7 @@ interface BigCardWithImage {
   title: string;
   subtitle: string;
   description: string;
+  image: string;
   lang: Locale;
   className?: string;
 }
@@ -27,10 +28,13 @@ export function BigCardWithImage({
   title,
   subtitle,
   description,
+  image,
   lang,
   className,
 }: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   return (
     <li

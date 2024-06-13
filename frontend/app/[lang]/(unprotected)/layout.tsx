@@ -14,10 +14,10 @@ export default async function UnprotectedLayout({
   params: { lang: Locale };
 }) {
   const session = await getSession();
-  let userEmail: string;
-  let userAvatar: string;
+  let userEmail: string ;
+  let userAvatar: string | null;
   let initials: string;
-  if (!session || session.user.length === 0) {
+  if (!session || !session.user) {
     userEmail = '';
     userAvatar = '';
     initials = '';
