@@ -558,7 +558,7 @@ async def create_event(
             raise HTTPException(status_code=400, detail="You are not an organizer")
 
         # Создание директории для хранения изображений, если она не существует
-        image_dir = "static/images"
+        image_dir = "static/events"
         os.makedirs(image_dir, exist_ok=True)
         file_location = os.path.join(image_dir, image.filename)
 
