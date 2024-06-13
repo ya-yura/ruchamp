@@ -8,6 +8,7 @@ import { ContentWraper } from '../content-wraper';
 import { Button } from '../ui/button';
 import { MagniglassIcon } from '../icons';
 import { MenuWithButton } from './menu-with-button';
+import Counter from '../ui/counter';
 
 interface HeaderProps {
   userEmail: string;
@@ -60,6 +61,7 @@ export function Header({
             <AuthButtons lang={lang} />
           )}
         </div>
+        <Counter />
       </ContentWraper>
     </header>
   );
