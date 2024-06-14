@@ -2,25 +2,20 @@ import React, { ReactNode, useCallback, useState } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { H4 } from '../text';
 import { Form } from '../ui/form';
 import { CustomForm } from '../forms/custom-form';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
-import { Locale } from '@/i18n.config';
 
 const CreateEventTabs = {
   Name: 'Название',
@@ -69,7 +64,7 @@ export function CreateEventDialog({ className }: { className?: string }) {
     ReactNode
   > = {
     Name: <NameFieldset form={form} />,
-    Time: 'Время',
+    Time: <TimeFieldset form={form} />,
     Location: 'Место',
     Docs: 'Документы',
   } as const;
@@ -168,6 +163,30 @@ function NameFieldset({ form }: NameFieldsetProps) {
     <CustomFieldset<CreateEventSchema>
       form={form}
       fieldsetData={nameFieldsetData}
+    />
+  );
+}
+
+interface TimeFieldsetProps {
+  form: UseFormReturn<CreateEventSchema>;
+}
+
+function TimeFieldset({ form }: TimeFieldsetProps) {
+  const timeFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+    fields: [
+      {
+        type: 'date',
+        name: 'start_datetime',
+        placeholder: 'Начало',
+        label: 'Название',
+        defaultValue: '',
+      },
+    ],
+  };
+  return (
+    <CustomFieldset<CreateEventSchema>
+      form={form}
+      fieldsetData={timeFieldsetData}
     />
   );
 }
