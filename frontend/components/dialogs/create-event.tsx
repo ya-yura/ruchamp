@@ -27,6 +27,15 @@ const CreateEventTabs = {
 type CreateEventTabsKeys =
   (typeof CreateEventTabs)[keyof typeof CreateEventTabs];
 
+const MAX_UPLOAD_SIZE = 1024 * 1024 * 5; // 5MB
+const ACCEPTED_IMG_FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+const ACCEPTED_DOC_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+];
+
 export const createEventSchema = z.object({
   name: z.string(),
   start_datetime: z.string(),
@@ -34,9 +43,6 @@ export const createEventSchema = z.object({
   start_request_datetime: z.string(),
   end_request_datetime: z.string(),
   location: z.string(),
-  organizer_id: z.number(),
-  event_order: z.string(),
-  event_system: z.string(),
   geo: z.string(),
   description: z
     .string()
@@ -46,7 +52,33 @@ export const createEventSchema = z.object({
     .max(160, {
       message: 'Bio must not be longer than 30 characters.',
     }),
-  image: z.string(),
+  event_order: z
+    // .instanceof(File)
+    .any()
+    .refine((file) => {
+      return !file || file.size <= MAX_UPLOAD_SIZE;
+    }, 'File size must be less than 5MB')
+    .refine((file) => {
+      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
+    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
+  event_system: z
+    // .instanceof(File)
+    .any()
+    .refine((file) => {
+      return !file || file.size <= MAX_UPLOAD_SIZE;
+    }, 'File size must be less than 5MB')
+    .refine((file) => {
+      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
+    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
+  image: z
+    // .instanceof(File)
+    .any()
+    .refine((file) => {
+      return !file || file.size <= MAX_UPLOAD_SIZE;
+    }, 'File size must be less than 5MB')
+    .refine((file) => {
+      return ACCEPTED_IMG_FILE_TYPES.includes(file?.type);
+    }, 'File must be a .png or .jpg'),
 });
 
 export type CreateEventSchema = z.infer<typeof createEventSchema>;
@@ -56,7 +88,19 @@ export function CreateEventDialog({ className }: { className?: string }) {
 
   const form = useForm<CreateEventSchema>({
     resolver: zodResolver(createEventSchema),
-    defaultValues: {},
+    defaultValues: {
+      name: '',
+      start_datetime: '',
+      end_datetime: '',
+      start_request_datetime: '',
+      end_request_datetime: '',
+      location: '',
+      geo: '',
+      description: '',
+      event_order: '',
+      event_system: '',
+      image: '',
+    },
   });
 
   const CreateEventTabsContent: Record<
@@ -66,7 +110,7 @@ export function CreateEventDialog({ className }: { className?: string }) {
     Name: <NameFieldset form={form} />,
     Time: <TimeFieldset form={form} />,
     Location: <LocationFieldset form={form} />,
-    Docs: 'Документы',
+    Docs: <DocsFieldset form={form} />,
   } as const;
 
   const handleTabChange = useCallback((value: string) => {
@@ -238,6 +282,34 @@ function LocationFieldset({
     <CustomFieldset<CreateEventSchema>
       form={form}
       fieldsetData={locationFieldsetData}
+    />
+  );
+}
+
+function DocsFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
+  const docsFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+    fields: [
+      {
+        type: 'file',
+        name: 'event_order',
+        placeholder: 'Загрузить устав',
+        label: 'Загрузить устав',
+        defaultValue: '',
+      },
+      {
+        type: 'file',
+        name: 'event_system',
+        placeholder: 'Заргрузить отчёт',
+        label: 'Загрузить отчёт',
+        defaultValue: '',
+      },
+    ],
+  };
+
+  return (
+    <CustomFieldset<CreateEventSchema>
+      form={form}
+      fieldsetData={docsFieldsetData}
     />
   );
 }
