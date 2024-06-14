@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-interface StyleProps {
+interface CounterProps {
   className?: string;
 }
 
-function Counter({ className }: StyleProps) {
+function Counter({ className }: CounterProps) {
   const [count, setCount] = useState(0);
 
   function handleClick(value: 1 | -1) {
@@ -15,13 +15,8 @@ function Counter({ className }: StyleProps) {
   }
 
   return (
-    <div className="flex items-end">
-      <div
-        className={cn(
-          'border-1 flex h-[24px] w-[56px] items-center justify-between rounded border border-neutralForeground3 bg-white px-1 py-1',
-          className,
-        )}
-      >
+    <div className={cn('flex items-end', className)}>
+      <div className="border-1 flex h-[24px] w-[56px] items-center justify-between rounded border border-neutralForeground3 bg-white px-1 py-1">
         <button
           onClick={() => handleClick(-1)}
           className="flex h-[12px] w-[12px] items-center justify-between text-base text-neutralForeground3Rest"
