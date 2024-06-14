@@ -518,11 +518,11 @@ async def create_event(
     start_request_datetime: datetime = Form(...),
     end_request_datetime: datetime = Form(...),
     location: str = Form(...),
-    event_order: str = Form(...),
-    event_system: str = Form(...),
     description: str = Form(...),
     geo: str = Form(...),
     image: UploadFile = File(...),
+    event_order: UploadFile = File(...),
+    event_system: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
@@ -534,8 +534,6 @@ async def create_event(
             start_request_datetime=start_request_datetime,
             end_request_datetime=end_request_datetime,
             location=location,
-            event_order=event_order,
-            event_system=event_system,
             description=description,
             geo=geo,
         )
@@ -555,16 +553,30 @@ async def create_event(
         # all_organizer_id.extend(all_admin_id)
 
         if current_user.id not in all_organizer_id:
-            raise HTTPException(status_code=400, detail="You are not an organizer")
+            raise HTTPException(
+                status_code=400, detail="You are not an organizer"
+            )
 
         # Создание директории для хранения изображений, если она не существует
         image_dir = "static/events"
+        files_dir = "static/files"
         os.makedirs(image_dir, exist_ok=True)
-        file_location = os.path.join(image_dir, image.filename)
+        os.makedirs(files_dir, exist_ok=True)
+
+        image_location = os.path.join(image_dir, image.filename)
+        event_order_location = os.path.join(files_dir, event_order.filename)
+        event_system_location = os.path.join(files_dir, event_system.filename)
 
         # Сохранение изображения на сервере
-        with open(file_location, "wb") as file:
+        with open(image_location, "wb") as file:
             shutil.copyfileobj(image.file, file)
+
+        # Сохранение файлов на сервере
+        with open(event_order_location, "wb") as file:
+            shutil.copyfileobj(event_order.file, file)
+
+        with open(event_system_location, "wb") as file:
+            shutil.copyfileobj(event_system.file, file)
 
         new_event = Event(
             name=event_data.name,
@@ -574,11 +586,11 @@ async def create_event(
             end_request_datetime=event_data.end_request_datetime,
             location=event_data.location,
             organizer_id=org_id,
-            event_order=event_data.event_order,
-            event_system=event_data.event_system,
+            event_order=event_order_location,
+            event_system=event_system_location,
             description=event_data.description,
             geo=event_data.geo,
-            image_field=file_location,
+            image_field=image_location,
         )
         db.add(new_event)
         await db.commit()
@@ -587,10 +599,14 @@ async def create_event(
 
     except SQLAlchemyError as e:
         await db.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}"
+        )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 
 @router.post("/update-image/{event_id}")
