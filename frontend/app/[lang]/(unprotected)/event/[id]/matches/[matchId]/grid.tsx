@@ -20,6 +20,7 @@ import { getInitials } from '@/lib/utils/text-utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/back-button';
 import { GridInfo, GridPlayer, GridRound } from './page';
+import Counter from '@/components/counter';
 
 interface GridProps {
   info: GridInfo;
@@ -395,6 +396,11 @@ function AthleteSmallCard({
               <i>возраст не указан</i>
             )}
           </PersonDescriptionOnCard>
+          <PersonDescriptionOnCard className="text-neutralForeground3 mt-2">
+          <p>В этом бою набрал:</p>
+          <Counter className='mt-2' />
+        </PersonDescriptionOnCard>
+
         </div>
       </div>
       <div className="w-full sm:w-1/3">
@@ -405,6 +411,7 @@ function AthleteSmallCard({
           <b>Команда: {team_name}</b>
         </PersonDescriptionOnCard>
       </div>
+
     </TextCard>
   );
 }

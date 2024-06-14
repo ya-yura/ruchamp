@@ -1,22 +1,27 @@
 'use client';
 
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
-function Counter() {
+interface StyleProps {
+  className?: string;
+}
+
+function Counter({ className }: StyleProps) {
   const [count, setCount] = useState(0);
 
-  function handleClick(value: number) {
-    if (value > 0) {
-      setCount(count + value);
-    } else if (count > 0 && value < 0) {
-      // если значение меньше нуля и счётчик больше нуля
-      setCount(count - Math.abs(value));
-    }
+  function handleClick(value: 1 | -1) {
+    setCount((count) => Math.max(count + value, 0));
   }
 
   return (
-    <>
-      <div className="border-1 flex h-[24px] w-[56px] items-center justify-between rounded border border-neutralForeground3 bg-white px-1 py-1">
+    <div className="flex items-end">
+      <div
+        className={cn(
+          'border-1 flex h-[24px] w-[56px] items-center justify-between rounded border border-neutralForeground3 bg-white px-1 py-1',
+          className,
+        )}
+      >
         <button
           onClick={() => handleClick(-1)}
           className="flex h-[12px] w-[12px] items-center justify-between text-base text-neutralForeground3Rest"
@@ -31,7 +36,8 @@ function Counter() {
           +
         </button>
       </div>
-    </>
+      <p className="ml-1.5">баллов</p>
+    </div>
   );
 }
 

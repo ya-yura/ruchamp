@@ -69,7 +69,7 @@ export function AthleteCardSmall({
         <H4 className="text-white">
           {sirname} {name} {fathername}
         </H4>
-        <Counter />
+
         <div className="col-span-2 xl:col-span-1 xl:col-start-2">
           <PersonDescriptionOnCard>
             {city}, {AllRegions[region]}, {Country[country]}
@@ -82,6 +82,7 @@ export function AthleteCardSmall({
             <b>Вес</b>: {weight} кг
           </PersonDescriptionOnCard>
         </div>
+        <Counter />
       </div>
       {isWithEvent && (
         <>
@@ -107,8 +108,6 @@ export function AthleteCardSmall({
           </div>
         </>
       )}
-
     </TextCard>
   );
 }
-
