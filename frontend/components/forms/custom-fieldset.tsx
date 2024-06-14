@@ -45,6 +45,8 @@ export type TypeField<T> = {
     | 'number'
     | 'email'
     | 'date'
+    | 'datetime-local'
+    | 'time'
     | 'checkbox'
     | 'radio'
     | 'customradio'
@@ -53,6 +55,8 @@ export type TypeField<T> = {
   name: Path<T>;
   placeholder?: string;
   label?: string;
+  span?: string;
+  start?: string;
   defaultValue?: string;
   orientation?: 'row' | 'col';
   selectOptions?: TypeOptionWithIcon[];
@@ -87,11 +91,19 @@ export function CustomFieldset<T extends FieldValues>({
           control={form.control}
           name={item.name}
           render={({ field }) => (
-            <FormItem className={`relative col-span-12 flex flex-col`}>
+            <FormItem
+              className={cn(`relative col-span-12 flex flex-col`, item.span, item.start)}
+            >
               {item.label && <FormLabel>{item.label}</FormLabel>}
-              {['text', 'email', 'date', 'number', 'file'].includes(
-                item.type,
-              ) && (
+              {[
+                'text',
+                'email',
+                'datetime-local',
+                'time',
+                'date',
+                'number',
+                'file',
+              ].includes(item.type) && (
                 <>
                   <FormControl>
                     <Input

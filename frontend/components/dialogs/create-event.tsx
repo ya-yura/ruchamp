@@ -65,7 +65,7 @@ export function CreateEventDialog({ className }: { className?: string }) {
   > = {
     Name: <NameFieldset form={form} />,
     Time: <TimeFieldset form={form} />,
-    Location: 'Место',
+    Location: <LocationFieldset form={form} />,
     Docs: 'Документы',
   } as const;
 
@@ -129,11 +129,7 @@ export function CreateEventDialog({ className }: { className?: string }) {
   );
 }
 
-interface NameFieldsetProps {
-  form: UseFormReturn<CreateEventSchema>;
-}
-
-function NameFieldset({ form }: NameFieldsetProps) {
+function NameFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
   const nameFieldsetData: TypeFieldsetData<CreateEventSchema> = {
     fields: [
       {
@@ -159,6 +155,7 @@ function NameFieldset({ form }: NameFieldsetProps) {
       },
     ],
   };
+
   return (
     <CustomFieldset<CreateEventSchema>
       form={form}
@@ -167,26 +164,80 @@ function NameFieldset({ form }: NameFieldsetProps) {
   );
 }
 
-interface TimeFieldsetProps {
-  form: UseFormReturn<CreateEventSchema>;
-}
-
-function TimeFieldset({ form }: TimeFieldsetProps) {
+function TimeFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
   const timeFieldsetData: TypeFieldsetData<CreateEventSchema> = {
     fields: [
       {
-        type: 'date',
+        type: 'datetime-local',
         name: 'start_datetime',
-        placeholder: 'Начало',
-        label: 'Название',
+        placeholder: 'Начало события',
+        label: 'Начало события',
         defaultValue: '',
+        span: 'col-span-6',
+      },
+      {
+        type: 'datetime-local',
+        name: 'end_datetime',
+        placeholder: 'Окончание события',
+        label: 'Окончание события',
+        defaultValue: '',
+        span: 'col-span-6',
+      },
+      {
+        type: 'datetime-local',
+        name: 'start_request_datetime',
+        placeholder: 'Начало приёма заявок на участие',
+        label: 'Начало приёма заявок на участие',
+        defaultValue: '',
+        span: 'col-span-6',
+      },
+      {
+        type: 'datetime-local',
+        name: 'end_request_datetime',
+        placeholder: 'Звершение приёма заявок на участие',
+        label: 'Завершение приёма заявок на участие',
+        defaultValue: '',
+        span: 'col-span-6',
       },
     ],
   };
+
   return (
     <CustomFieldset<CreateEventSchema>
       form={form}
       fieldsetData={timeFieldsetData}
+    />
+  );
+}
+
+function LocationFieldset({
+  form,
+}: {
+  form: UseFormReturn<CreateEventSchema>;
+}) {
+  const locationFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+    fields: [
+      {
+        type: 'text',
+        name: 'location',
+        placeholder: 'Адрес',
+        label: 'Адрес',
+        defaultValue: '',
+      },
+      {
+        type: 'text',
+        name: 'geo',
+        placeholder: 'Координаты',
+        label: 'Координаты',
+        defaultValue: '',
+      },
+    ],
+  };
+
+  return (
+    <CustomFieldset<CreateEventSchema>
+      form={form}
+      fieldsetData={locationFieldsetData}
     />
   );
 }
