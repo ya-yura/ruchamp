@@ -92,9 +92,24 @@ export function CustomFieldset<T extends FieldValues>({
           name={item.name}
           render={({ field }) => (
             <FormItem
-              className={cn(`relative col-span-12 flex flex-col`, item.span, item.start)}
+              className={cn(
+                `relative col-span-12 flex flex-col`,
+                item.span,
+                item.start,
+              )}
             >
               {item.label && <FormLabel>{item.label}</FormLabel>}
+              {item.type === 'file' && (
+                <Input
+                  {...field}
+                  value={field.value?.fileName}
+                  onChange={(event) => {
+                    field.onChange(event.target.files?.[0]);
+                  }}
+                  type={item.type}
+                  id={item.name}
+                />
+              )}
               {[
                 'text',
                 'email',
@@ -102,7 +117,6 @@ export function CustomFieldset<T extends FieldValues>({
                 'time',
                 'date',
                 'number',
-                'file',
               ].includes(item.type) && (
                 <>
                   <FormControl>

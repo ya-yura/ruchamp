@@ -10,6 +10,7 @@ import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page'
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
+import { checkResponse } from './utils/other-utils';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -176,4 +177,44 @@ export async function fetchOrgEvents(
     console.error("Error while fetching org's events: ", error);
     throw new Error("Failed to fetch org's events.");
   }
+}
+
+export async function createEvent(
+  token: string,
+  values: any,
+): Promise<void | Response> {
+  // fix "any"
+  const formData = new FormData();
+  // Append each field to the FormData object
+  formData.append('name', values.name);
+  formData.append('start_datetime', values.start_datetime);
+  formData.append('end_datetime', values.end_datetime);
+  formData.append('start_request_datetime', values.start_request_datetime);
+  formData.append('end_request_datetime', values.end_request_datetime);
+  formData.append('location', values.location);
+  formData.append('geo', values.geo);
+  formData.append('description', values.description);
+
+  // Append files if they are present
+  if (values.image instanceof File) {
+    formData.append('image', values.image);
+  }
+  if (values.event_order instanceof File) {
+    formData.append('event_order', values.event_order);
+  }
+  if (values.event_system instanceof File) {
+    formData.append('event_system', values.event_system);
+  }
+
+  return fetch(`${baseUrl}/event/create`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  })
+    .then(checkResponse)
+    .catch((err) => {
+      console.log('Failed to create event', err);
+    });
 }

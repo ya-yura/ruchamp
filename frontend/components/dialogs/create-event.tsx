@@ -16,6 +16,7 @@ import { UseFormReturn, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
+import { createEvent } from '@/lib/data';
 
 const CreateEventTabs = {
   Name: 'Название',
@@ -85,18 +86,23 @@ export type CreateEventSchema = z.infer<typeof createEventSchema>;
 
 export function CreateEventDialog({ className }: { className?: string }) {
   const [tabValue, setTabValue] = useState<string>('');
+  // const [files, setFiles] = useState({
+  //   image: null,
+  //   event_order: null,
+  //   event_system: null,
+  // });
 
   const form = useForm<CreateEventSchema>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
-      name: '',
-      start_datetime: '',
-      end_datetime: '',
-      start_request_datetime: '',
-      end_request_datetime: '',
-      location: '',
-      geo: '',
-      description: '',
+      name: 'Название',
+      start_datetime: '2024-06-15T15:00:00',
+      end_datetime: '2024-06-15T15:00:00',
+      start_request_datetime: '2024-06-15T15:00:00',
+      end_request_datetime: '2024-06-15T15:00:00',
+      location: 'адрес',
+      geo: '55.755864, 37.617698',
+      description: 'Описание балбалалала',
       event_order: '',
       event_system: '',
       image: '',
@@ -118,7 +124,10 @@ export function CreateEventDialog({ className }: { className?: string }) {
   }, []);
 
   function onSubmit(values: CreateEventSchema): void {
-    console.log(values);
+    createEvent(
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAzIiwiYXVkIjpbImZhc3RhcGktdXNlcnM6YXV0aCJdLCJleHAiOjE3MTg1NDI4OTN9.nK_Ui9OpI6SJBTuVia2JKzSILlRzpNutVxe1d6s3MQA',
+      values,
+    );
   }
 
   return (
