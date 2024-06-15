@@ -12,7 +12,7 @@ from fastapi import (APIRouter, Body, Depends, File, HTTPException, UploadFile,
                      BackgroundTasks, Form)
 from fastapi.responses import RedirectResponse
 from fastapi_users import FastAPIUsers
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
@@ -29,7 +29,10 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           UserData, UserDB, UserRead, UserUpdate, 
                           Feedback)
 from connection import get_db
-from event.models import Match, Event, MatchSport
+from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
+                          MatchParticipant, MatchAge, MatchCategory,
+                          MatchGender, AllWeightClass, CombatType,
+                          MatchWeights)
 from teams.models import TeamMember
 
 load_dotenv()
@@ -356,6 +359,39 @@ async def get_current_user(
         )
         athlete_coaches = query.scalars().all()
         athlete["coaches"] = athlete_coaches
+
+        # Получаем достижения атлета
+        query = await db.execute(
+            select(
+                SportType.name,
+                Medal.medal_type,
+                func.count(WinnerTable.id).label("count")
+            )
+            .join(
+                MatchParticipant,
+                MatchParticipant.id == WinnerTable.winner_id
+            )
+            .join(Match, Match.id == WinnerTable.match_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(Medal, Medal.id == WinnerTable.medal)
+            .where(MatchParticipant.player_id == athlete_id)
+            .group_by(SportType.name, Medal.medal_type)
+        )
+        achievement_rows = query.all()
+        achievements = {}
+        for sport_name, medal_name, count in achievement_rows:
+            if sport_name not in achievements:
+                achievements[sport_name] = {
+                    "gold": 0, "silver": 0, "bronze": 0
+                }
+            if medal_name == "Золото":
+                achievements[sport_name]["gold"] += count
+            elif medal_name == "Серебро":
+                achievements[sport_name]["silver"] += count
+            elif medal_name == "Бронза":
+                achievements[sport_name]["bronze"] += count
+        athlete["achievements"] = achievements
         result.append(athlete)
 
     elif user.role_id == 2:
@@ -403,6 +439,65 @@ async def get_current_user(
     result.append(user)
 
     return result
+
+
+@router.get("/me/matches")
+async def get_current_user_matches(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    '''Информация о матчах, в которых участвовал спортсмен'''
+
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id))
+    athlete_id = query.scalars().first()
+
+    query = await db.execute(
+        select(MatchParticipant.match_id)
+        .where(MatchParticipant.player_id == athlete_id)
+    )
+
+    all_matches_id = query.scalars().all()
+
+    matches = []
+    for match_id in all_matches_id:
+        query = await db.execute(
+            select(
+                Match.id.label("match_id"),
+                Match.event_id.label("event_id"),
+                Event.name.label("event_name"),
+                Event.location.label("location"),
+                EventOrganizer.organization_name.label("org_name"),
+                Match.name,
+                SportType.name.label("sport_name"),
+                Match.start_datetime,
+                Match.end_datetime,
+                Match.nominal_time*60,
+                Match.mat_vol,
+                MatchAge.age_from.label("age_min"),
+                MatchAge.age_till.label("age_max"),
+                AllWeightClass.name.label("weight_category"),
+                AllWeightClass.min_weight.label("weight_min"),
+                AllWeightClass.max_weight.label("weight_max"),
+                MatchGender.gender.label("gender"),
+                CategoryType.name.label("category_type"),
+            )
+            .join(Event, Event.id == Match.event_id)
+            .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
+            .join(CombatType, CombatType.id == Match.combat_type_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchAge, MatchAge.match_id == Match.id)
+            .join(MatchGender, MatchGender.match_id == Match.id)
+            .join(MatchWeights, MatchWeights.match_id == Match.id)
+            .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
+            .join(MatchCategory, MatchCategory.match_id == Match.id)
+            .join(CategoryType, CategoryType.id == MatchCategory.category_id)
+            .where(Match.id == match_id))
+        match_info = query.mappings().all()
+        matches.append(match_info[0])
+
+    return matches
 
 
 @router.get("/me/organizer")
@@ -498,27 +593,6 @@ async def get_current_user_events(
     events = query.scalars().all()
 
     return {"events": events}'''
-
-
-@router.get("/me/matches")
-async def get_current_user_matches(
-    current_user: User = Depends(current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    query = await db.execute(select(
-        Athlete.id).where(Athlete.user_id == current_user.id))
-    athlete_id = query.scalars().first()
-
-    query = await db.execute(select(
-        TeamMember.id).where(TeamMember.member == athlete_id))
-    member_id = query.scalars().first()
-
-    query = await db.execute(select(
-        Match.id).where(
-            Match.player_one == member_id and Match.player_two == member_id))
-    matches = query.scalars().all()
-
-    return {"matches": matches}
 
 
 @router.get("/me/athlete")
