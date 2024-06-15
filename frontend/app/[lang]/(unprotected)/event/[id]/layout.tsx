@@ -65,13 +65,14 @@ export default async function EventPageLayout({
         title={event.name}
         badges={event.sports_in_matches}
         buttons={<EventActionButtons />}
+        image={event.image_field}
         isOwner={isOwner}
         tabsData={tabsData}
         lang={lang}
       />
       {children}
       <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} />}
+      {events.length > 0 && <ExpectedEvents events={expectedEvents} lang={lang}/>}
     </Container>
   );
 }

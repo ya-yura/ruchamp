@@ -5,13 +5,17 @@ import {
   TeamMatch,
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
+import { checkResponse } from './utils/other-utils';
+import { CreateEventSchema } from '@/components/dialogs/create-event';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+// Sport types
 
 export async function fetchSportTypes(): Promise<string[]> {
   try {
@@ -26,11 +30,13 @@ export async function fetchSportTypes(): Promise<string[]> {
   }
 }
 
+// Events
+
 export async function fetchEvents(): Promise<Event[]> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
       // cache: 'force-cache',
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['createEvent'] },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : [];
@@ -77,9 +83,7 @@ export async function fetchParticipants(id: string): Promise<Participant[]> {
   }
 }
 
-export async function fetchResults(
-  id: string,
-): Promise<EventResult[]> {
+export async function fetchResults(id: string): Promise<EventResult[]> {
   try {
     const res = await fetch(`${baseUrl}/event/${id}/matches-results`, {});
     return res.ok ? await res.json() : [];
@@ -101,6 +105,8 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
     throw new Error(`Failed to fetch tournament grid with id ${id}`);
   }
 }
+
+// Teams
 
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
@@ -145,4 +151,71 @@ export async function fetchTeamResults(
     console.error(`Error while fetching team results with id ${id}: `, error);
     throw new Error(`Failed to fetch team results with id ${id}`);
   }
+}
+
+// For Orgs
+
+export async function fetchOrgEvents(
+  token: string | undefined,
+): Promise<Event[]> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return [];
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/organizer`, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${token}`,
+      },
+      // cache: 'force-cache',
+      // next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['createEvent'] },
+    });
+    // revalidatePath('/events');
+    return res.ok ? await res.json() : [];
+  } catch (error) {
+    console.error("Error while fetching org's events: ", error);
+    throw new Error("Failed to fetch org's events.");
+  }
+}
+
+export async function createEvent(
+  token: string,
+  values: CreateEventSchema,
+): Promise<void | Response> {
+  const formData = new FormData();
+  formData.append('name', values.name);
+  formData.append('start_datetime', values.start_datetime);
+  formData.append('end_datetime', values.end_datetime);
+  formData.append('start_request_datetime', values.start_request_datetime);
+  formData.append('end_request_datetime', values.end_request_datetime);
+  formData.append('location', values.location);
+  formData.append('geo', values.geo);
+  formData.append('description', values.description);
+
+  if (values.image instanceof File) {
+    formData.append('image', values.image);
+  }
+  if (values.event_order instanceof File) {
+    formData.append('event_order', values.event_order);
+  }
+  if (values.event_system instanceof File) {
+    formData.append('event_system', values.event_system);
+  }
+
+  const response = await fetch(`${baseUrl}/event/create`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create event');
+  }
+
+  return await response.json();
 }

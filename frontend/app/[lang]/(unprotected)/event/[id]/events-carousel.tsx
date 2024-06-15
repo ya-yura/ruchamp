@@ -12,8 +12,15 @@ import { BigCardWithImage } from '@/components/cards/big-card-with-image';
 import React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 import { transformDate } from '@/lib/utils/date-and-time';
+import { Locale } from '@/i18n.config';
 
-export function EventsCarousel({ events }: { events: Event[] }) {
+export function EventsCarousel({
+  events,
+  lang,
+}: {
+  events: Event[];
+  lang: Locale;
+}) {
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true }),
   );
@@ -39,7 +46,8 @@ export function EventsCarousel({ events }: { events: Event[] }) {
               title={transformDate(event.start_datetime)}
               subtitle={event.location}
               description={event.description}
-              lang={'ru'} // fix hardcode
+              image={event.image_field}
+              lang={lang}
             />
           </CarouselItem>
         ))}

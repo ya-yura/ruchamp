@@ -21,7 +21,7 @@ export function EventsPageSkeleton() {
           </div>
           <Skeleton className="mx-auto mt-4 h-6 w-[270px] rounded-full"></Skeleton>
           <div className="mt-6 flex max-w-5xl flex-wrap gap-[16px]">
-            {Array.from({ length: 30 }).map((_, index) => (
+            {Array.from({ length: 12 }).map((_, index) => (
               <Skeleton
                 key={index}
                 className="h-7 w-32 rounded-full"
@@ -58,7 +58,7 @@ export function TeamsPageSkeleton() {
           </div>
           <Skeleton className="mx-auto mt-4 h-6 w-[270px] rounded-full"></Skeleton>
           <div className="mt-6 flex max-w-5xl flex-wrap gap-[16px]">
-            {Array.from({ length: 30 }).map((_, index) => (
+            {Array.from({ length: 12 }).map((_, index) => (
               <Skeleton
                 key={index}
                 className="h-7 w-32 rounded-full"
@@ -126,18 +126,11 @@ export function EventResultsSkeleton() {
 
 export function EventParticipantsSkeleton() {
   return (
-    <CustomSection className="relative mb-10 bg-transparent">
-      <ContentWraper className="relative w-full">
-        <TextCardFieldWithTwoLists
-          firstList={Array.from({ length: 30 }).map((_, index) => (
-            <Skeleton
-              key={index}
-              className="h-[92px] w-full rounded-lg"
-            ></Skeleton>
-          ))}
-          secondList={<Skeleton className="h-96 w-full" />}
-        />
-      </ContentWraper>
-    </CustomSection>
+    <TextCardFieldWithTwoLists
+      firstList={Array.from({ length: 30 }).map((_, index) => (
+        <Skeleton key={index} className="h-[92px] w-full rounded-lg"></Skeleton>
+      ))}
+      secondList={<Skeleton className="h-96 w-full" />}
+    />
   );
 }

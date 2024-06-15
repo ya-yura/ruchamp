@@ -5,7 +5,7 @@ import { logout } from '@/lib/actions/auth';
 import { useRouter } from 'next/navigation';
 import { useFormState } from 'react-dom';
 
-export function LogoutButtons({ token }: { token: string }) {
+export function LogoutButtons({ token }: { token: string | null }) {
   const [errorMessage, dispatch] = useFormState(logout, undefined);
   const router = useRouter();
   return (
