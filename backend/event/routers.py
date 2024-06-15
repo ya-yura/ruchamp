@@ -558,8 +558,9 @@ async def create_event(
             )
 
         # Создание директории для хранения изображений, если она не существует
-        image_dir = "static/events"
-        files_dir = "static/files"
+        base_dir = "static"
+        image_dir = os.path.join(base_dir, "images")
+        files_dir = os.path.join(base_dir, "files")
         os.makedirs(image_dir, exist_ok=True)
         os.makedirs(files_dir, exist_ok=True)
 
@@ -595,7 +596,7 @@ async def create_event(
         db.add(new_event)
         await db.commit()
 
-        return {f"Event {new_event.name} - created"}
+        return new_event.id
 
     except SQLAlchemyError as e:
         await db.rollback()

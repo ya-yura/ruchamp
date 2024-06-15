@@ -2,7 +2,7 @@ from datetime import date
 from typing import List, Optional
 
 from fastapi_users import schemas
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -95,3 +95,9 @@ class OrganizerUpdate(BaseModel):
 class RefereeUpdate(BaseModel):
     qualification_level: Optional[str]
     image_field: Optional[str]
+
+
+class Feedback(BaseModel):
+    name: str
+    email: EmailStr
+    message: str
