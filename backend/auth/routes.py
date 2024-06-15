@@ -1,8 +1,15 @@
 import uuid
 from typing import Type
+import smtplib
+from dotenv import load_dotenv
+import os
+import yagmail
 
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from fastapi import (APIRouter, Body, Depends, File, HTTPException, UploadFile,
-                     BackgroundTasks)
+                     BackgroundTasks, Form)
 from fastapi.responses import RedirectResponse
 from fastapi_users import FastAPIUsers
 from sqlalchemy import insert, select, update
@@ -16,13 +23,21 @@ from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
                          SportType, SystemAdministrator, User,
                          athlete_sport_type_association, Coach,
                          athlete_coach_association, CategoryType,
-                         athlete_grade_association)
+                         athlete_grade_association, AthleteSport)
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
-                          UserData, UserDB, UserRead, UserUpdate)
+                          UserData, UserDB, UserRead, UserUpdate, 
+                          Feedback)
 from connection import get_db
 from event.models import Match, Event, MatchSport
 from teams.models import TeamMember
+
+load_dotenv()
+
+EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = int(os.getenv("SMTP_PORT"))
 
 router = APIRouter(prefix="/users", tags=["Users"])
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
@@ -299,8 +314,6 @@ async def get_current_user(
                 Athlete.user_id,
                 Athlete.weight,
                 Athlete.height,
-                # Athlete.grades,
-                # Athlete.coaches,
                 Athlete.country,
                 Athlete.region,
                 Athlete.city,
@@ -314,6 +327,19 @@ async def get_current_user(
             select(Athlete.id).where(Athlete.user_id == current_user.id)
         )
         athlete_id = query.scalars().first()
+
+        query = await db.execute(
+            select(SportType.name, CategoryType.name)
+            .join(AthleteSport, AthleteSport.sport_id == SportType.id)
+            .join(CategoryType, CategoryType.id == AthleteSport.grade_id)
+            .where(AthleteSport.athlete_id == athlete_id)
+        )
+        athlete_grades = query.all()
+
+        grades = {
+            sport_name: grade_name for sport_name, grade_name in athlete_grades
+        }
+        athlete["grades"] = grades
 
         query = await db.execute(
             select(SportType.name)
@@ -330,14 +356,6 @@ async def get_current_user(
         )
         athlete_coaches = query.scalars().all()
         athlete["coaches"] = athlete_coaches
-
-        query = await db.execute(
-            select(CategoryType.name)
-            .join(athlete_grade_association)
-            .where(athlete_grade_association.c.athlete_id == athlete_id)
-        )
-        athleye_grade = query.scalars().all()
-        athlete["grades"] = athleye_grade
         result.append(athlete)
 
     elif user.role_id == 2:
@@ -713,8 +731,74 @@ async def sport_asosiation(
     #     await db.commit()
 
     # # await db.execute(athlete.sport_types = [id for id in sports_types])
-    # # await db.commit()    
+    # # await db.commit()
     # #print(athlete)
     # print(sports_types)
 
     return {"message": "Sport asosiation created"}'''
+
+
+@router.post("/feedback")
+async def send_feedback(
+    feedback: Feedback,
+):
+    try:
+        # Настройки SMTP сервера
+        smtp_server = SMTP_SERVER
+        smtp_port = SMTP_PORT
+        smtp_user = EMAIL_USERNAME
+        smtp_password = EMAIL_PASSWORD
+
+        # Настройка сообщения
+        msg = MIMEMultipart()
+        msg['From'] = feedback.email
+        msg['To'] = "support@sportplatform.ru"
+        msg['Subject'] = "Feedback from " + feedback.name
+
+        # Тело письма
+        body = (
+            f"Name: {feedback.name}\n"
+            f"Email: {feedback.email}\n"
+            f"Message: {feedback.message}"
+        )
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Отправка письма
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+
+        try:
+            server.login(smtp_user, smtp_password)
+        except smtplib.SMTPAuthenticationError as auth_error:
+            raise HTTPException(
+                status_code=401,
+                detail=f"SMTP Authentication error: {auth_error}"
+            )
+
+        try:
+            server.sendmail(
+                smtp_user, "support@sportplatform.ru", msg.as_string()
+            )
+        except smtplib.SMTPRecipientsRefused as recipient_error:
+            raise HTTPException(
+                status_code=400,
+                detail=f"SMTP Recipients Refused: {recipient_error}"
+            )
+        except smtplib.SMTPSenderRefused as sender_error:
+            raise HTTPException(
+                status_code=400, detail=f"SMTP Sender Refused: {sender_error}"
+            )
+        except smtplib.SMTPDataError as data_error:
+            raise HTTPException(
+                status_code=400, detail=f"SMTP Data Error: {data_error}"
+            )
+
+        server.quit()
+        return {"message": "Feedback sent successfully"}
+
+    except smtplib.SMTPException as e:
+        raise HTTPException(
+            status_code=500, detail=f"SMTP error occurred: {e}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")

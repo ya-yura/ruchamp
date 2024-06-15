@@ -2,7 +2,12 @@ import os
 from typing import Type
 import uuid
 from aiofiles import open as async_open
+import smtplib
+from dotenv import load_dotenv
+import os
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile)
 from fastapi_pagination import Params, add_pagination, paginate
@@ -22,12 +27,20 @@ from auth.models import (User, Athlete, athlete_coach_association, Coach,
 from auth.schemas import AthleteUpdate, UserDB
 from connection import get_db
 from teams.models import Team, TeamMember
-from teams.schemas import TeamCreate, TeamUpdate, Participant
+from teams.schemas import TeamCreate, TeamUpdate, Participant, Message
 from event.models import (MatchParticipant, Match, MatchAge,
                           MatchCategory, MatchGender, MatchSport,
                           MatchWeights, EventOrganizer, Event,
                           CategoryType, CombatType, AllWeightClass,
                           WinnerTable, Medal)
+
+
+load_dotenv()
+
+EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = int(os.getenv("SMTP_PORT"))
 
 
 router = APIRouter(prefix="/team", tags=["Teams"])
@@ -44,6 +57,44 @@ team_update = TeamUpdate
 user_db_verify = UserDB
 
 add_pagination(router)
+
+
+# Функция для отправки email
+async def send_email(to_email: str, subject: str, body: str):
+    # Настройки SMTP сервера
+    smtp_server = SMTP_SERVER
+    smtp_port = SMTP_PORT
+    smtp_user = EMAIL_USERNAME
+    smtp_password = EMAIL_PASSWORD
+
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.sendmail(smtp_user, to_email, msg.as_string())
+        server.quit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to send email: {e}"
+        )
+
+
+# Функция для получения email капитана команды
+async def get_captain_email(team_id: int, db: AsyncSession):
+    query = await db.execute(
+        select(User.email)
+        .join(Athlete, Athlete.user_id == User.id)
+        .join(Team, Team.captain == Athlete.id)
+        .where(Team.id == team_id)
+    )
+    captain_email = query.scalars().first()
+    return captain_email
 
 
 def is_model_field(model: Type[DeclarativeMeta], field_name: str) -> bool:
@@ -806,3 +857,74 @@ async def all_teams_rating(
     # print(all_members)
     # print(all_users)
     return teams_info
+
+
+@router.post("/send-email-team/{team_id}")
+async def send_team_email(
+    team_id: int,
+    message: Message,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user),
+):
+    # Проверка текущий пользователь капитан этой команды?
+    query = await db.execute(
+        select(Athlete.id).where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalar_one_or_none()
+    query = await db.execute(
+        select(Team.captain).where(Team.id == team_id)
+    )
+    captain_id = query.scalar_one_or_none()
+    if athlete_id != captain_id:
+        raise HTTPException(
+            status_code=400,
+            detail="You is not a capitan of this team"
+         )
+
+    # Получение email капитана команды
+    captain_email = await get_captain_email(team_id, db)
+    if not captain_email:
+        raise HTTPException(
+            status_code=404, detail="Captain email not found"
+        )
+
+    # Извлечение email-адресов участников команды
+    member_emails = await get_member_emails(team_id, db)
+
+    if not member_emails:
+        raise HTTPException(
+            status_code=404,
+            detail="No team members found with email addresses"
+        )
+
+    # Исключение email капитана из списка участников
+    member_emails = [
+        email for email in member_emails if email != captain_email
+    ]
+
+    query = await db.execute(
+        select(Team.name).where(Team.id == team_id)
+    )
+    team_name = query.scalars().first()
+
+    # Отправка писем каждому участнику команды
+    for member_email in member_emails:
+        await send_email(
+            to_email=member_email,
+            subject=f"Message from Team Captain (Team: {team_name})",
+            body=message.message
+        )
+
+    return {"message": "Emails sent successfully"}
+
+
+async def get_member_emails(team_id: int, db: AsyncSession = Depends(get_db)):
+    # Запрос для получения email-адресов всех участников команды
+    query = await db.execute(
+        select(User.email)
+        .join(Athlete, Athlete.user_id == User.id)
+        .join(TeamMember, TeamMember.member == Athlete.id)
+        .where(TeamMember.team == team_id)
+    )
+    emails = query.scalars().all()
+    return emails
