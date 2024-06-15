@@ -28,6 +28,9 @@ import { YandexMapPicker } from '../yandex-map-picker';
 import { Toaster, toast } from 'sonner';
 import { Spinner } from '../spinner';
 import revalidateEvents from '@/lib/actions';
+import { useRouter } from 'next/navigation';
+import { path } from '@/lib/utils/other-utils';
+import { Locale } from '@/i18n.config';
 
 const CreateEventTabs = {
   Name: 'Название',
@@ -87,31 +90,36 @@ export const createEventSchema = z.object({
 
 export type CreateEventSchema = z.infer<typeof createEventSchema>;
 
-export function CreateEventDialog({
-  className,
-  token,
-}: {
-  className?: string;
+interface CreateEventDialogProps {
   token?: string;
-}) {
+  lang: Locale;
+  className?: string;
+}
+
+export function CreateEventDialog({
+  token,
+  lang,
+  className,
+}: CreateEventDialogProps) {
   const [tabValue, setTabValue] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<[number, number]>([
     55.751574, 37.573856,
   ]);
+  const router = useRouter();
 
   const form = useForm<CreateEventSchema>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
       name: '',
-      start_datetime: '2024-06-16T15:00:00',
-      end_datetime: '2024-06-17T16:00:00',
-      start_request_datetime: '2024-06-16T15:00:00',
-      end_request_datetime: '2024-06-16T15:00:00',
-      location: 'адрес',
+      start_datetime: '',
+      end_datetime: '',
+      start_request_datetime: '',
+      end_request_datetime: '',
+      location: '',
       geo: '55.751574, 37.573856',
-      description: 'Описание балбалалала',
+      description: '',
       event_order: '',
       event_system: '',
       image: '',
@@ -130,10 +138,13 @@ export function CreateEventDialog({
     setIsLoading(true);
     if (token) {
       createEvent(token, values)
-        .then(() => {
+        .then((id) => {
           setIsOpen(false);
-          toast.success('Событие успешно создано');
-          revalidateEvents()
+          toast.success(
+            'Событие успешно создано. Вы будете перенаправлены на него',
+          );
+          revalidateEvents();
+          router.push(path(lang, `/event/${id}/info`));
         })
         .catch((err) => {
           console.log('Ошибка при создании события: ', err);

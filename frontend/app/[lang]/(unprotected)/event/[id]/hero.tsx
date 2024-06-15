@@ -20,12 +20,14 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Locale } from '@/i18n.config';
 import { usePathname, useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
+import { fallbackImage } from '@/lib/constants';
 
 interface HeroProps {
   id: number;
   title: string;
   badges: string[];
   buttons: ReactNode;
+  image: string;
   isOwner: boolean;
   tabsData: Record<string, string>;
   lang: Locale;
@@ -36,6 +38,7 @@ export function Hero({
   title,
   badges,
   buttons,
+  image,
   isOwner,
   tabsData,
   lang,
@@ -47,6 +50,10 @@ export function Hero({
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = image.startsWith('http')
+    ? image
+    : `${baseUrl}/${image}` || fallbackImage;
 
   let progress = 0;
   const { current: elContainer } = refContainer;
@@ -76,7 +83,7 @@ export function Hero({
       >
         <Image
           className=""
-          src={`/ru/images/mock-event-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={imageUrl}
           alt="Обложка"
           fill={true}
           style={{

@@ -14,8 +14,6 @@ import { CheckedState } from '@radix-ui/react-checkbox';
 import { Locale } from '@/i18n.config';
 import { calculateAge } from '@/lib/utils/date-and-time';
 import { cn } from '@/lib/utils';
-import { CustomSection } from '../custom-section';
-import { ContentWraper } from '../content-wraper';
 
 interface AthleteCardData {
   id?: number;
@@ -103,25 +101,18 @@ export function AthletesCardsWithFilters({
   }, [filters, athletes, filtersData]);
 
   return (
-    <CustomSection className="relative mb-10">
-      <ContentWraper>
-        <TextCardFieldWithTwoLists
-          className={cn('w-full', className)}
-          ariaLabelledby="athletes"
-          firstList={
-            <AthletesList athletes={filtredAthletes} captainId={captainId} />
-          }
-          secondList={
-            !!athletes.length && (
-              <Filters
-                filtersData={filtersData}
-                updateFilters={updateFilters}
-              />
-            )
-          }
-        />
-      </ContentWraper>
-    </CustomSection>
+    <TextCardFieldWithTwoLists
+      className={cn('w-full', className)}
+      ariaLabelledby="athletes"
+      firstList={
+        <AthletesList athletes={filtredAthletes} captainId={captainId} />
+      }
+      secondList={
+        !!athletes.length && (
+          <Filters filtersData={filtersData} updateFilters={updateFilters} />
+        )
+      }
+    />
   );
 }
 

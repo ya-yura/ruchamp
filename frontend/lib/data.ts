@@ -217,5 +217,5 @@ export async function createEvent(
     throw new Error('Failed to create event');
   }
 
-  return response;
+  return await response.json();
 }

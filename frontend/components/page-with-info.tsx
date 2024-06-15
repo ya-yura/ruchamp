@@ -12,6 +12,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ContentWraper } from '@/components/content-wraper';
 import { Locale } from '@/i18n.config';
 import { Button } from './ui/button';
+import { fallbackImage } from '@/lib/constants';
 
 interface PageWithInfoProps<T extends string> {
   id: number;
@@ -19,6 +20,7 @@ interface PageWithInfoProps<T extends string> {
   title: string;
   bages: string[];
   buttons: ReactNode;
+  image: string;
   tabsContent: Record<T, ReactNode>;
   tabsObj: Record<string, T>;
   isOwner?: boolean;
@@ -31,6 +33,7 @@ export function PageWithInfo<T extends string>({
   title,
   bages,
   buttons,
+  image,
   tabsContent,
   tabsObj,
   isOwner,
@@ -38,6 +41,11 @@ export function PageWithInfo<T extends string>({
 }: PageWithInfoProps<T>) {
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = image.startsWith('http')
+    ? image
+    : `${baseUrl}/${image}` || fallbackImage;
 
   let progress = 0;
 
@@ -56,7 +64,8 @@ export function PageWithInfo<T extends string>({
       >
         <Image
           className=""
-          src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          // src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={imageUrl}
           alt="Обложка"
           fill={true}
           style={{

@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { CustomLink } from '../custom-link';
+import { fallbackImage } from '@/lib/constants';
 
 interface BigCardWithImage {
   type: 'event' | 'team';
@@ -33,8 +34,12 @@ export function BigCardWithImage({
   className,
 }: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
-
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = image
+    ? image.startsWith('http')
+      ? image
+      : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
+    : fallbackImage;
 
   return (
     <li
@@ -46,7 +51,7 @@ export function BigCardWithImage({
     >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
-          src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={imageUrl}
           alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}

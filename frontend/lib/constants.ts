@@ -10,6 +10,14 @@ import {
   GridRound,
 } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 
+export const userRoles = {
+  athlete: '1',
+  organizer: '2',
+  spectator: '3',
+  admin: '4',
+  referee: '5',
+};
+
 export const testData: Event[] = [
   {
     name: 'Турнир чемпионов.',
@@ -2880,3 +2888,5 @@ export const testGridInfoData: GridInfo = {
   weight_min: 90,
   gender: false,
 };
+
+export const fallbackImage = '/ru/images/mock-event-bg/5.avif';

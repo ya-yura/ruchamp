@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../api/auth';
 import { SessionData } from '../definitions';
+import { redirect } from 'next/navigation';
 
 const secretKey = process.env.NEXT_PUBLIC_AUTH_SECRET;
 
@@ -53,6 +54,7 @@ export async function authenticate(
 export async function logout() {
   // Destroy the session
   cookies().set('session', '', { expires: new Date(0) });
+  redirect('/');
 }
 
 export async function getSession(): Promise<SessionData | null> {

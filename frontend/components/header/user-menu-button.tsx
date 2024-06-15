@@ -11,11 +11,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { ListItem } from './list-item';
 import { Locale } from '@/i18n.config';
+import { EnumUserRole } from '@/lib/definitions';
+import { userRoles } from '@/lib/constants';
 
 interface UserMenuButtonProps {
   userEmail: string;
   userAvatar: string | null;
   initials: string;
+  roleId: number;
   lang: Locale;
 }
 
@@ -23,6 +26,7 @@ export function UserMenuButton({
   userEmail,
   userAvatar,
   initials,
+  roleId,
   lang,
 }: UserMenuButtonProps) {
   return (
@@ -38,6 +42,15 @@ export function UserMenuButton({
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="flex w-[100px] flex-col gap-1 p-1 ">
+              {userRoles['organizer'] === roleId?.toString() && (
+                <ListItem
+                  className="text-right"
+                  title="Мои события"
+                  href="/org/events"
+                  lang={lang}
+                />
+              )}
+
               <ListItem
                 className="text-right"
                 title="Профиль"

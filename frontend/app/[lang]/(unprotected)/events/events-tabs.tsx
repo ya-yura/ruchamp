@@ -131,6 +131,7 @@ export function EventsTabs({
               <CreateEventDialog
                 className="absolute right-0 top-0"
                 token={token}
+                lang={lang}
               />
             )}
           </div>
