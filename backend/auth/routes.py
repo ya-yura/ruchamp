@@ -15,6 +15,7 @@ from fastapi_users import FastAPIUsers
 from sqlalchemy import insert, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm import aliased
 
 from auth.auth import auth_backend
 from auth.mailer import send_forgot_password_email
@@ -26,14 +27,15 @@ from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
                          athlete_grade_association, AthleteSport)
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
-                          UserData, UserDB, UserRead, UserUpdate, 
+                          UserData, UserDB, UserRead, UserUpdate,
                           Feedback)
 from connection import get_db
 from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
                           MatchParticipant, MatchAge, MatchCategory,
                           MatchGender, AllWeightClass, CombatType,
-                          MatchWeights)
-from teams.models import TeamMember
+                          MatchWeights, Fight, FightWinner)
+from teams.models import TeamMember, Team
+from match.utils import round_name
 
 load_dotenv()
 
@@ -113,6 +115,57 @@ async def update_profile(
     await update_function(current_user, data)
 
     return {"message": f"{model.__name__} profile updated successfully"}
+
+
+async def get_athlete_result(db, athlete_id, match_id):
+    # Запрос для получения результата атлета в конкретном матче
+    query = await db.execute(
+        select(MatchParticipant.id)
+        .where(MatchParticipant.player_id == athlete_id)
+    )
+    participant_id = query.scalars().first()
+    query = await db.execute(
+        select(Fight.id, Fight.round, Fight.player_one, Fight.player_two)
+        .where(Fight.match_id == match_id)
+    )
+    fights = query.mappings().all()
+
+    max_round = 0
+    last_fight_result = None
+
+    for fight in fights:
+        if fight['player_one'] == participant_id or fight['player_two'] == participant_id:
+            # Проверяем, кто победил в этом бою
+            result_query = await db.execute(
+                select(FightWinner.winner_id)
+                .where(FightWinner.fight_id == fight['id'])
+            )
+            winner_id = result_query.scalar_one_or_none()
+
+            if fight['round'] > max_round:
+                max_round = fight['round']
+                query = await db.execute(
+                    select(Fight.player_one)
+                    .where(Fight.round == max_round)
+                )
+                players = query.scalars().all()
+                players_count = len(players) * 2
+
+                if winner_id is None:
+                    last_fight_result = "Unknown"
+                elif winner_id == participant_id:
+                    last_fight_result = "Won"
+                else:
+                    last_fight_result = "Lost"
+
+    if last_fight_result == "Lost":
+        return f"{round_name(players_count)}"
+    elif last_fight_result == "Won":
+        return f"{round_name(players_count)}"
+    elif last_fight_result == "Unknown":
+        return f"{round_name(players_count)}"
+    else:
+        return "Did not compete in this match"
 
 
 '''  ATHLETE  '''
@@ -470,6 +523,7 @@ async def get_current_user_matches(
                 EventOrganizer.organization_name.label("org_name"),
                 Match.name,
                 SportType.name.label("sport_name"),
+                CategoryType.name.label("category_type"),
                 Match.start_datetime,
                 Match.end_datetime,
                 Match.nominal_time*60,
@@ -480,7 +534,6 @@ async def get_current_user_matches(
                 AllWeightClass.min_weight.label("weight_min"),
                 AllWeightClass.max_weight.label("weight_max"),
                 MatchGender.gender.label("gender"),
-                CategoryType.name.label("category_type"),
             )
             .join(Event, Event.id == Match.event_id)
             .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
@@ -494,10 +547,77 @@ async def get_current_user_matches(
             .join(MatchCategory, MatchCategory.match_id == Match.id)
             .join(CategoryType, CategoryType.id == MatchCategory.category_id)
             .where(Match.id == match_id))
-        match_info = query.mappings().all()
-        matches.append(match_info[0])
+        match_info = query.mappings().first()
+
+        # Получаем результат атлета для этого матча
+        athlete_result = await get_athlete_result(db, athlete_id, match_id)
+
+        match_info = dict(match_info)
+        match_info["athlete_result"] = athlete_result
+
+        matches.append(match_info)
 
     return matches
+
+
+@router.get("/me/teams")
+async def get_current_user_teams(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    '''Информация о командах, в которых состоит спортсмен'''
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    query = await db.execute(
+        select(TeamMember.team)
+        .where(TeamMember.member == athlete_id)
+    )
+    teams_id = query.scalars().all()
+    if teams_id is None:
+        raise HTTPException(
+            status_code=400, detail="You are not a member of any team"
+        )
+
+    teams_info = []
+
+    for team_id in teams_id:
+        query = await db.execute(
+            select(
+                Team.id.label("team_id"),
+                Team.name,
+                Team.description,
+                Team.slug,
+                Team.invite_link,
+                Team.image_field,
+                Team.country,
+                Team.city,
+                Team.region,
+            )
+            .where(Team.id == team_id)
+        )
+        team_info = query.mappings().first()
+        team_info = dict(team_info)
+
+        # Получаем информацию о капитане команды
+        query = await db.execute(
+            select(
+                User.sirname,
+                User.name,
+                User.fathername,
+            )
+            .select_from(Team)
+            .join(Athlete, Athlete.id == Team.captain)
+            .join(User, User.id == Athlete.user_id)
+            .where(Team.id == team_id)
+        )
+        captain_info = query.mappings().first()
+        team_info["captain"] = captain_info
+        teams_info.append(team_info)
+
+    return teams_info
 
 
 @router.get("/me/organizer")
