@@ -43,7 +43,7 @@ export function YandexMap({ places, size }: YandexMapProps) {
       // Add placemarks for each location
       places.forEach((place) => {
         // @ts-ignore
-        var myPlacemark = new window.ymaps.Placemark(
+        const myPlacemark = new window.ymaps.Placemark(
           [+place.geo.split(',')[0], +place.geo.split(',')[1]],
           {
             hintContent: place.name || '',

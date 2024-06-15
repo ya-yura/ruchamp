@@ -43,6 +43,7 @@ export default async function OrgEventsPage({
           futureEvents={sortedFutureEvents}
           pastEvents={sortedPastEvents}
           isOrg={true}
+          token={token}
         />
       </Suspense>
     </Container>

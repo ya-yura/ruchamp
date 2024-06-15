@@ -79,29 +79,3 @@ export async function updateSession(request: NextRequest) {
   });
   return res;
 }
-
-export async function createEvent(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  console.log(formData.get('location'));
-  // const username = formData.get('username') as string;
-  // const password = formData.get('password') as string;
-  // try {
-  //   const token = await auth.login(username, password);
-  //   if (token) {
-  //     const user = await auth.getCurrentUser(token);
-  //     // Create the session
-  //     const expires = new Date(Date.now() + 604800 * 1000); // 604800 - seconds in the week
-  //     const session = await encrypt({ user, token, expires });
-  //     // Save the session in a cookie
-  //     cookies().set('session', session, { expires, httpOnly: true });
-  //   } else throw new Error();
-  // } catch (error) {
-  //   return 'Введены не верные данные';
-  // }
-  try {
-  } catch (error) {
-    return 'Что-то пошло не так';
-  }
-}

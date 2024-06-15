@@ -5,12 +5,13 @@ import {
   TeamMatch,
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
 import { checkResponse } from './utils/other-utils';
+import { CreateEventSchema } from '@/components/dialogs/create-event';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -35,7 +36,7 @@ export async function fetchEvents(): Promise<Event[]> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
       // cache: 'force-cache',
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['createEvent'] },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : [];
@@ -169,7 +170,8 @@ export async function fetchOrgEvents(
         Authorization: `Bearer ${token}`,
       },
       // cache: 'force-cache',
-      next: { revalidate: 300 },
+      // next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['createEvent'] },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : [];
@@ -181,11 +183,9 @@ export async function fetchOrgEvents(
 
 export async function createEvent(
   token: string,
-  values: any,
+  values: CreateEventSchema,
 ): Promise<void | Response> {
-  // fix "any"
   const formData = new FormData();
-  // Append each field to the FormData object
   formData.append('name', values.name);
   formData.append('start_datetime', values.start_datetime);
   formData.append('end_datetime', values.end_datetime);
@@ -195,7 +195,6 @@ export async function createEvent(
   formData.append('geo', values.geo);
   formData.append('description', values.description);
 
-  // Append files if they are present
   if (values.image instanceof File) {
     formData.append('image', values.image);
   }
@@ -206,15 +205,17 @@ export async function createEvent(
     formData.append('event_system', values.event_system);
   }
 
-  return fetch(`${baseUrl}/event/create`, {
+  const response = await fetch(`${baseUrl}/event/create`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
     body: formData,
-  })
-    .then(checkResponse)
-    .catch((err) => {
-      console.log('Failed to create event', err);
-    });
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create event');
+  }
+
+  return response;
 }

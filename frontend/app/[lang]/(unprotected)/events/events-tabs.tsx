@@ -26,6 +26,7 @@ interface EventTabsProps {
   futureEvents: Event[];
   pastEvents: Event[];
   isOrg?: boolean;
+  token?: string;
 }
 
 enum EventTabs {
@@ -40,6 +41,7 @@ export function EventsTabs({
   futureEvents,
   pastEvents,
   isOrg,
+  token,
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
@@ -125,7 +127,12 @@ export function EventsTabs({
               date={date}
               setDate={setDate}
             />
-            {isOrg && <CreateEventDialog className="absolute right-0 top-0" />}
+            {isOrg && (
+              <CreateEventDialog
+                className="absolute right-0 top-0"
+                token={token}
+              />
+            )}
           </div>
           <FilterByType
             options={sportTypes}

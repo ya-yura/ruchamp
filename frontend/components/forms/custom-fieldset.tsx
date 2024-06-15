@@ -28,6 +28,7 @@ import {
 import { DropdownMenuCheckboxes } from './custom-multiselect';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
 
 type TypeOptionWithIcon = {
   value: string;
@@ -55,8 +56,8 @@ export type TypeField<T> = {
   name: Path<T>;
   placeholder?: string;
   label?: string;
-  span?: string;
-  start?: string;
+  fieldStyles?: string;
+  inputStyles?: string;
   defaultValue?: string;
   orientation?: 'row' | 'col';
   selectOptions?: TypeOptionWithIcon[];
@@ -93,34 +94,58 @@ export function CustomFieldset<T extends FieldValues>({
           render={({ field }) => (
             <FormItem
               className={cn(
-                `relative col-span-12 flex flex-col`,
-                item.span,
-                item.start,
+                `group relative col-span-12 flex flex-col`,
+                item.fieldStyles,
               )}
             >
               {item.label && <FormLabel>{item.label}</FormLabel>}
               {item.type === 'file' && (
-                <Input
-                  {...field}
-                  value={field.value?.fileName}
-                  onChange={(event) => {
-                    field.onChange(event.target.files?.[0]);
-                  }}
-                  type={item.type}
-                  id={item.name}
-                />
+                <>
+                  <Button
+                    className="absolute top-[16px] w-fit cursor-pointer"
+                    variant={'default'}
+                    size={'sm'}
+                  >
+                    Загрузить
+                  </Button>
+                  <Input
+                    className={cn(
+                      'relative w-fit opacity-0 file:cursor-pointer',
+                      item.inputStyles,
+                    )}
+                    {...field}
+                    value={field.value?.fileName}
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0]);
+                    }}
+                    type={item.type}
+                    id={item.name}
+                    title="Выберите файл"
+                  />
+                  <span className="text-xs text-white group-last:mt-0">
+                    {form.getValues()[`${item.name}`].name
+                      ? `Выбран файл: ${form.getValues()[`${item.name}`].name}`
+                      : 'Файл не выбран'}
+                  </span>
+                </>
               )}
-              {[
-                'text',
-                'email',
-                'datetime-local',
-                'time',
-                'date',
-                'number',
-              ].includes(item.type) && (
+              {['text', 'email', 'number'].includes(item.type) && (
                 <>
                   <FormControl>
                     <Input
+                      className={cn(item.inputStyles)}
+                      placeholder={item.placeholder}
+                      type={item.type}
+                      {...field}
+                    />
+                  </FormControl>
+                </>
+              )}
+              {['datetime-local', 'time', 'date'].includes(item.type) && (
+                <>
+                  <FormControl>
+                    <Input
+                      className={cn('w-fit', item.inputStyles)}
                       placeholder={item.placeholder}
                       type={item.type}
                       {...field}
@@ -131,7 +156,11 @@ export function CustomFieldset<T extends FieldValues>({
               {item.type === 'textarea' && (
                 <>
                   <FormControl>
-                    <Textarea placeholder={item.placeholder} {...field} />
+                    <Textarea
+                      className={cn(item.inputStyles)}
+                      placeholder={item.placeholder}
+                      {...field}
+                    />
                   </FormControl>
                 </>
               )}
