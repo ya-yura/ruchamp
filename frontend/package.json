@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "clean": "node clean-next-cache.js",
     "dev": "next dev",
+    "lint": "next lint",
     "prettier": "prettier --write --ignore-unknown .",
     "prettier:check": "prettier --check --ignore-unknown .",
     "seed": "node -r dotenv/config ./scripts/seed.js",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
