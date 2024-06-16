@@ -24,7 +24,7 @@ export default async function Events({
 
   const { futureEvents, pastEvents } = divideEventsByDateTime(events);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
-  const sortedPastEvents = sortedEventsByDate(pastEvents);
+  const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
 
   return (
     <Container>

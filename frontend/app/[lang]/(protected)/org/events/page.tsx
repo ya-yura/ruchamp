@@ -31,7 +31,7 @@ export default async function OrgEventsPage({
 
   const { futureEvents, pastEvents } = divideEventsByDateTime(orgEvents);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
-  const sortedPastEvents = sortedEventsByDate(pastEvents);
+  const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
 
   return (
     <Container>
