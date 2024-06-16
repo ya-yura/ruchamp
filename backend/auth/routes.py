@@ -526,7 +526,7 @@ async def get_current_user_matches(
                 CategoryType.name.label("category_type"),
                 Match.start_datetime,
                 Match.end_datetime,
-                Match.nominal_time*60,
+                (Match.nominal_time*60).label("nominal_time"),
                 Match.mat_vol,
                 MatchAge.age_from.label("age_min"),
                 MatchAge.age_till.label("age_max"),
