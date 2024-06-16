@@ -51,9 +51,11 @@ export function Hero({
   const [scrollY] = useScrollY();
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const imageUrl = image.startsWith('http')
-    ? image
-    : `${baseUrl}/${image}` || fallbackImage;
+  const imageUrl = image
+    ? image.startsWith('http')
+      ? image
+      : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
+    : fallbackImage;
 
   let progress = 0;
   const { current: elContainer } = refContainer;
