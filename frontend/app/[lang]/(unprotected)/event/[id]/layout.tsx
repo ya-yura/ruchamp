@@ -31,6 +31,7 @@ export default async function EventPageLayout({
         roleInfo: session.user[0],
       }
     : null;
+  const token = session?.token;
   const isOwner = user?.roleInfo.id === event?.organizer_id;
   const randomInt = getRandomInt(100);
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
@@ -64,7 +65,14 @@ export default async function EventPageLayout({
         id={event.id}
         title={event.name}
         badges={event.sports_in_matches}
-        buttons={<EventActionButtons isOwner={isOwner} />}
+        buttons={
+          <EventActionButtons
+            token={token}
+            eventId={event.id}
+            isOwner={isOwner}
+            lang={lang}
+          />
+        }
         image={event.image_field}
         isOwner={isOwner}
         tabsData={tabsData}
@@ -72,7 +80,9 @@ export default async function EventPageLayout({
       />
       {children}
       <AddressSection event={event} />
-      {events.length > 0 && <ExpectedEvents events={expectedEvents} lang={lang}/>}
+      {events.length > 0 && (
+        <ExpectedEvents events={expectedEvents} lang={lang} />
+      )}
     </Container>
   );
 }

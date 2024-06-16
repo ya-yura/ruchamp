@@ -172,7 +172,6 @@ export function CreateEventDialog({
 
   return (
     <Dialog onOpenChange={(open: boolean) => setIsOpen(!isOpen)} open={isOpen}>
-      <Toaster />
       <DialogTrigger asChild>
         <Button className={cn(className)} variant={'ruchampDefault'}>
           Создать событие
