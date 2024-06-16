@@ -74,7 +74,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
   };
   const mtVariants: Record<string, string> = {
     0: 'mt-[0]',
-    1: 'mt-[30px]',
+    1: `${rounds.length === 3 ? 'mt-[55px]' : 'mt-[30px]'}`,
     2: 'mt-[89px]',
     3: 'mt-[208px]',
     4: 'mt-[448px]',
@@ -129,10 +129,10 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                   : mtVariants[index],
               )}
             >
-              {round.fights.map((fight) => (
+              {round.fights.map((fight, ind) => (
                 <GridCard
                   key={fight.fight_info.fight_id}
-                  fight_id={fight.fight_info.fight_id}
+                  fight_index={ind}
                   time={fight.fight_info.start_time}
                   mat_number={fight.fight_info.mat_number}
                   player_1={fight.player_1}
@@ -155,7 +155,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
 }
 
 interface GridCardProps {
-  fight_id: number;
+  fight_index: number;
   time: string;
   mat_number: number;
   player_1: GridPlayer;
@@ -170,7 +170,7 @@ interface GridCardProps {
 }
 
 export function GridCard({
-  fight_id,
+  fight_index,
   time,
   mat_number,
   player_1,
@@ -186,7 +186,7 @@ export function GridCard({
   const isPlayerFirstWinner = player_1.points > player_2.points;
   const isDraw = player_1.points === player_2.points;
   const arrowHeight: Record<string, string> = {
-    0: 'h-[13px]',
+    0: `${roundsNumber === 3 ? 'h-[38px]' : 'h-[13px]'}`,
     1: 'h-[44px]',
     2: 'h-[104px]',
     3: 'h-[224px]',
@@ -194,7 +194,7 @@ export function GridCard({
     5: 'h-[828px]',
   };
   const arrowTop: Record<string, string> = {
-    0: 'top-[12.5px]',
+    0: `${roundsNumber === 3 ? 'top-[37px]' : 'top-[12.5px]'}`,
     1: 'top-[43px]',
     2: 'top-[103px]',
     3: 'top-[223px]',
@@ -217,32 +217,36 @@ export function GridCard({
   };
   // Вывод стрелок на бронзовый матч для соревнований,начинающихся с 1/4-1/32
   const bronzeArrowHeight: Record<string, string> = {
+    3: 'h-[14px]',
     4: 'h-[19px]',
     5: 'h-[79px]',
     6: 'h-[199px]',
     7: 'h-[439px]',
   };
   const bronzeArrowTop: Record<string, string> = {
+    3: 'top-[13px]',
     4: 'top-[18px]',
     5: 'top-[78px]',
     6: 'top-[198px]',
     7: 'top-[438px]',
   };
   const bronzeArrowTopShift: Record<string, string> = {
+    3: 'top-[-31px]',
     4: 'top-[-34px]',
     5: 'top-[-84px]',
     6: 'top-[-201px]',
     7: 'top-[-441px]',
   };
   const bronzeArrowBottomShift: Record<string, string> = {
-    4: 'top-[-53px]',
-    5: 'top-[-119px]',
-    6: 'top-[-243px]',
-    7: 'top-[-487px]',
+    3: 'top-[-39px]',
+    4: 'top-[-54px]',
+    5: 'top-[-104px]',
+    6: 'top-[-215px]',
+    7: 'top-[-451px]',
   };
   //
   const spaceHeight: Record<string, string> = {
-    0: 'h-[4px]',
+    0: `${roundsNumber === 3 ? 'mt-[54px]' : 'mt-[4px]'}`,
     1: 'h-[64px]',
     2: 'h-[136px]',
     3: 'h-[256px]',
@@ -254,7 +258,8 @@ export function GridCard({
   return (
     <li className={cn('group grid cursor-default',
       isPreSemiFinalCol ? 'grid-cols-[122px_381px]':
-      (!isLastCol && !isPreLastCol) ? 'grid-cols-[122px_153px]' : '',
+      (!isLastCol && !isPreLastCol) ? `grid-cols-[122px_153px]` : '',
+      roundsNumber === 3 ? 'last:grid-rows-[1fr_0]' : (roundIndex === 0 || roundIndex === 1) ? '' : 'last:grid-rows-[1fr_40px]',
     )}>
       <div className={cn('flex flex-col', isPreLastCol ? 'mr-2' : '')}>
         <div
@@ -294,10 +299,10 @@ export function GridCard({
       {!(isLastCol || isPreLastCol) && (
         <>
           <div className={cn('relative flex w-full items-end',
-            fight_id % 2 === 0 ? arrowBottomShift[roundIndex] : arrowTopShift[roundIndex])}>
+            fight_index % 2 === 0 ? arrowTopShift[roundIndex] : arrowBottomShift[roundIndex])}>
             <div className="border-Grey102 w-[53px] border-b border-dashed h-full"></div>
             <p className={cn('relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
-              fight_id % 2 === 0 ? 'bottom-[-8px]' : 'top-[7px]'
+              fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]'
             )}>
               <span
                 className={cn(isPlayerFirstWinner && !isDraw ? 'text-white' : '')}
@@ -316,7 +321,7 @@ export function GridCard({
             <div
               className={cn(
                 'border-Grey102 relative w-1/2 border-e border-dashed',
-                fight_id % 2 === 0 ? 'rounded-br-md border-b' : `rounded-tr-md border-t ${arrowTop[roundIndex]}`,
+                fight_index % 2 === 0 ? `rounded-tr-md border-t ${arrowTop[roundIndex]}` : 'rounded-br-md border-b',
                 isLastCol
                   ? 'relative bottom-0 right-[90%] w-[calc(100%+40%)]'
                   : '',
@@ -328,7 +333,7 @@ export function GridCard({
               <Image
                 className={cn(
                   'absolute right-[-4px]  h-[7px] w-[7px]',
-                  fight_id % 2 === 0 ? 'rotate-180 top-[-1px]' : 'bottom-[-1px]'
+                  fight_index % 2 === 0 ? 'bottom-[-1px]' : 'rotate-180 top-[-1px]'
                 )}
                 src={'/ru/images/icons/triangle.svg'}
                 alt=""
@@ -338,16 +343,16 @@ export function GridCard({
           </div>
           <div
             className={cn(
-              'group-last:h-0',
-              isLastCol ? spaceHeight[roundIndex - 1] : spaceHeight[roundIndex]
+              'group-last:h-0 group-last:mt-0',
+                isLastCol ? spaceHeight[roundIndex - 1] : spaceHeight[roundIndex]
             )}
           ></div>
           {isPreSemiFinalCol && (
             <div className={cn('relative flex w-[151px] items-end',
-              fight_id % 2 === 0 ? `${bronzeArrowBottomShift[roundsNumber]} ${arrowBottomShift[roundIndex]}` : `${bronzeArrowTopShift[roundsNumber]} ${arrowTopShift[roundIndex]}`)}>
+              fight_index % 2 === 0 ? `${bronzeArrowTopShift[roundsNumber]} ${arrowTopShift[roundIndex]}` : `${bronzeArrowBottomShift[roundsNumber]} ${arrowBottomShift[roundIndex]}`)}>
               <div className="border-Grey102 w-[53px] border-b border-dashed h-full"></div>
               <p className={cn('relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
-                fight_id % 2 === 0 ? 'bottom-[-8px]' : 'top-[7px]'
+                fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]'
               )}>
                 <span
                   className={cn(isPlayerFirstWinner && !isDraw ? 'text-white' : '')}
@@ -366,14 +371,14 @@ export function GridCard({
               <div
                 className={cn(
                   'border-Grey102 relative w-[60px] border-e border-dashed',
-                  fight_id % 2 === 0 ? 'rounded-br-md border-b' : `rounded-tr-md border-t ${bronzeArrowTop[roundsNumber]}`,
+                  fight_index % 2 === 0 ? `rounded-tr-md border-t ${bronzeArrowTop[roundsNumber]}` : 'rounded-br-md border-b',
                   bronzeArrowHeight[roundsNumber]
                 )}
               >
                 <Image
                   className={cn(
                     'absolute right-[-4px]  h-[7px] w-[7px]',
-                    fight_id % 2 === 0 ? 'rotate-180 top-[-1px]' : 'bottom-[-1px]'
+                    fight_index % 2 === 0 ? 'bottom-[-1px]' : 'rotate-180 top-[-1px]'
                   )}
                   src={'/ru/images/icons/triangle.svg'}
                   alt=""

@@ -1278,7 +1278,7 @@ export const initialGrid: GridRound[] = [
           birthdate: null,
           team_name: 'Нет команды',
           team_id: 0,
-          points: 0,
+          points: 3,
         },
       },
       {
@@ -2764,7 +2764,7 @@ export const initialGrid: GridRound[] = [
           birthdate: null,
           team_name: 'Нет команды',
           team_id: 0,
-          points: 0,
+          points: 2,
         },
         player_2: {
           player_id: 0,
@@ -2773,7 +2773,7 @@ export const initialGrid: GridRound[] = [
           birthdate: null,
           team_name: 'Нет команды',
           team_id: 0,
-          points: 0,
+          points: 4,
         },
       },
       {
@@ -2789,7 +2789,7 @@ export const initialGrid: GridRound[] = [
           birthdate: null,
           team_name: 'Нет команды',
           team_id: 0,
-          points: 0,
+          points: 5,
         },
         player_2: {
           player_id: 0,
@@ -2798,7 +2798,7 @@ export const initialGrid: GridRound[] = [
           birthdate: null,
           team_name: 'Нет команды',
           team_id: 0,
-          points: 0,
+          points: 1,
         },
       },
     ],
