@@ -4,6 +4,7 @@ import '@/app/[lang]/ui/global.css';
 import { Providers } from './providers';
 import { Locale, i18n } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Спортплатформа',
@@ -34,6 +35,7 @@ export default async function RootLayout({
         // suppressHydrationWarning={false} // To switch off warnings
       >
         <Providers dictionary={dictionary}>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );

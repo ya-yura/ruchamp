@@ -169,11 +169,8 @@ export async function fetchOrgEvents(
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`,
       },
-      // cache: 'force-cache',
-      // next: { revalidate: 300 },
       next: { revalidate: 300, tags: ['createEvent'] },
     });
-    // revalidatePath('/events');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error("Error while fetching org's events: ", error);
@@ -215,6 +212,21 @@ export async function createEvent(
 
   if (!response.ok) {
     throw new Error('Failed to create event');
+  }
+
+  return await response.json();
+}
+
+export async function deleteEvent(token: string, id: number): Promise<any> {
+  const response = await fetch(`${baseUrl}/event/delete/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete event');
   }
 
   return await response.json();

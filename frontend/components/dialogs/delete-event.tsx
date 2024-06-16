@@ -1,46 +1,96 @@
-import React from 'react';
+'use client';
+
+import React, { FormEvent, useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
-import { Toaster, toast } from 'sonner';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import { Form } from 'react-hook-form';
+import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Spinner } from '../spinner';
+import { cn } from '@/lib/utils';
+import { deleteEvent } from '@/lib/data';
+import { useRouter } from 'next/navigation';
+import { Locale } from '@/i18n.config';
+import { path } from '@/lib/utils/other-utils';
 
-export function DeleteEventDialog() {
+interface DeleteEventDialogProps {
+  eventId?: number;
+  token?: string;
+  className?: string;
+  lang: Locale;
+}
+
+export function DeleteEventDialog({
+  eventId,
+  token,
+  className,
+  lang,
+}: DeleteEventDialogProps) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+
+  function hangleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setIsLoading(true);
+    if (token && eventId) {
+      deleteEvent(token, eventId)
+        .then(() => {
+          toast.success('Событие успешно удалено');
+          router.push(path(lang, `/org/events`));
+        })
+        .catch((err) => {
+          console.log('Ошибка при удалении события: ', err);
+          toast.error('Что-то пошло не так. Событие не удалено');
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setIsOpen(false);
+        });
+    }
+  }
+
   return (
-    <>
-    </>
-    // <Dialog onOpenChange={(open: boolean) => setIsOpen(!isOpen)} open={isOpen}>
-    //   <Toaster />
-    //   <DialogTrigger asChild>
-    //     {/* <Button className={cn(className)} variant={'ruchampDefault'}>
-    //       Создать событие
-    //     </Button> */}
-    //   </DialogTrigger>
-    //   <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
-    //     <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-    //       <DialogTitle>Событие</DialogTitle>
-    //     </DialogHeader>
-    //     <form>
-    //       <DialogFooter>
-    //         <Button
-    //           className="absolute bottom-[-86px] right-[-24px] text-white"
-    //           variant={'ruchampDefault'}
-    //           type="submit"
-    //           disabled={isLoading}
-    //         >
-    //           {isLoading && <Spinner className="h-6 w-6" />}
-    //           Создать событие
-    //         </Button>
-    //       </DialogFooter>
-    //     </form>
-    //   </DialogContent>
-    // </Dialog>
+    <Dialog onOpenChange={(open: boolean) => setIsOpen(!isOpen)} open={isOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className={cn(className)}
+          variant={'ruchampTransparentGreyBorder'}
+        >
+          Удалить
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="">
+        <DialogHeader className="mb-10">
+          <DialogTitle className="text-xl">
+            Вы уверены, что хотите удалить событие?
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={hangleSubmit}>
+          <DialogFooter className="gap-3 sm:justify-center">
+            <Button
+              variant={'ruchampDefault'}
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading && <Spinner className="h-6 w-6" />}
+              Да
+            </Button>
+            <Button
+              onClick={() => setIsOpen(false)}
+              variant={'ruchampTransparentGreyBorder'}
+              type="button"
+            >
+              Нет
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
