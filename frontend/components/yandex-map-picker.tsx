@@ -1,13 +1,11 @@
-import { cn } from '@/lib/utils';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface YandexMapProps {
   coordinates: [number, number];
-  setCoordinates: Dispatch<SetStateAction<[number, number]>>;
+  setCoordinates: (coordinates: [number, number]) => void;
   className?: string;
 }
 
-// Declare the `window.ymaps` type
 declare global {
   interface Window {
     ymaps: any;
@@ -19,91 +17,69 @@ export function YandexMapPicker({
   setCoordinates,
   className,
 }: YandexMapProps) {
-  const [myMap, setMyMap] = useState<any>(null);
+  const myMap = useRef<any>(null);
 
   useEffect(() => {
     const script = document.createElement('script');
     script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
     script.async = true;
 
+    script.addEventListener('load', initMap);
+
     document.body.appendChild(script);
 
-    script.addEventListener('load', () => {
-      window.ymaps.ready(init);
-    });
+    return () => {
+      if (myMap.current) {
+        myMap.current.destroy();
+      }
+      document.body.removeChild(script);
+    };
+  }, []);
 
-    function init() {
-      const mapInstance = new window.ymaps.Map('map', {
+  const initMap = () => {
+    window.ymaps.ready(() => {
+      myMap.current = new window.ymaps.Map('map', {
         center: coordinates,
         zoom: 10,
       });
 
-      setMyMap(mapInstance);
-
-      // Create a draggable placemark at the center of the map
-      const initialCoords = coordinates;
       const placemark = new window.ymaps.Placemark(
-        initialCoords,
+        coordinates,
         {},
-        {
-          preset: 'islands#icon',
-          iconColor: '#0F6CBD',
-          draggable: true,
-        },
+        { preset: 'islands#icon', iconColor: '#0F6CBD', draggable: true },
       );
 
-      // Add the placemark to the map
-      mapInstance.geoObjects.add(placemark);
+      myMap.current.geoObjects.add(placemark);
 
-      // Listen for drag end event to get the new coordinates
-      placemark.events.add('dragend', function (e: any) {
-        const coords = placemark.geometry.getCoordinates();
-        const [x, y] = coords as [number, number];
-        const fixedX = x.toFixed(6);
-        const fixedY = y.toFixed(6);
-        setCoordinates([+fixedX, +fixedY]);
-        // Update the balloon content with the new coordinates and open it
-        placemark.properties.set(
-          'balloonContent',
-          `Координаты: ${fixedX}, ${fixedY}`,
-        );
-        placemark.balloon.open();
-      });
+      placemark.events.add('dragend', updateCoordinates(placemark));
 
-      // Listen for click event to set the placemark at the clicked location
-      mapInstance.events.add('click', function (e: any) {
-        const coords = e.get('coords') as [number, number];
-        const [x, y] = coords as [number, number];
-        const fixedX = x.toFixed(6);
-        const fixedY = y.toFixed(6);
+      myMap.current.events.add('click', (e: any) => {
+        const coords = e.get('coords');
         placemark.geometry.setCoordinates(coords);
-        setCoordinates([+fixedX, +fixedY]);
-
-        // Update the balloon content with the new coordinates and open it
-        placemark.properties.set(
-          'balloonContent',
-          `Координаты: ${fixedX}, ${fixedY}`,
-        );
-        placemark.balloon.open();
+        updateCoordinates(placemark)();
       });
-    }
+    });
+  };
 
-    return () => {
-      if (myMap) {
-        myMap.destroy(); // Properly destroy the map instance
-      }
-      document.body.removeChild(script);
-    };
-  }, [coordinates]);
+  const updateCoordinates = (placemark: any) => () => {
+    const coords = placemark.geometry.getCoordinates();
+    const [x, y] = coords as [number, number];
+    const fixedX = Number(x.toFixed(6));
+    const fixedY = Number(y.toFixed(6));
+    setCoordinates([fixedX, fixedY]);
+
+    placemark.properties.set(
+      'balloonContent',
+      `Координаты: ${fixedX}, ${fixedY}`,
+    );
+    placemark.balloon.open();
+  };
 
   return (
     <div
-      className={cn(className)}
+      className={className}
       id="map"
-      style={{
-        width: '100%',
-        height: '400px',
-      }}
-    ></div>
+      style={{ width: '100%', height: '400px' }}
+    />
   );
 }
