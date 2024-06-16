@@ -276,9 +276,11 @@ export function RegisterForm({
         </CustomForm>
       </Form>
       <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="gap-6 sm:max-w-[425px]">
+        <DialogContent className="gap-6 bg-white sm:max-w-[425px]">
           <DialogHeader className="gap-4">
-            <DialogTitle>Поздравляем!</DialogTitle>
+            <DialogTitle className="font-bold text-primary-background">
+              Поздравляем!
+            </DialogTitle>
             <DialogDescription>
               Вы успешно зарегистрировались, теперь можно войти на сайт
             </DialogDescription>
