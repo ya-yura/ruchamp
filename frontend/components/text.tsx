@@ -49,7 +49,20 @@ export function H4({ children, className }: TextProps) {
   return (
     <h4
       className={cn(
-        'text-lg font-semibold text-background sm:text-base md:text-lg',
+        'text-lg font-semibold text-background sm:text-base md:text-xl',
+        className,
+      )}
+    >
+      {children}
+    </h4>
+  );
+}
+
+export function H4low({ children, className }: TextProps) {
+  return (
+    <h4
+      className={cn(
+        'text-[18px] font-semibold text-background sm:text-[16px] md:text-[20px] leading-[120%]',
         className,
       )}
     >
