@@ -105,7 +105,7 @@ export function EventsTabs({
           value={tabValue}
           onValueChange={handleTabChange}
         >
-          <div className="flex h-[164px] w-full sm:h-[64px]">
+          <div className="flex w-full sm:h-[64px]">
             <TabsList className="mx-auto mb-5 flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
               {Object.entries(EventTabs).map(([key, value]) => (
                 <TabsTrigger key={value} value={value}>
