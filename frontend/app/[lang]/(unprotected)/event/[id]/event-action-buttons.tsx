@@ -11,6 +11,7 @@ export function EventActionButtons({ isOwner }: EventActionButtonsProps) {
     return (
       <div className="mb-[87px] flex gap-6">
         <Button variant="ruchampDefault">Изменить</Button>
+        <Button variant="ruchampTransparentGreyBorder">Удалить</Button>
         <Button className="group" variant="ruchampTransparent">
           <Image
             className="mr-3 group-hover:invert"

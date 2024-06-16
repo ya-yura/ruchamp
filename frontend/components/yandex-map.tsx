@@ -27,13 +27,25 @@ export function YandexMap({ places, size }: YandexMapProps) {
     });
 
     function init() {
+      const validPlaces = places.filter(
+        (place) => place.geo && place.geo.split(',').length === 2,
+      );
+
+      if (validPlaces.length === 0) {
+        var myMap = new window.ymaps.Map('map', {
+          center: [55.751574, 37.573856],
+          zoom: 10,
+        });
+        return;
+      }
+
       const avgX =
-        places.reduce((acc, place) => acc + +place.geo.split(',')[0], 0) /
-        places.length;
+        validPlaces.reduce((acc, place) => acc + +place.geo.split(',')[0], 0) /
+        validPlaces.length;
       const avgY =
-        places.reduce((acc, place) => acc + +place.geo.split(',')[1], 0) /
-        places.length;
-      const zoom = places.length <= 1 ? 15 : 4;
+        validPlaces.reduce((acc, place) => acc + +place.geo.split(',')[1], 0) /
+        validPlaces.length;
+      const zoom = validPlaces.length <= 1 ? 15 : 4;
 
       // @ts-ignore
       var myMap = new window.ymaps.Map('map', {
@@ -41,7 +53,7 @@ export function YandexMap({ places, size }: YandexMapProps) {
         zoom: zoom,
       });
       // Add placemarks for each location
-      places.forEach((place) => {
+      validPlaces.forEach((place) => {
         // @ts-ignore
         const myPlacemark = new window.ymaps.Placemark(
           [+place.geo.split(',')[0], +place.geo.split(',')[1]],

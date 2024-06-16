@@ -38,7 +38,7 @@ export default async function EventInfoPage({
   }
 
   const eventStartTime = transformDate(event.start_datetime, true);
-  const applicationTime = `${transformDate(event.end_request_datetime)} – ${transformDate(event.end_request_datetime)}`;
+  const applicationTime = `${transformDate(event.end_request_datetime, true)} – ${transformDate(event.end_request_datetime, true)}`;
 
   return (
     <Suspense fallback={<Loading />}>

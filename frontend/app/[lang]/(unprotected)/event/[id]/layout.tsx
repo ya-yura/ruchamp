@@ -64,7 +64,7 @@ export default async function EventPageLayout({
         id={event.id}
         title={event.name}
         badges={event.sports_in_matches}
-        buttons={<EventActionButtons />}
+        buttons={<EventActionButtons isOwner={isOwner} />}
         image={event.image_field}
         isOwner={isOwner}
         tabsData={tabsData}
