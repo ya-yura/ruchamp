@@ -22,6 +22,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'sportplatform.ru',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'unsplash.com',
         port: '',
         pathname: '/**',
