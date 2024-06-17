@@ -22,6 +22,23 @@ export default async function Events({
   ]);
   const dictionary = page.events;
 
+  if (events === null) {
+    return (
+      <Container>
+        <Suspense fallback={<Loading />}>
+          <EventsTabs
+            dictionary={dictionary}
+            lang={lang}
+            sportTypes={sportTypes}
+            futureEvents={[]}
+            pastEvents={[]}
+            errorText={'Произошла ошибка при загрузке событий'}
+          />
+        </Suspense>
+      </Container>
+    );
+  }
+
   const { futureEvents, pastEvents } = divideEventsByDateTime(events);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
   const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');

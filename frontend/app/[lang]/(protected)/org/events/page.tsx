@@ -29,6 +29,25 @@ export default async function OrgEventsPage({
   ]);
   const dictionary = page.events;
 
+  if (orgEvents === null) {
+    return (
+      <Container>
+        <Suspense fallback={<Loading />}>
+          <EventsTabs
+            dictionary={dictionary}
+            lang={lang}
+            sportTypes={sportTypes}
+            futureEvents={[]}
+            pastEvents={[]}
+            isOrg={true}
+            token={token}
+            errorText={'Произошла ошибка при загрузке событий'}
+          />
+        </Suspense>
+      </Container>
+    );
+  }
+
   const { futureEvents, pastEvents } = divideEventsByDateTime(orgEvents);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
   const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
