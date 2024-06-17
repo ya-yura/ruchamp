@@ -35,7 +35,7 @@ export async function fetchEvents(): Promise<Event[] | null> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
       // cache: 'force-cache',
-      next: { revalidate: 300, tags: ['createEvent'] },
+      next: { revalidate: 300, tags: ['events'] },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : null;
@@ -170,7 +170,7 @@ export async function fetchOrgEvents(
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300, tags: ['createEvent'] },
+      next: { revalidate: 300, tags: ['events'] },
     });
     return res.ok ? await res.json() : null;
   } catch (error) {

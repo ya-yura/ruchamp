@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache';
 
 export async function revalidateEvents() {
-  revalidateTag('createEvent');
+  revalidateTag('events');
 }
 
 export async function revalidateEvent(id: number) {
