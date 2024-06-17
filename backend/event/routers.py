@@ -719,8 +719,12 @@ async def delete_event(
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    query = await db.execute(select(Match.id).where(Event.id == event_id))
+    query = await db.execute(
+        select(Match.id)
+        .where(Match.event_id == event_id)
+    )
     matches_in_event = query.scalars().all()
+
     if matches_in_event != []:
         raise HTTPException(status_code=404, detail="Event has matches")
 
