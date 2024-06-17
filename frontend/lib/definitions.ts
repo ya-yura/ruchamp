@@ -225,7 +225,7 @@ export interface Event {
   start_request_datetime: string;
   location: string;
   event_order: string;
-  geo: string;
+  geo: string | null;
   description: string;
   end_datetime: string;
   id: number;
