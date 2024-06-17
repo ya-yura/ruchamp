@@ -112,7 +112,7 @@ async def get_events(
     return result
 
 
-@router.get("/events/me")
+'''@router.get("/events/me")
 async def get_events_me(
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
@@ -146,7 +146,7 @@ async def get_events_me(
     )
     events = query.mappings().all()
 
-    return events
+    return events'''
 
 
 @router.get("/{event_id}/org-info")
@@ -466,6 +466,10 @@ async def get_events_id(
         Event.name,
         EventOrganizer.organization_name.label("organizer_name"),
         EventOrganizer.id.label("organizer_id"),
+        EventOrganizer.contact_phone.label("contact_phone"),
+        EventOrganizer.contact_email.label("contact_email"),
+        EventOrganizer.website.label("website"),
+        EventOrganizer.image_field.label("image"),
         Event.description,
         Event.location,
         Event.start_request_datetime,
@@ -636,17 +640,25 @@ async def update_image_in_event(
                             )
 
     image_name = f"{uuid.uuid4().hex}.{image.filename.split('.')[-1]}"
-    image_path = os.path.join("static/event/", image_name)
+    image_path = os.path.join("static/images", image_name)
 
-    async with async_open(image_path, 'wb') as f:
-        await f.write(await image.read())
+    # Запись файла на диск
+    try:
+        async with async_open(image_path, 'wb') as f:
+            await f.write(await image.read())
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while saving the file: {str(e)}"
+        )
 
-    event.image_field = f"/static/event/{image_name}"
+    event.image_field = f"/static/images/{image_name}"
     await db.commit()
+
     return {f"Event {event_id} updated"}
 
 
-@router.post("/update-geo/{event_id}")
+'''@router.post("/update-geo/{event_id}")
 async def update_geo_in_event(event_id: int,
                               db: AsyncSession = Depends(get_db)):
 
@@ -660,7 +672,7 @@ async def update_geo_in_event(event_id: int,
         Event.id == event_id).values(geo=geo))
 
     await db.commit()
-    return {f"Events {event_id} updated"}
+    return {f"Events {event_id} updated"}'''
 
 
 @router.put("/update/{event_id}")

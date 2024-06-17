@@ -669,6 +669,7 @@ async def get_organizer_events(
         )
         matches_id = query.scalars().all()
         sports_in_matches_info = []
+
         for match_id in matches_id:
             query = await db.execute(
                 select(MatchSport.sport_id)
@@ -683,13 +684,15 @@ async def get_organizer_events(
                 )
                 sport_name = query.scalars().first()
                 sports_in_matches_info.append(sport_name)
-                unique_sports_in_matches_info = list(
+
+        unique_sports_in_matches_info = list(
                     set(sports_in_matches_info)
                 )
 
         event_result = {k: v for k, v in event.items()}
 
         event_result["sports_in_matches"] = unique_sports_in_matches_info
+
         result.append(event_result)
 
     return result

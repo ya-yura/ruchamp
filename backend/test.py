@@ -1,4 +1,4 @@
-import smtplib
+'''import smtplib
 from email.message import EmailMessage
 import logging
 
@@ -115,4 +115,23 @@ def test_send_verification_email():
     send_verification_email(username, email, token)
 
 if __name__ == "__main__":
-    test_send_verification_email()
+    test_send_verification_email()'''
+
+
+# Путь к папке с изображениями
+image_folder = '/images/'
+# Генерация списка имен файлов изображений (1.jpg, 2.jpg, ..., 32.jpg) - сейчас их всего 32
+image_files = [f"{i}.jpg" for i in range(1, 33)]
+
+# Получение всех событий из таблицы Event
+events = session.query(Event).all()
+
+# Обновление поля image_field для каждого события
+for event in events:
+    # Выбор случайного изображения
+    random_image = random.choice(image_files)
+    # Формирование полного пути к изображению
+    event.image_field = os.path.join(image_folder, random_image)
+
+# Сохранение изменений в базе данных
+session.commit()
