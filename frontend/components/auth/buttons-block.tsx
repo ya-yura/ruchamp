@@ -7,5 +7,5 @@ interface ButtonsBlockProps {
 }
 
 export function ButtonsBlock({ className, children }: ButtonsBlockProps) {
-  return <div className={cn('flex flex-col sm:flex-row items-center justify-between gap-4', className)}>{children}</div>;
+  return <div className={cn('flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4', className)}>{children}</div>;
 }
