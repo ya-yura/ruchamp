@@ -10,6 +10,7 @@ import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
 import { CreateEventSchema } from '@/components/dialogs/create-event';
+import { UpdateEventImageSchema } from '@/components/dialogs/update-event-image';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -233,6 +234,31 @@ export async function updateEvent(
 
   if (!response.ok) {
     throw new Error('Failed to update event');
+  }
+
+  return await response.json();
+}
+
+export async function updateEventImage(
+  token: string,
+  values: UpdateEventImageSchema,
+  id: number,
+): Promise<void | Response> {
+  const formData = new FormData();
+  if (values.image instanceof File) {
+    formData.append('image', values.image);
+  }
+
+  const response = await fetch(`${baseUrl}/event/update-image/${id}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update event image');
   }
 
   return await response.json();

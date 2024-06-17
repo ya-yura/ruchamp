@@ -60,32 +60,32 @@ export const createEventSchema = z.object({
   location: z.string(),
   geo: z.string(),
   description: z.string().min(10, {
-    message: 'Bio must be at least 10 characters.',
+    message: 'Минимальная длина описания – 10 символов',
   }),
   event_order: z
     .any()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
+    }, 'Файл должен быть менее 5MB')
     .refine((file) => {
       return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
-    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
+    }, 'Допустимые форматы файлов: .pdf, .doc, .docx, .txt'),
   event_system: z
     .any()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
+    }, 'Файл должен быть менее 5MB')
     .refine((file) => {
       return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
-    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
+    }, 'Допустимые форматы файлов: .pdf, .doc, .docx, .txt'),
   image: z
     .any()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
+    }, 'Файл должен быть менее 5MB')
     .refine((file) => {
       return ACCEPTED_IMG_FILE_TYPES.includes(file?.type);
-    }, 'File must be a .png or .jpg'),
+    }, 'Файл должен быть формата .png или .jpg'),
 });
 
 export type CreateEventSchema = z.infer<typeof createEventSchema>;

@@ -28,9 +28,6 @@ import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
 import { updateEvent } from '@/lib/data';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
-// import revalidateEvents from '@/lib/actions';
-import { useRouter } from 'next/navigation';
-import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
 import { YandexMapPicker } from '../yandex-map-picker';
 import { revalidateEvent } from '@/lib/actions';
@@ -50,7 +47,7 @@ export const updateEventSchema = z.object({
   location: z.string(),
   geo: z.string(),
   description: z.string().min(10, {
-    message: 'Bio must be at least 10 characters.',
+    message: 'Минимальная длина описания – 10 символов',
   }),
 });
 
@@ -124,7 +121,6 @@ export function UpdateEventDialog({
           setIsOpen(false);
           toast.success('Событие успешно обновлено');
           revalidateEvent(eventId);
-          // form.reset();
         })
         .catch((err) => {
           console.log('Ошибка при обновлении события: ', err);
