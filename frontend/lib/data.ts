@@ -32,14 +32,14 @@ export async function fetchSportTypes(): Promise<string[]> {
 
 // Events
 
-export async function fetchEvents(): Promise<Event[]> {
+export async function fetchEvents(): Promise<Event[] | null> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
       // cache: 'force-cache',
       next: { revalidate: 300, tags: ['createEvent'] },
     });
     // revalidatePath('/events');
-    return res.ok ? await res.json() : [];
+    return res.ok ? await res.json() : null;
   } catch (error) {
     console.error('Error while fetching events:', error);
     throw new Error('Failed to fetch events.');
@@ -157,7 +157,7 @@ export async function fetchTeamResults(
 
 export async function fetchOrgEvents(
   token: string | undefined,
-): Promise<Event[]> {
+): Promise<Event[] | null> {
   if (!token) {
     console.error('Something wrong with token');
     return [];
@@ -171,7 +171,7 @@ export async function fetchOrgEvents(
       },
       next: { revalidate: 300, tags: ['createEvent'] },
     });
-    return res.ok ? await res.json() : [];
+    return res.ok ? await res.json() : null;
   } catch (error) {
     console.error("Error while fetching org's events: ", error);
     throw new Error("Failed to fetch org's events.");

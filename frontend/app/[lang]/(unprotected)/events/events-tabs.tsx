@@ -27,6 +27,7 @@ interface EventTabsProps {
   pastEvents: Event[];
   isOrg?: boolean;
   token?: string;
+  errorText?: string;
 }
 
 enum EventTabs {
@@ -42,6 +43,7 @@ export function EventsTabs({
   pastEvents,
   isOrg,
   token,
+  errorText,
 }: EventTabsProps) {
   const [tabValue, setTabValue] = useState<EventTabs>(EventTabs.FUTURE_EVENTS);
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([]);
@@ -153,7 +155,7 @@ export function EventsTabs({
             <TabsContent key={value} value={value}>
               {filteredEvents.length === 0 && (
                 <p className="mb-5 text-base text-background">
-                  Ничего не найдено
+                  {errorText ? errorText : 'Ничего не найдено'}
                 </p>
               )}
               {isMapMode ? (
@@ -167,15 +169,15 @@ export function EventsTabs({
                   {isFirstCardBig && !!filteredEvents.length && (
                     <ul className="mb-10">
                       <BigCardWithImage
-                        key={filteredEvents[0].id}
+                        key={filteredEvents[0]?.id}
                         type={'event'}
-                        id={filteredEvents[0].id}
-                        name={filteredEvents[0].name}
-                        tags={filteredEvents[0].sports_in_matches.join(', ')}
-                        title={transformDate(filteredEvents[0].start_datetime)}
-                        subtitle={filteredEvents[0].location}
-                        description={filteredEvents[0].description}
-                        image={filteredEvents[0].image_field}
+                        id={filteredEvents[0]?.id}
+                        name={filteredEvents[0]?.name}
+                        tags={filteredEvents[0]?.sports_in_matches.join(', ')}
+                        title={transformDate(filteredEvents[0]?.start_datetime)}
+                        subtitle={filteredEvents[0]?.location}
+                        description={filteredEvents[0]?.description}
+                        image={filteredEvents[0]?.image_field}
                         lang={lang}
                       />
                     </ul>
