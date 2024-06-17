@@ -33,7 +33,9 @@ export function filterDuplicates<T extends Record<string, any>>(
   return Array.from(uniqueDataMap.values());
 }
 
-export function filterUniqueDisplayedValues(data: ValueOption[]): ValueOption[] {
+export function filterUniqueDisplayedValues(
+  data: ValueOption[],
+): ValueOption[] {
   const seenDisplayedValues = new Set<string>();
   return data.filter((item) => {
     if (seenDisplayedValues.has(item.displayedValue)) {
@@ -50,10 +52,11 @@ export function checkResponse(res: any) {
 }
 
 export function getExpectedEvents(
-  events: Event[],
+  events: Event[] | null,
   randomInt: number,
   maxEvents: number,
 ): Event[] {
+  if (events === null) return [];
   if (events.length > 3) {
     return events.slice(randomInt, randomInt + maxEvents);
   }

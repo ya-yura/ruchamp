@@ -103,7 +103,7 @@ export function Hero({
           <div className="relative flex flex-col gap-10">
             <div>
               <H1 className="inline">{title}</H1>
-              {isOwner && (
+              {/* {isOwner && (
                 <Button variant={'ghost'}>
                   <Image
                     className="ml- inline"
@@ -113,7 +113,7 @@ export function Hero({
                     height={32}
                   />
                 </Button>
-              )}
+              )} */}
             </div>
             {buttons}
           </div>

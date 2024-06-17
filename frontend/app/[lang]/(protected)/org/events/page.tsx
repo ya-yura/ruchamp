@@ -3,12 +3,7 @@ import Loading from './loading';
 import { Container } from '@/components/container';
 import { EventsTabs } from '@/app/[lang]/(unprotected)/events/events-tabs';
 import { getDictionary } from '@/lib/dictionary';
-import {
-  fetchEvent,
-  fetchEvents,
-  fetchOrgEvents,
-  fetchSportTypes,
-} from '@/lib/data';
+import { fetchOrgEvents, fetchSportTypes } from '@/lib/data';
 import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
 import { sortedEventsByDate } from '@/lib/utils/filters';
 import { Locale } from '@/i18n.config';

@@ -68,7 +68,7 @@ export default async function EventPageLayout({
         buttons={
           <EventActionButtons
             token={token}
-            eventId={event.id}
+            event={event}
             isOwner={isOwner}
             lang={lang}
           />
@@ -80,7 +80,7 @@ export default async function EventPageLayout({
       />
       {children}
       <AddressSection event={event} />
-      {events.length > 0 && (
+      {events && !!events.length && (
         <ExpectedEvents events={expectedEvents} lang={lang} />
       )}
     </Container>

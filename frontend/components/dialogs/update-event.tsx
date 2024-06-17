@@ -1,3 +1,5 @@
+'use client';
+
 import React, {
   Dispatch,
   ReactNode,
@@ -32,26 +34,13 @@ import { useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
 
-const CreateEventTabs = {
+const UpdateEventTabs = {
   Name: 'Название',
   Time: 'Время',
   Location: 'Место',
-  Docs: 'Документы',
 } as const;
 
-type CreateEventTabsKeys =
-  (typeof CreateEventTabs)[keyof typeof CreateEventTabs];
-
-const MAX_UPLOAD_SIZE = 1024 * 1024 * 5; // 5MB
-const ACCEPTED_IMG_FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
-const ACCEPTED_DOC_FILE_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
-];
-
-export const createEventSchema = z.object({
+export const updateEventSchema = z.object({
   name: z.string(),
   start_datetime: z.string(),
   end_datetime: z.string(),
@@ -62,45 +51,29 @@ export const createEventSchema = z.object({
   description: z.string().min(10, {
     message: 'Bio must be at least 10 characters.',
   }),
-  event_order: z
-    .any()
-    .refine((file) => {
-      return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
-    .refine((file) => {
-      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
-    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
-  event_system: z
-    .any()
-    .refine((file) => {
-      return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
-    .refine((file) => {
-      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
-    }, 'File must be one of the folling: .pdf, .doc, .docx, .txt'),
-  image: z
-    .any()
-    .refine((file) => {
-      return !file || file.size <= MAX_UPLOAD_SIZE;
-    }, 'File size must be less than 5MB')
-    .refine((file) => {
-      return ACCEPTED_IMG_FILE_TYPES.includes(file?.type);
-    }, 'File must be a .png or .jpg'),
 });
 
-export type CreateEventSchema = z.infer<typeof createEventSchema>;
+export type UpdateEventSchema = z.infer<typeof updateEventSchema>;
 
-interface CreateEventDialogProps {
+interface UpdateEventDialogProps {
   token?: string;
+  name: string;
+  start_datetime: string;
+  end_datetime: string;
+  start_request_datetime: string;
+  end_request_datetime: string;
+  location: string;
+  geo: string;
+  description: string;
   lang: Locale;
   className?: string;
 }
 
-export function CreateEventDialog({
+export function UpdateEventDialog({
   token,
   lang,
   className,
-}: CreateEventDialogProps) {
+}: UpdateEventDialogProps) {
   const [tabValue, setTabValue] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -109,8 +82,8 @@ export function CreateEventDialog({
   ]);
   const router = useRouter();
 
-  const form = useForm<CreateEventSchema>({
-    resolver: zodResolver(createEventSchema),
+  const form = useForm<UpdateEventSchema>({
+    resolver: zodResolver(updateEventSchema),
     defaultValues: {
       name: '',
       start_datetime: '',
@@ -120,9 +93,6 @@ export function CreateEventDialog({
       location: '',
       geo: '55.751574, 37.573856',
       description: '',
-      event_order: '',
-      event_system: '',
-      image: '',
     },
   });
 
@@ -134,7 +104,7 @@ export function CreateEventDialog({
     setTabValue(value);
   }, []);
 
-  function onSubmit(values: CreateEventSchema): void {
+  function onSubmit(values: UpdateEventSchema): void {
     setIsLoading(true);
     if (token) {
       createEvent(token, values)
@@ -155,8 +125,8 @@ export function CreateEventDialog({
     }
   }
 
-  const CreateEventTabsContent: Record<
-    keyof typeof CreateEventTabs,
+  const UpdateEventTabsContent: Record<
+    keyof typeof UpdateEventTabs,
     ReactNode
   > = {
     Name: <NameFieldset form={form} />,
@@ -168,19 +138,18 @@ export function CreateEventDialog({
         setCoordinates={setCoordinates}
       />
     ),
-    Docs: <DocsFieldset form={form} />,
   } as const;
 
   return (
     <Dialog onOpenChange={(open: boolean) => setIsOpen(!isOpen)} open={isOpen}>
       <DialogTrigger asChild>
         <Button className={cn(className)} variant={'ruchampDefault'}>
-          Создать событие
+          Изменить
         </Button>
       </DialogTrigger>
       <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-          <DialogTitle>Событие</DialogTitle>
+          <DialogTitle>Изменить событие</DialogTitle>
         </DialogHeader>
         <Tabs
           className="relative mx-auto w-full"
@@ -189,7 +158,7 @@ export function CreateEventDialog({
         >
           <div className="absolute top-[-60px] flex h-[36px] w-full">
             <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
-              {Object.entries(CreateEventTabs).map(([key, value]) => (
+              {Object.entries(UpdateEventTabs).map(([key, value]) => (
                 <TabsTrigger key={key} value={key}>
                   {value}
                 </TabsTrigger>
@@ -201,7 +170,7 @@ export function CreateEventDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3"
             >
-              {Object.entries(CreateEventTabsContent).map(([key, value]) => (
+              {Object.entries(UpdateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
                   {value}
                 </TabsContent>
@@ -214,7 +183,7 @@ export function CreateEventDialog({
                   disabled={isLoading}
                 >
                   {isLoading && <Spinner className="h-6 w-6" />}
-                  Создать событие
+                  Обновить данные
                 </Button>
               </DialogFooter>
             </CustomForm>
@@ -225,8 +194,8 @@ export function CreateEventDialog({
   );
 }
 
-function NameFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
-  const nameFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+function NameFieldset({ form }: { form: UseFormReturn<UpdateEventSchema> }) {
+  const nameFieldsetData: TypeFieldsetData<UpdateEventSchema> = {
     fields: [
       {
         type: 'text',
@@ -241,25 +210,19 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
         label: 'Описание',
         inputStyles: 'h-[250px] min-h-[250px]',
       },
-      {
-        type: 'file',
-        name: 'image',
-        placeholder: 'Картинка',
-        label: 'Афиша',
-      },
     ],
   };
 
   return (
-    <CustomFieldset<CreateEventSchema>
+    <CustomFieldset<UpdateEventSchema>
       form={form}
       fieldsetData={nameFieldsetData}
     />
   );
 }
 
-function TimeFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
-  const timeFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+function TimeFieldset({ form }: { form: UseFormReturn<UpdateEventSchema> }) {
+  const timeFieldsetData: TypeFieldsetData<UpdateEventSchema> = {
     fields: [
       {
         type: 'datetime-local',
@@ -293,7 +256,7 @@ function TimeFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
   };
 
   return (
-    <CustomFieldset<CreateEventSchema>
+    <CustomFieldset<UpdateEventSchema>
       className="gap-10"
       form={form}
       fieldsetData={timeFieldsetData}
@@ -302,7 +265,7 @@ function TimeFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
 }
 
 interface LocationFieldsetProps {
-  form: UseFormReturn<CreateEventSchema>;
+  form: UseFormReturn<UpdateEventSchema>;
   coordinates: [number, number];
   setCoordinates: Dispatch<SetStateAction<[number, number]>>;
 }
@@ -312,7 +275,7 @@ function LocationFieldset({
   coordinates,
   setCoordinates,
 }: LocationFieldsetProps) {
-  const locationFieldsetData: TypeFieldsetData<CreateEventSchema> = {
+  const locationFieldsetData: TypeFieldsetData<UpdateEventSchema> = {
     fields: [
       {
         type: 'text',
@@ -332,7 +295,7 @@ function LocationFieldset({
 
   return (
     <>
-      <CustomFieldset<CreateEventSchema>
+      <CustomFieldset<UpdateEventSchema>
         form={form}
         fieldsetData={locationFieldsetData}
       />
@@ -342,31 +305,5 @@ function LocationFieldset({
         setCoordinates={setCoordinates}
       />
     </>
-  );
-}
-
-function DocsFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
-  const docsFieldsetData: TypeFieldsetData<CreateEventSchema> = {
-    fields: [
-      {
-        type: 'file',
-        name: 'event_order',
-        placeholder: 'Загрузить устав',
-        label: 'Загрузить устав',
-      },
-      {
-        type: 'file',
-        name: 'event_system',
-        placeholder: 'Заргрузить отчёт',
-        label: 'Загрузить отчёт',
-      },
-    ],
-  };
-
-  return (
-    <CustomFieldset<CreateEventSchema>
-      form={form}
-      fieldsetData={docsFieldsetData}
-    />
   );
 }
