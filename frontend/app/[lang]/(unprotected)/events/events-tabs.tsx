@@ -151,11 +151,11 @@ export function EventsTabs({
 
           {Object.entries(EventTabs).map(([key, value]) => (
             <TabsContent key={value} value={value}>
-              {/* <p className="mb-5 text-base text-background">
-                {!!filteredEvents.length
-                  ? `Найдено: ${filteredEvents.length}`
-                  : 'Ничего не найдено'}
-              </p> */}
+              {filteredEvents.length === 0 && (
+                <p className="mb-5 text-base text-background">
+                  Ничего не найдено
+                </p>
+              )}
               {isMapMode ? (
                 <YandexMap
                   key={mapKey} // This key is to reload map with new data
@@ -164,7 +164,7 @@ export function EventsTabs({
                 />
               ) : (
                 <>
-                  {isFirstCardBig && (
+                  {isFirstCardBig && !!filteredEvents.length && (
                     <ul className="mb-10">
                       <BigCardWithImage
                         key={filteredEvents[0].id}
