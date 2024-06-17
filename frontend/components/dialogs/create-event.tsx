@@ -27,7 +27,7 @@ import { createEvent } from '@/lib/data';
 import { YandexMapPicker } from '../yandex-map-picker';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
-import revalidateEvents from '@/lib/actions';
+import { revalidateEvents } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
@@ -337,6 +337,7 @@ function LocationFieldset({
         fieldsetData={locationFieldsetData}
       />
       <YandexMapPicker
+        mapId="createEvent"
         className="mt-5"
         coordinates={coordinates}
         setCoordinates={setCoordinates}

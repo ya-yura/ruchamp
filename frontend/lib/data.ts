@@ -5,12 +5,10 @@ import {
   TeamMatch,
   TeamMemberWithResults,
 } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import { revalidatePath, revalidateTag } from 'next/cache';
 import { EventResult } from '@/app/[lang]/(unprotected)/event/[id]/results/page';
 import { GridData } from '@/app/[lang]/(unprotected)/event/[id]/matches/[matchId]/page';
 import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matches-event';
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
-import { checkResponse } from './utils/other-utils';
 import { CreateEventSchema } from '@/components/dialogs/create-event';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -48,7 +46,9 @@ export async function fetchEvents(): Promise<Event[] | null> {
 
 export async function fetchEvent(id: string): Promise<Event | null> {
   try {
-    const res = await fetch(`${baseUrl}/event/${id}`, {});
+    const res = await fetch(`${baseUrl}/event/${id}`, {
+      next: { revalidate: 300, tags: [`update-event-${id}`] },
+    });
     const event = await res.json();
     return res.ok ? event[0] : null;
   } catch (error) {
@@ -212,6 +212,27 @@ export async function createEvent(
 
   if (!response.ok) {
     throw new Error('Failed to create event');
+  }
+
+  return await response.json();
+}
+
+export async function updateEvent(
+  token: string,
+  values: CreateEventSchema,
+  id: number,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/event/update/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update event');
   }
 
   return await response.json();

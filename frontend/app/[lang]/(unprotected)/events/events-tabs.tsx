@@ -161,6 +161,7 @@ export function EventsTabs({
               {isMapMode ? (
                 <YandexMap
                   key={mapKey} // This key is to reload map with new data
+                  mapId="eventsMap"
                   places={filteredEvents}
                   size={{ width: '100%', height: '50vh' }}
                 />

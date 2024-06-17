@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Locale } from '@/i18n.config';
 import { Event } from '@/lib/definitions';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface EventActionButtonsProps {
   event: Event;
@@ -25,6 +25,7 @@ export function EventActionButtons({
         {/* <Button variant="ruchampDefault">Изменить</Button> */}
         <UpdateEventDialog
           token={token}
+          eventId={event.id}
           name={event.name}
           start_datetime={event.start_datetime}
           end_datetime={event.end_datetime}

@@ -25,14 +25,15 @@ import { UseFormReturn, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
-import { createEvent } from '@/lib/data';
-import { YandexMapPicker } from '../yandex-map-picker';
+import { updateEvent } from '@/lib/data';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
-import revalidateEvents from '@/lib/actions';
+// import revalidateEvents from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
+import { YandexMapPicker } from '../yandex-map-picker';
+import { revalidateEvent } from '@/lib/actions';
 
 const UpdateEventTabs = {
   Name: 'Название',
@@ -57,13 +58,14 @@ export type UpdateEventSchema = z.infer<typeof updateEventSchema>;
 
 interface UpdateEventDialogProps {
   token?: string;
+  eventId: number;
   name: string;
   start_datetime: string;
   end_datetime: string;
   start_request_datetime: string;
   end_request_datetime: string;
   location: string;
-  geo: string;
+  geo: string | null;
   description: string;
   lang: Locale;
   className?: string;
@@ -71,28 +73,38 @@ interface UpdateEventDialogProps {
 
 export function UpdateEventDialog({
   token,
+  eventId,
+  name,
+  start_datetime,
+  end_datetime,
+  start_request_datetime,
+  end_request_datetime,
+  location,
+  geo,
+  description,
   lang,
   className,
 }: UpdateEventDialogProps) {
   const [tabValue, setTabValue] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [coordinates, setCoordinates] = useState<[number, number]>([
-    55.751574, 37.573856,
-  ]);
-  const router = useRouter();
+  const [coordinates, setCoordinates] = useState<[number, number]>(
+    geo
+      ? (geo.split(', ').map((i) => +i) as [number, number])
+      : [55.751574, 37.573856], // Will be Moscow if geo is null
+  );
 
   const form = useForm<UpdateEventSchema>({
     resolver: zodResolver(updateEventSchema),
     defaultValues: {
-      name: '',
-      start_datetime: '',
-      end_datetime: '',
-      start_request_datetime: '',
-      end_request_datetime: '',
-      location: '',
-      geo: '55.751574, 37.573856',
-      description: '',
+      name: name,
+      start_datetime: start_datetime,
+      end_datetime: end_datetime,
+      start_request_datetime: start_request_datetime,
+      end_request_datetime: end_request_datetime,
+      location: location,
+      geo: geo || '55.751574, 37.573856',
+      description: description,
     },
   });
 
@@ -107,18 +119,15 @@ export function UpdateEventDialog({
   function onSubmit(values: UpdateEventSchema): void {
     setIsLoading(true);
     if (token) {
-      createEvent(token, values)
-        .then((id) => {
+      updateEvent(token, values, eventId)
+        .then(() => {
           setIsOpen(false);
-          toast.success(
-            'Событие успешно создано. Вы будете перенаправлены на него',
-          );
-          revalidateEvents();
-          form.reset();
-          router.push(path(lang, `/event/${id}/info`));
+          toast.success('Событие успешно обновлено');
+          revalidateEvent(eventId);
+          // form.reset();
         })
         .catch((err) => {
-          console.log('Ошибка при создании события: ', err);
+          console.log('Ошибка при обновлении события: ', err);
           toast.error('Что-то пошло не так');
         })
         .finally(() => setIsLoading(false));
@@ -303,6 +312,7 @@ function LocationFieldset({
         className="mt-5"
         coordinates={coordinates}
         setCoordinates={setCoordinates}
+        mapId="updateEvent"
       />
     </>
   );

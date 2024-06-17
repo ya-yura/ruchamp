@@ -4,11 +4,13 @@ interface YandexMapProps {
   coordinates: [number, number];
   setCoordinates: (coordinates: [number, number]) => void;
   className?: string;
+  mapId: string; // Unique ID for the map container
 }
 
 declare global {
   interface Window {
     ymaps: any;
+    ymapsLoaded: boolean;
   }
 }
 
@@ -16,31 +18,43 @@ export function YandexMapPicker({
   coordinates,
   setCoordinates,
   className,
+  mapId,
 }: YandexMapProps) {
   const myMap = useRef<any>(null);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
-    script.async = true;
+    const loadYandexMaps = () => {
+      return new Promise((resolve, reject) => {
+        if (window.ymaps) {
+          resolve(window.ymaps);
+          return;
+        }
 
-    script.addEventListener('load', initMap);
+        const script = document.createElement('script');
+        script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
+        script.async = true;
+        script.onload = () => resolve(window.ymaps);
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    };
 
-    document.body.appendChild(script);
+    loadYandexMaps().then(() => {
+      window.ymaps.ready(initMap);
+    });
 
     return () => {
       if (myMap.current) {
         myMap.current.destroy();
       }
-      document.body.removeChild(script);
     };
   }, []);
 
   const initMap = () => {
     window.ymaps.ready(() => {
-      myMap.current = new window.ymaps.Map('map', {
+      myMap.current = new window.ymaps.Map(mapId, {
         center: coordinates,
-        zoom: 10,
+        zoom: 13,
       });
 
       const placemark = new window.ymaps.Placemark(
@@ -78,7 +92,7 @@ export function YandexMapPicker({
   return (
     <div
       className={className}
-      id="map"
+      id={mapId}
       style={{ width: '100%', height: '400px' }}
     />
   );

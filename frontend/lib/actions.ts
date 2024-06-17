@@ -2,6 +2,10 @@
 
 import { revalidateTag } from 'next/cache';
 
-export default async function revalidateEvents() {
+export async function revalidateEvents() {
   revalidateTag('createEvent');
+}
+
+export async function revalidateEvent(id: number) {
+  revalidateTag(`update-event-${id}`);
 }
