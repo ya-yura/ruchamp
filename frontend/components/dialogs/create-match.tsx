@@ -20,9 +20,10 @@ import { z } from 'zod';
 import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
-import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n.config';
 import { RangeSlider } from '@/app/[lang]/(unprotected)/teams/range-slider';
+import { createMatch } from '@/lib/data';
+import { revalidateEvent, revalidateEvents } from '@/lib/actions';
 
 const toNumber = (val: unknown) => {
   const num = Number(val);
@@ -78,6 +79,7 @@ const CreateMatchTabs: Record<string, string> = {
 };
 interface CreateMatchDialogProps {
   token?: string;
+  eventId: string;
   sportTypes: string[];
   lang: Locale;
   className?: string;
@@ -85,6 +87,7 @@ interface CreateMatchDialogProps {
 
 export function CreateMatchDialog({
   token,
+  eventId,
   sportTypes,
   lang,
   className,
@@ -94,8 +97,6 @@ export function CreateMatchDialog({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [ages, setAges] = useState<number[]>([]);
   const [weights, setWeights] = useState<number[]>([]);
-
-  const router = useRouter();
 
   const weightRange = [20, 150];
   const ageRange = [3, 100];
@@ -139,24 +140,22 @@ export function CreateMatchDialog({
   }
 
   function onSubmit(values: CreateMatchSchema): void {
-    // setIsLoading(true);
+    setIsLoading(true);
     if (token) {
-      console.log(values);
-      //   createEvent(token, values)
-      //     .then((id) => {
-      //       setIsOpen(false);
-      //       toast.success(
-      //         'Событие успешно создано. Вы будете перенаправлены на него',
-      //       );
-      //       revalidateEvents();
-      //       form.reset();
-      //       router.push(path(lang, `/event/${id}/info`));
-      //     })
-      //     .catch((err) => {
-      //       console.log('Ошибка при создании события: ', err);
-      //       toast.error('Что-то пошло не так');
-      //     })
-      //     .finally(() => setIsLoading(false));
+      createMatch(token, values, eventId)
+        .then(() => {
+          setIsOpen(false);
+          toast.success('Мероприятие успешно создано');
+          revalidateEvents();
+          revalidateEvent(eventId);
+          form.reset();
+          setTabValue('1');
+        })
+        .catch((err) => {
+          console.log('Ошибка при создании мероприятия: ', err);
+          toast.error('Что-то пошло не так');
+        })
+        .finally(() => setIsLoading(false));
     }
   }
 
@@ -225,18 +224,7 @@ export function CreateMatchDialog({
                       Назад
                     </Button>
                   )}
-
-                  {+tabValue === Object.keys(CreateMatchTabs).length ? (
-                    <Button
-                      className="text-white"
-                      variant={'ruchampDefault'}
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      {isLoading && <Spinner className="h-6 w-6" />}
-                      Создать
-                    </Button>
-                  ) : (
+                  {+tabValue !== Object.keys(CreateMatchTabs).length && (
                     <Button
                       className="text-white"
                       type="button"
@@ -245,6 +233,17 @@ export function CreateMatchDialog({
                       onClick={handleNextClick}
                     >
                       Далее
+                    </Button>
+                  )}
+                  {+tabValue === Object.keys(CreateMatchTabs).length && (
+                    <Button
+                      className="text-white"
+                      variant={'ruchampDefault'}
+                      type="submit"
+                      disabled={isLoading}
+                    >
+                      {isLoading && <Spinner className="h-6 w-6" />}
+                      Создать
                     </Button>
                   )}
                 </div>
@@ -365,12 +364,12 @@ function MatchCriteriaFieldset({
         fieldStyles: 'col-span-6',
         selectOptions: [
           {
-            value: 'Мужской',
-            option: 'Мужской',
+            value: 'Мужчины',
+            option: 'Мужчины',
           },
           {
-            value: 'Женский',
-            option: 'Женский',
+            value: 'Женщины',
+            option: 'Женщины',
           },
         ],
       },
@@ -459,7 +458,7 @@ function MatchCriteriaFieldset({
 }
 
 function TicketsFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
-  const docsFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
+  const ticketsFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
     fields: [
       {
         type: 'number',
@@ -496,7 +495,7 @@ function TicketsFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
     <>
       <CustomFieldset<CreateMatchSchema>
         form={form}
-        fieldsetData={docsFieldsetData}
+        fieldsetData={ticketsFieldsetData}
       />
       <p className="absolute bottom-7 right-0 w-[56%] text-xs leading-[20px] text-NeutralBackground4Rest sm:text-sm">
         Если у вас несколько мероприятий подряд и вы рассчитываете провести их

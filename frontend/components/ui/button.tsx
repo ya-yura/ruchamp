@@ -23,7 +23,7 @@ const buttonVariants = cva(
         ruchampTransparent:
           'border border-input bg-transparent text-white hover:bg-accent hover:text-accent-foreground',
         ruchampTransparentGreyBorder:
-          'border border-input bg-transparent text-white text-base font-semibold hover:bg-accent hover:text-accent-foreground border-border',
+          'border border-input bg-transparent text-white text-base font-semibold hover:bg-accent hover:text-accent-foreground border-border dark:border-white',
         ruchampTransparentRedBorder:
           'border border-input bg-transparent text-white text-base  font-semibold hover:bg-accent hover:text-accent-foreground border-destructive/90',
       },
