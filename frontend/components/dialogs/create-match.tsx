@@ -35,10 +35,10 @@ import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
 
 const CreateMatchTabs = {
-  Name: 'Название и время',
-  SportType: 'Вид спорта',
-  Criteria: 'Критерии',
-  Tickets: 'Проведение и билеты',
+  1: 'Название и время',
+  2: 'Вид спорта',
+  3: 'Критерии',
+  4: 'Проведение и билеты',
 } as const;
 
 export const createMatchSchema = z.object({
@@ -127,10 +127,10 @@ export function CreateMatchDialog({
     keyof typeof CreateMatchTabs,
     ReactNode
   > = {
-    Name: <NameFieldset form={form} />,
-    SportType: <NameFieldset form={form} />,
-    Criteria: <NameFieldset form={form} />,
-    Tickets: <NameFieldset form={form} />,
+    1: <NameFieldset form={form} />,
+    2: <NameFieldset form={form} />,
+    3: <NameFieldset form={form} />,
+    4: <NameFieldset form={form} />,
   } as const;
 
   return (
@@ -169,15 +169,33 @@ export function CreateMatchDialog({
                 </TabsContent>
               ))}
               <DialogFooter>
-                <Button
-                  className="absolute bottom-[-86px] right-[-24px] text-white"
-                  variant={'ruchampDefault'}
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading && <Spinner className="h-6 w-6" />}
-                  Создать мероприятие
-                </Button>
+                {+tabValue === Object.keys(CreateMatchTabs).length ? (
+                  <Button
+                    className="absolute bottom-[-86px] right-[-24px] text-white"
+                    variant={'ruchampDefault'}
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Spinner className="h-6 w-6" />}
+                    Создать
+                  </Button>
+                ) : (
+                  <div className="absolute bottom-[-86px] right-[-24px] flex gap-3">
+                    <Button
+                      className="text-white"
+                      variant={'ruchampTransparentGreyBorder'}
+                    >
+                      Назад
+                    </Button>
+                    <Button
+                      className="text-white"
+                      variant={'ruchampDefault'}
+                      disabled={false}
+                    >
+                      Далее
+                    </Button>
+                  </div>
+                )}
               </DialogFooter>
             </CustomForm>
           </Form>
