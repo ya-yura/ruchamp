@@ -79,10 +79,10 @@ export default async function EventPageLayout({
         lang={lang}
       />
       {children}
-      {/* <AddressSection event={event} />
+      <AddressSection event={event} />
       {events && !!events.length && (
         <ExpectedEvents events={expectedEvents} lang={lang} />
-      )} */}
+      )}
     </Container>
   );
 }

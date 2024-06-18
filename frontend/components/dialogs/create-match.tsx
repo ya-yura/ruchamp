@@ -24,6 +24,7 @@ import { Locale } from '@/i18n.config';
 import { RangeSlider } from '@/app/[lang]/(unprotected)/teams/range-slider';
 import { createMatch } from '@/lib/data';
 import { revalidateEvent, revalidateEvents } from '@/lib/actions';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 
 const toNumber = (val: unknown) => {
   const num = Number(val);
@@ -278,14 +279,15 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
         name: 'start_datetime',
         placeholder: 'Начало',
         label: 'Начало',
+        fieldStyles: 'col-span-4',
       },
       {
         type: 'select',
         name: 'nominal_time',
         placeholder: 'Выберите время',
         label: 'Номинальное время проведения одного соревнования',
-        fieldStyles: 'w-fit',
-        inputStyles: 'w-fit',
+        fieldStyles: 'w-full col-span-8',
+        inputStyles: 'w-full',
         selectOptions: timeSelectOptions,
       },
     ],
@@ -293,6 +295,7 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
 
   return (
     <CustomFieldset<CreateMatchSchema>
+      className="sm:gap-8"
       form={form}
       fieldsetData={nameFieldsetData}
     />
@@ -394,7 +397,6 @@ function MatchCriteriaFieldset({
         name: 'age_category',
         placeholder: 'Например, "Юниоры"',
         label: 'Возрастная категория',
-        fieldStyles: 'flex-row items-center',
       },
     ],
   };
@@ -406,7 +408,6 @@ function MatchCriteriaFieldset({
         name: 'weight_category',
         placeholder: 'Например, "Суперлёгкий"',
         label: 'Весовая категория',
-        fieldStyles: 'flex-row items-center',
       },
     ],
   };
