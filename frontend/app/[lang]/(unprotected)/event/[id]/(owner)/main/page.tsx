@@ -1,7 +1,7 @@
 import React from 'react';
 import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
-import { fetchEvent, fetchMatches } from '@/lib/data';
+import { fetchEvent, fetchMatches, fetchSportTypes } from '@/lib/data';
 import { OwnerMain } from './owner-main';
 import { CustomSection } from '@/components/custom-section';
 import { ContentWraper } from '@/components/content-wraper';
@@ -15,11 +15,13 @@ export default async function EventMainPage({
   params: { id: string; lang: Locale };
 }) {
   const { id, lang } = params;
-  const [session, event, matches] = await Promise.all([
+  const [session, event, matches, sportTypes] = await Promise.all([
     getSession(),
     fetchEvent(id),
     fetchMatches(id),
+    fetchSportTypes()
   ]);
+  const token = session?.token;
   const allMatchDates: ValueOption[] = matches
     .map((match) => ({
       value: match?.start_datetime || '',
@@ -37,9 +39,11 @@ export default async function EventMainPage({
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start gap-6 pb-10">
         <OwnerMain
+          token={token}
           eventId={id}
           matches={matches}
           matchDates={matchDates}
+          sportTypes={sportTypes}
           lang={lang}
         />
       </ContentWraper>

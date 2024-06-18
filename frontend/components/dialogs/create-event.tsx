@@ -199,7 +199,7 @@ export function CreateEventDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3"
+              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
             >
               {Object.entries(CreateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -231,20 +231,20 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
       {
         type: 'text',
         name: 'name',
-        placeholder: 'Название мероприятия',
+        placeholder: 'Название',
         label: 'Название',
       },
       {
         type: 'textarea',
         name: 'description',
-        placeholder: 'Описание мероприятия',
+        placeholder: 'Описание',
         label: 'Описание',
         inputStyles: 'h-[250px] min-h-[250px]',
       },
       {
         type: 'file',
         name: 'image',
-        placeholder: 'Картинка',
+        placeholder: 'Афиша',
         label: 'Афиша',
       },
     ],

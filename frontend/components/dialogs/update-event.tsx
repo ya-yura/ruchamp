@@ -173,7 +173,7 @@ export function UpdateEventDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3"
+              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
             >
               {Object.entries(UpdateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>

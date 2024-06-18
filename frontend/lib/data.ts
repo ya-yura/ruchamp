@@ -11,6 +11,7 @@ import { EventMatch } from '@/app/[lang]/(unprotected)/event/[id]/matches/matche
 import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/page';
 import { CreateEventSchema } from '@/components/dialogs/create-event';
 import { UpdateEventImageSchema } from '@/components/dialogs/update-event-image';
+import { CreateMatchSchema } from '@/components/dialogs/create-match';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -35,7 +36,7 @@ export async function fetchEvents(): Promise<Event[] | null> {
   try {
     const res = await fetch(`${baseUrl}/event/events`, {
       // cache: 'force-cache',
-      next: { revalidate: 300, tags: ['createEvent'] },
+      next: { revalidate: 300, tags: ['events'] },
     });
     // revalidatePath('/events');
     return res.ok ? await res.json() : null;
@@ -170,7 +171,7 @@ export async function fetchOrgEvents(
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300, tags: ['createEvent'] },
+      next: { revalidate: 300, tags: ['events'] },
     });
     return res.ok ? await res.json() : null;
   } catch (error) {
@@ -221,7 +222,7 @@ export async function createEvent(
 export async function updateEvent(
   token: string,
   values: CreateEventSchema,
-  id: number,
+  id: number | string,
 ): Promise<void | Response> {
   const response = await fetch(`${baseUrl}/event/update/${id}`, {
     method: 'PUT',
@@ -242,7 +243,7 @@ export async function updateEvent(
 export async function updateEventImage(
   token: string,
   values: UpdateEventImageSchema,
-  id: number,
+  id: number | string,
 ): Promise<void | Response> {
   const formData = new FormData();
   if (values.image instanceof File) {
@@ -264,7 +265,7 @@ export async function updateEventImage(
   return await response.json();
 }
 
-export async function deleteEvent(token: string, id: number): Promise<any> {
+export async function deleteEvent(token: string, id: number | string): Promise<any> {
   const response = await fetch(`${baseUrl}/event/delete/${id}`, {
     method: 'DELETE',
     headers: {
@@ -274,6 +275,27 @@ export async function deleteEvent(token: string, id: number): Promise<any> {
 
   if (!response.ok) {
     throw new Error('Failed to delete event');
+  }
+
+  return await response.json();
+}
+
+export async function createMatch(
+  token: string,
+  values: CreateMatchSchema,
+  id: number | string,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/event/${id}/matches/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create match');
   }
 
   return await response.json();

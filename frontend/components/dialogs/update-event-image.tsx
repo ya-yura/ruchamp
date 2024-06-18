@@ -116,7 +116,7 @@ export function UpdateEventImageDialog({
         <Form {...form}>
           <CustomForm
             onSubmit={form.handleSubmit(onSubmit)}
-            className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3"
+            className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
           >
             <CustomFieldset<UpdateEventImageSchema>
               form={form}

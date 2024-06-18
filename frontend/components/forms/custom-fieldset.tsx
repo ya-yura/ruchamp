@@ -192,7 +192,7 @@ export function CustomFieldset<T extends FieldValues>({
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(item.inputStyles)}>
                       <SelectValue placeholder={item.placeholder} />
                     </SelectTrigger>
                   </FormControl>

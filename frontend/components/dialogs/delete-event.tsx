@@ -17,6 +17,7 @@ import { deleteEvent } from '@/lib/data';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n.config';
 import { path } from '@/lib/utils/other-utils';
+import { revalidateEvent, revalidateEvents } from '@/lib/actions';
 
 interface DeleteEventDialogProps {
   eventId?: number;
@@ -41,6 +42,8 @@ export function DeleteEventDialog({
     if (token && eventId) {
       deleteEvent(token, eventId)
         .then(() => {
+          revalidateEvents();
+          revalidateEvent(eventId);
           toast.success('Событие успешно удалено');
           router.push(path(lang, `/org/events`));
         })
