@@ -15,8 +15,8 @@ class AgeCategory(Base):
     __tablename__ = "AgeCategory"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    min_age = Column(String, nullable=False)
-    max_age = Column(String, nullable=False)
+    min_age = Column(Integer, nullable=False)
+    max_age = Column(Integer, nullable=False)
 
 
 # временная таблица для сортировки

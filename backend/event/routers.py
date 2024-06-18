@@ -31,6 +31,7 @@ from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           CreateTournamentApplicationAthlete,
                           UpdateTournamentApplication)
 from teams.models import Team
+from match.models import AgeCategory
 from shop.models import Ticket, Engagement, Sector, Place, Row, SpectatorTicket
 from geo.geo import get_geo
 
@@ -791,6 +792,9 @@ async def get_matches(
             .join(CategoryType, CategoryType.id == MatchCategory.category_id)
             .where(Match.id == match_id))
         match_info = query.mappings().all()
+        if match_info == []:
+            continue
+
         matches.append(match_info[0])
 
     return matches
@@ -963,35 +967,38 @@ async def create_match(
         match_gender = False
 
     # Весовая категория участников
-    min_weight_id_subquery = select(
-        func.min(AllWeightClass.id)
-    ).scalar_subquery()
-    max_weight_id_subquery = select(
-        func.max(AllWeightClass.id)
-    ).scalar_subquery()
-
-    query = await db.execute(
-        select(
-            case(
-                    (
-                        and_(
-                            AllWeightClass.min_weight <= match_data.weight,
-                            AllWeightClass.max_weight >= match_data.weight
-                        ),
-                        AllWeightClass.id
-                    ),
-                    (
-                        match_data.weight < AllWeightClass.min_weight,
-                        max_weight_id_subquery
-                    ),
-                    (
-                        match_data.weight > AllWeightClass.max_weight,
-                        min_weight_id_subquery
-                    )
-                )
-            )
+    query = await db.execute(select(AllWeightClass.id).where(
+        AllWeightClass.name == match_data.weight_category,
+        AllWeightClass.min_weight == match_data.weight_min,
+        AllWeightClass.max_weight == match_data.weight_max
+    ))
+    weight_category_id = query.scalars().first()
+    if not weight_category_id:
+        new_weight_category = AllWeightClass(
+            name=match_data.weight_category,
+            min_weight=match_data.weight_min,
+            max_weight=match_data.weight_max
         )
-    match_weights_id = query.scalars().first()
+        db.add(new_weight_category)
+        await db.commit()
+        weight_category_id = new_weight_category.id
+
+    # Обработка возрастной категории
+    query = await db.execute(select(AgeCategory.id).where(
+        AgeCategory.name == match_data.age_category,
+        AgeCategory.min_age == match_data.age_min,
+        AgeCategory.max_age == match_data.age_max
+    ))
+    age_category_id = query.scalars().first()
+    if not age_category_id:
+        new_age_category = AgeCategory(
+            name=match_data.age_category,
+            min_age=match_data.age_min,
+            max_age=match_data.age_max
+        )
+        db.add(new_age_category)
+        await db.commit()
+        age_category_id = new_age_category.id
 
     # Время поединка в секундах
     time = re.search(r'^(\d+)\s', match_data.nominal_time)
@@ -1002,7 +1009,7 @@ async def create_match(
 
     if match_data.age_min == 0 or match_data.age_max == 0:
         raise HTTPException(status_code=400, detail="Age is not set")
-    elif match_data.weight == 0:
+    elif match_data.weight_min == 0 or match_data.weight_max == 0:
         raise HTTPException(status_code=400, detail="Weight is not set")
     else:
         new_match = Match(
@@ -1027,7 +1034,7 @@ async def create_match(
 
         match_weight = MatchWeights(
             match_id=new_match.id,
-            weight_id=match_weights_id
+            weight_id=weight_category_id
         )
         db.add(match_weight)
 
