@@ -13,8 +13,10 @@ import { Button } from '@/components/ui/button';
 import { EventMatch } from '../../matches/matches-event';
 import { MatchesEventTabs } from '../../matches/matches-events-tabs';
 import { Locale } from '@/i18n.config';
+import { CreateMatchDialog } from '@/components/dialogs/create-match';
 
 interface OwnerMainProps {
+  token?: string;
   eventId: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
@@ -22,6 +24,7 @@ interface OwnerMainProps {
 }
 
 export function OwnerMain({
+  token,
   eventId,
   matches,
   matchDates,
@@ -43,17 +46,15 @@ export function OwnerMain({
     setSelectedDate(value);
   }
   return (
-    <div className="flex flex-col gap-9 w-full">
+    <div className="flex w-full flex-col gap-9">
       <ColoredCards />
       <TransparentCards />
       <Separator className="bg-NeutralStroke3Rest" />
       <div className="flex w-full items-center justify-between">
-        <h5 className="text-ColorsGrey26 text-xl font-light tracking-tighter md:text-[28px]">
+        <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
           Календарь мероприятий
         </h5>
-        <Button variant={'ruchampDefault'} type="button">
-          Добавить мероприятие
-        </Button>
+        <CreateMatchDialog token={token} lang={lang} />
       </div>
       {!!matches.length ? (
         <MatchesEventTabs
@@ -114,10 +115,10 @@ function ColoredCards() {
           />
         ))}
         <li className="flex flex-col gap-4">
-          <h5 className="text-ColorsGrey26 text-right text-2xl font-light tracking-tighter md:text-left">
+          <h5 className="text-right text-2xl font-light tracking-tighter text-ColorsGrey26 md:text-left">
             До начала осталось:
           </h5>
-          <h6 className="text-ColorsGrey98 text-right text-4xl font-semibold md:text-left">
+          <h6 className="text-right text-4xl font-semibold text-ColorsGrey98 md:text-left">
             33 дня
           </h6>
         </li>
@@ -179,16 +180,16 @@ function TransparentCard({
 }: TransparentCardProps) {
   return (
     <li className="flex flex-col">
-      <p className="text-ColorsGrey26 mb-5 text-xl font-light tracking-tighter md:text-[28px]">
+      <p className="mb-5 text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
         {title}
       </p>
-      <p className="text-ColorsGrey98 mb-2 text-2xl font-semibold tracking-tighter md:text-[36px]">
+      <p className="mb-2 text-2xl font-semibold tracking-tighter text-ColorsGrey98 md:text-[36px]">
         {text}{' '}
         <span className="font-light text-neutralForeground3Rest">
           {spanText}
         </span>
       </p>
-      <p className="text-darkRed text-sm tracking-tighter md:text-base">
+      <p className="text-sm tracking-tighter text-darkRed md:text-base">
         {redFlagText}
       </p>
     </li>

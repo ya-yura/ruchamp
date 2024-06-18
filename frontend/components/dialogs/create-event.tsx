@@ -231,20 +231,20 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
       {
         type: 'text',
         name: 'name',
-        placeholder: 'Название мероприятия',
+        placeholder: 'Название',
         label: 'Название',
       },
       {
         type: 'textarea',
         name: 'description',
-        placeholder: 'Описание мероприятия',
+        placeholder: 'Описание',
         label: 'Описание',
         inputStyles: 'h-[250px] min-h-[250px]',
       },
       {
         type: 'file',
         name: 'image',
-        placeholder: 'Картинка',
+        placeholder: 'Афиша',
         label: 'Афиша',
       },
     ],

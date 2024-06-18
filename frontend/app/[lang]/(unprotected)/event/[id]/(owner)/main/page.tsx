@@ -20,6 +20,7 @@ export default async function EventMainPage({
     fetchEvent(id),
     fetchMatches(id),
   ]);
+  const token = session?.token;
   const allMatchDates: ValueOption[] = matches
     .map((match) => ({
       value: match?.start_datetime || '',
@@ -37,6 +38,7 @@ export default async function EventMainPage({
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start gap-6 pb-10">
         <OwnerMain
+          token={token}
           eventId={id}
           matches={matches}
           matchDates={matchDates}
