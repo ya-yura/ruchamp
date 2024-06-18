@@ -20,6 +20,7 @@ interface OwnerMainProps {
   eventId: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
+  sportTypes: string[];
   lang: Locale;
 }
 
@@ -28,6 +29,7 @@ export function OwnerMain({
   eventId,
   matches,
   matchDates,
+  sportTypes,
   lang,
 }: OwnerMainProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -54,7 +56,7 @@ export function OwnerMain({
         <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
           Календарь мероприятий
         </h5>
-        <CreateMatchDialog token={token} lang={lang} />
+        <CreateMatchDialog token={token} sportTypes={sportTypes} lang={lang} />
       </div>
       {!!matches.length ? (
         <MatchesEventTabs

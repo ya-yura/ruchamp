@@ -34,24 +34,17 @@ import { useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
 
-const CreateMatchTabs = {
-  1: 'Название и время',
-  2: 'Вид спорта',
-  3: 'Критерии',
-  4: 'Проведение и билеты',
-} as const;
-
 export const createMatchSchema = z.object({
-  name: z.string(),
-  start_datetime: z.string(),
-  sport_type: z.string(),
-  combat_type: z.string(),
-  grade: z.string(),
-  gender: z.string(),
+  name: z.string().min(1, 'Это обязательное поле'),
+  start_datetime: z.string().min(1, 'Это обязательное поле'),
+  sport_type: z.string().min(1, 'Это обязательное поле'),
+  combat_type: z.string().min(1, 'Это обязательное поле'),
+  grade: z.string().min(1, 'Это обязательное поле'),
+  gender: z.string().min(1, 'Это обязательное поле'),
   age_min: z.number(),
   age_max: z.number(),
   weight: z.number(),
-  nominal_time: z.string(),
+  nominal_time: z.string().min(1, 'Это обязательное поле'),
   mat_vol: z.number(),
   price: z.number(),
   seat_capacity: z.number(),
@@ -60,18 +53,33 @@ export const createMatchSchema = z.object({
 
 export type CreateMatchSchema = z.infer<typeof createMatchSchema>;
 
+const CreateMatchFields: Record<string, Partial<keyof CreateMatchSchema>[]> = {
+  1: ['name', 'start_datetime', 'nominal_time'],
+  2: ['sport_type'],
+  3: ['gender', 'age_min', 'age_max', 'weight', 'grade', 'combat_type'],
+  4: ['mat_vol', 'price', 'seat_capacity', 'price_athlete'],
+};
+
+const CreateMatchTabs: Record<string, string> = {
+  1: 'Название и время',
+  2: 'Вид спорта',
+  3: 'Критерии',
+  4: 'Проведение и билеты',
+};
 interface CreateMatchDialogProps {
   token?: string;
+  sportTypes: string[];
   lang: Locale;
   className?: string;
 }
 
 export function CreateMatchDialog({
   token,
+  sportTypes,
   lang,
   className,
 }: CreateMatchDialogProps) {
-  const [tabValue, setTabValue] = useState<string>('');
+  const [tabValue, setTabValue] = useState<string>('1');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -81,6 +89,7 @@ export function CreateMatchDialog({
     defaultValues: {
       name: '',
       start_datetime: '',
+      nominal_time: '',
       sport_type: '',
       combat_type: '',
       grade: '',
@@ -88,7 +97,6 @@ export function CreateMatchDialog({
       age_min: 0,
       age_max: 0,
       weight: 0,
-      nominal_time: '',
       mat_vol: 0,
       price: 0,
       seat_capacity: 0,
@@ -98,12 +106,12 @@ export function CreateMatchDialog({
 
   const title = form.watch('name');
 
-  const handleTabChange = useCallback((value: string) => {
-    setTabValue(value);
-  }, []);
+  function handleTabChange(value: -1 | 1) {
+    setTabValue((prevVal) => Math.max(+prevVal + value, 1).toString());
+  }
 
   function onSubmit(values: CreateMatchSchema): void {
-    setIsLoading(true);
+    // setIsLoading(true);
     if (token) {
       //   createEvent(token, values)
       //     .then((id) => {
@@ -128,7 +136,7 @@ export function CreateMatchDialog({
     ReactNode
   > = {
     1: <NameFieldset form={form} />,
-    2: <NameFieldset form={form} />,
+    2: <SportTypeFieldset form={form} sportTypes={sportTypes} />,
     3: <NameFieldset form={form} />,
     4: <NameFieldset form={form} />,
   } as const;
@@ -144,15 +152,11 @@ export function CreateMatchDialog({
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
           <DialogTitle>{title ? title : 'Мероприятие'}</DialogTitle>
         </DialogHeader>
-        <Tabs
-          className="relative mx-auto w-full"
-          value={tabValue}
-          onValueChange={handleTabChange}
-        >
+        <Tabs className="relative mx-auto w-full" value={tabValue}>
           <div className="absolute top-[-60px] flex h-[36px] w-full">
             <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
               {Object.entries(CreateMatchTabs).map(([key, value]) => (
-                <TabsTrigger key={key} value={key}>
+                <TabsTrigger className="cursor-default" key={key} value={key}>
                   {value}
                 </TabsTrigger>
               ))}
@@ -169,33 +173,42 @@ export function CreateMatchDialog({
                 </TabsContent>
               ))}
               <DialogFooter>
-                {+tabValue === Object.keys(CreateMatchTabs).length ? (
+                <div className="absolute bottom-[-86px] right-[-24px] flex gap-3">
                   <Button
-                    className="absolute bottom-[-86px] right-[-24px] text-white"
-                    variant={'ruchampDefault'}
-                    type="submit"
-                    disabled={isLoading}
+                    className="text-white"
+                    variant={'ruchampTransparentGreyBorder'}
+                    onClick={() => handleTabChange(-1)}
                   >
-                    {isLoading && <Spinner className="h-6 w-6" />}
-                    Создать
+                    Назад
                   </Button>
-                ) : (
-                  <div className="absolute bottom-[-86px] right-[-24px] flex gap-3">
+                  {+tabValue === Object.keys(CreateMatchTabs).length ? (
                     <Button
                       className="text-white"
-                      variant={'ruchampTransparentGreyBorder'}
+                      variant={'ruchampDefault'}
+                      type="submit"
+                      disabled={isLoading}
                     >
-                      Назад
+                      {isLoading && <Spinner className="h-6 w-6" />}
+                      Создать
                     </Button>
+                  ) : (
                     <Button
                       className="text-white"
                       variant={'ruchampDefault'}
                       disabled={false}
+                      onClick={async () => {
+                        const output = await form.trigger(
+                          CreateMatchFields[tabValue],
+                        );
+                        if (output) {
+                          handleTabChange(1);
+                        }
+                      }}
                     >
                       Далее
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </DialogFooter>
             </CustomForm>
           </Form>
@@ -206,6 +219,14 @@ export function CreateMatchDialog({
 }
 
 function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
+  const timeSelectOptions = Array.from({ length: 20 }, (_, index) => {
+    const res = `${(index + 1) * 10} минут`;
+    return {
+      value: res,
+      option: res,
+    };
+  });
+
   const nameFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
     fields: [
       {
@@ -215,10 +236,10 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
         label: 'Название',
       },
       {
-        type: 'text',
+        type: 'datetime-local',
         name: 'start_datetime',
-        placeholder: 'Описание мероприятия',
-        label: 'Описание',
+        placeholder: 'Начало',
+        label: 'Начало',
       },
       {
         type: 'select',
@@ -227,24 +248,7 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
         label: 'Номинальное время проведения одного соревнования',
         fieldStyles: 'w-fit',
         inputStyles: 'w-fit',
-        selectOptions: [
-          {
-            value: '10 минут',
-            option: '10 минут',
-          },
-          {
-            value: '20 минут',
-            option: '20 минут',
-          },
-          {
-            value: '30 минут',
-            option: '30 минут',
-          },
-          {
-            value: '40 минут',
-            option: '40 минут',
-          },
-        ],
+        selectOptions: timeSelectOptions,
       },
     ],
   };
@@ -257,48 +261,40 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
   );
 }
 
-// function TimeFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
-//   const timeFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
-//     fields: [
-//       {
-//         type: 'datetime-local',
-//         name: 'start_datetime',
-//         placeholder: 'Начало события',
-//         label: 'Начало события',
-//         fieldStyles: 'col-span-6',
-//       },
-//       {
-//         type: 'datetime-local',
-//         name: 'end_datetime',
-//         placeholder: 'Окончание события',
-//         label: 'Окончание события',
-//         fieldStyles: 'col-span-6',
-//       },
-//       {
-//         type: 'datetime-local',
-//         name: 'start_request_datetime',
-//         placeholder: 'Начало приёма заявок на участие',
-//         label: 'Начало приёма заявок на участие',
-//         fieldStyles: 'col-span-6',
-//       },
-//       {
-//         type: 'datetime-local',
-//         name: 'end_request_datetime',
-//         placeholder: 'Звершение приёма заявок на участие',
-//         label: 'Завершение приёма заявок на участие',
-//         fieldStyles: 'col-span-6',
-//       },
-//     ],
-//   };
+function SportTypeFieldset({
+  form,
+  sportTypes,
+}: {
+  form: UseFormReturn<CreateMatchSchema>;
+  sportTypes: string[];
+}) {
+  const sportSelectOptions = sportTypes.map((option) => ({
+    value: option,
+    option: option,
+  }));
 
-//   return (
-//     <CustomFieldset<CreateMatchSchema>
-//       className="gap-10"
-//       form={form}
-//       fieldsetData={timeFieldsetData}
-//     />
-//   );
-// }
+  const timeFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
+    fields: [
+      {
+        type: 'select',
+        name: 'sport_type',
+        placeholder: 'Выберите из списка',
+        label: 'Вид спорта',
+        fieldStyles: 'w-fit',
+        inputStyles: 'w-fit',
+        selectOptions: sportSelectOptions,
+      },
+    ],
+  };
+
+  return (
+    <CustomFieldset<CreateMatchSchema>
+      className="gap-10"
+      form={form}
+      fieldsetData={timeFieldsetData}
+    />
+  );
+}
 
 // interface LocationFieldsetProps {
 //   form: UseFormReturn<CreateMatchSchema>;
