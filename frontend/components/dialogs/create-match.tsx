@@ -1,13 +1,6 @@
 'use client';
 
-import React, {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -25,46 +18,63 @@ import { UseFormReturn, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
-import { createEvent } from '@/lib/data';
-import { YandexMapPicker } from '../yandex-map-picker';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
-import { revalidateEvents } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
-import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
+import { RangeSlider } from '@/app/[lang]/(unprotected)/teams/range-slider';
+
+const toNumber = (val: unknown) => {
+  const num = Number(val);
+  if (isNaN(num)) {
+    throw new Error('Invalid number');
+  }
+  return num;
+};
 
 export const createMatchSchema = z.object({
   name: z.string().min(1, 'Это обязательное поле'),
   start_datetime: z.string().min(1, 'Это обязательное поле'),
+  nominal_time: z.string().min(1, 'Это обязательное поле'),
   sport_type: z.string().min(1, 'Это обязательное поле'),
   combat_type: z.string().min(1, 'Это обязательное поле'),
   grade: z.string().min(1, 'Это обязательное поле'),
   gender: z.string().min(1, 'Это обязательное поле'),
-  age_min: z.number(),
-  age_max: z.number(),
-  weight: z.number(),
-  nominal_time: z.string().min(1, 'Это обязательное поле'),
-  mat_vol: z.number(),
-  price: z.number(),
-  seat_capacity: z.number(),
-  price_athlete: z.number(),
+  age_category: z.string().min(1, 'Это обязательное поле'),
+  age_min: z.preprocess((val) => toNumber(val), z.number()),
+  age_max: z.preprocess((val) => toNumber(val), z.number()),
+  weight_category: z.string().min(1, 'Это обязательное поле'),
+  weight_min: z.preprocess((val) => toNumber(val), z.number()),
+  weight_max: z.preprocess((val) => toNumber(val), z.number()),
+  mat_vol: z.preprocess((val) => toNumber(val), z.number()),
+  price: z.preprocess((val) => toNumber(val), z.number()),
+  seat_capacity: z.preprocess((val) => toNumber(val), z.number()),
+  price_athlete: z.preprocess((val) => toNumber(val), z.number()),
 });
 
 export type CreateMatchSchema = z.infer<typeof createMatchSchema>;
 
 const CreateMatchFields: Record<string, Partial<keyof CreateMatchSchema>[]> = {
   1: ['name', 'start_datetime', 'nominal_time'],
-  2: ['sport_type'],
-  3: ['gender', 'age_min', 'age_max', 'weight', 'grade', 'combat_type'],
-  4: ['mat_vol', 'price', 'seat_capacity', 'price_athlete'],
+  2: [
+    'sport_type',
+    'gender',
+    'age_min',
+    'age_max',
+    'age_category',
+    'weight_min',
+    'weight_max',
+    'weight_category',
+    'grade',
+    'combat_type',
+  ],
+  3: ['mat_vol', 'price', 'seat_capacity', 'price_athlete'],
 };
 
 const CreateMatchTabs: Record<string, string> = {
   1: 'Название и время',
-  2: 'Вид спорта',
-  3: 'Критерии',
-  4: 'Проведение и билеты',
+  2: 'Критерии',
+  3: 'Проведение и билеты',
 };
 interface CreateMatchDialogProps {
   token?: string;
@@ -82,7 +92,15 @@ export function CreateMatchDialog({
   const [tabValue, setTabValue] = useState<string>('1');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [ages, setAges] = useState<number[]>([]);
+  const [weights, setWeights] = useState<number[]>([]);
+
   const router = useRouter();
+
+  const weightRange = [20, 150];
+  const ageRange = [3, 100];
+  const weightDefaults = [50, 70];
+  const ageDefaults = [15, 30];
 
   const form = useForm<CreateMatchSchema>({
     resolver: zodResolver(createMatchSchema),
@@ -94,9 +112,12 @@ export function CreateMatchDialog({
       combat_type: '',
       grade: '',
       gender: '',
-      age_min: 0,
-      age_max: 0,
-      weight: 0,
+      age_category: '',
+      age_min: ageDefaults[0],
+      age_max: ageDefaults[1],
+      weight_category: '',
+      weight_min: weightDefaults[0],
+      weight_max: weightDefaults[1],
       mat_vol: 0,
       price: 0,
       seat_capacity: 0,
@@ -110,9 +131,17 @@ export function CreateMatchDialog({
     setTabValue((prevVal) => Math.max(+prevVal + value, 1).toString());
   }
 
+  async function handleNextClick() {
+    const output = await form.trigger(CreateMatchFields[tabValue]);
+    if (output) {
+      handleTabChange(1);
+    }
+  }
+
   function onSubmit(values: CreateMatchSchema): void {
     // setIsLoading(true);
     if (token) {
+      console.log(values);
       //   createEvent(token, values)
       //     .then((id) => {
       //       setIsOpen(false);
@@ -136,10 +165,22 @@ export function CreateMatchDialog({
     ReactNode
   > = {
     1: <NameFieldset form={form} />,
-    2: <SportTypeFieldset form={form} sportTypes={sportTypes} />,
-    3: <NameFieldset form={form} />,
-    4: <NameFieldset form={form} />,
-  } as const;
+    2: (
+      <MatchCriteriaFieldset
+        form={form}
+        sportTypes={sportTypes}
+        ages={ages}
+        setAges={setAges}
+        weights={weights}
+        setWeights={setWeights}
+        weightDefaults={weightDefaults}
+        ageDefaults={ageDefaults}
+        weightRange={weightRange}
+        ageRange={ageRange}
+      />
+    ),
+    3: <TicketsFieldset form={form} />,
+  };
 
   return (
     <Dialog onOpenChange={(open: boolean) => setIsOpen(!isOpen)} open={isOpen}>
@@ -165,7 +206,7 @@ export function CreateMatchDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3"
+              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
             >
               {Object.entries(CreateMatchTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -174,13 +215,17 @@ export function CreateMatchDialog({
               ))}
               <DialogFooter>
                 <div className="absolute bottom-[-86px] right-[-24px] flex gap-3">
-                  <Button
-                    className="text-white"
-                    variant={'ruchampTransparentGreyBorder'}
-                    onClick={() => handleTabChange(-1)}
-                  >
-                    Назад
-                  </Button>
+                  {tabValue !== '1' && (
+                    <Button
+                      className="text-white"
+                      type="button"
+                      variant={'ruchampTransparentGreyBorder'}
+                      onClick={() => handleTabChange(-1)}
+                    >
+                      Назад
+                    </Button>
+                  )}
+
                   {+tabValue === Object.keys(CreateMatchTabs).length ? (
                     <Button
                       className="text-white"
@@ -194,16 +239,10 @@ export function CreateMatchDialog({
                   ) : (
                     <Button
                       className="text-white"
+                      type="button"
                       variant={'ruchampDefault'}
                       disabled={false}
-                      onClick={async () => {
-                        const output = await form.trigger(
-                          CreateMatchFields[tabValue],
-                        );
-                        if (output) {
-                          handleTabChange(1);
-                        }
-                      }}
+                      onClick={handleNextClick}
                     >
                       Далее
                     </Button>
@@ -261,108 +300,210 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
   );
 }
 
-function SportTypeFieldset({
-  form,
-  sportTypes,
-}: {
+interface MatchCriteriaFieldsetProps {
   form: UseFormReturn<CreateMatchSchema>;
   sportTypes: string[];
-}) {
+  ages: number[];
+  setAges: Dispatch<SetStateAction<number[]>>;
+  weights: number[];
+  setWeights: Dispatch<SetStateAction<number[]>>;
+  weightDefaults: number[];
+  ageDefaults: number[];
+  weightRange: number[];
+  ageRange: number[];
+}
+
+function MatchCriteriaFieldset({
+  form,
+  sportTypes,
+  ages,
+  setAges,
+  weights,
+  setWeights,
+  weightDefaults,
+  ageDefaults,
+  weightRange,
+  ageRange,
+}: MatchCriteriaFieldsetProps) {
   const sportSelectOptions = sportTypes.map((option) => ({
     value: option,
     option: option,
   }));
+  const gradeSelectOptions = [
+    {
+      value: '1',
+      option: 'МС',
+    },
+    {
+      value: '2',
+      option: 'КМС',
+    },
+  ];
 
-  const timeFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
+  const combatSelectOptions = [
+    {
+      value: 'Олимпийская',
+      option: 'Олимпийская',
+    },
+  ];
+
+  const basicFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
     fields: [
       {
         type: 'select',
         name: 'sport_type',
         placeholder: 'Выберите из списка',
         label: 'Вид спорта',
-        fieldStyles: 'w-fit',
-        inputStyles: 'w-fit',
+        fieldStyles: 'col-span-6',
         selectOptions: sportSelectOptions,
+      },
+      {
+        type: 'select',
+        name: 'gender',
+        placeholder: 'Выберите значение',
+        label: 'Пол участников',
+        fieldStyles: 'col-span-6',
+        selectOptions: [
+          {
+            value: 'Мужской',
+            option: 'Мужской',
+          },
+          {
+            value: 'Женский',
+            option: 'Женский',
+          },
+        ],
+      },
+      {
+        type: 'select',
+        name: 'grade',
+        placeholder: 'Выберите из списка',
+        label: 'Уровень спортсменов',
+        fieldStyles: 'col-span-6',
+        selectOptions: gradeSelectOptions,
+      },
+      {
+        type: 'select',
+        name: 'combat_type',
+        placeholder: 'Выберите из списка',
+        label: 'Схема боёв',
+        fieldStyles: 'col-span-6',
+        selectOptions: combatSelectOptions,
+      },
+      {
+        type: 'text',
+        name: 'age_category',
+        placeholder: 'Например, "Юниоры"',
+        label: 'Возрастная категория',
+        fieldStyles: 'flex-row items-center',
+      },
+    ],
+  };
+
+  const weightFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
+    fields: [
+      {
+        type: 'text',
+        name: 'weight_category',
+        placeholder: 'Например, "Суперлёгкий"',
+        label: 'Весовая категория',
+        fieldStyles: 'flex-row items-center',
       },
     ],
   };
 
   return (
-    <CustomFieldset<CreateMatchSchema>
-      className="gap-10"
-      form={form}
-      fieldsetData={timeFieldsetData}
-    />
+    <>
+      <CustomFieldset<CreateMatchSchema>
+        className="mb-5 sm:gap-x-14 sm:gap-y-10"
+        form={form}
+        fieldsetData={basicFieldsetData}
+      />
+      <RangeSlider
+        className="mb-12"
+        title={'Возраст (лет)'}
+        defaultValue={ageDefaults}
+        minValue={ageRange[0]}
+        maxValue={ageRange[1]}
+        minStepsBetweenThumbs={1}
+        value={ages}
+        setValue={(ages) => {
+          const newAges = ages as number[];
+          form.setValue('age_min', newAges[0]);
+          form.setValue('age_max', newAges[1]);
+          setAges(newAges);
+        }}
+      />
+      <CustomFieldset<CreateMatchSchema>
+        className="mb-5"
+        form={form}
+        fieldsetData={weightFieldsetData}
+      />
+      <RangeSlider
+        className=""
+        title={'Вес (кг)'}
+        defaultValue={weightDefaults}
+        minValue={weightRange[0]}
+        maxValue={weightRange[1]}
+        minStepsBetweenThumbs={1}
+        value={weights}
+        setValue={(weights) => {
+          const newWeights = weights as number[];
+          form.setValue('weight_min', newWeights[0]);
+          form.setValue('weight_max', newWeights[1]);
+          setWeights(newWeights);
+        }}
+      />
+    </>
   );
 }
 
-// interface LocationFieldsetProps {
-//   form: UseFormReturn<CreateMatchSchema>;
-//   coordinates: [number, number];
-//   setCoordinates: Dispatch<SetStateAction<[number, number]>>;
-// }
+function TicketsFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
+  const docsFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
+    fields: [
+      {
+        type: 'number',
+        name: 'price_athlete',
+        placeholder: 'Введите стоимость',
+        label: 'Стоимость участия, руб',
+        fieldStyles: 'col-start-1 col-end-6',
+      },
+      {
+        type: 'number',
+        name: 'mat_vol',
+        placeholder: 'Введите количество матов/арен',
+        label: 'Количество матов/арен',
+        fieldStyles: 'col-start-1 col-end-6',
+      },
+      {
+        type: 'number',
+        name: 'price',
+        placeholder: 'Введите стоимость',
+        label: 'Стоимость билета для зрителей, руб',
+        fieldStyles: 'col-start-1 col-end-6',
+      },
+      {
+        type: 'number',
+        name: 'seat_capacity',
+        placeholder: 'Введите количество мест',
+        label: 'Количество мест для зрителей',
+        fieldStyles: 'col-start-1 col-end-6',
+      },
+    ],
+  };
 
-// function LocationFieldset({
-//   form,
-//   coordinates,
-//   setCoordinates,
-// }: LocationFieldsetProps) {
-//   const locationFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
-//     fields: [
-//       {
-//         type: 'text',
-//         name: 'location',
-//         placeholder: 'Адрес',
-//         label: 'Адрес',
-//       },
-//       {
-//         type: 'text',
-//         name: 'geo',
-//         placeholder: 'Координаты',
-//         label: 'Выберите кооординаты на карте',
-//         inputStyles: 'hidden',
-//       },
-//     ],
-//   };
-
-//   return (
-//     <>
-//       <CustomFieldset<CreateMatchSchema>
-//         form={form}
-//         fieldsetData={locationFieldsetData}
-//       />
-//       <YandexMapPicker
-//         mapId="createEvent"
-//         className="mt-5"
-//         coordinates={coordinates}
-//         setCoordinates={setCoordinates}
-//       />
-//     </>
-//   );
-// }
-
-// function DocsFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
-//   const docsFieldsetData: TypeFieldsetData<CreateMatchSchema> = {
-//     fields: [
-//       {
-//         type: 'file',
-//         name: 'event_order',
-//         placeholder: 'Загрузить устав',
-//         label: 'Загрузить устав',
-//       },
-//       {
-//         type: 'file',
-//         name: 'event_system',
-//         placeholder: 'Заргрузить отчёт',
-//         label: 'Загрузить отчёт',
-//       },
-//     ],
-//   };
-
-//   return (
-//     <CustomFieldset<CreateMatchSchema>
-//       form={form}
-//       fieldsetData={docsFieldsetData}
-//     />
-//   );
-// }
+  return (
+    <>
+      <CustomFieldset<CreateMatchSchema>
+        form={form}
+        fieldsetData={docsFieldsetData}
+      />
+      <p className="absolute bottom-7 right-0 w-[56%] text-xs leading-[20px] text-NeutralBackground4Rest sm:text-sm">
+        Если у вас несколько мероприятий подряд и вы рассчитываете провести их
+        для зрителей за один сеанс, то указывайте стоимость и количество мест
+        только для первого мероприятия по времени, а за следующие мероприятия
+        устанавливайте их равными нулю.
+      </p>
+    </>
+  );
+}
