@@ -65,6 +65,10 @@ export function FeedbackForm({ lang }: { lang: Locale }) {
   });
 
   useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
     if (errorMessage === '200') {
       toast.success('Ваше сообщение отправлено');
     }

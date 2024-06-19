@@ -42,7 +42,6 @@ export function TeamsListing({
   const [genderValue, setGenderValue] = useState<GenderTabs>(GenderTabs.MALE);
   const [ages, setAges] = useState<number[]>(defineDefaultRange(ageDefaults));
   const [weights, setWeights] = useState<number[]>(weightDefaults);
-  const topRef = useRef<HTMLDivElement | null>(null);
 
   // Filtring logic
   const filteredTeams = useMemo(() => {
@@ -70,13 +69,11 @@ export function TeamsListing({
   }, []);
 
   function scrollToTop(): void {
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
-    <CustomSection className="relative mt-7 bg-transparent" ref={topRef}>
+    <CustomSection className="relative mt-7 bg-transparent">
       <ContentWraper>
         <BasicFilters
           tabValue={genderValue}

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { Badges } from '../app/[lang]/(unprotected)/event/[id]/badges';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useScrollY } from '@/lib/hooks/useScrollY';
@@ -42,6 +42,10 @@ export function PageWithInfo<T extends string>({
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const imageUrl = image.startsWith('http')
     ? image
@@ -63,10 +67,9 @@ export function PageWithInfo<T extends string>({
         ref={refContainer}
       >
         <Image
-          className=""
           // src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
           src={imageUrl}
-          alt="Обложка"
+          alt={title}
           fill={true}
           style={{
             objectFit: 'cover',

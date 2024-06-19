@@ -50,7 +50,6 @@ export function EventsTabs({
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isMapMode, setIsMapMode] = useState<boolean>(false);
   const [mapKey, setMapKey] = useState<number>(0); // This state is to reload map with new data
-  const topRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
   const isFirstCardBig =
     isOrg &&
@@ -90,9 +89,7 @@ export function EventsTabs({
   }, [tabValue, selectedSportTypes, date]);
 
   function scrollToTop(): void {
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const handleTabChange = useCallback((value: string) => {
@@ -100,7 +97,7 @@ export function EventsTabs({
   }, []);
 
   return (
-    <CustomSection ref={topRef}>
+    <CustomSection>
       <ContentWraper className="h-fit justify-between">
         <Tabs
           className="relative mx-auto mb-10 w-full"

@@ -63,6 +63,10 @@ export function Hero({
   }
 
   useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
     setSelectedTabValue(pathname.split('/')[3]);
   }, [pathname]);
 
