@@ -3,6 +3,7 @@ import uuid
 import re
 from datetime import timedelta, datetime
 import shutil
+from typing import Optional
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -537,9 +538,9 @@ async def create_event(
     location: str = Form(...),
     description: str = Form(...),
     geo: str = Form(...),
-    image: UploadFile = File(...),
-    event_order: UploadFile = File(...),
-    event_system: UploadFile = File(...),
+    image: Optional[UploadFile] = File(None),
+    event_order: Optional[UploadFile] = File(None),
+    event_system: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
@@ -586,15 +587,25 @@ async def create_event(
         event_system_location = os.path.join(files_dir, event_system.filename)
 
         # Сохранение изображения на сервере
-        with open(image_location, "wb") as file:
-            shutil.copyfileobj(image.file, file)
+        if image:
+            image_location = os.path.join(image_dir, image.filename)
+            with open(image_location, "wb") as file:
+                shutil.copyfileobj(image.file, file)
 
         # Сохранение файлов на сервере
-        with open(event_order_location, "wb") as file:
-            shutil.copyfileobj(event_order.file, file)
+        if event_order:
+            event_order_location = os.path.join(
+                files_dir, event_order.filename
+            )
+            with open(event_order_location, "wb") as file:
+                shutil.copyfileobj(event_order.file, file)
 
-        with open(event_system_location, "wb") as file:
-            shutil.copyfileobj(event_system.file, file)
+        if event_system:
+            event_system_location = os.path.join(
+                files_dir, event_system.filename
+            )
+            with open(event_system_location, "wb") as file:
+                shutil.copyfileobj(event_system.file, file)
 
         new_event = Event(
             name=event_data.name,
