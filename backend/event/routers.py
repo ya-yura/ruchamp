@@ -185,6 +185,12 @@ async def get_event_org_info(
     )
     match_ids = query.scalars().all()
 
+    if not match_ids:
+        raise HTTPException(
+            status_code=404,
+            detail="No matches found for this event"
+        )
+
     # Получение текущей даты и времени
     now = datetime.utcnow()
     today_start = datetime(now.year, now.month, now.day)
@@ -214,11 +220,14 @@ async def get_event_org_info(
     )
     ticket_price = query.scalars().first()
 
+    # Проверка наличия билетов
+    # установление цены в 0 для бесплатных мероприятий
+    if not ticket_price:
+        ticket_price = 0
+
     query = await db.execute(
         select(SpectatorTicket.id)
-        .where(
-            SpectatorTicket.match_id.in_(match_ids),
-        )
+        .where(SpectatorTicket.match_id.in_(match_ids))
     )
     tickets = query.scalars().all()
 
@@ -227,6 +236,9 @@ async def get_event_org_info(
         .where(Engagement.match_id.in_(match_ids))
     )
     engagement_price = query.scalars().first()
+
+    if not engagement_price:
+        engagement_price = 0
 
     query = await db.execute(
         select(TournamentApplication.id)
