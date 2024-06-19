@@ -85,7 +85,7 @@ export function BigCardWithImage({
         <p className="line-clamp-2 text-background">{description}</p>
       </div>
       <div className="mt-auto flex justify-end gap-5 px-4">
-        <Button
+        {/* <Button
           className="border-none bg-transparent p-0 hover:border-none hover:bg-transparent"
           variant="outline"
           onClick={() => setIsLiked(!isLiked)}
@@ -105,7 +105,7 @@ export function BigCardWithImage({
               strokeLinejoin="round"
             />
           </svg>
-        </Button>
+        </Button> */}
         <CustomLink
           className={cn(
             'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',

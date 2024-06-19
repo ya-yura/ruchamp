@@ -39,14 +39,7 @@ export function HeaderNavigation({
                 href="/teams"
                 lang={lang}
               />
-              {isLoggedIn ? (
-                <ListItem
-                  className="text-right"
-                  title="Панель управления"
-                  href="/dashboard"
-                  lang={lang}
-                />
-              ) : (
+              {isLoggedIn ? null : ( // add something later
                 <>
                   <ListItem
                     className="text-right"
