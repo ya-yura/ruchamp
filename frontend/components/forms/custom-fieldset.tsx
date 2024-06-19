@@ -75,6 +75,7 @@ export type TypeFieldsetData<T> = {
 type TypeCustomFildsetProps<T extends FieldValues> = {
   form: UseFormReturn<T>;
   fieldsetData: TypeFieldsetData<T>;
+  isFieldsetDisabled?: boolean;
   errorMessage?: string;
 } & React.HTMLAttributes<HTMLFormElement>;
 
@@ -82,10 +83,14 @@ export function CustomFieldset<T extends FieldValues>({
   fieldsetData,
   form,
   errorMessage,
+  isFieldsetDisabled,
   className,
 }: TypeCustomFildsetProps<T>) {
   return (
-    <fieldset className={cn(`grid w-full grid-cols-12 gap-3 sm:gap-5`, className)}>
+    <fieldset
+      className={cn(`grid w-full grid-cols-12 gap-3 sm:gap-5`, className)}
+      disabled={isFieldsetDisabled}
+    >
       {fieldsetData.fields.map((item) => (
         <FormField
           key={item.name}
