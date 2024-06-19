@@ -13,6 +13,9 @@ import { path } from '@/lib/utils/other-utils';
 import { redirect } from 'next/navigation';
 import React, { Suspense } from 'react';
 import Loading from './loading';
+import { Event } from '@/lib/definitions';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default async function EventInfoPage({
   params,
@@ -49,7 +52,7 @@ export default async function EventInfoPage({
           <DateAndOrganizer
             eventStartTime={eventStartTime}
             applicationTime={applicationTime}
-            organizer={event.organizer_name}
+            organizer={event}
           />
         }
       />
@@ -68,7 +71,7 @@ function MainEventInfo({ description }: { description: string }) {
 interface DateAndOrganizerProps {
   eventStartTime: string;
   applicationTime: string;
-  organizer: string;
+  organizer: Event;
 }
 
 function DateAndOrganizer({
@@ -90,9 +93,39 @@ function DateAndOrganizer({
       />
       <TextCard
         className="bg-card-backgroundDark"
-        title={organizer}
+        title={organizer.organizer_name}
         text={'Организатор'}
-      />
+      >
+        <div className='flex'>        
+          <p className='whitespace-pre-line text-sm text-white'>Телефон:&nbsp;</p>
+          <Link className='text-sm text-white transition-colors hover:text-neutral-400' href={organizer.contact_phone}>
+            {organizer.contact_phone}
+          </Link>
+        </div>
+        <div className='flex'>        
+          <p className='whitespace-pre-line text-sm text-white'>Email:&nbsp;</p>
+          <Link className='text-sm text-white transition-colors hover:text-neutral-400' href={organizer.contact_email}>
+            {organizer.contact_email}
+          </Link>
+        </div>
+        <div className='flex mb-3'>        
+          <p className='whitespace-pre-line text-sm text-white'>Website:&nbsp;</p>
+          <Link href={organizer.website} passHref legacyBehavior>
+            <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">{organizer.website}</a>
+          </Link>
+        </div>
+      </TextCard>
+      <TextCard
+        className="bg-card-backgroundDark"
+        text={'Документы'}
+      >
+        <Link href={organizer.event_system} passHref legacyBehavior>
+          <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">Регламент проведения</a>
+        </Link>
+        <Link href={organizer.event_order} passHref legacyBehavior>
+          <a className='text-sm text-white transition-colors hover:text-neutral-400 mb-3' target="_blank">Отчет судьи</a>
+        </Link>
+      </TextCard>
     </>
   );
 }

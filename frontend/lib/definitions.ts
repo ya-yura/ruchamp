@@ -151,6 +151,10 @@ export interface Event {
   end_request_datetime: string;
   organizer_id: number;
   organizer_name: string;
+  contact_phone: string;
+  contact_email: string;
+  website: string;
+  image: string;
   event_system: string;
   image_field: string;
   sports_in_matches: string[];
