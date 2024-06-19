@@ -4,6 +4,7 @@ import { Locale } from '@/i18n.config';
 import { path } from '@/lib/utils/other-utils';
 import { getSession } from '@/lib/actions/auth';
 import { Logo } from '@/components/logo';
+import { ContentWraper } from '@/components/content-wraper';
 
 export default async function AuthLayout({
   children,
@@ -22,15 +23,16 @@ export default async function AuthLayout({
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"
-        alt={'ДОБАВИТЬ ОПИСАНИЕ'}
+        alt=""
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <div className="absolute z-10 pt-[10px] sm:pt-[15px] sm:pl-7 md:pl-10 lg:pl-[72px]">
-        <Logo lang={lang} />
+      <div className="absolute w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
+        <ContentWraper>
+          <Logo lang={lang} />
+        </ContentWraper>
       </div>
-
-      <div className="relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[1fr_1fr]">
+      <div className="xl:mx-custom-calc relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[0.7fr_1fr]">
         {children}
       </div>
     </main>
