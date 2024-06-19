@@ -1,9 +1,8 @@
 import { Greetings } from '@/components/greetings';
 import { Locale } from '@/i18n.config';
 import { FeedbackForm } from './feedback-form';
-import { Container } from '@/components/container';
 
-export default function ResetPassword({
+export default function FeedbackPage({
   params: { lang },
 }: {
   params: { lang: Locale };

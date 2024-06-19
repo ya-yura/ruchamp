@@ -27,7 +27,7 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <div className="absolute w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
+      <div className="z-10 absolute w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
         <ContentWraper>
           <Logo lang={lang} />
         </ContentWraper>
