@@ -16,11 +16,11 @@ const config = {
     container: {
       center: true,
       padding: '2rem',
+    },
+    extend: {
       screens: {
         '2xl': '1400px',
       },
-    },
-    extend: {
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -121,6 +121,9 @@ const config = {
       dropShadow: {
         contrastText: '0 1px 5px rgba(0, 0, 0, 0.9)',
       },
+      margin: {
+        'custom-calc': 'calc((100vw - 80rem)/2)',
+      }
     },
   },
   plugins: [
