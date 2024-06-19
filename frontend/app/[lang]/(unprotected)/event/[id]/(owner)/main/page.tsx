@@ -1,13 +1,23 @@
 import React from 'react';
 import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
-import { fetchEvent, fetchMatches, fetchSportTypes } from '@/lib/data';
+import {
+  fetchEvent,
+  fetchEventStatistics,
+  fetchMatches,
+  fetchSportTypes,
+} from '@/lib/data';
 import { OwnerMain } from './owner-main';
 import { CustomSection } from '@/components/custom-section';
 import { ContentWraper } from '@/components/content-wraper';
-import { filterUniqueDisplayedValues, path } from '@/lib/utils/other-utils';
+import { filterUniqueDisplayedValues } from '@/lib/utils/other-utils';
 import { ValueOption } from '../../../../team/[id]/page';
-import { transformDate } from '@/lib/utils/date-and-time';
+import {
+  calculateDaysBefore,
+  getEventStatus,
+  transformDate,
+} from '@/lib/utils/date-and-time';
+import { isToday } from 'date-fns';
 
 export default async function EventMainPage({
   params,
@@ -19,9 +29,10 @@ export default async function EventMainPage({
     getSession(),
     fetchEvent(id),
     fetchMatches(id),
-    fetchSportTypes()
+    fetchSportTypes(),
   ]);
   const token = session?.token;
+  const eventStatistics = await fetchEventStatistics(token, id);
   const allMatchDates: ValueOption[] = matches
     .map((match) => ({
       value: match?.start_datetime || '',
@@ -34,6 +45,13 @@ export default async function EventMainPage({
     });
 
   const matchDates = filterUniqueDisplayedValues(allMatchDates);
+  const daysBeforeEvent = calculateDaysBefore(
+    event?.start_datetime,
+    new Date(),
+  );
+  const eventStatus = isToday(event?.start_datetime || new Date())
+    ? ''
+    : getEventStatus(event?.start_datetime, new Date());
 
   return (
     <CustomSection className="relative bg-transparent">
@@ -41,9 +59,12 @@ export default async function EventMainPage({
         <OwnerMain
           token={token}
           eventId={id}
+          daysBeforeEvent={daysBeforeEvent}
+          eventStatus={eventStatus}
           matches={matches}
           matchDates={matchDates}
           sportTypes={sportTypes}
+          eventStatistics={eventStatistics}
           lang={lang}
         />
       </ContentWraper>

@@ -11,36 +11,36 @@ export const metadata: Metadata = {
   description:
     'Онлайн-платформа для организации, регистрации и участия в соревнованиях и мероприятиях в сфере боевых искусств. Платформа обеспечивает удобное взаимодействие организаторов мероприятий, соревнующихся и зрителей, предоставляя всестороннюю функциональность для планирования, управления и участия в событиях. ',
     icons: {
-      icon: 'ru/favicon.ico',
-      apple: 'ru/apple-touch-icon.png',
+      icon: '/ru/favicon.ico',
+      apple: '/ru/apple-touch-icon.png',
       other: [
         {
           rel: 'icon',
-          url: 'ru/favicon-32x32.png',
+          url: '/ru/favicon-32x32.png',
           sizes: '32x32',
           type: 'image/png',
         },
         {
           rel: 'icon',
-          url: 'ru/favicon-16x16.png',
+          url: '/ru/favicon-16x16.png',
           sizes: '16x16',
           type: 'image/png',
         },
         {
           rel: 'icon',
-          url: 'ru/android-chrome-192x192.png',
+          url: '/ru/android-chrome-192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
         {
         rel: 'icon',
-        url: 'ru/android-chrome-512x512.png',
+        url: '/ru/android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png',
       },
       {
           rel: 'manifest',
-          url: 'ru/site.webmanifest',
+          url: '/ru/site.webmanifest',
         },
       ],
     },

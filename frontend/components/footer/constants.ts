@@ -28,6 +28,10 @@ export const LinkData1: TypeLinkData[] = [
     text: 'Правила рекомендаций',
     url: '/',
   },
+  {
+    text: 'Форма обратной связи',
+    url: '/feedback',
+  },
 ];
 
 export const LinkData2: TypeLinkData[] = [

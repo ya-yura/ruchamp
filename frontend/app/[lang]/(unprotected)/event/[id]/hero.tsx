@@ -14,7 +14,6 @@ import React, {
 } from 'react';
 import { Badges } from './badges';
 import { H1 } from '@/components/text';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Locale } from '@/i18n.config';
@@ -106,7 +105,7 @@ export function Hero({
               {/* {isOwner && (
                 <Button variant={'ghost'}>
                   <Image
-                    className="ml- inline"
+                    className="inline"
                     src={'/images/icons/pencil.svg'}
                     alt=""
                     width={32}

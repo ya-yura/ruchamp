@@ -595,6 +595,7 @@ async def get_current_user_teams(
                 Team.country,
                 Team.city,
                 Team.region,
+                Team.captain.label("captain_id"),
             )
             .where(Team.id == team_id)
         )

@@ -4,10 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDictionary } from '../../dictionary-provider';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n.config';
-import { useFormState, useFormStatus } from 'react-dom';
 import { AuthSwitcher } from '@/components/auth/auth-switcher';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/spinner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -21,6 +18,8 @@ import { ButtonsBlock } from '@/components/auth/buttons-block';
 import { CustomLink } from '@/components/custom-link';
 import { authenticate } from '@/lib/actions/auth';
 import { path } from '@/lib/utils/other-utils';
+import { SubmitActionButton } from '@/components/forms/submit-action-button';
+import { useFormState } from 'react-dom';
 
 const formSchema = z.object({
   username: z
@@ -100,24 +99,9 @@ export function LoginForm({ lang }: { lang: Locale }) {
           >
             <p className="text-xs">Я забыл пароль</p>
           </CustomLink>
-          <LoginButton isValid={form.formState.isValid} />
+          <SubmitActionButton text={'Войти'} isValid={form.formState.isValid} />
         </ButtonsBlock>
       </CustomForm>
     </Form>
-  );
-}
-
-function LoginButton({ isValid }: { isValid: boolean }) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button
-      className="flex w-full gap-3 px-9 sm:w-auto"
-      variant="ruchampDefault"
-      type="submit"
-      disabled={!isValid || pending}
-    >
-      {pending && <Spinner className="h-6 w-6" />} Войти
-    </Button>
   );
 }

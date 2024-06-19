@@ -1,4 +1,4 @@
-import { Event } from './definitions';
+import { Event, EventStatistics } from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import {
   TeamByIdFromServer,
@@ -162,7 +162,7 @@ export async function fetchOrgEvents(
 ): Promise<Event[] | null> {
   if (!token) {
     console.error('Something wrong with token');
-    return [];
+    return null;
   }
 
   try {
@@ -177,6 +177,29 @@ export async function fetchOrgEvents(
   } catch (error) {
     console.error("Error while fetching org's events: ", error);
     throw new Error("Failed to fetch org's events.");
+  }
+}
+
+export async function fetchEventStatistics(
+  token: string | undefined,
+  id: number | string,
+): Promise<EventStatistics | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/event/${id}/org-info`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error("Error while fetching org's event main page: ", error);
+    throw new Error("Failed to fetch org's event main page.");
   }
 }
 
@@ -265,7 +288,10 @@ export async function updateEventImage(
   return await response.json();
 }
 
-export async function deleteEvent(token: string, id: number | string): Promise<any> {
+export async function deleteEvent(
+  token: string,
+  id: number | string,
+): Promise<any> {
   const response = await fetch(`${baseUrl}/event/delete/${id}`, {
     method: 'DELETE',
     headers: {
