@@ -85,7 +85,7 @@ export function CustomFieldset<T extends FieldValues>({
   className,
 }: TypeCustomFildsetProps<T>) {
   return (
-    <fieldset className={cn(`grid w-full grid-cols-12 gap-3 sm:gap-5`, className)}>
+    <fieldset className={cn(`grid w-full grid-cols-12 gap-5`, className)}>
       {fieldsetData.fields.map((item) => (
         <FormField
           key={item.name}

@@ -23,16 +23,16 @@ export default async function AuthLayout({
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"
-        alt={'ДОБАВИТЬ ОПИСАНИЕ'}
+        alt=""
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <div className="z-10 pt-[10px] sm:pt-[15px] px-4 sm:px-7 md:px-10 lg:px-[72px]">
+      <div className="absolute w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
         <ContentWraper>
           <Logo lang={lang} />
         </ContentWraper>
       </div>
-      <div className="relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[0.7fr_1fr] xl:mx-custom-calc">
+      <div className="xl:mx-custom-calc relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[0.7fr_1fr]">
         {children}
       </div>
     </main>
