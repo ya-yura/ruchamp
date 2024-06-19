@@ -10,7 +10,7 @@ from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile, Form)
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select, update, and_, case, func
+from sqlalchemy import select, update, and_, case, func, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import SQLAlchemyError
@@ -279,23 +279,29 @@ async def get_event_org_info(
     )
     today_applications_teams_paid = query.scalars().all()
 
-    today_tickets_query = await db.execute(
-        select(SpectatorTicket)
-        .where(
-            SpectatorTicket.match_id.in_(match_ids),
-            SpectatorTicket.status == "paid",
-            SpectatorTicket.updated_at >= today_start
-        )
-    )
-    today_tickets = today_tickets_query.scalars().all()
-
     today_teams_count = len(today_applications_teams)
     today_teams_payed = sum(
         1 for team in today_applications_teams_paid if team.status == "paid"
     )
     #today_tickets = [1]  # заглушка надо подумать как взять сколько зрителей оплатило за сегодня
-    today_tickets_count = len(today_tickets)
-    today_sold_tickets_price = sum(ticket_price for ticket in today_tickets)
+
+    if tickets and any(price > 0 for price in ticket_price):
+        today_tickets_query = await db.execute(
+            select(SpectatorTicket)
+            .where(
+                SpectatorTicket.match_id.in_(match_ids),
+                SpectatorTicket.status == "paid",
+                SpectatorTicket.updated_at >= today_start
+            )
+        )
+        today_tickets = today_tickets_query.scalars().all()
+        today_tickets_count = len(today_tickets)
+        today_sold_tickets_price = sum(
+            ticket_price for ticket in today_tickets
+        )
+    else:
+        today_tickets_count = 0
+        today_sold_tickets_price = 0
 
     org_info = {
         "total": {
