@@ -88,7 +88,7 @@ export function CustomFieldset<T extends FieldValues>({
 }: TypeCustomFildsetProps<T>) {
   return (
     <fieldset
-      <fieldset className={cn(`grid w-full grid-cols-12 gap-5`, className)}>
+      className={cn(`grid w-full grid-cols-12 gap-5`, className)}
       disabled={isFieldsetDisabled}
     >
       {fieldsetData.fields.map((item) => (
