@@ -7,29 +7,35 @@ import {
 import { H4, PersonDescriptionOnCard } from '@/components/text';
 import { Separator } from '@/components/ui/separator';
 import React, { useMemo, useState } from 'react';
-import { ValueOption } from '../../../../team/[id]/page';
+import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { transformDate } from '@/lib/utils/date-and-time';
-import { Button } from '@/components/ui/button';
 import { EventMatch } from '../../matches/matches-event';
 import { MatchesEventTabs } from '../../matches/matches-events-tabs';
 import { Locale } from '@/i18n.config';
 import { CreateMatchDialog } from '@/components/dialogs/create-match';
+import { EventStatistics } from '@/lib/definitions';
 
 interface OwnerMainProps {
   token?: string;
   eventId: string;
+  daysBeforeEvent: string;
+  eventStatus: string;
   matches: EventMatch[];
   matchDates: ValueOption[];
   sportTypes: string[];
+  eventStatistics: EventStatistics | null;
   lang: Locale;
 }
 
 export function OwnerMain({
   token,
   eventId,
+  daysBeforeEvent,
+  eventStatus,
   matches,
   matchDates,
   sportTypes,
+  eventStatistics,
   lang,
 }: OwnerMainProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -47,16 +53,26 @@ export function OwnerMain({
   function handleTabChange(value: string): void {
     setSelectedDate(value);
   }
+
   return (
     <div className="flex w-full flex-col gap-9">
-      <ColoredCards />
-      <TransparentCards />
+      <ColoredCards
+        dayStatistics={eventStatistics?.today}
+        daysBeforeEvent={daysBeforeEvent}
+        eventStatus={eventStatus}
+      />
+      <TransparentCards totalStatistics={eventStatistics?.total} />
       <Separator className="bg-NeutralStroke3Rest" />
       <div className="flex w-full items-center justify-between">
         <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
           Календарь мероприятий
         </h5>
-        <CreateMatchDialog token={token} eventId={eventId} sportTypes={sportTypes} lang={lang} />
+        <CreateMatchDialog
+          token={token}
+          eventId={eventId}
+          sportTypes={sportTypes}
+          lang={lang}
+        />
       </div>
       {!!matches.length ? (
         <MatchesEventTabs
@@ -77,25 +93,40 @@ export function OwnerMain({
   );
 }
 
-function ColoredCards() {
+interface ColoredCardsProps {
+  dayStatistics?: EventStatistics['today'];
+  daysBeforeEvent: string;
+  eventStatus: string;
+}
+
+function ColoredCards({
+  dayStatistics,
+  daysBeforeEvent,
+  eventStatus,
+}: ColoredCardsProps) {
+  const totalTicketPrice = new Intl.NumberFormat('RU', {
+    style: 'currency',
+    currency: 'RUB',
+  }).format(dayStatistics?.sold_tickets_price || 0);
+
   const textCardsData: TextCardColoredProps[] = [
     {
-      title: '11 команд',
+      title: `${dayStatistics?.teams || 0} команд`,
       text: 'Подали заявки на участие',
       className: 'bg-pistachio',
       titleStyles: 'text-ColorsGrey14 font-black',
       textStyles: 'text-ColorsGrey26',
     },
     {
-      title: '83 команды',
+      title: `${dayStatistics?.teams_payed || 0} команд`,
       text: 'Внесли платёж за участие',
       className: 'bg-orange',
       titleStyles: 'text-ColorsGrey14 font-black',
       textStyles: 'text-ColorsGrey26',
     },
     {
-      title: '111 билетов',
-      text: 'Продано на 10 000 ₽',
+      title: `${dayStatistics?.tickets || 0} билетов`,
+      text: `Продано на ${totalTicketPrice}`,
       className: 'bg-purple',
       titleStyles: 'text-ColorsGrey98 font-black',
       textStyles: 'text-ColorsGrey98',
@@ -108,7 +139,7 @@ function ColoredCards() {
       <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
         {textCardsData.map((card) => (
           <TextCardColored
-            key={card.title}
+            key={card.text}
             title={card.title}
             text={card.text}
             className={card.className}
@@ -117,11 +148,13 @@ function ColoredCards() {
           />
         ))}
         <li className="flex flex-col gap-4">
-          <h5 className="text-right text-2xl font-light tracking-tighter text-ColorsGrey26 md:text-left">
-            До начала осталось:
-          </h5>
+          {eventStatus && (
+            <h5 className="text-right text-2xl font-light tracking-tighter text-ColorsGrey26 md:text-left">
+              {eventStatus}
+            </h5>
+          )}
           <h6 className="text-right text-4xl font-semibold text-ColorsGrey98 md:text-left">
-            33 дня
+            {daysBeforeEvent}
           </h6>
         </li>
       </ul>
@@ -129,26 +162,39 @@ function ColoredCards() {
   );
 }
 
-function TransparentCards() {
+function TransparentCards({
+  totalStatistics,
+}: {
+  totalStatistics?: EventStatistics['total'];
+}) {
+  const totalTicketPrice = new Intl.NumberFormat('RU', {
+    style: 'currency',
+    currency: 'RUB',
+  }).format(totalStatistics?.sold_tickets_price || 0);
+  const totalGain = new Intl.NumberFormat('RU', {
+    style: 'currency',
+    currency: 'RUB',
+  }).format(totalStatistics?.total_gain || 0);
+
   const transparentCardsData: TransparentCardProps[] = [
     {
       title: 'В мероприятии участвуют:',
-      text: '99 команд',
-      spanText: '(289 человек)',
-      redFlagText: 'Заявки 33 команд отклонены',
+      text: `${totalStatistics?.teams || 0} команд`,
+      spanText: '(* человек)',
+      redFlagText: 'Нет отклоненных заявок',
     },
     {
       title: 'Зрителями будут:',
-      text: '358 человек',
-      redFlagText: '12 человек вернули билеты',
+      text: `${totalStatistics?.tickets || 0} человек`,
+      redFlagText: 'Нет возвратов по билетам',
     },
     {
       title: 'Собрано взносов:',
-      text: '790 000 ₽',
+      text: totalTicketPrice,
     },
     {
       title: 'Продано билетов на:',
-      text: '110 000 ₽',
+      text: totalGain,
     },
   ];
 

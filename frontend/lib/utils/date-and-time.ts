@@ -6,6 +6,7 @@ import {
   parse,
   isToday,
   isFuture,
+  differenceInDays,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Event } from '../definitions';
@@ -113,4 +114,53 @@ export function calculateAge(birthDate: string): number {
   const dob: Date = parse(birthDate, 'yyyy-MM-dd', new Date());
   const age: number = differenceInYears(today, dob);
   return age;
+}
+
+function getRussianDayWord(days: number): string {
+  if (days % 10 === 1 && days % 100 !== 11) {
+    return 'день';
+  } else if (
+    [2, 3, 4].includes(days % 10) &&
+    ![12, 13, 14].includes(days % 100)
+  ) {
+    return 'дня';
+  } else {
+    return 'дней';
+  }
+}
+
+export function calculateDaysBefore(
+  dateString: string | undefined,
+  currentDate: Date,
+): string {
+  if (!dateString) return 'Данных нет';
+  const date = parseISO(dateString);
+  const daysDifference = differenceInDays(date, currentDate);
+
+  const absoluteDaysDifference = Math.abs(daysDifference);
+  const dayWord = getRussianDayWord(absoluteDaysDifference);
+
+  if (daysDifference < 0) {
+    return `${absoluteDaysDifference} ${dayWord} назад`;
+  } else if (isToday(date)) {
+    return 'Событие сегодня';
+  } else {
+    return `${absoluteDaysDifference} ${dayWord}`;
+  }
+}
+
+export function getEventStatus(
+  dateString: string | undefined,
+  currentDate: Date,
+): string {
+  if (!dateString) return 'Данных нет';
+  const date = parseISO(dateString);
+
+  if (isToday(date)) {
+    return '';
+  } else if (date > currentDate) {
+    return 'До начала осталось:';
+  } else {
+    return 'Событие прошло';
+  }
 }
