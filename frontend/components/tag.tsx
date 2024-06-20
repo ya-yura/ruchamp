@@ -15,6 +15,7 @@ const tagVariants = cva(
         transparentAccentBorder:
           'bg-transparent border-primary-mainAccent text-primary-mainAccent',
         transparentWhiteBorder: 'bg-transparent border-white text-white',
+        whiteGreyvBorder: 'bg-white border-NeutralStroke2Rest text-neutralForeground3Rest',
       },
 
       size: {

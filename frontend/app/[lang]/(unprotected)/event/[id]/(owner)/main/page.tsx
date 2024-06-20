@@ -31,6 +31,7 @@ export default async function EventMainPage({
     fetchMatches(id),
     fetchSportTypes(),
   ]);
+
   const token = session?.token;
   const eventStatistics = await fetchEventStatistics(token, id);
   const allMatchDates: ValueOption[] = matches
