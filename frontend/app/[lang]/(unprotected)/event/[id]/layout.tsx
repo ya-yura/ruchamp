@@ -8,7 +8,7 @@ import { fetchEvent, fetchEvents } from '@/lib/data';
 import { H4 } from '@/components/text';
 import { getRandomInt } from '@/lib/utils/math-utils';
 import { getExpectedEvents } from '@/lib/utils/other-utils';
-import { Hero } from './hero';
+import { Hero } from '@/components/hero';
 import { EventActionButtons } from './event-action-buttons';
 import { UserInfo } from '@/lib/definitions';
 

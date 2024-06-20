@@ -97,7 +97,21 @@ export interface BasicInfo {
   role_id: number;
 }
 
-export interface AthleteInfo {
+interface Achievements {
+  gold: number;
+  silver: number;
+  bronze: number;
+}
+
+interface Grades {
+  [key: string]: string;
+}
+
+export interface AchievementsRecord {
+  [key: string]: Achievements;
+}
+
+interface AthleteInfo {
   id: number;
   user_id: number;
   weight: number;
@@ -106,10 +120,25 @@ export interface AthleteInfo {
   region: number;
   city: string;
   image_field: string | null;
+  grades: Grades;
   sport_types: string[];
   coaches: string[];
-  grades: string[];
+  achievements: AchievementsRecord;
 }
+
+// export interface AthleteInfo {
+//   id: number;
+//   user_id: number;
+//   weight: number;
+//   height: number;
+//   country: number;
+//   region: number;
+//   city: string;
+//   image_field: string | null;
+//   sport_types: string[];
+//   coaches: string[];
+//   grades: string[];
+// }
 
 export interface OrganizerInfo {
   id: number;
@@ -122,11 +151,11 @@ export interface OrganizerInfo {
   image_field: string | null;
 }
 
-export type UserFromServer = [AthleteInfo | OrganizerInfo, BasicInfo];
+export type UserFromServer = [AthleteInfo & OrganizerInfo, BasicInfo];
 
 export interface UserInfo {
   basicInfo: BasicInfo;
-  roleInfo: AthleteInfo | OrganizerInfo;
+  roleInfo: AthleteInfo & OrganizerInfo;
 }
 
 export interface SessionData {

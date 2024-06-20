@@ -43,8 +43,11 @@ const config = {
         Grey101: '#B6B6B6',
         Grey102: '#888888',
         bronze: '#A85835',
+        bronze1: '#AC735B',
         silver: '#898989',
+        silver1: '#888888',
         gold: '#F69301',
+        gold1: '#FFD875',
         pistachio: '#8AC285',
         orange: '#FCD483',
         purple: '#7567D7',
@@ -123,7 +126,7 @@ const config = {
       },
       margin: {
         'custom-calc': 'calc((100vw - 80rem)/2)',
-      }
+      },
     },
   },
   plugins: [

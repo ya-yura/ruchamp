@@ -12,7 +12,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Badges } from './badges';
+import { Badges } from '../app/[lang]/(unprotected)/event/[id]/badges';
 import { H1 } from '@/components/text';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -28,7 +28,7 @@ interface HeroProps {
   buttons: ReactNode;
   image: string;
   isOwner: boolean;
-  tabsData: Record<string, string>;
+  tabsData?: Record<string, string>;
   lang: Locale;
 }
 
@@ -123,32 +123,34 @@ export function Hero({
         </ContentWraper>
       </CustomSection>
       <CustomSection className="relative">
-        <ContentWraper>
-          <Tabs
-            defaultValue={Object.keys(tabsData)[0]}
-            className="mb-10 mt-[-38px] w-full"
-            onValueChange={onTabSelect}
-            value={selectedTabValue}
-          >
-            <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
-              <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
-                {Object.entries(tabsData).map(([key, value]) => (
-                  <TabsTrigger
-                    key={key}
-                    className={cn(
-                      'first-of-type:ml-4 last-of-type:mr-4',
-                      'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
-                    )}
-                    value={key}
-                  >
-                    {value}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <ScrollBar className="hidden" orientation="horizontal" />
-            </ScrollArea>
-          </Tabs>
-        </ContentWraper>
+        {tabsData && (
+          <ContentWraper>
+            <Tabs
+              defaultValue={Object.keys(tabsData)[0]}
+              className="mb-10 mt-[-38px] w-full"
+              onValueChange={onTabSelect}
+              value={selectedTabValue}
+            >
+              <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+                <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
+                  {Object.entries(tabsData).map(([key, value]) => (
+                    <TabsTrigger
+                      key={key}
+                      className={cn(
+                        'first-of-type:ml-4 last-of-type:mr-4',
+                        'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                      )}
+                      value={key}
+                    >
+                      {value}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                <ScrollBar className="hidden" orientation="horizontal" />
+              </ScrollArea>
+            </Tabs>
+          </ContentWraper>
+        )}
       </CustomSection>
     </div>
   );
