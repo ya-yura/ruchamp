@@ -5,6 +5,7 @@ interface CustomLinkProps extends React.RefAttributes<HTMLAnchorElement> {
   className?: string;
   href: string;
   lang: string;
+  onClick?:() => void;
   children: React.ReactNode;
 }
 
@@ -13,6 +14,7 @@ export function CustomLink({
   href,
   lang,
   children,
+  onClick,
   ...props
 }: CustomLinkProps) {
   const isDefaultLang = lang === i18n.defaultLocale;

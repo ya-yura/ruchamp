@@ -41,7 +41,7 @@ export default async function EventInfoPage({
   }
 
   const eventStartTime = transformDate(event.start_datetime, true);
-  const applicationTime = `${transformDate(event.end_request_datetime, true)} – ${transformDate(event.end_request_datetime, true)}`;
+  const applicationTime = `${transformDate(event.end_request_datetime, true).replace(/ /g, '\u00A0')} – ${transformDate(event.end_request_datetime, true).replace(/ /g, '\u00A0')}`;
 
   return (
     <Suspense fallback={<Loading />}>
@@ -79,6 +79,7 @@ function DateAndOrganizer({
   applicationTime,
   organizer,
 }: DateAndOrganizerProps) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   return (
     <>
       <TextCard
@@ -97,20 +98,23 @@ function DateAndOrganizer({
         text={'Организатор'}
       >
         <div className='flex'>        
-          <p className='whitespace-pre-line text-sm text-white'>Телефон:&nbsp;</p>
-          <Link className='text-sm text-white transition-colors hover:text-neutral-400' href={organizer.contact_phone}>
+          <p className='whitespace-pre-line text-sm text-text-mutedCard'>Телефон:&nbsp;</p>
+          <Link className='text-sm text-white transition-colors hover:text-neutral-400' href={`tel:${organizer.contact_phone}`}>
             {organizer.contact_phone}
           </Link>
         </div>
-        <div className='flex'>        
-          <p className='whitespace-pre-line text-sm text-white'>Email:&nbsp;</p>
-          <Link className='text-sm text-white transition-colors hover:text-neutral-400' href={organizer.contact_email}>
-            {organizer.contact_email}
+        <div className='flex max-w-full'>        
+          <p className='whitespace-pre-line text-sm text-text-mutedCard'>Email:&nbsp;</p>
+          <Link href={`mailto:${organizer.contact_email}`} passHref legacyBehavior>
+          <a className='text-sm transition-colors inline-block max-w-[85%] whitespace-nowrap overflow-hidden text-white text-ellipsis  hover:text-neutral-400' 
+            title={organizer.contact_email}>
+              {organizer.contact_email}
+          </a>
           </Link>
         </div>
         <div className='flex mb-3'>        
-          <p className='whitespace-pre-line text-sm text-white'>Website:&nbsp;</p>
-          <Link href={organizer.website} passHref legacyBehavior>
+          <p className='whitespace-pre-line text-sm text-text-mutedCard'>Website:&nbsp;</p>
+          <Link href={organizer.website.startsWith('http') ? organizer.website : `http://${organizer.website}`} passHref legacyBehavior>
             <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">{organizer.website}</a>
           </Link>
         </div>
@@ -119,7 +123,7 @@ function DateAndOrganizer({
         className="bg-card-backgroundDark"
         text={'Документы'}
       >
-        <Link href={organizer.event_system} passHref legacyBehavior>
+        <Link href={`${baseUrl}${organizer.event_system}`} passHref legacyBehavior>
           <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">Регламент проведения</a>
         </Link>
         <Link href={organizer.event_order} passHref legacyBehavior>

@@ -1,9 +1,12 @@
+"use client"
+
 import { HomeIcon, ListIcon, MenuIcon } from '../icons';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetOverlay, SheetTrigger } from '../ui/sheet';
 import { Separator } from '../ui/separator';
 import { CustomLink } from '../custom-link';
 import { Locale } from '@/i18n.config';
+import { useState } from 'react';
 
 type TypeMenuItem = {
   icon: React.ReactNode;
@@ -12,6 +15,12 @@ type TypeMenuItem = {
 };
 
 export function MenuWithButton({ lang }: { lang: Locale }) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
+  };
+  
   const menuMain: TypeMenuItem[] = [
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
@@ -59,6 +68,7 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
           className="sm:hidden"
           variant="ruchampTransparentGreyBorder"
           size="icon"
+          onClick={() => setIsSheetOpen(true)}
         >
           <MenuIcon />
         </Button>
@@ -76,6 +86,7 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
                     className="flex w-fit items-center gap-3"
                     href={item.url}
                     lang={lang}
+                    onClick={handleLinkClick}
                   >
                     {item.icon}
                     <p className="text-white">{item.text}</p>
@@ -89,6 +100,7 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
                     className="flex w-fit items-center gap-3"
                     href={item.url}
                     lang={lang}
+                    onClick={handleLinkClick}
                   >
                     {item.icon}
                     <p className="text-white">{item.text}</p>
