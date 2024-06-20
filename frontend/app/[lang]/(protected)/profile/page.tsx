@@ -16,6 +16,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BigCardWithImage } from '@/components/cards/big-card-with-image';
+import MatchesField from '../../(unprotected)/event/[id]/matches/matches-events-tabs-athlete';
 
 export default function AthleteProfile() {
   const id = 171;
@@ -32,6 +33,33 @@ export default function AthleteProfile() {
     capitan: 'Я капитан',
     member: 'Я участник',
   };
+
+  const matches = [
+    {
+      id: 6,
+      match_id: 4,
+      event_id: 2,
+      date: '12 мая 2024',
+      event_name: 'Оборот плод предоставить.',
+      location: 'г. Устюжна, пр. Профсоюзный, д. 5 стр. 471, 074626',
+      org_name: '123',
+      name: 'Предварительный раунд',
+      sport_name: 'Айкидо',
+      category_type: '2-й юношеский разряд',
+      start_datetime: '2024-05-21T10:29:12.818092',
+      end_datetime: '2024-05-21T10:39:12.818092',
+      nominal_time: 36000,
+      mat_vol: 4,
+      age_min: 0,
+      age_max: 0,
+      weight_category: 'Тяжёлый',
+      weight_min: 90.0,
+      weight_max: 100.0,
+      gender: false,
+      athlete_result: 'Did not compete in this match',
+    },
+
+  ];
 
   return (
     <>
@@ -99,36 +127,40 @@ export default function AthleteProfile() {
             <ContentWraper>
               <div className="flex w-full flex-col gap-9">
                 <ColoredCards />
-                <div className="flex w-full items-center justify-between">
-                  <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
-                    Мои мероприятия
-                  </h5>
+                <div>
+                  <div className="flex w-full items-center justify-between">
+                    <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
+                      Мои мероприятия
+                    </h5>
+                  </div>
+
+                  <Tabs
+                    defaultValue={Object.keys(tabsData)[0]}
+                    className="w-full "
+                    // onValueChange={onTabSelect}
+                    // value={selectedTabValue}
+                  >
+                    <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+                      <TabsList className="mb-2 flex w-fit justify-between bg-transparent text-text-mutedLight">
+                        {Object.entries(tabsData).map(([key, value]) => (
+                          <TabsTrigger
+                            key={key}
+                            className={cn(
+                              'first-of-type:ml-4 last-of-type:mr-4',
+                              'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                            )}
+                            value={key}
+                          >
+                            {value}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                      <ScrollBar className="hidden" orientation="horizontal" />
+                    </ScrollArea>
+                  </Tabs>
+                  <MatchesField matches={matches} />
                 </div>
 
-                <Tabs
-                  defaultValue={Object.keys(tabsData)[0]}
-                  className="mb-10  w-full "
-                  // onValueChange={onTabSelect}
-                  // value={selectedTabValue}
-                >
-                  <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
-                    <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight">
-                      {Object.entries(tabsData).map(([key, value]) => (
-                        <TabsTrigger
-                          key={key}
-                          className={cn(
-                            'first-of-type:ml-4 last-of-type:mr-4',
-                            'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
-                          )}
-                          value={key}
-                        >
-                          {value}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                    <ScrollBar className="hidden" orientation="horizontal" />
-                  </ScrollArea>
-                </Tabs>
                 <div className="flex w-full items-center justify-between">
                   <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
                     Мои команды
@@ -158,29 +190,6 @@ export default function AthleteProfile() {
                     <ScrollBar className="hidden" orientation="horizontal" />
                   </ScrollArea>
                 </Tabs>
-                {/* <ul className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => (
-          <BigCardWithImage
-            key={card.id}
-            type={type}
-            id={card.id}
-            name={card.name}
-            tags={
-              type === 'team'
-                ? card.sportTypes.join(', ')
-                : card.sports_in_matches.join(', ')
-            }
-            title={
-              type === 'event' && card.start_datetime
-                ? transformDate(card.start_datetime)
-                : `${card.captain.sirname} ${card.captain.name} ${card.captain.fathername}`
-            }
-            subtitle={card.location}
-            description={card.description}
-            lang={lang}
-          />
-        ))}
-      </ul> */}
               </div>
             </ContentWraper>
           </CustomSection>
