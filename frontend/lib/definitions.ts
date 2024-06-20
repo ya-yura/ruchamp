@@ -172,6 +172,35 @@ export interface EventStatistics {
   };
 }
 
+interface ApplicationMember {
+  id: number;
+  sirname: string;
+  name: string;
+  fathername: string;
+  birthdate: string;
+  gender: boolean;
+  height: number;
+  weight: number;
+  image_field: string | null;
+  country: number;
+  region: number;
+  city: string;
+  grade_types: string[];
+}
+
+interface ApplicationTeam {
+  id: number;
+  name: string;
+  members: ApplicationMember[];
+}
+
+export interface Applications {
+  approved?: ApplicationTeam[];
+  rejected?: ApplicationTeam[];
+  paid?: ApplicationTeam[];
+  accepted?: ApplicationTeam[];
+}
+
 // *** Teams ***
 
 export enum TeamTabs {

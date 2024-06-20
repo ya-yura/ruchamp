@@ -1,4 +1,4 @@
-import { Event, EventStatistics } from './definitions';
+import { Applications, Event, EventStatistics } from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import {
   TeamByIdFromServer,
@@ -200,6 +200,29 @@ export async function fetchEventStatistics(
   } catch (error) {
     console.error("Error while fetching org's event main page: ", error);
     throw new Error("Failed to fetch org's event main page.");
+  }
+}
+
+export async function fetchEventApplications(
+  token: string | undefined,
+  id: number | string,
+): Promise<Applications | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/event/${id}/org-info/application`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error("Error while fetching org's event applications: ", error);
+    throw new Error("Failed to fetch org's event applications.");
   }
 }
 

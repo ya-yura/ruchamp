@@ -110,7 +110,7 @@ export function UpdateEventImageDialog({
       </DialogTrigger>
       <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-          <DialogTitle>Изменить событие</DialogTitle>
+          <DialogTitle>Сменить афишу</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
