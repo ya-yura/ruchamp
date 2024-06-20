@@ -18,6 +18,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BigCardWithImageAthlete } from '@/components/cards/big-card-with-image-athlete';
 import MatchesFieldAthlete from '../../(unprotected)/event/[id]/matches/matches-field-athlete';
 import { CarouselContent } from '@/components/ui/carousel';
+import { BigCardsWithImageFieldAthlete } from '@/components/cards/big-cards-with-image-field-athlete';
 
 export default function AthleteProfile({
   params,
@@ -46,6 +47,26 @@ export default function AthleteProfile({
       name: 'Турнир турниров',
       date: '24 мая',
       location: 'Москва',
+      type: 'event',
+
+    },
+    {
+      id: 37,
+      name: 'Братуха-борцуха',
+      date: '30 июня',
+      location: 'Владивосток',
+    },
+    {
+      id: 4,
+      name: 'Чемпион Москвы',
+      date: '7 августа',
+      location: 'Афипский',
+    },
+    {
+      id: 9,
+      name: 'Плавали-знаем!',
+      date: '1 января',
+      location: 'Братск',
     },
   ];
 
@@ -164,7 +185,7 @@ export default function AthleteProfile({
           </CustomSection>
           <CustomSection className="relative pt-[76px]">
             <ContentWraper>
-              <div className="flex w-full flex-col gap-9">
+              <div className="flex w-full flex-col gap-9 mb-9">
                 <ColoredCards />
                 <div>
                   <div className="flex w-full items-center justify-between">
@@ -233,6 +254,7 @@ export default function AthleteProfile({
                       <ScrollBar className="hidden" orientation="horizontal" />
                     </ScrollArea>
                   </Tabs>
+                  <ul className="mb-10 flex gap-4">
                   {events.map((event) => (
                     <BigCardWithImageAthlete
                       key={event.id}
@@ -244,6 +266,9 @@ export default function AthleteProfile({
                       lang={lang}
                     />
                   ))}
+
+
+                  </ul>
                 </div>
               </div>
             </ContentWraper>

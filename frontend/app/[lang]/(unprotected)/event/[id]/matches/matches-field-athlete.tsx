@@ -31,7 +31,7 @@ export default function MatchesFieldAthlete({
 }: MatchesFieldAthleteProps) {
   return (
     <div className="rounded-lg bg-black p-3">
-      <ul className="flex gap-3 ">
+      <ul className="flex flex-col gap-3 ">
         {matches.map((match) => (
           <MatchCard
             key={match.id}
