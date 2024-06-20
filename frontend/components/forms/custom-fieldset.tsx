@@ -27,6 +27,8 @@ import {
 } from '../ui/radio-group';
 import { DropdownMenuCheckboxes } from './custom-multiselect';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
 
 type TypeOptionWithIcon = {
   value: string;
@@ -37,11 +39,15 @@ type TypeOptionWithIcon = {
 export type TypeField<T> = {
   type:
     | 'text'
+    | 'textarea'
     | 'password'
+    | 'file'
     | 'tel'
     | 'number'
     | 'email'
     | 'date'
+    | 'datetime-local'
+    | 'time'
     | 'checkbox'
     | 'radio'
     | 'customradio'
@@ -50,6 +56,8 @@ export type TypeField<T> = {
   name: Path<T>;
   placeholder?: string;
   label?: string;
+  fieldStyles?: string;
+  inputStyles?: string;
   defaultValue?: string;
   orientation?: 'row' | 'col';
   selectOptions?: TypeOptionWithIcon[];
@@ -67,6 +75,7 @@ export type TypeFieldsetData<T> = {
 type TypeCustomFildsetProps<T extends FieldValues> = {
   form: UseFormReturn<T>;
   fieldsetData: TypeFieldsetData<T>;
+  isFieldsetDisabled?: boolean;
   errorMessage?: string;
 } & React.HTMLAttributes<HTMLFormElement>;
 
@@ -74,24 +83,87 @@ export function CustomFieldset<T extends FieldValues>({
   fieldsetData,
   form,
   errorMessage,
+  isFieldsetDisabled,
   className,
 }: TypeCustomFildsetProps<T>) {
   return (
-    <fieldset className={cn(`grid w-full grid-cols-12 gap-5`, className)}>
+    <fieldset
+      className={cn(`grid w-full grid-cols-12 gap-5`, className)}
+      disabled={isFieldsetDisabled}
+    >
       {fieldsetData.fields.map((item) => (
         <FormField
           key={item.name}
           control={form.control}
           name={item.name}
           render={({ field }) => (
-            <FormItem className={`relative col-span-12 flex flex-col`}>
+            <FormItem
+              className={cn(
+                `group relative col-span-12 flex flex-col`,
+                item.fieldStyles,
+              )}
+            >
               {item.label && <FormLabel>{item.label}</FormLabel>}
-              {['text', 'email', 'date', 'number'].includes(item.type) && (
+              {item.type === 'file' && (
+                <>
+                  <Button
+                    className="absolute top-[16px] w-fit cursor-pointer"
+                    variant={'default'}
+                    size={'sm'}
+                  >
+                    Загрузить
+                  </Button>
+                  <Input
+                    className={cn(
+                      'relative w-fit opacity-0 file:cursor-pointer',
+                      item.inputStyles,
+                    )}
+                    {...field}
+                    value={field.value?.fileName}
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0]);
+                    }}
+                    type={item.type}
+                    id={item.name}
+                    title="Выберите файл"
+                  />
+                  <span className="text-xs text-white group-last:mt-0">
+                    {form.getValues()[`${item.name}`].name
+                      ? `Выбран файл: ${form.getValues()[`${item.name}`].name}`
+                      : 'Файл не выбран'}
+                  </span>
+                </>
+              )}
+              {['text', 'email', 'number'].includes(item.type) && (
                 <>
                   <FormControl>
                     <Input
+                      className={cn(item.inputStyles)}
                       placeholder={item.placeholder}
                       type={item.type}
+                      {...field}
+                    />
+                  </FormControl>
+                </>
+              )}
+              {['datetime-local', 'time', 'date'].includes(item.type) && (
+                <>
+                  <FormControl>
+                    <Input
+                      className={cn('w-fit', item.inputStyles)}
+                      placeholder={item.placeholder}
+                      type={item.type}
+                      {...field}
+                    />
+                  </FormControl>
+                </>
+              )}
+              {item.type === 'textarea' && (
+                <>
+                  <FormControl>
+                    <Textarea
+                      className={cn(item.inputStyles)}
+                      placeholder={item.placeholder}
                       {...field}
                     />
                   </FormControl>
@@ -125,7 +197,7 @@ export function CustomFieldset<T extends FieldValues>({
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(item.inputStyles)}>
                       <SelectValue placeholder={item.placeholder} />
                     </SelectTrigger>
                   </FormControl>

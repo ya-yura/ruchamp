@@ -14,18 +14,19 @@ import React, {
 } from 'react';
 import { Badges } from './badges';
 import { H1 } from '@/components/text';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Locale } from '@/i18n.config';
 import { usePathname, useRouter } from 'next/navigation';
 import { path } from '@/lib/utils/other-utils';
+import { fallbackImage } from '@/lib/constants';
 
 interface HeroProps {
   id: number;
   title: string;
   badges: string[];
   buttons: ReactNode;
+  image: string;
   isOwner: boolean;
   tabsData: Record<string, string>;
   lang: Locale;
@@ -36,6 +37,7 @@ export function Hero({
   title,
   badges,
   buttons,
+  image,
   isOwner,
   tabsData,
   lang,
@@ -47,12 +49,22 @@ export function Hero({
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [scrollY] = useScrollY();
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = image
+    ? image.startsWith('http')
+      ? image
+      : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
+    : fallbackImage;
 
   let progress = 0;
   const { current: elContainer } = refContainer;
   if (elContainer) {
     progress = Math.min(1, scrollY / elContainer.clientHeight);
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   useEffect(() => {
     setSelectedTabValue(pathname.split('/')[3]);
@@ -76,7 +88,7 @@ export function Hero({
       >
         <Image
           className=""
-          src={`/ru/images/mock-event-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={imageUrl}
           alt="Обложка"
           fill={true}
           style={{
@@ -94,17 +106,17 @@ export function Hero({
           <div className="relative flex flex-col gap-10">
             <div>
               <H1 className="inline">{title}</H1>
-              {isOwner && (
+              {/* {isOwner && (
                 <Button variant={'ghost'}>
                   <Image
-                    className="ml- inline"
+                    className="inline"
                     src={'/images/icons/pencil.svg'}
                     alt=""
                     width={32}
                     height={32}
                   />
                 </Button>
-              )}
+              )} */}
             </div>
             {buttons}
           </div>

@@ -53,9 +53,12 @@ class MatchCreate(BaseModel):
     combat_type: str = "Олимпийская система"
     grade: str = "1-й юношеский разряд"
     gender: str = "Мужчины"
+    age_category: str
     age_min: int  # Возраст от
     age_max: int  # Возраст до
-    weight: float  # Вес до
+    weight_category: str
+    weight_min: float
+    weight_max: float
     nominal_time: str = "10 минут"
     mat_vol: Optional[int] = 4
     start_datetime: datetime = datetime.now()

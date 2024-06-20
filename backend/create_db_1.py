@@ -8,7 +8,7 @@ from auth.models import (AllWeightClass, Athlete, Base, CategoryType, Coach,
                          RefereeType, Role, Spectator, SportType,
                          SystemAdministrator, User, athlete_coach_association,
                          athlete_grade_association, Region, Country, Area,
-                         athlete_sport_type_association)
+                         athlete_sport_type_association, AthleteSport)
 from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 
 engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")

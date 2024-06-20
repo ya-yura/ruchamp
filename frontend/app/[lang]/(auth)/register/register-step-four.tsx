@@ -123,7 +123,7 @@ export function RegisterStepFour({
         type: 'text',
         name: 'user_data.info.event_organizer_organization_contact_email',
         placeholder: 'Электронный адрес компании',
-        label: 'Email',
+        label: 'Электронный адрес компании',
         defaultValue: '',
       },
       {

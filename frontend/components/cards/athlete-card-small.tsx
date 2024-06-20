@@ -82,7 +82,6 @@ export function AthleteCardSmall({
             <b>Вес</b>: {weight} кг
           </PersonDescriptionOnCard>
         </div>
-        <Counter />
       </div>
       {isWithEvent && (
         <>

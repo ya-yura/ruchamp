@@ -20,12 +20,28 @@ export default async function Events({
     fetchEvents(),
     fetchSportTypes(),
   ]);
-  const usersEvents: Event[] = []; // make this logic later
   const dictionary = page.events;
+
+  if (events === null) {
+    return (
+      <Container>
+        <Suspense fallback={<Loading />}>
+          <EventsTabs
+            dictionary={dictionary}
+            lang={lang}
+            sportTypes={sportTypes}
+            futureEvents={[]}
+            pastEvents={[]}
+            errorText={'Произошла ошибка при загрузке событий'}
+          />
+        </Suspense>
+      </Container>
+    );
+  }
 
   const { futureEvents, pastEvents } = divideEventsByDateTime(events);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
-  const sortedPastEvents = sortedEventsByDate(pastEvents);
+  const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
 
   return (
     <Container>
@@ -36,7 +52,6 @@ export default async function Events({
           sportTypes={sportTypes}
           futureEvents={sortedFutureEvents}
           pastEvents={sortedPastEvents}
-          usersEvents={usersEvents}
         />
       </Suspense>
     </Container>

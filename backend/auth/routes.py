@@ -1,13 +1,21 @@
 import uuid
 from typing import Type
+import smtplib
+from dotenv import load_dotenv
+import os
+import yagmail
 
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from fastapi import (APIRouter, Body, Depends, File, HTTPException, UploadFile,
-                     BackgroundTasks)
+                     BackgroundTasks, Form)
 from fastapi.responses import RedirectResponse
 from fastapi_users import FastAPIUsers
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm import aliased
 
 from auth.auth import auth_backend
 from auth.mailer import send_forgot_password_email
@@ -16,13 +24,25 @@ from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
                          SportType, SystemAdministrator, User,
                          athlete_sport_type_association, Coach,
                          athlete_coach_association, CategoryType,
-                         athlete_grade_association)
+                         athlete_grade_association, AthleteSport)
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
-                          UserData, UserDB, UserRead, UserUpdate)
+                          UserData, UserDB, UserRead, UserUpdate,
+                          Feedback)
 from connection import get_db
-from event.models import Match, Event, MatchSport
-from teams.models import TeamMember
+from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
+                          MatchParticipant, MatchAge, MatchCategory,
+                          MatchGender, AllWeightClass, CombatType,
+                          MatchWeights, Fight, FightWinner)
+from teams.models import TeamMember, Team
+from match.utils import round_name
+
+load_dotenv()
+
+EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = int(os.getenv("SMTP_PORT"))
 
 router = APIRouter(prefix="/users", tags=["Users"])
 fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
@@ -95,6 +115,57 @@ async def update_profile(
     await update_function(current_user, data)
 
     return {"message": f"{model.__name__} profile updated successfully"}
+
+
+async def get_athlete_result(db, athlete_id, match_id):
+    # Запрос для получения результата атлета в конкретном матче
+    query = await db.execute(
+        select(MatchParticipant.id)
+        .where(MatchParticipant.player_id == athlete_id)
+    )
+    participant_id = query.scalars().first()
+    query = await db.execute(
+        select(Fight.id, Fight.round, Fight.player_one, Fight.player_two)
+        .where(Fight.match_id == match_id)
+    )
+    fights = query.mappings().all()
+
+    max_round = 0
+    last_fight_result = None
+
+    for fight in fights:
+        if fight['player_one'] == participant_id or fight['player_two'] == participant_id:
+            # Проверяем, кто победил в этом бою
+            result_query = await db.execute(
+                select(FightWinner.winner_id)
+                .where(FightWinner.fight_id == fight['id'])
+            )
+            winner_id = result_query.scalar_one_or_none()
+
+            if fight['round'] > max_round:
+                max_round = fight['round']
+                query = await db.execute(
+                    select(Fight.player_one)
+                    .where(Fight.round == max_round)
+                )
+                players = query.scalars().all()
+                players_count = len(players) * 2
+
+                if winner_id is None:
+                    last_fight_result = "Unknown"
+                elif winner_id == participant_id:
+                    last_fight_result = "Won"
+                else:
+                    last_fight_result = "Lost"
+
+    if last_fight_result == "Lost":
+        return f"{round_name(players_count)}"
+    elif last_fight_result == "Won":
+        return f"{round_name(players_count)}"
+    elif last_fight_result == "Unknown":
+        return f"{round_name(players_count)}"
+    else:
+        return "Did not compete in this match"
 
 
 '''  ATHLETE  '''
@@ -299,8 +370,6 @@ async def get_current_user(
                 Athlete.user_id,
                 Athlete.weight,
                 Athlete.height,
-                # Athlete.grades,
-                # Athlete.coaches,
                 Athlete.country,
                 Athlete.region,
                 Athlete.city,
@@ -314,6 +383,19 @@ async def get_current_user(
             select(Athlete.id).where(Athlete.user_id == current_user.id)
         )
         athlete_id = query.scalars().first()
+
+        query = await db.execute(
+            select(SportType.name, CategoryType.name)
+            .join(AthleteSport, AthleteSport.sport_id == SportType.id)
+            .join(CategoryType, CategoryType.id == AthleteSport.grade_id)
+            .where(AthleteSport.athlete_id == athlete_id)
+        )
+        athlete_grades = query.all()
+
+        grades = {
+            sport_name: grade_name for sport_name, grade_name in athlete_grades
+        }
+        athlete["grades"] = grades
 
         query = await db.execute(
             select(SportType.name)
@@ -331,13 +413,38 @@ async def get_current_user(
         athlete_coaches = query.scalars().all()
         athlete["coaches"] = athlete_coaches
 
+        # Получаем достижения атлета
         query = await db.execute(
-            select(CategoryType.name)
-            .join(athlete_grade_association)
-            .where(athlete_grade_association.c.athlete_id == athlete_id)
+            select(
+                SportType.name,
+                Medal.medal_type,
+                func.count(WinnerTable.id).label("count")
+            )
+            .join(
+                MatchParticipant,
+                MatchParticipant.id == WinnerTable.winner_id
+            )
+            .join(Match, Match.id == WinnerTable.match_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(Medal, Medal.id == WinnerTable.medal)
+            .where(MatchParticipant.player_id == athlete_id)
+            .group_by(SportType.name, Medal.medal_type)
         )
-        athleye_grade = query.scalars().all()
-        athlete["grades"] = athleye_grade
+        achievement_rows = query.all()
+        achievements = {}
+        for sport_name, medal_name, count in achievement_rows:
+            if sport_name not in achievements:
+                achievements[sport_name] = {
+                    "gold": 0, "silver": 0, "bronze": 0
+                }
+            if medal_name == "Золото":
+                achievements[sport_name]["gold"] += count
+            elif medal_name == "Серебро":
+                achievements[sport_name]["silver"] += count
+            elif medal_name == "Бронза":
+                achievements[sport_name]["bronze"] += count
+        athlete["achievements"] = achievements
         result.append(athlete)
 
     elif user.role_id == 2:
@@ -385,6 +492,133 @@ async def get_current_user(
     result.append(user)
 
     return result
+
+
+@router.get("/me/matches")
+async def get_current_user_matches(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    '''Информация о матчах, в которых участвовал спортсмен'''
+
+    query = await db.execute(select(
+        Athlete.id).where(Athlete.user_id == current_user.id))
+    athlete_id = query.scalars().first()
+
+    query = await db.execute(
+        select(MatchParticipant.match_id)
+        .where(MatchParticipant.player_id == athlete_id)
+    )
+
+    all_matches_id = query.scalars().all()
+
+    matches = []
+    for match_id in all_matches_id:
+        query = await db.execute(
+            select(
+                Match.id.label("match_id"),
+                Match.event_id.label("event_id"),
+                Event.name.label("event_name"),
+                Event.location.label("location"),
+                EventOrganizer.organization_name.label("org_name"),
+                Match.name,
+                SportType.name.label("sport_name"),
+                CategoryType.name.label("category_type"),
+                Match.start_datetime,
+                Match.end_datetime,
+                (Match.nominal_time*60).label("nominal_time"),
+                Match.mat_vol,
+                MatchAge.age_from.label("age_min"),
+                MatchAge.age_till.label("age_max"),
+                AllWeightClass.name.label("weight_category"),
+                AllWeightClass.min_weight.label("weight_min"),
+                AllWeightClass.max_weight.label("weight_max"),
+                MatchGender.gender.label("gender"),
+            )
+            .join(Event, Event.id == Match.event_id)
+            .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
+            .join(CombatType, CombatType.id == Match.combat_type_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchAge, MatchAge.match_id == Match.id)
+            .join(MatchGender, MatchGender.match_id == Match.id)
+            .join(MatchWeights, MatchWeights.match_id == Match.id)
+            .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
+            .join(MatchCategory, MatchCategory.match_id == Match.id)
+            .join(CategoryType, CategoryType.id == MatchCategory.category_id)
+            .where(Match.id == match_id))
+        match_info = query.mappings().first()
+
+        # Получаем результат атлета для этого матча
+        athlete_result = await get_athlete_result(db, athlete_id, match_id)
+
+        match_info = dict(match_info)
+        match_info["athlete_result"] = athlete_result
+
+        matches.append(match_info)
+
+    return matches
+
+
+@router.get("/me/teams")
+async def get_current_user_teams(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    '''Информация о командах, в которых состоит спортсмен'''
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    query = await db.execute(
+        select(TeamMember.team)
+        .where(TeamMember.member == athlete_id)
+    )
+    teams_id = query.scalars().all()
+    if teams_id is None:
+        raise HTTPException(
+            status_code=400, detail="You are not a member of any team"
+        )
+
+    teams_info = []
+
+    for team_id in teams_id:
+        query = await db.execute(
+            select(
+                Team.id.label("team_id"),
+                Team.name,
+                Team.description,
+                Team.slug,
+                Team.invite_link,
+                Team.image_field,
+                Team.country,
+                Team.city,
+                Team.region,
+                Team.captain.label("captain_id"),
+            )
+            .where(Team.id == team_id)
+        )
+        team_info = query.mappings().first()
+        team_info = dict(team_info)
+
+        # Получаем информацию о капитане команды
+        query = await db.execute(
+            select(
+                User.sirname,
+                User.name,
+                User.fathername,
+            )
+            .select_from(Team)
+            .join(Athlete, Athlete.id == Team.captain)
+            .join(User, User.id == Athlete.user_id)
+            .where(Team.id == team_id)
+        )
+        captain_info = query.mappings().first()
+        team_info["captain"] = captain_info
+        teams_info.append(team_info)
+
+    return teams_info
 
 
 @router.get("/me/organizer")
@@ -436,6 +670,7 @@ async def get_organizer_events(
         )
         matches_id = query.scalars().all()
         sports_in_matches_info = []
+
         for match_id in matches_id:
             query = await db.execute(
                 select(MatchSport.sport_id)
@@ -450,13 +685,15 @@ async def get_organizer_events(
                 )
                 sport_name = query.scalars().first()
                 sports_in_matches_info.append(sport_name)
-                unique_sports_in_matches_info = list(
+
+        unique_sports_in_matches_info = list(
                     set(sports_in_matches_info)
                 )
 
         event_result = {k: v for k, v in event.items()}
 
         event_result["sports_in_matches"] = unique_sports_in_matches_info
+
         result.append(event_result)
 
     return result
@@ -480,27 +717,6 @@ async def get_current_user_events(
     events = query.scalars().all()
 
     return {"events": events}'''
-
-
-@router.get("/me/matches")
-async def get_current_user_matches(
-    current_user: User = Depends(current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    query = await db.execute(select(
-        Athlete.id).where(Athlete.user_id == current_user.id))
-    athlete_id = query.scalars().first()
-
-    query = await db.execute(select(
-        TeamMember.id).where(TeamMember.member == athlete_id))
-    member_id = query.scalars().first()
-
-    query = await db.execute(select(
-        Match.id).where(
-            Match.player_one == member_id and Match.player_two == member_id))
-    matches = query.scalars().all()
-
-    return {"matches": matches}
 
 
 @router.get("/me/athlete")
@@ -713,8 +929,74 @@ async def sport_asosiation(
     #     await db.commit()
 
     # # await db.execute(athlete.sport_types = [id for id in sports_types])
-    # # await db.commit()    
+    # # await db.commit()
     # #print(athlete)
     # print(sports_types)
 
     return {"message": "Sport asosiation created"}'''
+
+
+@router.post("/feedback")
+async def send_feedback(
+    feedback: Feedback,
+):
+    try:
+        # Настройки SMTP сервера
+        smtp_server = SMTP_SERVER
+        smtp_port = SMTP_PORT
+        smtp_user = EMAIL_USERNAME
+        smtp_password = EMAIL_PASSWORD
+
+        # Настройка сообщения
+        msg = MIMEMultipart()
+        msg['From'] = feedback.email
+        msg['To'] = "support@sportplatform.ru"
+        msg['Subject'] = "Feedback from " + feedback.name
+
+        # Тело письма
+        body = (
+            f"Name: {feedback.name}\n"
+            f"Email: {feedback.email}\n"
+            f"Message: {feedback.message}"
+        )
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Отправка письма
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+
+        try:
+            server.login(smtp_user, smtp_password)
+        except smtplib.SMTPAuthenticationError as auth_error:
+            raise HTTPException(
+                status_code=401,
+                detail=f"SMTP Authentication error: {auth_error}"
+            )
+
+        try:
+            server.sendmail(
+                smtp_user, "support@sportplatform.ru", msg.as_string()
+            )
+        except smtplib.SMTPRecipientsRefused as recipient_error:
+            raise HTTPException(
+                status_code=400,
+                detail=f"SMTP Recipients Refused: {recipient_error}"
+            )
+        except smtplib.SMTPSenderRefused as sender_error:
+            raise HTTPException(
+                status_code=400, detail=f"SMTP Sender Refused: {sender_error}"
+            )
+        except smtplib.SMTPDataError as data_error:
+            raise HTTPException(
+                status_code=400, detail=f"SMTP Data Error: {data_error}"
+            )
+
+        server.quit()
+        return {"message": "Feedback sent successfully"}
+
+    except smtplib.SMTPException as e:
+        raise HTTPException(
+            status_code=500, detail=f"SMTP error occurred: {e}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")

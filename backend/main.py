@@ -10,21 +10,13 @@ from auth.routes import router as auth_router
 from auth.schemas import UserCreate, UserRead
 from event.routers import router as event_router
 from match.routers import router as match_router
-from pages.router import router as pages_router
+# from pages.router import router as pages_router
 from shop.routers import router as shop_router
 from teams.routers import router as team_router
+from middleware import LimitUploadSizeMiddleware
 
 # app = FastAPI(title="Ruchamp", docs_url=None, redoc_url=None)
 app = FastAPI(title="Ruchamp")
-
-# Подключение маршрута для статических файлов
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-fastapi_users = FastAPIUsers[User, int](
-    get_user_manager,
-    [auth_backend],
-)
-
 
 # Configure CORS
 origins = [
@@ -38,11 +30,28 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Устанавливаем лимит в 10 MB (10 * 1024 * 1024 байт)
+app.add_middleware(
+    LimitUploadSizeMiddleware,
+    max_upload_size=10 * 1024 * 1024
+)
+
+# Подключение маршрута для статических файлов
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+fastapi_users = FastAPIUsers[User, int](
+    get_user_manager,
+    [auth_backend],
+)
+
+
+
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),

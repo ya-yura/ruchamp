@@ -119,10 +119,12 @@ export function getAthletesByMedal(
   return res;
 }
 
-export function sortedEventsByDate(events: Event[]) {
+export function sortedEventsByDate(events: Event[], past?: 'past') {
   return events.sort((a, b) => {
     const dateA = new Date(a.start_datetime);
     const dateB = new Date(b.start_datetime);
-    return dateA.getTime() - dateB.getTime();
+    return past
+      ? dateB.getTime() - dateA.getTime()
+      : dateA.getTime() - dateB.getTime();
   });
 }

@@ -87,6 +87,7 @@ export function BigCardsWithImageField({
             }
             subtitle={card.location}
             description={card.description}
+            image={card.image_field}
             lang={lang}
           />
         ))}

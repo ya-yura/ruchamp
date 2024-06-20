@@ -15,18 +15,21 @@ export default async function UnprotectedLayout({
 }) {
   const session = await getSession();
   let userEmail: string;
-  let userAvatar: string;
+  let userAvatar: string | null;
   let initials: string;
-  if (!session || session.user.length === 0) {
+  let roleId: number;
+  if (!session || !session.user) {
     userEmail = '';
     userAvatar = '';
     initials = '';
+    roleId = 0;
   } else {
     const user = session.user;
     const firstName: string = user[1].name;
     const lastName: string = user[1].sirname;
     userEmail = user[1].email;
     userAvatar = user[0].image_field;
+    roleId = user[1].role_id;
     initials = getInitials(firstName, lastName);
   }
 
@@ -37,6 +40,7 @@ export default async function UnprotectedLayout({
         userAvatar={userAvatar}
         initials={initials}
         isLoggedIn={!!session}
+        roleId={roleId}
         lang={params.lang}
       />
       <div className="absolute mt-[-92px] h-[853px] w-full ">

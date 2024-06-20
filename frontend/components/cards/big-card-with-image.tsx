@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { CustomLink } from '../custom-link';
+import { fallbackImage } from '@/lib/constants';
 
 interface BigCardWithImage {
   type: 'event' | 'team';
@@ -15,6 +16,7 @@ interface BigCardWithImage {
   title: string;
   subtitle: string;
   description: string;
+  image: string;
   lang: Locale;
   className?: string;
 }
@@ -27,10 +29,17 @@ export function BigCardWithImage({
   title,
   subtitle,
   description,
+  image,
   lang,
   className,
 }: BigCardWithImage) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = image
+    ? image.startsWith('http')
+      ? image
+      : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
+    : fallbackImage;
 
   return (
     <li
@@ -42,7 +51,7 @@ export function BigCardWithImage({
     >
       <div className="relative h-[60%] w-full px-9 py-8">
         <Image
-          src={`/ru/images/mock-${type}-bg/${id.toString()[id.toString().length - 1]}.avif`}
+          src={imageUrl}
           alt={name}
           fill={true}
           style={{ objectFit: 'cover' }}
@@ -76,7 +85,7 @@ export function BigCardWithImage({
         <p className="line-clamp-2 text-background">{description}</p>
       </div>
       <div className="mt-auto flex justify-end gap-5 px-4">
-        <Button
+        {/* <Button
           className="border-none bg-transparent p-0 hover:border-none hover:bg-transparent"
           variant="outline"
           onClick={() => setIsLiked(!isLiked)}
@@ -96,7 +105,7 @@ export function BigCardWithImage({
               strokeLinejoin="round"
             />
           </svg>
-        </Button>
+        </Button> */}
         <CustomLink
           className={cn(
             'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',

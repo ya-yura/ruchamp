@@ -33,7 +33,7 @@ export function AuthSwitcher({
           <TabsTrigger
             key={option.value as string}
             className={cn(
-              'w-1/3 sm:w-1/2',
+              'w-1/2',
               'rounded-md border-none',
               'data-[state=active]:border-b-0 data-[state=active]:bg-white',
               'data-[state=active]:font-bold data-[state=active]:text-foreground',

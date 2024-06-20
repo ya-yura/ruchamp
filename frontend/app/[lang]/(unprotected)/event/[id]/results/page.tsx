@@ -30,6 +30,9 @@ export default async function EventResultsPage({
 }) {
   const { id, lang } = params;
   const results = await fetchResults(id);
+  const sortedByPointsResult = results.sort((a, b) => {
+    return b.points - a.points;
+  });
   const goldenMedalWinners = results.filter(
     (athlete) => athlete.medal === 'gold',
   );
@@ -43,7 +46,7 @@ export default async function EventResultsPage({
   return (
     <Suspense fallback={<Loading />}>
       <Results
-        athletes={results}
+        athletes={sortedByPointsResult}
         goldenMedalWinners={goldenMedalWinners}
         silverMedalWinners={silverMedalWinners}
         bronzeMedalWinners={bronzeMedalWinners}

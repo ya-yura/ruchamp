@@ -16,11 +16,11 @@ const config = {
     container: {
       center: true,
       padding: '2rem',
+    },
+    extend: {
       screens: {
         '2xl': '1400px',
       },
-    },
-    extend: {
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -31,15 +31,20 @@ const config = {
         neutralForeground3Rest: '#616161',
         neutralForeground3: '#ADADAD',
         NeutralBackground4Rest: '#F0F0F0',
+        NeutralStroke1Rest: '#666666',
         NeutralStroke2Rest: '#E0E0E0',
         NeutralStroke3Rest: '#3D3D3D',
         NeutralGrayColor1: '#071623',
         ColorsGrey26: '#424242',
         ColorsGrey14: '#242424',
         ColorsGrey98: '#FAFAFA',
+        Grey90: '#E6E6E6',
         Grey100: '#0A0A0A',
         Grey101: '#B6B6B6',
         Grey102: '#888888',
+        bronze: '#A85835',
+        silver: '#898989',
+        gold: '#F69301',
         pistachio: '#8AC285',
         orange: '#FCD483',
         purple: '#7567D7',
@@ -116,6 +121,9 @@ const config = {
       dropShadow: {
         contrastText: '0 1px 5px rgba(0, 0, 0, 0.9)',
       },
+      margin: {
+        'custom-calc': 'calc((100vw - 80rem)/2)',
+      }
     },
   },
   plugins: [

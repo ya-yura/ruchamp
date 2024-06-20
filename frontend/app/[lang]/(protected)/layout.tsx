@@ -16,12 +16,14 @@ export default async function ProtectedLayout({
 }) {
   const session = await getSession();
   let userEmail: string;
-  let userAvatar: string;
+  let userAvatar: string | null;
   let initials: string;
-  if (!session || session.user.length === 0) {
+  let roleId: number;
+  if (!session) {
     userEmail = '';
     userAvatar = '';
     initials = '';
+    roleId = 0;
   } else {
     const user = session.user;
     const firstName: string = user[1].name;
@@ -29,6 +31,7 @@ export default async function ProtectedLayout({
     userEmail = user[1].email;
     userAvatar = user[0].image_field;
     initials = getInitials(firstName, lastName);
+    roleId = user[1].role_id;
   }
 
   if (!session) {
@@ -42,6 +45,7 @@ export default async function ProtectedLayout({
         userAvatar={userAvatar}
         initials={initials}
         isLoggedIn={!!session}
+        roleId={roleId}
         lang={params.lang}
       />
       {children}

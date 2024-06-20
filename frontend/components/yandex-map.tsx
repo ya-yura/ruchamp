@@ -11,40 +11,65 @@ interface MapSize {
 interface YandexMapProps {
   places: Event[];
   size?: MapSize;
+  mapId: string; // Unique ID for the map container
 }
 
-export function YandexMap({ places, size }: YandexMapProps) {
+export function YandexMap({ places, size, mapId }: YandexMapProps) {
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
-    script.async = true;
+    const loadYandexMaps = () => {
+      return new Promise((resolve, reject) => {
+        if (window.ymaps) {
+          resolve(window.ymaps);
+          return;
+        }
 
-    document.body.appendChild(script);
+        const script = document.createElement('script');
+        script.src = `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${process.env.NEXT_PUBLIC_YANDEX_MAP_API_KEY}`;
+        script.async = true;
+        script.onload = () => resolve(window.ymaps);
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    };
 
-    script.addEventListener('load', () => {
-      // @ts-ignore
+    loadYandexMaps().then(() => {
       window.ymaps.ready(init);
     });
 
     function init() {
-      const avgX =
-        places.reduce((acc, place) => acc + +place.geo.split(',')[0], 0) /
-        places.length;
-      const avgY =
-        places.reduce((acc, place) => acc + +place.geo.split(',')[1], 0) /
-        places.length;
-      const zoom = places.length <= 1 ? 15 : 4;
-
-      // @ts-ignore
-      var myMap = new window.ymaps.Map('map', {
-        center: [avgX, avgY],
-        zoom: zoom,
+      const validPlaces = places.filter((place) => {
+        if (!place.geo) return false;
+        const geoParts = place.geo.split(',');
+        return (
+          geoParts.length === 2 && !isNaN(+geoParts[0]) && !isNaN(+geoParts[1])
+        );
       });
-      // Add placemarks for each location
-      places.forEach((place) => {
-        // @ts-ignore
-        var myPlacemark = new window.ymaps.Placemark(
-          [+place.geo.split(',')[0], +place.geo.split(',')[1]],
+
+      const mapCenter =
+        validPlaces.length > 0
+          ? [
+              validPlaces.reduce(
+                (acc, place) => acc + +place.geo!.split(',')[0],
+                0,
+              ) / validPlaces.length,
+              validPlaces.reduce(
+                (acc, place) => acc + +place.geo!.split(',')[1],
+                0,
+              ) / validPlaces.length,
+            ]
+          : [55.751574, 37.573856];
+
+      const zoomLevel = validPlaces.length <= 1 ? 15 : 10;
+
+      const myMap = new window.ymaps.Map(mapId, {
+        center: mapCenter,
+        zoom: zoomLevel,
+      });
+
+      validPlaces.forEach((place) => {
+        const geoParts = place.geo!.split(',');
+        const myPlacemark = new window.ymaps.Placemark(
+          [+geoParts[0], +geoParts[1]],
           {
             hintContent: place.name || '',
             balloonContentHeader: place.name || '',
@@ -55,15 +80,15 @@ export function YandexMap({ places, size }: YandexMapProps) {
             iconColor: '#0F6CBD',
           },
         );
-        // Add the placemark to the map
         myMap.geoObjects.add(myPlacemark);
       });
     }
 
     return () => {
-      document.body.removeChild(script);
+      const mapContainer = document.getElementById(mapId);
+      if (mapContainer) mapContainer.innerHTML = '';
     };
-  }, [places]);
+  }, [places, mapId]);
 
   return (
     <div
@@ -78,7 +103,7 @@ export function YandexMap({ places, size }: YandexMapProps) {
         }}
       />
       <div
-        id="map"
+        id={mapId}
         className="absolute z-10"
         style={{
           width: size?.width || '100%',

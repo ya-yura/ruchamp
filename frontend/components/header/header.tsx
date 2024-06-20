@@ -11,9 +11,10 @@ import { MenuWithButton } from './menu-with-button';
 
 interface HeaderProps {
   userEmail: string;
-  userAvatar: string;
+  userAvatar: string | null;
   initials: string;
   isLoggedIn: boolean;
+  roleId: number;
   lang: Locale;
 }
 
@@ -22,6 +23,7 @@ export function Header({
   userAvatar,
   initials,
   isLoggedIn,
+  roleId,
   lang,
 }: HeaderProps) {
   return (
@@ -53,6 +55,7 @@ export function Header({
                 userEmail={userEmail}
                 userAvatar={userAvatar}
                 initials={initials}
+                roleId={roleId}
                 lang={lang}
               />
             </>

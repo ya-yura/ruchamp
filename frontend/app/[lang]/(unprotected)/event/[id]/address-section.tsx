@@ -11,7 +11,7 @@ export function AddressSection({ event }: { event: Event }) {
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start gap-6 pb-10">
         <H3 className="m text-text-muted">Адрес</H3>
-        <YandexMap places={[event]} />
+        <YandexMap places={[event]} mapId="eventMap" />
         <div className="flex flex-col">
           <p className="text-base font-normal text-text-muted">
             {event.location}

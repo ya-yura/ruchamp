@@ -1,5 +1,6 @@
 import datetime
 import random
+import os
 
 from faker import Faker
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -1197,7 +1198,28 @@ def generate_fake_medals(session, num_medals=num_medals):
     session.commit()
 
 
-generate_medal_name(session)
+def update_images_events(session):
+
+    # Путь к папке с изображениями
+    image_folder = '/static/images'
+    # Генерация списка имен файлов изображений (1.jpg, 2.jpg, ..., 32.jpg) - сейчас их всего 32
+    image_files = [f"{i}.jpg" for i in range(1, 33)]
+
+    # Получение всех событий из таблицы Event
+    events = session.query(Event).all()
+
+    # Обновление поля image_field для каждого события
+    for event in events:
+        # Выбор случайного изображения
+        random_image = random.choice(image_files)
+        # Формирование полного пути к изображению
+        event.image_field = os.path.join(image_folder, random_image)
+
+    # Сохранение изменений в базе данных
+    session.commit()
+
+
+# generate_medal_name(session)
 # generate_fake_countries(session)
 # generate_fake_roles(session)
 
@@ -1235,3 +1257,4 @@ generate_medal_name(session)
 # generate_fake_prizes(session)
 # generate_fake_medals(session)
 # generate_fake_links(session)
+update_images_events(session)

@@ -11,7 +11,8 @@ import { UserInfo } from '@/lib/definitions';
 import { transformDate } from '@/lib/utils/date-and-time';
 import { path } from '@/lib/utils/other-utils';
 import { redirect } from 'next/navigation';
-import React from 'react';
+import React, { Suspense } from 'react';
+import Loading from './loading';
 
 export default async function EventInfoPage({
   params,
@@ -37,24 +38,22 @@ export default async function EventInfoPage({
   }
 
   const eventStartTime = transformDate(event.start_datetime, true);
-  const applicationTime = `${transformDate(event.end_request_datetime)} – ${transformDate(event.end_request_datetime)}`;
+  const applicationTime = `${transformDate(event.end_request_datetime, true)} – ${transformDate(event.end_request_datetime, true)}`;
 
   return (
-    <CustomSection className="relative mb-10">
-      <ContentWraper>
-        <TextCardFieldWithTwoLists
-          ariaLabelledby="info"
-          firstList={<MainEventInfo description={event.description} />}
-          secondList={
-            <DateAndOrganizer
-              eventStartTime={eventStartTime}
-              applicationTime={applicationTime}
-              organizer={event.organizer_name}
-            />
-          }
-        />
-      </ContentWraper>
-    </CustomSection>
+    <Suspense fallback={<Loading />}>
+      <TextCardFieldWithTwoLists
+        ariaLabelledby="info"
+        firstList={<MainEventInfo description={event.description} />}
+        secondList={
+          <DateAndOrganizer
+            eventStartTime={eventStartTime}
+            applicationTime={applicationTime}
+            organizer={event.organizer_name}
+          />
+        }
+      />
+    </Suspense>
   );
 }
 

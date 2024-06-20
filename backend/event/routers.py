@@ -3,13 +3,14 @@ import uuid
 import re
 from datetime import timedelta, datetime
 import shutil
+from typing import Optional
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile, Form)
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select, update, and_, case, func
+from sqlalchemy import select, update, and_, case, func, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from sqlalchemy.exc import SQLAlchemyError
@@ -31,6 +32,7 @@ from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           CreateTournamentApplicationAthlete,
                           UpdateTournamentApplication)
 from teams.models import Team
+from match.models import AgeCategory
 from shop.models import Ticket, Engagement, Sector, Place, Row, SpectatorTicket
 from geo.geo import get_geo
 
@@ -112,7 +114,7 @@ async def get_events(
     return result
 
 
-@router.get("/events/me")
+'''@router.get("/events/me")
 async def get_events_me(
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
@@ -146,7 +148,7 @@ async def get_events_me(
     )
     events = query.mappings().all()
 
-    return events
+    return events'''
 
 
 @router.get("/{event_id}/org-info")
@@ -184,6 +186,12 @@ async def get_event_org_info(
     )
     match_ids = query.scalars().all()
 
+    if not match_ids:
+        raise HTTPException(
+            status_code=404,
+            detail="No matches found for this event"
+        )
+
     # Получение текущей даты и времени
     now = datetime.utcnow()
     today_start = datetime(now.year, now.month, now.day)
@@ -213,11 +221,14 @@ async def get_event_org_info(
     )
     ticket_price = query.scalars().first()
 
+    # Проверка наличия билетов
+    # установление цены в 0 для бесплатных мероприятий
+    if not ticket_price:
+        ticket_price = 0
+
     query = await db.execute(
         select(SpectatorTicket.id)
-        .where(
-            SpectatorTicket.match_id.in_(match_ids),
-        )
+        .where(SpectatorTicket.match_id.in_(match_ids))
     )
     tickets = query.scalars().all()
 
@@ -226,6 +237,9 @@ async def get_event_org_info(
         .where(Engagement.match_id.in_(match_ids))
     )
     engagement_price = query.scalars().first()
+
+    if not engagement_price:
+        engagement_price = 0
 
     query = await db.execute(
         select(TournamentApplication.id)
@@ -265,23 +279,29 @@ async def get_event_org_info(
     )
     today_applications_teams_paid = query.scalars().all()
 
-    today_tickets_query = await db.execute(
-        select(SpectatorTicket)
-        .where(
-            SpectatorTicket.match_id.in_(match_ids),
-            SpectatorTicket.status == "paid",
-            SpectatorTicket.updated_at >= today_start
-        )
-    )
-    today_tickets = today_tickets_query.scalars().all()
-
     today_teams_count = len(today_applications_teams)
     today_teams_payed = sum(
         1 for team in today_applications_teams_paid if team.status == "paid"
     )
     #today_tickets = [1]  # заглушка надо подумать как взять сколько зрителей оплатило за сегодня
-    today_tickets_count = len(today_tickets)
-    today_sold_tickets_price = sum(ticket_price for ticket in today_tickets)
+
+    if tickets and any(price > 0 for price in ticket_price):
+        today_tickets_query = await db.execute(
+            select(SpectatorTicket)
+            .where(
+                SpectatorTicket.match_id.in_(match_ids),
+                SpectatorTicket.status == "paid",
+                SpectatorTicket.updated_at >= today_start
+            )
+        )
+        today_tickets = today_tickets_query.scalars().all()
+        today_tickets_count = len(today_tickets)
+        today_sold_tickets_price = sum(
+            ticket_price for ticket in today_tickets
+        )
+    else:
+        today_tickets_count = 0
+        today_sold_tickets_price = 0
 
     org_info = {
         "total": {
@@ -466,6 +486,10 @@ async def get_events_id(
         Event.name,
         EventOrganizer.organization_name.label("organizer_name"),
         EventOrganizer.id.label("organizer_id"),
+        EventOrganizer.contact_phone.label("contact_phone"),
+        EventOrganizer.contact_email.label("contact_email"),
+        EventOrganizer.website.label("website"),
+        EventOrganizer.image_field.label("image"),
         Event.description,
         Event.location,
         Event.start_request_datetime,
@@ -520,9 +544,9 @@ async def create_event(
     location: str = Form(...),
     description: str = Form(...),
     geo: str = Form(...),
-    image: UploadFile = File(...),
-    event_order: UploadFile = File(...),
-    event_system: UploadFile = File(...),
+    image: Optional[UploadFile] = File(None),
+    event_order: Optional[UploadFile] = File(None),
+    event_system: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
@@ -558,8 +582,9 @@ async def create_event(
             )
 
         # Создание директории для хранения изображений, если она не существует
-        image_dir = "static/events"
-        files_dir = "static/files"
+        base_dir = "static"
+        image_dir = os.path.join(base_dir, "images")
+        files_dir = os.path.join(base_dir, "files")
         os.makedirs(image_dir, exist_ok=True)
         os.makedirs(files_dir, exist_ok=True)
 
@@ -568,15 +593,25 @@ async def create_event(
         event_system_location = os.path.join(files_dir, event_system.filename)
 
         # Сохранение изображения на сервере
-        with open(image_location, "wb") as file:
-            shutil.copyfileobj(image.file, file)
+        if image:
+            image_location = os.path.join(image_dir, image.filename)
+            with open(image_location, "wb") as file:
+                shutil.copyfileobj(image.file, file)
 
         # Сохранение файлов на сервере
-        with open(event_order_location, "wb") as file:
-            shutil.copyfileobj(event_order.file, file)
+        if event_order:
+            event_order_location = os.path.join(
+                files_dir, event_order.filename
+            )
+            with open(event_order_location, "wb") as file:
+                shutil.copyfileobj(event_order.file, file)
 
-        with open(event_system_location, "wb") as file:
-            shutil.copyfileobj(event_system.file, file)
+        if event_system:
+            event_system_location = os.path.join(
+                files_dir, event_system.filename
+            )
+            with open(event_system_location, "wb") as file:
+                shutil.copyfileobj(event_system.file, file)
 
         new_event = Event(
             name=event_data.name,
@@ -595,7 +630,7 @@ async def create_event(
         db.add(new_event)
         await db.commit()
 
-        return {f"Event {new_event.name} - created"}
+        return new_event.id
 
     except SQLAlchemyError as e:
         await db.rollback()
@@ -635,17 +670,25 @@ async def update_image_in_event(
                             )
 
     image_name = f"{uuid.uuid4().hex}.{image.filename.split('.')[-1]}"
-    image_path = os.path.join("static/event/", image_name)
+    image_path = os.path.join("static/images", image_name)
 
-    async with async_open(image_path, 'wb') as f:
-        await f.write(await image.read())
+    # Запись файла на диск
+    try:
+        async with async_open(image_path, 'wb') as f:
+            await f.write(await image.read())
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while saving the file: {str(e)}"
+        )
 
-    event.image_field = f"/static/event/{image_name}"
+    event.image_field = f"/static/images/{image_name}"
     await db.commit()
+
     return {f"Event {event_id} updated"}
 
 
-@router.post("/update-geo/{event_id}")
+'''@router.post("/update-geo/{event_id}")
 async def update_geo_in_event(event_id: int,
                               db: AsyncSession = Depends(get_db)):
 
@@ -659,7 +702,7 @@ async def update_geo_in_event(event_id: int,
         Event.id == event_id).values(geo=geo))
 
     await db.commit()
-    return {f"Events {event_id} updated"}
+    return {f"Events {event_id} updated"}'''
 
 
 @router.put("/update/{event_id}")
@@ -706,8 +749,12 @@ async def delete_event(
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    query = await db.execute(select(Match.id).where(Event.id == event_id))
+    query = await db.execute(
+        select(Match.id)
+        .where(Match.event_id == event_id)
+    )
     matches_in_event = query.scalars().all()
+
     if matches_in_event != []:
         raise HTTPException(status_code=404, detail="Event has matches")
 
@@ -774,6 +821,9 @@ async def get_matches(
             .join(CategoryType, CategoryType.id == MatchCategory.category_id)
             .where(Match.id == match_id))
         match_info = query.mappings().all()
+        if match_info == []:
+            continue
+
         matches.append(match_info[0])
 
     return matches
@@ -946,35 +996,38 @@ async def create_match(
         match_gender = False
 
     # Весовая категория участников
-    min_weight_id_subquery = select(
-        func.min(AllWeightClass.id)
-    ).scalar_subquery()
-    max_weight_id_subquery = select(
-        func.max(AllWeightClass.id)
-    ).scalar_subquery()
-
-    query = await db.execute(
-        select(
-            case(
-                    (
-                        and_(
-                            AllWeightClass.min_weight <= match_data.weight,
-                            AllWeightClass.max_weight >= match_data.weight
-                        ),
-                        AllWeightClass.id
-                    ),
-                    (
-                        match_data.weight < AllWeightClass.min_weight,
-                        max_weight_id_subquery
-                    ),
-                    (
-                        match_data.weight > AllWeightClass.max_weight,
-                        min_weight_id_subquery
-                    )
-                )
-            )
+    query = await db.execute(select(AllWeightClass.id).where(
+        AllWeightClass.name == match_data.weight_category,
+        AllWeightClass.min_weight == match_data.weight_min,
+        AllWeightClass.max_weight == match_data.weight_max
+    ))
+    weight_category_id = query.scalars().first()
+    if not weight_category_id:
+        new_weight_category = AllWeightClass(
+            name=match_data.weight_category,
+            min_weight=match_data.weight_min,
+            max_weight=match_data.weight_max
         )
-    match_weights_id = query.scalars().first()
+        db.add(new_weight_category)
+        await db.commit()
+        weight_category_id = new_weight_category.id
+
+    # Обработка возрастной категории
+    query = await db.execute(select(AgeCategory.id).where(
+        AgeCategory.name == match_data.age_category,
+        AgeCategory.min_age == match_data.age_min,
+        AgeCategory.max_age == match_data.age_max
+    ))
+    age_category_id = query.scalars().first()
+    if not age_category_id:
+        new_age_category = AgeCategory(
+            name=match_data.age_category,
+            min_age=match_data.age_min,
+            max_age=match_data.age_max
+        )
+        db.add(new_age_category)
+        await db.commit()
+        age_category_id = new_age_category.id
 
     # Время поединка в секундах
     time = re.search(r'^(\d+)\s', match_data.nominal_time)
@@ -985,7 +1038,7 @@ async def create_match(
 
     if match_data.age_min == 0 or match_data.age_max == 0:
         raise HTTPException(status_code=400, detail="Age is not set")
-    elif match_data.weight == 0:
+    elif match_data.weight_min == 0 or match_data.weight_max == 0:
         raise HTTPException(status_code=400, detail="Weight is not set")
     else:
         new_match = Match(
@@ -1010,7 +1063,7 @@ async def create_match(
 
         match_weight = MatchWeights(
             match_id=new_match.id,
-            weight_id=match_weights_id
+            weight_id=weight_category_id
         )
         db.add(match_weight)
 

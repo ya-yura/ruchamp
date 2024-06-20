@@ -32,9 +32,9 @@ export function RangeSlider({
       <div className="flex gap-2 text-sm text-text-mutedLight">
         <p>{title}</p>
         <p>от:</p>
-        <b className="text-background">{range[0]}</b>
+        <b className="text-background dark:text-white">{range[0]}</b>
         <p>до: </p>
-        <b className="text-background">{range[1]}</b>
+        <b className="text-background dark:text-white">{range[1]}</b>
       </div>
       <Slider
         defaultValue={defaultValue}

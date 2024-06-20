@@ -122,70 +122,20 @@ export interface OrganizerInfo {
   image_field: string | null;
 }
 
+export type UserFromServer = [AthleteInfo | OrganizerInfo, BasicInfo];
+
 export interface UserInfo {
   basicInfo: BasicInfo;
   roleInfo: AthleteInfo | OrganizerInfo;
 }
 
-// export interface UserBasicData {
-//   id: number;
-//   registered_at: string;
-//   name: string;
-//   fathername: string;
-//   country: string;
-//   hashed_password: string;
-//   is_superuser: boolean;
-//   verification_token: string;
-//   role_id: number;
-//   email: string;
-//   username: string;
-//   sirname: string;
-//   gender: boolean;
-//   birthdate: string;
-//   is_active: boolean;
-//   is_verified: boolean;
-// }
-
-// export interface AtleteData {
-//   id: number;
-//   height: number;
-//   user_id: number;
-//   weight: number;
-//   image_field: string | null;
-// }
-
-// export interface OrganizerData {
-//   organization_name: string;
-//   contact_email: string;
-//   user_id: number;
-//   description: string | null;
-//   website: string;
-//   id: number;
-//   contact_phone: string;
-//   image_field: string | null;
-// }
-
-// export interface SpectatorData {
-//   image_field: string | null;
-//   user_id: number;
-//   id: number;
-//   phone_number: string;
-// }
-
-// export interface RefereeData {
-//   user_id: number;
-//   qualification_level: number;
-//   id: number;
-//   image_field: string | null;
-// }
-
-// export interface UserData {
-//   Athlete?: AtleteData;
-//   EventOrganizer?: OrganizerData;
-//   Spectator?: SpectatorData;
-//   Referee?: RefereeData;
-//   User: UserBasicData;
-// }
+export interface SessionData {
+  user: UserFromServer;
+  token: string;
+  expires: string;
+  iat: number;
+  exp: number;
+}
 
 // *** Events ***
 export interface Event {
@@ -194,7 +144,7 @@ export interface Event {
   start_request_datetime: string;
   location: string;
   event_order: string;
-  geo: string;
+  geo: string | null;
   description: string;
   end_datetime: string;
   id: number;
@@ -206,19 +156,20 @@ export interface Event {
   sports_in_matches: string[];
 }
 
-export enum EventTabs {
-  'info' = 'Информация',
-  'athletes' = 'Спортсмены',
-  'matches' = 'Мероприятия',
-  'grid' = 'Турнирная сетка',
-  'results' = 'Результаты',
-}
-
-export enum EventOwnerTabs {
-  'main' = 'Главное',
-  'teams' = 'Команды',
-  'results' = 'Результаты',
-  'docs' = 'Документы',
+export interface EventStatistics {
+  total: {
+    teams: number;
+    teams_payed: number;
+    tickets: number;
+    sold_tickets_price: number;
+    total_gain: number;
+  };
+  today: {
+    teams: number;
+    teams_payed: number;
+    tickets: number;
+    sold_tickets_price: number;
+  };
 }
 
 // *** Teams ***
