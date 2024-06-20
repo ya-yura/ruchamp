@@ -15,8 +15,9 @@ import {
 } from '@/components/cards/text-card-colored';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { BigCardWithImage } from '@/components/cards/big-card-with-image';
+import { BigCardWithImageAthlete } from '@/components/cards/big-card-with-image-athlete';
 import MatchesFieldAthlete from '../../(unprotected)/event/[id]/matches/matches-field-athlete';
+import { CarouselContent } from '@/components/ui/carousel';
 
 export default function AthleteProfile({
   params,
@@ -39,6 +40,15 @@ export default function AthleteProfile({
     member: 'Я участник',
   };
 
+  const events = [
+    {
+      id: 1,
+      name: 'Турнир турниров',
+      date: '24 мая',
+      location: 'Москва',
+    },
+  ];
+
   const matches = [
     {
       id: 6,
@@ -46,11 +56,47 @@ export default function AthleteProfile({
       event_id: 2,
       date: '12 мая 2024',
       match_type: 'Предварительный раунд',
-      sport_type: 'Айкидо',
+      sport_type: 'Греко-римская борьба',
       gender: false,
       weight_min: 90.0,
       weight_max: 100.0,
-      athlete_result: '1/8',
+      athlete_result: '1/4',
+    },
+    {
+      id: 7,
+      match_id: 4,
+      event_id: 2,
+      date: '30 сентября 2024',
+      match_type: 'Утешительный раунд',
+      sport_type: 'Греко-римская борьба',
+      gender: false,
+      weight_min: 90.0,
+      weight_max: 100.0,
+      athlete_result: '1/16',
+    },
+    {
+      id: 6,
+      match_id: 4,
+      event_id: 2,
+      date: '1 мая 2022',
+      match_type: 'Полуфиналы',
+      sport_type: 'Греко-римская борьба',
+      gender: false,
+      weight_min: 90.0,
+      weight_max: 100.0,
+      athlete_result: '1/2',
+    },
+    {
+      id: 6,
+      match_id: 4,
+      event_id: 2,
+      date: '30 августа 2021',
+      match_type: 'Жеребьевка',
+      sport_type: 'Греко-римская борьба',
+      gender: false,
+      weight_min: 90.0,
+      weight_max: 100.0,
+      athlete_result: '3 место',
     },
   ];
 
@@ -126,7 +172,6 @@ export default function AthleteProfile({
                       Мои мероприятия
                     </h5>
                   </div>
-
                   <Tabs
                     defaultValue={Object.keys(tabsData)[0]}
                     className="w-full "
@@ -158,35 +203,48 @@ export default function AthleteProfile({
                   />
                 </div>
 
-                <div className="flex w-full items-center justify-between">
-                  <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
-                    Мои команды
-                  </h5>
+                <div>
+                  <div className="flex w-full items-center justify-between">
+                    <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
+                      Мои команды
+                    </h5>
+                  </div>
+                  <Tabs
+                    defaultValue={Object.keys(tabsData)[0]}
+                    className="w-full "
+                    // onValueChange={onTabSelect}
+                    // value={selectedTabValue}
+                  >
+                    <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+                      <TabsList className="mb-1 flex w-fit justify-between bg-transparent text-text-mutedLight">
+                        {Object.entries(tabsData2).map(([key, value]) => (
+                          <TabsTrigger
+                            key={key}
+                            className={cn(
+                              'first-of-type:ml-4 last-of-type:mr-4',
+                              'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                            )}
+                            value={key}
+                          >
+                            {value}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                      <ScrollBar className="hidden" orientation="horizontal" />
+                    </ScrollArea>
+                  </Tabs>
+                  {events.map((event) => (
+                    <BigCardWithImageAthlete
+                      key={event.id}
+                      type="event"
+                      id={event.id}
+                      name={event.name}
+                      date={event.date}
+                      location={event.location}
+                      lang={lang}
+                    />
+                  ))}
                 </div>
-                <Tabs
-                  defaultValue={Object.keys(tabsData)[0]}
-                  className="mb-10  w-full "
-                  // onValueChange={onTabSelect}
-                  // value={selectedTabValue}
-                >
-                  <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
-                    <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight">
-                      {Object.entries(tabsData2).map(([key, value]) => (
-                        <TabsTrigger
-                          key={key}
-                          className={cn(
-                            'first-of-type:ml-4 last-of-type:mr-4',
-                            'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
-                          )}
-                          value={key}
-                        >
-                          {value}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                    <ScrollBar className="hidden" orientation="horizontal" />
-                  </ScrollArea>
-                </Tabs>
               </div>
             </ContentWraper>
           </CustomSection>
