@@ -48,11 +48,10 @@ export default function AthleteProfile({
       date: '24 мая',
       location: 'Москва',
       type: 'event',
-
     },
     {
       id: 37,
-      name: 'Братуха-борцуха',
+      name: 'Соревнование года',
       date: '30 июня',
       location: 'Владивосток',
     },
@@ -185,7 +184,7 @@ export default function AthleteProfile({
           </CustomSection>
           <CustomSection className="relative pt-[76px]">
             <ContentWraper>
-              <div className="flex w-full flex-col gap-9 mb-9">
+              <div className="mb-9 flex w-full flex-col gap-9">
                 <ColoredCards />
                 <div>
                   <div className="flex w-full items-center justify-between">
@@ -255,19 +254,17 @@ export default function AthleteProfile({
                     </ScrollArea>
                   </Tabs>
                   <ul className="mb-10 flex gap-4">
-                  {events.map((event) => (
-                    <BigCardWithImageAthlete
-                      key={event.id}
-                      type="event"
-                      id={event.id}
-                      name={event.name}
-                      date={event.date}
-                      location={event.location}
-                      lang={lang}
-                    />
-                  ))}
-
-
+                    {events.map((event) => (
+                      <BigCardWithImageAthlete
+                        key={event.id}
+                        type="event"
+                        id={event.id}
+                        name={event.name}
+                        date={event.date}
+                        location={event.location}
+                        lang={lang}
+                      />
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -282,21 +279,21 @@ export default function AthleteProfile({
 function ColoredCards() {
   const textCardsData: TextCardColoredProps[] = [
     {
-      title: '238 кг',
+      title: '98 кг',
       text: 'Мой вес',
       className: 'bg-pistachio',
       titleStyles: 'text-ColorsGrey14 font-black',
       textStyles: 'text-ColorsGrey26',
     },
     {
-      title: '31 февраля 1888',
-      text: 'Дата моего рожденияh',
+      title: '31 февраля 1998',
+      text: 'Дата моего рождения',
       className: 'bg-orange',
       titleStyles: 'text-ColorsGrey14 font-black',
       textStyles: 'text-ColorsGrey26',
     },
     {
-      title: 'Дата моего рождения',
+      title: 'Мастер спорта',
       text: 'В самбо',
       className: 'bg-purple',
       titleStyles: 'text-ColorsGrey98 font-black',

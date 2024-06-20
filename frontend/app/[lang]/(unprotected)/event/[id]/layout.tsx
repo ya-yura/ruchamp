@@ -58,8 +58,6 @@ export default async function EventPageLayout({
     );
   }
 
-  console.log('badges: ', event.sports_in_matches);
-
   return (
     <Container>
       <Hero
