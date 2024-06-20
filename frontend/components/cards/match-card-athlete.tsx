@@ -10,7 +10,7 @@ export interface MatchCardProps {
   name?: string;
   eventId: string;
   matchId: number;
-  date: string,
+  date: string;
   // startTime: string;
   // endTime: string;
   sportType: string;
@@ -45,44 +45,52 @@ export function MatchCard({
 }: MatchCardProps) {
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
-      <div className="flex gap-7">
-        <H5 className="whitespace-nowrap text-xl font-semibold text-white">
-          {date}
-        </H5>
-        <H5 className="truncate text-xl font-normal text-neutralForeground3Rest">
-          {name}
-        </H5>
+      <div className="flex justify-between gap-7">
+        <div className="flex">
+          <H5 className="whitespace-nowrap text-xl font-semibold text-white">
+            {date}
+          </H5>
+          <H5 className="ml-4 truncate text-xl font-normal text-neutralForeground3Rest">
+            {name}
+          </H5>
+        </div>
+        <div className="flex">
+          <H5 className="mr-4 truncate text-xl font-normal text-neutralForeground3Rest">
+            Мой результат:
+          </H5>
+          <H5 className="whitespace-nowrap text-xl font-semibold text-white">
+            1/4
+          </H5>
+        </div>
       </div>
       <div className="flex flex-col justify-between gap-5 md:flex-row">
         <div className="flex flex-wrap gap-2">
+          <Tag variant={'whiteGreyvBorder'}>{sportType}</Tag>
           <Tag variant={'transparentAccentBorder'}>
             {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
           </Tag>
-          {ageMin && ageMax && (
-            <Tag variant={'transparentGrayBorder'}>
-              {ageMin} – {ageMax} лет
-            </Tag>
-          )}
+
           {weightClass && (
-            <Tag variant={'transparentGrayBorder'}>
-              {weightClass}: от {weightMin} кг до {weightMax} кг
-            </Tag>
+            <Tag variant={'transparentGrayBorder'}>до {weightMax} кг</Tag>
           )}
-          {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
+          {/* {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>} */}
         </div>
-        {buttonText && (
-          <CustomLink
-            className={cn(
-              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            )}
-            lang={lang}
-            href={`/event/${eventId}/matches/${matchId}`}
-          >
-            Подробнее
-          </CustomLink>
-        )}
+
+        <div>
+          {buttonText && (
+            <CustomLink
+              className={cn(
+                'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+                'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+                'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              )}
+              lang={lang}
+              href={`/event/${eventId}/matches/${matchId}`}
+            >
+              Турнирная сетка
+            </CustomLink>
+          )}
+        </div>
       </div>
     </li>
   );
