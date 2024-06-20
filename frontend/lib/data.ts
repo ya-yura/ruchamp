@@ -1,4 +1,4 @@
-import { Applications, Event, EventStatistics } from './definitions';
+import { Applications, AthleteMatch, Event, EventStatistics } from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import {
   TeamByIdFromServer,
@@ -348,4 +348,28 @@ export async function createMatch(
   }
 
   return await response.json();
+}
+
+// Athlete Profile
+
+export async function fetchAthleteMatches(
+  token: string | undefined,
+): Promise<AthleteMatch[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/matches`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete matches: ', error);
+    throw new Error('Failed to fetch athlete matches.');
+  }
 }

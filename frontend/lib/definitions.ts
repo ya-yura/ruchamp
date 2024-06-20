@@ -166,6 +166,28 @@ export interface SessionData {
   exp: number;
 }
 
+export interface AthleteMatch {
+  match_id: number;
+  event_id: number;
+  event_name: string;
+  location: string;
+  org_name: string;
+  name: string;
+  sport_name: string;
+  category_type: string;
+  start_datetime: string;
+  end_datetime: string;
+  nominal_time: number;
+  mat_vol: number;
+  age_min: number;
+  age_max: number;
+  weight_category: string;
+  weight_min: number;
+  weight_max: number;
+  gender: boolean;
+  athlete_result: string;
+}
+
 // *** Events ***
 export interface Event {
   name: string;
