@@ -40,7 +40,7 @@ export default async function EventPageLayout({
     ? {
         info: 'Информация',
         main: 'Главное',
-        teams: 'Команды',
+        applications: 'Заявки',
         results: 'Результаты',
         docs: 'Документы',
       }
