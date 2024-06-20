@@ -7,40 +7,30 @@ import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 
 export interface MatchCardProps {
-  name?: string;
-  eventId: string;
   matchId: number;
+  eventId: string;
   date: string;
-  // startTime: string;
-  // endTime: string;
+  matchType?: string;
   sportType: string;
-  grade: string;
   gender?: boolean;
-  weightClass: string;
-  weightMin: number;
+  weightMin?: number;
   weightMax: number;
   buttonText?: string;
-  ageMin: number;
-  ageMax: number;
+  athleteResult: string;
   lang: Locale;
 }
 
 export function MatchCard({
-  name,
+  matchType,
   eventId,
   matchId,
   date,
-  // startTime,
-  // endTime,
   sportType,
-  grade,
   gender,
-  weightClass,
   weightMin,
   weightMax,
   buttonText,
-  ageMin,
-  ageMax,
+  athleteResult,
   lang,
 }: MatchCardProps) {
   return (
@@ -51,7 +41,7 @@ export function MatchCard({
             {date}
           </H5>
           <H5 className="ml-4 truncate text-xl font-normal text-neutralForeground3Rest">
-            {name}
+            {matchType}
           </H5>
         </div>
         <div className="flex">
@@ -59,7 +49,7 @@ export function MatchCard({
             Мой результат:
           </H5>
           <H5 className="whitespace-nowrap text-xl font-semibold text-white">
-            1/4
+            {athleteResult}
           </H5>
         </div>
       </div>
@@ -70,9 +60,8 @@ export function MatchCard({
             {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
           </Tag>
 
-          {weightClass && (
-            <Tag variant={'transparentGrayBorder'}>до {weightMax} кг</Tag>
-          )}
+          <Tag variant={'transparentGrayBorder'}>до {weightMax} кг</Tag>
+
           {/* {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>} */}
         </div>
 

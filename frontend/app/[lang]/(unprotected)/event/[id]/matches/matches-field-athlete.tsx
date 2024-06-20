@@ -10,19 +10,8 @@ interface Match {
   match_id: number;
   event_id: number;
   date: string;
-  event_name: string;
-  location: string;
-  org_name: string;
-  name: string;
-  sport_name: string;
-  category_type: string;
-  start_datetime: string;
-  end_datetime: string;
-  nominal_time: number;
-  mat_vol: number;
-  age_min: number;
-  age_max: number;
-  weight_category: string;
+  match_type: string;
+  sport_type: string;
   weight_min: number;
   weight_max: number;
   gender: boolean;
@@ -48,16 +37,13 @@ export default function MatchesFieldAthlete({
             key={match.id}
             eventId={eventId}
             matchId={match.id}
-            name={match.name}
+            matchType={match.match_type}
             date={match.date}
-            sportType={match.sport_name}
-            grade={match.category_type}
+            sportType={match.sport_type}
             gender={match.gender}
-            weightClass={match.weight_category}
             weightMin={match.weight_min}
             weightMax={match.weight_max}
-            ageMin={match.age_min}
-            ageMax={match.age_max}
+            athleteResult={match.athlete_result}
             buttonText={'Турнирная сетка'}
             lang={lang}
           />

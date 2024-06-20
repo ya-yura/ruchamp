@@ -16,9 +16,14 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BigCardWithImage } from '@/components/cards/big-card-with-image';
-import MatchesField from '../../(unprotected)/event/[id]/matches/matches-events-tabs-athlete';
+import MatchesFieldAthlete from '../../(unprotected)/event/[id]/matches/matches-field-athlete';
 
-export default function AthleteProfile() {
+export default function AthleteProfile({
+  params,
+}: {
+  params: { lang: Locale };
+}) {
+  const { lang } = params;
   const id = 171;
   const isOwner = true;
   const badges = ['Главное', 'Айкидо', 'Греко-римская борьба'];
@@ -40,94 +45,13 @@ export default function AthleteProfile() {
       match_id: 4,
       event_id: 2,
       date: '12 мая 2024',
-      event_name: 'Оборот плод предоставить.',
-      location: 'г. Устюжна, пр. Профсоюзный, д. 5 стр. 471, 074626',
-      org_name: '123',
-      name: 'Предварительный раунд',
-      sport_name: 'Айкидо',
-      category_type: '2-й юношеский разряд',
-      start_datetime: '2024-05-21T10:29:12.818092',
-      end_datetime: '2024-05-21T10:39:12.818092',
-      nominal_time: 36000,
-      mat_vol: 4,
-      age_min: 0,
-      age_max: 0,
-      weight_category: 'Тяжёлый',
+      match_type: 'Предварительный раунд',
+      sport_type: 'Айкидо',
+      gender: false,
       weight_min: 90.0,
       weight_max: 100.0,
-      gender: false,
-      athlete_result: 'Did not compete in this match',
+      athlete_result: '1/8',
     },
-    {
-      id: 6,
-      match_id: 4,
-      event_id: 2,
-      date: '12 мая 2024',
-      event_name: 'Оборот плод предоставить.',
-      location: 'г. Устюжна, пр. Профсоюзный, д. 5 стр. 471, 074626',
-      org_name: '123',
-      name: 'Предварительный раунд',
-      sport_name: 'Айкидо',
-      category_type: '2-й юношеский разряд',
-      start_datetime: '2024-05-21T10:29:12.818092',
-      end_datetime: '2024-05-21T10:39:12.818092',
-      nominal_time: 36000,
-      mat_vol: 4,
-      age_min: 0,
-      age_max: 0,
-      weight_category: 'Тяжёлый',
-      weight_min: 90.0,
-      weight_max: 100.0,
-      gender: false,
-      athlete_result: 'Did not compete in this match',
-    },
-    {
-      id: 6,
-      match_id: 4,
-      event_id: 2,
-      date: '12 мая 2024',
-      event_name: 'Оборот плод предоставить.',
-      location: 'г. Устюжна, пр. Профсоюзный, д. 5 стр. 471, 074626',
-      org_name: '123',
-      name: 'Предварительный раунд',
-      sport_name: 'Айкидо',
-      category_type: '2-й юношеский разряд',
-      start_datetime: '2024-05-21T10:29:12.818092',
-      end_datetime: '2024-05-21T10:39:12.818092',
-      nominal_time: 36000,
-      mat_vol: 4,
-      age_min: 0,
-      age_max: 0,
-      weight_category: 'Тяжёлый',
-      weight_min: 90.0,
-      weight_max: 100.0,
-      gender: false,
-      athlete_result: 'Did not compete in this match',
-    },
-    {
-      id: 6,
-      match_id: 4,
-      event_id: 2,
-      date: '12 мая 2024',
-      event_name: 'Оборот плод предоставить.',
-      location: 'г. Устюжна, пр. Профсоюзный, д. 5 стр. 471, 074626',
-      org_name: '123',
-      name: 'Предварительный раунд',
-      sport_name: 'Айкидо',
-      category_type: '2-й юношеский разряд',
-      start_datetime: '2024-05-21T10:29:12.818092',
-      end_datetime: '2024-05-21T10:39:12.818092',
-      nominal_time: 36000,
-      mat_vol: 4,
-      age_min: 0,
-      age_max: 0,
-      weight_category: 'Тяжёлый',
-      weight_min: 90.0,
-      weight_max: 100.0,
-      gender: false,
-      athlete_result: 'Did not compete in this match',
-    },
-
   ];
 
   return (
@@ -227,7 +151,11 @@ export default function AthleteProfile() {
                       <ScrollBar className="hidden" orientation="horizontal" />
                     </ScrollArea>
                   </Tabs>
-                  <MatchesField matches={matches} />
+                  <MatchesFieldAthlete
+                    matches={matches}
+                    eventId={'171'}
+                    lang={lang}
+                  />
                 </div>
 
                 <div className="flex w-full items-center justify-between">
