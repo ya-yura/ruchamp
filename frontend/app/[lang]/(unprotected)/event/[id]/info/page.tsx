@@ -80,6 +80,8 @@ function DateAndOrganizer({
   organizer,
 }: DateAndOrganizerProps) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const hasEventOrder = organizer.event_order.startsWith('static');
+  const hasEventSystem = organizer.event_system.startsWith('static');
   return (
     <>
       <TextCard
@@ -119,17 +121,23 @@ function DateAndOrganizer({
           </Link>
         </div>
       </TextCard>
-      <TextCard
-        className="bg-card-backgroundDark"
-        text={'Документы'}
-      >
-        <Link href={`${baseUrl}${organizer.event_system}`} passHref legacyBehavior>
-          <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">Регламент проведения</a>
-        </Link>
-        <Link href={organizer.event_order} passHref legacyBehavior>
-          <a className='text-sm text-white transition-colors hover:text-neutral-400 mb-3' target="_blank">Отчет судьи</a>
-        </Link>
-      </TextCard>
+      {(hasEventOrder || hasEventSystem) && ( 
+        <TextCard
+          className="bg-card-backgroundDark"
+          text={'Документы'}
+        >
+          {hasEventSystem && ( 
+            <Link href={`${baseUrl}/${organizer.event_system}`} passHref legacyBehavior>
+              <a className='text-sm text-white transition-colors hover:text-neutral-400' target="_blank">Регламент проведения</a>
+            </Link>
+          )}
+          {hasEventOrder && ( 
+            <Link href={`${baseUrl}/${organizer.event_order}`} passHref legacyBehavior>
+              <a className='text-sm text-white transition-colors hover:text-neutral-400 mb-3' target="_blank">Отчет судьи</a>
+            </Link>
+          )}
+        </TextCard>
+      )}
     </>
   );
 }
