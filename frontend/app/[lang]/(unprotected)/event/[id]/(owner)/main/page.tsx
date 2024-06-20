@@ -20,6 +20,8 @@ export default async function EventMainPage({
     fetchEvent(id),
     fetchMatches(id),
   ]);
+
+
   const allMatchDates: ValueOption[] = matches
     .map((match) => ({
       value: match?.start_datetime || '',
