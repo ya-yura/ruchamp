@@ -1,7 +1,6 @@
 import { EventsTabs } from './events-tabs';
 import { Event } from '@/lib/definitions';
 import { Container } from '@/components/container';
-import { testData } from '@/lib/constants';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
