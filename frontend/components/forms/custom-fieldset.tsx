@@ -64,6 +64,7 @@ export type TypeField<T> = {
   multiselectOptions?: PathValue<T, Path<T>>;
   radioOptions?: { [s: string]: string } | ArrayLike<string>;
   customRadioOptions?: TypeOptionWithIcon[];
+  isDisabled?: boolean;
 };
 
 export type TypeFieldsetData<T> = {
@@ -141,6 +142,7 @@ export function CustomFieldset<T extends FieldValues>({
                       className={cn(item.inputStyles)}
                       placeholder={item.placeholder}
                       type={item.type}
+                      disabled={item.isDisabled}
                       {...field}
                     />
                   </FormControl>

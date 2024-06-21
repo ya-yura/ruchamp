@@ -97,9 +97,7 @@ export function CreateTeamDialog({
       createTeam(token, values)
         .then((id) => {
           setIsOpen(false);
-          toast.success(
-            'Команда успешно создана',
-          );
+          toast.success('Команда успешно создана');
           revalidateTeams();
           form.reset();
           setTabValue('1');
@@ -212,8 +210,9 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateTeamSchema> }) {
       {
         type: 'text', // later change to file
         name: 'image_field',
-        placeholder: 'Вставьте ссылку на изображение',
+        placeholder: 'Функционал будет позже',
         label: 'Аватар',
+        isDisabled: true,
       },
     ],
   };
