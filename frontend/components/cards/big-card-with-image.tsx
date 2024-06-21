@@ -38,7 +38,9 @@ export function BigCardWithImage({
   const imageUrl = image
     ? image.startsWith('http')
       ? image
-      : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
+      : image === 'string'
+        ? fallbackImage
+        : `${baseUrl}/${image.startsWith('/') ? image.slice(1) : image}`
     : fallbackImage;
 
   return (

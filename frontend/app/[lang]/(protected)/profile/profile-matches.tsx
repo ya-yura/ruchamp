@@ -45,7 +45,7 @@ export function ProfileMatches({
   return (
     <CustomSection className="relative pt-[76px]">
       <ContentWraper className="min-h-44">
-        <h5 className="text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px] mb-10">
+        <h5 className="mb-10 text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
           Мои мероприятия
         </h5>
         <Tabs
@@ -65,7 +65,6 @@ export function ProfileMatches({
                 )}
                 value={key}
               >
-                <div className='mr-2 h-5 w-5 bg-[url("/images/icons/calendar.svg")] group-data-[state=active]:bg-[url("/images/icons/calendar-filled.svg")]'></div>
                 {value}
               </TabsTrigger>
             ))}

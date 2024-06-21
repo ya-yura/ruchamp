@@ -27,7 +27,7 @@ interface HeroProps {
   badges: string[];
   buttons: ReactNode;
   image: string;
-  isOwner: boolean;
+  isOwner?: boolean;
   tabsData?: Record<string, string>;
   lang: Locale;
 }

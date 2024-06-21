@@ -2890,3 +2890,4 @@ export const testGridInfoData: GridInfo = {
 };
 
 export const fallbackImage = '/ru/images/mock-event-bg/5.avif';
+export const fallbackTeamImage = '/ru/images/mock-team-bg/4.avif';

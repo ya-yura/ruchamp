@@ -11,7 +11,7 @@ import { transformDate } from '@/lib/utils/date-and-time';
 interface BigCardsWithImageFieldProps {
   cards: Event[] | Team[];
   type: 'event' | 'team';
-  scrollToTop: () => void;
+  scrollToTop?: () => void;
   lang: Locale;
 }
 

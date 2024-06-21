@@ -188,6 +188,26 @@ export interface AthleteMatch {
   athlete_result: string;
 }
 
+interface Captain {
+  sirname: string;
+  name: string;
+  fathername: string;
+}
+
+export interface TeamDetails {
+  team_id: number;
+  name: string;
+  description: string;
+  slug: string;
+  invite_link: string;
+  image_field: string;
+  country: number;
+  city: string;
+  region: number;
+  captain_id: number;
+  captain: Captain;
+}
+
 // *** Events ***
 export interface Event {
   name: string;

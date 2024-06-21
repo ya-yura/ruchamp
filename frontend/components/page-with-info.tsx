@@ -102,37 +102,37 @@ export function PageWithInfo<T extends string>({
           </div>
         </ContentWraper>
       </CustomSection>
-      <CustomSection className="relative">
-        <ContentWraper>
-          <Tabs
-            defaultValue={Object.keys(tabsObj)[0]}
-            className="mb-10 mt-[-38px] w-full"
-          >
-            <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
-              <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
-                {Object.entries(tabsObj).map(([key, value]) => (
-                  <TabsTrigger
-                    key={key}
-                    className={cn(
-                      'first-of-type:ml-4 last-of-type:mr-4',
-                      'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
-                    )}
-                    value={key}
-                  >
-                    {value}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <ScrollBar className="hidden" orientation="horizontal" />
-            </ScrollArea>
+      <Tabs
+        defaultValue={Object.keys(tabsObj)[0]}
+        className="mb-10 mt-[-38px] w-full"
+      >
+        <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+          <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
             {Object.entries(tabsObj).map(([key, value]) => (
-              <TabsContent key={key} value={key}>
-                {tabsContent[value as T]}
-              </TabsContent>
+              <TabsTrigger
+                key={key}
+                className={cn(
+                  'first-of-type:ml-4 last-of-type:mr-4',
+                  'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                )}
+                value={key}
+              >
+                {value}
+              </TabsTrigger>
             ))}
-          </Tabs>
-        </ContentWraper>
-      </CustomSection>
+          </TabsList>
+          <ScrollBar className="hidden" orientation="horizontal" />
+        </ScrollArea>
+        {Object.entries(tabsObj).map(([key, value]) => (
+          <TabsContent
+            className="relative mt-[-42px] bg-Grey100 pt-[68px]"
+            key={key}
+            value={key}
+          >
+            {tabsContent[value as T]}
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }
