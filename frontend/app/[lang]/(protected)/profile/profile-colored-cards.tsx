@@ -66,56 +66,78 @@ export function ProfileColoredCards({
                 textStyles={card.textStyles}
               />
             ))}
-            <li className="flex flex-col items-start rounded-lg bg-purple p-5">
-              <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
-                {grades[grade]}
-              </h4>
-              <Select
-                onValueChange={(data) => setGrade(data)}
-                defaultValue={Object.keys(grades)[0]}
-              >
-                <SelectTrigger className="w-fit space-x-2 whitespace-pre-line border-none bg-transparent p-0 text-sm text-ColorsGrey98 shadow-none focus:shadow-none">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(grades).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {key}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </li>
-            <li className="flex flex-col items-start rounded-lg bg-neutralForeground3 p-5">
-              <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
-                <span className="text-gold1">
-                  {achievements[achievement].gold} шт
-                </span>
-                ,{' '}
-                <span className="text-silver1">
-                  {achievements[achievement].silver} шт
-                </span>
-                ,{' '}
-                <span className="text-bronze1">
-                  {achievements[achievement].bronze} шт
-                </span>
-              </h4>
-              <Select
-                onValueChange={(data) => setAchievement(data)}
-                defaultValue={Object.keys(achievements)[0]}
-              >
-                <SelectTrigger className="w-fit space-x-2 whitespace-pre-line border-none bg-transparent p-0 text-sm text-ColorsGrey98 shadow-none focus:shadow-none">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(achievements).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      Медалей в {key}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </li>
+            {!!Object.keys(grades).length ? (
+              <li className="flex flex-col items-start rounded-lg bg-purple p-5">
+                <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
+                  {grades[grade]}
+                </h4>
+                <Select
+                  onValueChange={(data) => setGrade(data)}
+                  defaultValue={Object.keys(grades)[0]}
+                >
+                  <SelectTrigger className="w-fit space-x-2 whitespace-pre-line border-none bg-transparent p-0 text-sm text-ColorsGrey98 shadow-none focus:shadow-none">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(grades).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {key}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </li>
+            ) : (
+              <li className="flex flex-col items-start rounded-lg bg-purple p-5">
+                <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
+                  Уровень не указан
+                </h4>
+                <p className="whitespace-pre-line text-sm text-ColorsGrey98">
+                  Уровень
+                </p>
+              </li>
+            )}
+            {!!Object.keys(achievements).length ? (
+              <li className="flex flex-col items-start rounded-lg bg-neutralForeground3 p-5">
+                <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
+                  <span className="text-gold1">
+                    {achievements[achievement].gold} шт
+                  </span>
+                  ,{' '}
+                  <span className="text-silver1">
+                    {achievements[achievement].silver} шт
+                  </span>
+                  ,{' '}
+                  <span className="text-bronze1">
+                    {achievements[achievement].bronze} шт
+                  </span>
+                </h4>
+                <Select
+                  onValueChange={(data) => setAchievement(data)}
+                  defaultValue={Object.keys(achievements)[0]}
+                >
+                  <SelectTrigger className="w-fit space-x-2 whitespace-pre-line border-none bg-transparent p-0 text-sm text-ColorsGrey98 shadow-none focus:shadow-none">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(achievements).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        Медалей в {key}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </li>
+            ) : (
+              <li className="flex flex-col items-start rounded-lg bg-neutralForeground3 p-5">
+                <h4 className="mb-3 text-lg font-black text-ColorsGrey98">
+                  Наград пока что нет
+                </h4>
+                <p className={'whitespace-pre-line text-sm text-ColorsGrey98'}>
+                  Награды
+                </p>
+              </li>
+            )}
           </ul>
         </div>
       </ContentWraper>
