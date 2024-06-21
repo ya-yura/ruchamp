@@ -300,7 +300,7 @@ async def create_team(
         team=new_team.id, member=athlete_id))
     await db.commit()
 
-    return {"message": f"Team: {new_team.name} - created"}
+    return new_team.id
 
 
 @router.get("/get-all-teams")

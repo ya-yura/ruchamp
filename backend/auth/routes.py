@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import os
 import yagmail
 import logging
+import shutil
+from transliterate import translit
 
 
 from email.mime.multipart import MIMEMultipart
@@ -57,6 +59,12 @@ referee_update = RefereeUpdate
 user_db_verify = UserDB
 
 
+# Функция для транслитерации имени файла
+def transliterate_filename(filename):
+    name, ext = os.path.splitext(filename)
+    return translit(name, 'ru', reversed=True) + ext
+
+
 def is_model_field(model: Type, field_name: str) -> bool:
     """
     Проверяет, существует ли атрибут с указанным именем в модели.
@@ -72,6 +80,9 @@ async def upload_image(
     user_manager: UserManager = Depends(get_user_manager),
     db: AsyncSession = Depends(get_db),
 ):
+    base_dir = "static"
+    image_dir = os.path.join(base_dir, "images")
+
     role_id = current_user.role_id
     # Роли, которым разрешено загружать изображения
     allowed_roles = [1, 2, 3, 4, 5]
@@ -83,13 +94,23 @@ async def upload_image(
         raise HTTPException(
             status_code=400, detail="Invalid image field for the model")
 
-    with open(f"images/{image.filename}", "wb") as f:
-        f.write(image.file.read())
+    # Генерация уникального имени файла для изображения
+    image_filename = transliterate_filename(image.filename)
+    image_location = os.path.normpath(
+        os.path.join(image_dir, image_filename)
+    )
 
-    image_url = f"images/{image.filename}"
-    db.execute(update(model).where(model.user_id == current_user.id).values(
-        {image_field: image_url}))
+    # Сохранение изображения на сервере
+    with open(image_location, "wb") as file:
+        shutil.copyfileobj(image.file, file)
 
+    image_url = image_location
+    # Обновление модели в базе данных
+    await db.execute(
+            update(model)
+            .where(model.user_id == current_user.id)
+            .values({image_field: image_url})
+        )
     await db.commit()
 
     return {"message": f"{image_field} uploaded successfully"}
@@ -239,7 +260,9 @@ async def upload_athlete_photo(
     current_user: UserDB = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await upload_image(Athlete, "photo_url", image, current_user, db)
+    return await upload_image(
+        Athlete, "image_field", image, current_user=current_user, db=db
+    )
 
 
 @router.put("/update-athlete-profile")
@@ -925,13 +948,13 @@ async def update_user(
     user.sirname = user_update.sirname
     user.fathername = user_update.fathername
 
-    if user.role_id == 1:
+    '''if user.role_id == 1:
         await db.execute(update(Athlete).where(
             Athlete.user_id == current_user.id
         ).values(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
-        ))
+        ))'''
     if user.role_id == 2:
         await db.execute(update(EventOrganizer).where(
             EventOrganizer.user_id == current_user.id
