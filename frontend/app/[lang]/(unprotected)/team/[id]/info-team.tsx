@@ -7,7 +7,7 @@ import {
 } from '@/components/text';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TextCardFieldWithTwoLists } from '@/components/cards/text-card-field-with-two-lists';
-import { Country, AllRegions } from '@/lib/definitions';
+import { AllRegions, Countries } from '@/lib/definitions';
 import { Locale } from '@/i18n.config';
 import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
 import { getInitials } from '@/lib/utils/text-utils';
@@ -55,7 +55,7 @@ function CaptainAndCoaches({
           </PersonNameOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
             {captain.city}, {AllRegions[captain.region]},{' '}
-            {Country[captain.country]}
+            {Countries[captain.country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="col-start-2 sm:col-span-2 sm:col-start-1 xl:col-start-2">
             <b>{captain.birthdate.split('-')[0]} г.р.</b>,{' '}

@@ -9,6 +9,7 @@ import { ProfileColoredCards } from './profile-colored-cards';
 import { ProfileMatches } from './profile-matches';
 import { fetchAthleteMatches, fetchAthleteTeams } from '@/lib/data';
 import { ProfileTeams } from './profile-teams';
+import { userRoles } from '@/lib/constants';
 
 const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   upcoming: 'Будут',
@@ -43,7 +44,19 @@ export default async function AthleteProfile({
   const userFullName = `${user?.basicInfo.name} ${user?.basicInfo.fathername} ${user?.basicInfo.sirname}`;
 
   if (!user) {
-    return <H4>Пользователь не найден</H4>;
+    return (
+      <Container className="min-h-screen">
+        <H4>Пользователь не найден</H4>
+      </Container>
+    );
+  }
+
+  if (user.basicInfo.role_id === +userRoles['organizer']) {
+    return (
+      <Container className="min-h-screen">
+        <H4>Страница профиля организатора в разработке</H4>
+      </Container>
+    );
   }
 
   return (

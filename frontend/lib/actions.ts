@@ -9,3 +9,7 @@ export async function revalidateEvents() {
 export async function revalidateEvent(id: number | string) {
   revalidateTag(`update-event-${id}`);
 }
+
+export async function revalidateTeams() {
+  revalidateTag('teams');
+}

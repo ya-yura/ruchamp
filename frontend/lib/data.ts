@@ -18,6 +18,7 @@ import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/
 import { CreateEventSchema } from '@/components/dialogs/create-event';
 import { UpdateEventImageSchema } from '@/components/dialogs/update-event-image';
 import { CreateMatchSchema } from '@/components/dialogs/create-match';
+import { CreateTeamSchema } from '@/components/dialogs/create-team';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -119,7 +120,7 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['teams'] },
     });
     // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
@@ -400,4 +401,24 @@ export async function fetchAthleteTeams(
     console.error('Error while fetching athlete teams: ', error);
     throw new Error('Failed to fetch athlete teams.');
   }
+}
+
+export async function createTeam(
+  token: string,
+  values: CreateTeamSchema,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/team/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create team');
+  }
+
+  return await response.json();
 }

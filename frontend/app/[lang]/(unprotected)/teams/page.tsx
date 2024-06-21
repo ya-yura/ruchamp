@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { Container } from '@/components/container';
 import { TeamsListing } from './teams-listing';
 import { Locale } from '@/i18n.config';
-import { Country, AllRegions } from '@/lib/definitions';
+import { AllRegions, Countries } from '@/lib/definitions';
 import { getDictionary } from '@/lib/dictionary';
 import { testTeamInTeams } from '@/lib/constants';
 import { calculateGender } from '@/lib/utils/other-utils';
@@ -99,7 +99,7 @@ export default async function Teams({
     const ages = members
       .map((member) => calculateAge(member[0].birthdate))
       .sort((a, b) => a - b);
-    const location = `${teamInfo.city}, ${AllRegions[teamInfo.region]}, ${Country[teamInfo.country]}`;
+    const location = `${teamInfo.city}, ${AllRegions[teamInfo.region]}, ${Countries[teamInfo.country]}`;
 
     return {
       ...teamInfo,

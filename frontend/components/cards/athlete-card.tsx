@@ -3,7 +3,7 @@ import { Medals } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { H4, PersonDescriptionOnCard } from '../text';
-import { Country, AllRegions } from '@/lib/definitions';
+import { AllRegions, Countries } from '@/lib/definitions';
 import { Badge } from '../ui/badge';
 import { getInitials } from '@/lib/utils/text-utils';
 import { calculateAge, getRussianAgeWord } from '@/lib/utils/date-and-time';
@@ -91,7 +91,7 @@ export function AthleteCard({
             {sirname} {name} {fathername}
           </H4>
           <PersonDescriptionOnCard className="text-neutralForeground3">
-            {city}, {AllRegions[region]}, {Country[country]}
+            {city}, {AllRegions[region]}, {Countries[country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard className="text-neutralForeground3">
             {birthdate ? (

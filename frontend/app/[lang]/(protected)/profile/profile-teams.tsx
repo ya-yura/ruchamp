@@ -5,7 +5,7 @@ import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/i18n.config';
-import { AllRegions, Country, TeamDetails } from '@/lib/definitions';
+import { AllRegions, Countries, TeamDetails } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
 import React, { useMemo, useState } from 'react';
 
@@ -74,7 +74,7 @@ export function ProfileTeams({
                       name={team.name}
                       tags={''} // add later
                       title={`${team.captain.sirname} ${team.captain.name} ${team.captain.fathername}`}
-                      subtitle={`${team.city}, ${AllRegions[team.region]}, ${Country[team.country]}`}
+                      subtitle={`${team.city}, ${AllRegions[team.region]}, ${Countries[team.country]}`}
                       description={team.description}
                       image={team.image_field}
                       lang={lang}

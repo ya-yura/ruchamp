@@ -2,7 +2,7 @@ import {
   CustomFieldset,
   TypeFieldsetData,
 } from '@/components/forms/custom-fieldset';
-import { Country, EnumUserRole, AllRegions } from '@/lib/definitions';
+import { EnumUserRole, AllRegions, Countries } from '@/lib/definitions';
 import { UseFormReturn } from 'react-hook-form';
 import { TypeRegFormSchema } from './register-form';
 import { Locale } from '@/i18n.config';
@@ -19,26 +19,14 @@ type TypeRegisterStepFourProps = {
   sportTypes: string[];
 };
 
-const getCountryOptions = () => {
-  return Object.keys(Country)
-    .filter((key) => isNaN(Number(key))) // Only get the string keys
-    .map((key) => ({
-      value: Country[key as keyof typeof Country].toString(),
-      option: key,
-    }));
-};
-
-const getRegionOptions = () => {
-  return Object.keys(AllRegions)
-    .filter((key) => isNaN(Number(key))) // Only get the string keys
-    .map((key) => ({
-      value: AllRegions[key as keyof typeof AllRegions].toString(),
-      option: key,
-    }));
-};
-
-const countryOptions = getCountryOptions();
-const regionOptions = getRegionOptions();
+const countryOptions = Object.entries(Countries).map(([key, value]) => ({
+  value: key,
+  option: value,
+}));
+const regionOptions = Object.entries(AllRegions).map(([key, value]) => ({
+  value: key,
+  option: value,
+}));
 
 export function RegisterStepFour({
   form,
