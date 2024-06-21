@@ -17,12 +17,12 @@ export function TextCard({ title, text, className, children }: TextCardProps) {
       )}
     >
       {title && <H4 className={cn('mb-3')}>{title}</H4>}
+      {children}
       {text && (
         <p className={cn('whitespace-pre-line text-sm text-text-mutedCard')}>
           {text}
         </p>
       )}
-      {children}
     </li>
   );
 }
