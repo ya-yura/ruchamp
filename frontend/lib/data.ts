@@ -422,3 +422,26 @@ export async function createTeam(
 
   return await response.json();
 }
+
+export async function updateAthleteImage(
+  token: string,
+  values: UpdateEventImageSchema,
+): Promise<void | Response> {
+  const formData = new FormData();
+  if (values.image instanceof File) {
+    formData.append('image', values.image);
+  }
+
+  const response = await fetch(`${baseUrl}/users/upload-athlete-photo`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update profile image');
+  }
+  return await response.json();
+}

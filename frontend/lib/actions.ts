@@ -13,3 +13,7 @@ export async function revalidateEvent(id: number | string) {
 export async function revalidateTeams() {
   revalidateTag('teams');
 }
+
+export async function revalidateUser() {
+  revalidateTag('user');
+}
