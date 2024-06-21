@@ -56,7 +56,7 @@ export function MatchCard({
           <Tag variant={'transparentAccentBorder'}>
             {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
           </Tag>
-          {ageMin && ageMax && (
+          {ageMax !== 0 && (
             <Tag variant={'transparentGrayBorder'}>
               {ageMin} – {ageMax} лет
             </Tag>
@@ -78,7 +78,7 @@ export function MatchCard({
             lang={lang}
             href={`/event/${eventId}/matches/${matchId}`}
           >
-            Подробнее
+            {buttonText}
           </CustomLink>
         )}
       </div>

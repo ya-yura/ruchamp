@@ -1,74 +1,74 @@
-export enum Country {
-  'Россия' = 1,
-  'Беларусь' = 2,
-  'Казахстан' = 3,
-}
+export const Countries: Record<string, string> = {
+  1: 'Россия',
+  2: 'Беларусь',
+  3: 'Казахстан',
+};
 
-export enum AllRegions {
-  'Центральный федеральный округ' = 1,
-  'Северо-Западный федеральный округ' = 2,
-  'Южный федеральный округ' = 3,
-  'Приволжский федеральный округ' = 4,
-  'Уральский федеральный округ' = 5,
-  'Сибирский федеральный округ' = 6,
-  'Дальневосточный федеральный округ' = 7,
-  'Брестская область' = 8,
-  'Витебская область' = 9,
-  'Гомельская область' = 10,
-  'Гродненская область' = 11,
-  'Минская область' = 12,
-  'Могилевская область' = 13,
-  'Акмолинская область' = 14,
-  'Актюбинская область' = 15,
-  'Алматинская область' = 16,
-  'Атырауская область' = 17,
-  'Восточно-Казахстанская область' = 18,
-  'Жамбылская область' = 19,
-  'Западно-Казахстанская область' = 20,
-  'Карагандинская область' = 21,
-  'Костанайская область' = 22,
-  'Кызылординская область' = 23,
-  'Мангистауская область' = 24,
-  'Павлодарская область' = 25,
-  'Северо-Казахстанская область' = 26,
-  'Туркестанская область' = 27,
-}
+export const AllRegions: Record<string, string> = {
+  1: 'Центральный федеральный округ',
+  2: 'Северо-Западный федеральный округ',
+  3: 'Южный федеральный округ',
+  4: 'Приволжский федеральный округ',
+  5: 'Уральский федеральный округ',
+  6: 'Сибирский федеральный округ',
+  7: 'Дальневосточный федеральный округ',
+  8: 'Брестская область',
+  9: 'Витебская область',
+  10: 'Гомельская область',
+  11: 'Гродненская область',
+  12: 'Минская область',
+  13: 'Могилевская область',
+  14: 'Акмолинская область',
+  15: 'Актюбинская область',
+  16: 'Алматинская область',
+  17: 'Атырауская область',
+  18: 'Восточно-Казахстанская область',
+  19: 'Жамбылская область',
+  20: 'Западно-Казахстанская область',
+  21: 'Карагандинская область',
+  22: 'Костанайская область',
+  23: 'Кызылординская область',
+  24: 'Мангистауская область',
+  25: 'Павлодарская область',
+  26: 'Северо-Казахстанская область',
+  27: 'Туркестанская область',
+};
 
-export enum RuRegions {
-  'Центральный федеральный округ' = 1,
-  'Северо-Западный федеральный округ' = 2,
-  'Южный федеральный округ' = 3,
-  'Приволжский федеральный округ' = 4,
-  'Уральский федеральный округ' = 5,
-  'Сибирский федеральный округ' = 6,
-  'Дальневосточный федеральный округ' = 7,
-}
+export const RuRegions: Record<string, string> = {
+  1: 'Центральный федеральный округ',
+  2: 'Северо-Западный федеральный округ',
+  3: 'Южный федеральный округ',
+  4: 'Приволжский федеральный округ',
+  5: 'Уральский федеральный округ',
+  6: 'Сибирский федеральный округ',
+  7: 'Дальневосточный федеральный округ',
+};
 
-export enum ByRegions {
-  'Брестская область' = 8,
-  'Витебская область' = 9,
-  'Гомельская область' = 10,
-  'Гродненская область' = 11,
-  'Минская область' = 12,
-  'Могилевская область' = 13,
-}
+export const ByRegions: Record<string, string> = {
+  8: 'Брестская область',
+  9: 'Витебская область',
+  10: 'Гомельская область',
+  11: 'Гродненская область',
+  12: 'Минская область',
+  13: 'Могилевская область',
+};
 
-export enum KzRegions {
-  'Акмолинская область' = 14,
-  'Актюбинская область' = 15,
-  'Алматинская область' = 16,
-  'Атырауская область' = 17,
-  'Восточно-Казахстанская область' = 18,
-  'Жамбылская область' = 19,
-  'Западно-Казахстанская область' = 20,
-  'Карагандинская область' = 21,
-  'Костанайская область' = 22,
-  'Кызылординская область' = 23,
-  'Мангистауская область' = 24,
-  'Павлодарская область' = 25,
-  'Северо-Казахстанская область' = 26,
-  'Туркестанская область' = 27,
-}
+export const KzRegions: Record<string, string> = {
+  14: 'Акмолинская область',
+  15: 'Актюбинская область',
+  16: 'Алматинская область',
+  17: 'Атырауская область',
+  18: 'Восточно-Казахстанская область',
+  19: 'Жамбылская область',
+  20: 'Западно-Казахстанская область',
+  21: 'Карагандинская область',
+  22: 'Костанайская область',
+  23: 'Кызылординская область',
+  24: 'Мангистауская область',
+  25: 'Павлодарская область',
+  26: 'Северо-Казахстанская область',
+  27: 'Туркестанская область',
+};
 
 export enum EnumUserRole {
   'athlete' = 1,
@@ -97,7 +97,21 @@ export interface BasicInfo {
   role_id: number;
 }
 
-export interface AthleteInfo {
+interface Achievements {
+  gold: number;
+  silver: number;
+  bronze: number;
+}
+
+interface Grades {
+  [key: string]: string;
+}
+
+export interface AchievementsRecord {
+  [key: string]: Achievements;
+}
+
+interface AthleteInfo {
   id: number;
   user_id: number;
   weight: number;
@@ -106,10 +120,25 @@ export interface AthleteInfo {
   region: number;
   city: string;
   image_field: string | null;
+  grades: Grades;
   sport_types: string[];
   coaches: string[];
-  grades: string[];
+  achievements: AchievementsRecord;
 }
+
+// export interface AthleteInfo {
+//   id: number;
+//   user_id: number;
+//   weight: number;
+//   height: number;
+//   country: number;
+//   region: number;
+//   city: string;
+//   image_field: string | null;
+//   sport_types: string[];
+//   coaches: string[];
+//   grades: string[];
+// }
 
 export interface OrganizerInfo {
   id: number;
@@ -122,11 +151,11 @@ export interface OrganizerInfo {
   image_field: string | null;
 }
 
-export type UserFromServer = [AthleteInfo | OrganizerInfo, BasicInfo];
+export type UserFromServer = [AthleteInfo & OrganizerInfo, BasicInfo];
 
 export interface UserInfo {
   basicInfo: BasicInfo;
-  roleInfo: AthleteInfo | OrganizerInfo;
+  roleInfo: AthleteInfo & OrganizerInfo;
 }
 
 export interface SessionData {
@@ -135,6 +164,48 @@ export interface SessionData {
   expires: string;
   iat: number;
   exp: number;
+}
+
+export interface AthleteMatch {
+  match_id: number;
+  event_id: number;
+  event_name: string;
+  location: string;
+  org_name: string;
+  name: string;
+  sport_name: string;
+  category_type: string;
+  start_datetime: string;
+  end_datetime: string;
+  nominal_time: number;
+  mat_vol: number;
+  age_min: number;
+  age_max: number;
+  weight_category: string;
+  weight_min: number;
+  weight_max: number;
+  gender: boolean;
+  athlete_result: string;
+}
+
+interface Captain {
+  sirname: string;
+  name: string;
+  fathername: string;
+}
+
+export interface TeamDetails {
+  team_id: number;
+  name: string;
+  description: string;
+  slug: string;
+  invite_link: string;
+  image_field: string;
+  country: number;
+  city: string;
+  region: number;
+  captain_id: number;
+  captain: Captain;
 }
 
 // *** Events ***

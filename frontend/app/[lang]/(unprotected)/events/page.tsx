@@ -39,7 +39,7 @@ export default async function Events({
     );
   }
 
-  const { futureEvents, pastEvents } = divideEventsByDateTime(events);
+  const { futureEvents, pastEvents } = divideEventsByDateTime<Event>(events);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
   const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
 

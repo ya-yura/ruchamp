@@ -1,10 +1,9 @@
 'use client';
-import { MedalWinner } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import { useState } from 'react';
+
 import { TextCard } from './text-card';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { H4, PersonDescriptionOnCard } from '../text';
-import { AllRegions, Country } from '@/lib/definitions';
+import { AllRegions, Countries } from '@/lib/definitions';
 import { Separator } from '../ui/separator';
 import { Tag } from '../tag';
 import {
@@ -13,8 +12,6 @@ import {
   transformDate,
 } from '@/lib/utils/date-and-time';
 import { getInitials } from '@/lib/utils/text-utils';
-import Counter from '../counter';
-
 export interface AthleteCardSmall {
   id?: number;
   sirname: string;
@@ -72,7 +69,7 @@ export function AthleteCardSmall({
 
         <div className="col-span-2 xl:col-span-1 xl:col-start-2">
           <PersonDescriptionOnCard>
-            {city}, {AllRegions[region]}, {Country[country]}
+            {city}, {AllRegions[region]}, {Countries[country]}
           </PersonDescriptionOnCard>
           <PersonDescriptionOnCard>
             <b>{birthdate.split('-')[0]}</b> г.р.,{' '}

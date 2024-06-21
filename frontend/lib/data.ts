@@ -1,4 +1,10 @@
-import { Applications, Event, EventStatistics } from './definitions';
+import {
+  Applications,
+  AthleteMatch,
+  Event,
+  EventStatistics,
+  TeamDetails,
+} from './definitions';
 import { TeamDataFromServer } from '@/app/[lang]/(unprotected)/teams/page';
 import {
   TeamByIdFromServer,
@@ -12,6 +18,7 @@ import { Participant } from '@/app/[lang]/(unprotected)/event/[id]/participants/
 import { CreateEventSchema } from '@/components/dialogs/create-event';
 import { UpdateEventImageSchema } from '@/components/dialogs/update-event-image';
 import { CreateMatchSchema } from '@/components/dialogs/create-match';
+import { CreateTeamSchema } from '@/components/dialogs/create-team';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -113,7 +120,7 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['teams'] },
     });
     // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
@@ -345,6 +352,115 @@ export async function createMatch(
 
   if (!response.ok) {
     throw new Error('Failed to create match');
+  }
+
+  return await response.json();
+}
+
+// Athlete Profile
+
+export async function fetchAthleteMatches(
+  token: string | undefined,
+): Promise<AthleteMatch[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/matches`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete matches: ', error);
+    throw new Error('Failed to fetch athlete matches.');
+  }
+}
+
+export async function fetchAthleteTeams(
+  token: string | undefined,
+): Promise<TeamDetails[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/teams`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete teams: ', error);
+    throw new Error('Failed to fetch athlete teams.');
+  }
+}
+
+export async function createTeam(
+  token: string,
+  values: CreateTeamSchema,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/team/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create team');
+  }
+
+  return await response.json();
+}
+
+export async function updateAthleteImage(
+  token: string,
+  values: UpdateEventImageSchema,
+): Promise<void | Response> {
+  const formData = new FormData();
+  if (values.image instanceof File) {
+    formData.append('image', values.image);
+  }
+
+  const response = await fetch(`${baseUrl}/users/upload-athlete-photo`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update profile image');
+  }
+  return await response.json();
+}
+
+export async function updateProfile(
+  token: string,
+  values: any, // fix "any" later
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/users/update`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update event');
   }
 
   return await response.json();

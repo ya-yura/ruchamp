@@ -32,12 +32,18 @@ export function transformDate(
   return `${day} ${formattedDate}`;
 }
 
-export function divideEventsByDateTime(events: Event[]): {
-  futureEvents: Event[];
-  pastEvents: Event[];
+interface EventBase {
+  start_datetime: string;
+}
+
+export function divideEventsByDateTime<T extends EventBase>(
+  events: T[],
+): {
+  futureEvents: T[];
+  pastEvents: T[];
 } {
-  const futureEvents: Event[] = [];
-  const pastEvents: Event[] = [];
+  const futureEvents: T[] = [];
+  const pastEvents: T[] = [];
 
   events.forEach((event) => {
     const startDateTime = parseISO(event.start_datetime);

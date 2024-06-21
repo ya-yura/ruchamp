@@ -8,6 +8,7 @@ import { divideEventsByDateTime } from '@/lib/utils/date-and-time';
 import { sortedEventsByDate } from '@/lib/utils/filters';
 import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
+import { Event } from '@/lib/definitions';
 
 export default async function OrgEventsPage({
   params: { lang },
@@ -43,7 +44,7 @@ export default async function OrgEventsPage({
     );
   }
 
-  const { futureEvents, pastEvents } = divideEventsByDateTime(orgEvents);
+  const { futureEvents, pastEvents } = divideEventsByDateTime<Event>(orgEvents);
   const sortedFutureEvents = sortedEventsByDate(futureEvents);
   const sortedPastEvents = sortedEventsByDate(pastEvents, 'past');
 
