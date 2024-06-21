@@ -4,16 +4,22 @@ import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchEventApplications } from '@/lib/data';
 import { EventApplications } from './events-applications';
+import {INFO} from './const'
+
 
 export default async function EventTeamsPage({
   params,
 }: {
   params: { id: string; lang: Locale };
 }) {
-  const { id, lang } = params;
+  // const { id, lang } = params;
+  const id = '175'
   const [session, event] = await Promise.all([getSession(), fetchEvent(id)]);
   const token = session?.token;
   const applications = await fetchEventApplications(token, id);
+
+
+
 
   return (
     <CustomSection className="relative bg-transparent">
