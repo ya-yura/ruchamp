@@ -65,7 +65,7 @@ export default async function AthleteProfile({
         id={user.roleInfo.id}
         title={userFullName}
         badges={user.roleInfo.sport_types}
-        buttons={<ProfileActionButtons token={token} lang={lang} />}
+        buttons={<ProfileActionButtons user={user} token={token} lang={lang} />}
         image={user.roleInfo.image_field || ''}
         lang={lang}
       />

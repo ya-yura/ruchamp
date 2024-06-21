@@ -20,7 +20,7 @@ import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { Locale } from '@/i18n.config';
-import { revalidateEvent, revalidateUser } from '@/lib/actions';
+import { revalidateUser } from '@/lib/actions';
 import Image from 'next/image';
 import { updateAthleteImage } from '@/lib/data';
 
@@ -59,8 +59,8 @@ export function UpdateAthleteImageDialog({
       {
         type: 'file',
         name: 'image',
-        placeholder: 'Картинка',
-        label: 'Афиша',
+        placeholder: 'Изображение',
+        label: 'Изображение',
       },
     ],
   };

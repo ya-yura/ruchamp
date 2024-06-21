@@ -445,3 +445,23 @@ export async function updateAthleteImage(
   }
   return await response.json();
 }
+
+export async function updateProfile(
+  token: string,
+  values: any, // fix "any" later
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/users/update`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update event');
+  }
+
+  return await response.json();
+}
