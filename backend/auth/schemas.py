@@ -63,14 +63,18 @@ class UserDB(User, schemas.BaseUser):
         from_attributes = True
 
 
+class AthleteSportUpdate(BaseModel):
+    sport_id: int
+    grade_id: int
+
+
 class AthleteUpdate(BaseModel):
-    weight_category: Optional[str]
-    belt_rank: Optional[str]
-    coach_name: Optional[str]
-    height: Optional[str]
+    height: Optional[int]
+    weight: Optional[float]
     image_field: Optional[str]
-    combat_types: Optional[List[str]]
-    coaches: Optional[List[str]]
+    sports: Optional[List[AthleteSportUpdate]]
+    coaches: Optional[List[int]]
+    grade: Optional[List[int]]
 
 
 class SpectatorUpdate(BaseModel):

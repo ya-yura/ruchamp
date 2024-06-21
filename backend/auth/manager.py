@@ -84,7 +84,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         athlete_data: AthleteUpdate,
         request: Optional[Request] = None
     ) -> Athlete:
-        athlete = await self.get_athlete_profile(user)
+        athlete = await self.update_athlete_profile(user, athlete_data)
         for field, value in athlete_data.dict().items():
             if field == 'combat_types':
                 # Обработка видов борьбы

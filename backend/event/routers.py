@@ -4,6 +4,8 @@ import re
 from datetime import timedelta, datetime
 import shutil
 from typing import Optional
+from transliterate import translit
+from starlette.responses import JSONResponse
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -38,6 +40,12 @@ from geo.geo import get_geo
 
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')
+
+
+# Функция для транслитерации имени файла
+def transliterate_filename(filename):
+    name, ext = os.path.splitext(filename)
+    return translit(name, 'ru', reversed=True) + ext
 
 
 @router.get("/sports")
@@ -544,9 +552,9 @@ async def create_event(
     location: str = Form(...),
     description: str = Form(...),
     geo: str = Form(...),
-    image: Optional[UploadFile] = File(None),
-    event_order: Optional[UploadFile] = File(None),
-    event_system: Optional[UploadFile] = File(None),
+    image: UploadFile = File(...),
+    event_order: UploadFile = File(...),
+    event_system: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: UserDB = Depends(current_user)
 ):
@@ -588,27 +596,30 @@ async def create_event(
         os.makedirs(image_dir, exist_ok=True)
         os.makedirs(files_dir, exist_ok=True)
 
-        image_location = os.path.join(image_dir, image.filename)
-        event_order_location = os.path.join(files_dir, event_order.filename)
-        event_system_location = os.path.join(files_dir, event_system.filename)
-
         # Сохранение изображения на сервере
         if image:
-            image_location = os.path.join(image_dir, image.filename)
+            image_filename = transliterate_filename(image.filename)
+            image_location = os.path.normpath(
+                os.path.join(image_dir, image_filename)
+            )
             with open(image_location, "wb") as file:
                 shutil.copyfileobj(image.file, file)
 
         # Сохранение файлов на сервере
         if event_order:
-            event_order_location = os.path.join(
-                files_dir, event_order.filename
+            event_order_filename = transliterate_filename(event_order.filename)
+            event_order_location = os.path.normpath(
+                os.path.join(files_dir, event_order_filename)
             )
             with open(event_order_location, "wb") as file:
                 shutil.copyfileobj(event_order.file, file)
 
         if event_system:
-            event_system_location = os.path.join(
-                files_dir, event_system.filename
+            event_system_filename = transliterate_filename(
+                event_system.filename
+            )
+            event_system_location = os.path.normpath(
+                os.path.join(files_dir, event_system_filename)
             )
             with open(event_system_location, "wb") as file:
                 shutil.copyfileobj(event_system.file, file)

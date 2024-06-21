@@ -150,3 +150,4 @@ whitenoise==6.6.0
 WTForms==3.1.2
 zipp==3.17.0
 yagmail==0.15.293
+transliterate==1.10.2

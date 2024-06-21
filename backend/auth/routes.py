@@ -1,9 +1,10 @@
 import uuid
-from typing import Type
+from typing import Type, List
 import smtplib
 from dotenv import load_dotenv
 import os
 import yagmail
+import logging
 
 
 from email.mime.multipart import MIMEMultipart
@@ -15,7 +16,7 @@ from fastapi_users import FastAPIUsers
 from sqlalchemy import insert, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, selectinload
 
 from auth.auth import auth_backend
 from auth.mailer import send_forgot_password_email
@@ -28,7 +29,7 @@ from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate,
-                          Feedback)
+                          Feedback, AthleteSportUpdate)
 from connection import get_db
 from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
                           MatchParticipant, MatchAge, MatchCategory,
@@ -38,6 +39,7 @@ from teams.models import TeamMember, Team
 from match.utils import round_name
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
@@ -168,6 +170,66 @@ async def get_athlete_result(db, athlete_id, match_id):
         return "Did not compete in this match"
 
 
+async def update_relationships(
+    athlete: Athlete,
+    attr: str,
+    items: List[int],
+    db: AsyncSession
+):
+    model_map = {
+        "coaches": Coach,
+        "grades": CategoryType
+    }
+    if attr not in model_map:
+        return
+
+    # Очистка текущих связей
+    setattr(athlete, attr, [])
+
+    # Добавление новых связей
+    model_class = model_map[attr]
+    for item_id in items:
+        try:
+            item = await db.get(model_class, item_id)
+            if item:
+                getattr(athlete, attr).append(item)
+        except Exception as e:
+            logger.error(f"Error updating {attr}: {e}")
+            raise HTTPException(
+                status_code=500, detail=f"Error updating {attr}"
+            )
+
+
+async def update_athlete_sports(
+    athlete: Athlete,
+    sports: List[AthleteSportUpdate],
+    db: AsyncSession
+):
+    existing_sports_query = await db.execute(
+        select(AthleteSport).where(AthleteSport.athlete_id == athlete.id)
+    )
+    existing_sports = existing_sports_query.scalars().all()
+
+    existing_sports_map = {sport.sport_id: sport for sport in existing_sports}
+
+    # Добавление новых связей спорт-грэйд
+    for sport_data in sports:
+        sport_update = AthleteSportUpdate(**sport_data)
+        if sport_update.sport_id in existing_sports_map:
+            existing_sport = existing_sports_map[sport_update.sport_id]
+            if existing_sport.grade_id != sport_update.grade_id:
+                existing_sport.grade_id = sport_update.grade_id  # Обновляем грейд
+        else:
+            new_athlete_sport = AthleteSport(
+                athlete_id=athlete.id,
+                sport_id=sport_update.sport_id,
+                grade_id=sport_update.grade_id
+            )
+            db.add(new_athlete_sport)
+
+    await db.commit()
+
+
 '''  ATHLETE  '''
 
 
@@ -184,10 +246,37 @@ async def upload_athlete_photo(
 async def update_athlete_profile(
     athlete_data: athlete_update,
     current_user: User = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db),
+    # user_manager: UserManager = Depends(get_user_manager),
 ):
-    return await update_profile(Athlete, athlete_data, current_user,
-                                user_manager)
+    query = await db.execute(
+        select(Athlete)
+        .options(
+            selectinload(Athlete.coaches),
+            selectinload(Athlete.grades),
+        )
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete = query.scalars().first()
+
+    if athlete is None:
+        raise HTTPException(status_code=400, detail="Athlete not found")
+
+    # обновление полей атлета
+    update_data = athlete_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        if key == "sports":
+            await update_athlete_sports(athlete, value, db)
+        elif key in ["coaches", "grades"]:
+            await update_relationships(athlete, key, value, db)
+        else:
+            setattr(athlete, key, value)
+
+    # сохранение изменений в базу данных
+    await db.commit()
+    await db.refresh(athlete)
+
+    return {"status": "success", "data": athlete_data}
 
 
 '''  SPECTATOR  '''
