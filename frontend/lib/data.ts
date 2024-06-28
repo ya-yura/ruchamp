@@ -213,7 +213,7 @@ export async function fetchEventStatistics(
 export async function fetchEventApplications(
   token: string | undefined,
   id: number | string,
-): Promise<Applications | null> {
+): Promise<Applications> {
   if (!token) {
     console.error('Something wrong with token');
     return null;

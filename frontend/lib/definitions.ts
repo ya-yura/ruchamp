@@ -270,10 +270,10 @@ export interface ApplicationTeam {
 }
 
 export interface Applications {
-  approved?: ApplicationTeam[] | string;
-  rejected?: ApplicationTeam[] | string;
-  paid?: ApplicationTeam[] | string;
-  accepted?: ApplicationTeam[] | string;
+  approved?: ApplicationTeam[];
+  rejected?: ApplicationTeam[];
+  paid?: ApplicationTeam[];
+  accepted?: ApplicationTeam[];
 }
 
 // *** Teams ***

@@ -7,36 +7,60 @@ import {
   ApplicationMember,
   ApplicationTeam,
 } from '@/lib/definitions';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { se } from 'date-fns/locale';
+import { inter } from '@/app/[lang]/ui/fonts';
+import { Marker } from './marker';
 
-interface ApplicationsProps {
-  applications: Applications | null;
+// interface ApplicationsProps {
+//   applications: Applications;
+//   tabsData: Record<string, string>;
+// }
+
+interface ApplicationTeamProps {
+  approved: ApplicationTeam[];
+  accepted: ApplicationTeam[];
+  paid: ApplicationTeam[];
+  rejected: ApplicationTeam[];
   tabsData: Record<string, string>;
 }
 
 export function EventApplications({
-  applications,
+  paid,
+  accepted,
+  approved,
   tabsData,
-}: ApplicationsProps) {
-  if (!applications || !!Object.keys(applications).length) {
-    <p className="relative mb-4 mr-auto text-base text-background">
-      Заявок пока что нет
-    </p>;
+}: ApplicationTeamProps) {
+  if (!paid || !accepted || !approved) {
+    return (
+      <p className="relative mb-4 mr-auto text-base text-background">
+        Заявок пока что нет
+      </p>
+    );
   }
 
   const [selectedTabValue, setSelectedTabValue] = useState<string>(
     Object.keys(tabsData)[0],
   );
 
-  // console.log('applications?.accepted?:', applications?.accepted);
-
   const onTabSelect = useCallback((value: string) => {
     setSelectedTabValue(value);
   }, []);
+
+  const filteredApplications = useMemo(() => {
+    let filtered = [];
+    if (selectedTabValue === 'paid') {
+      filtered = paid;
+    } else if (selectedTabValue === 'approved') {
+      filtered = [...approved, ...paid];
+    } else if (selectedTabValue === 'accepted') {
+      filtered = accepted;
+    }
+    return filtered;
+  }, [selectedTabValue, approved, accepted, paid]);
 
   return (
     <>
@@ -69,7 +93,7 @@ export function EventApplications({
       <ul className="relative w-[100%] ">
         <li>
           <ul>
-            {applications[selectedTabValue].map((application: ApplicationTeam) => (
+            {filteredApplications.map((application: ApplicationTeam) => (
               <li
                 className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
                 key={application.id}
@@ -81,29 +105,32 @@ export function EventApplications({
                     <H4>Количество участников: {application.members.length}</H4>
                   </div>
                   {/* вставить значок оплаты */}
+                  <Marker variant='blue' children='ждем оплаты' />
 
-                  <div>
-                    <p className="bg-SuccessGreenBg border-SuccessGreenStroke text-SuccessGreenText rounded border border-solid p-1 text-[10px]">
+                  {/* <div>
+                    <p className="rounded border border-solid border-SuccessGreenStroke bg-SuccessGreenBg p-1 text-[10px] text-SuccessGreenText">
                       Оплатили участие
                     </p>
-                  </div>
+                  </div> */}
                 </div>
-                {application.members.map((athlete: ApplicationMember) => (
-                  <AthleteCard
-                    key={athlete.id}
-                    id={athlete.id}
-                    sirname={athlete.sirname}
-                    name={athlete.name}
-                    fathername={athlete.fathername}
-                    birthdate={athlete.birthdate}
-                    city={athlete.city}
-                    country={athlete.country}
-                    region={athlete.region}
-                    image_field={athlete.image_field || ''}
-                    weight={athlete.weight}
-                    grade_types={athlete.grade_types}
-                  />
-                ))}
+                <ul className="flex flex-col gap-2">
+                  {application.members.map((athlete: ApplicationMember) => (
+                    <AthleteCard
+                      key={athlete.id}
+                      id={athlete.id}
+                      sirname={athlete.sirname}
+                      name={athlete.name}
+                      fathername={athlete.fathername}
+                      birthdate={athlete.birthdate}
+                      city={athlete.city}
+                      country={athlete.country}
+                      region={athlete.region}
+                      image_field={athlete.image_field || ''}
+                      weight={athlete.weight}
+                      grade_types={athlete.grade_types}
+                    />
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
