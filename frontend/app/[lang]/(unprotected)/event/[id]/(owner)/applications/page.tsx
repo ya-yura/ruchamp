@@ -6,8 +6,6 @@ import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchEventApplications } from '@/lib/data';
 import { EventApplications } from './events-applications';
 import { INFO } from './const';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default async function EventApplicationsPage({
   params,
@@ -28,7 +26,13 @@ export default async function EventApplicationsPage({
     approved: 'Одобренные',
     rejected: 'Отклонённые',
     accepted: 'Новые в ожидании',
+    // paid: 'Оплаченные',
+  };
+
+  const tabsDataAdd: Record<string, string> = {
+    all: 'Все',
     paid: 'Оплаченные',
+    unpaid: 'Не внесли плату',
   };
 
 
@@ -36,7 +40,7 @@ export default async function EventApplicationsPage({
   return (
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start pb-10">
-        <EventApplications applications={applications} paid={paid} accepted={accepted} approved={approved} tabsData={tabsData} />
+        <EventApplications paid={paid} accepted={accepted} approved={approved} tabsData={tabsData} tabsDataAdd={tabsDataAdd} />
       </ContentWraper>
     </CustomSection>
   );

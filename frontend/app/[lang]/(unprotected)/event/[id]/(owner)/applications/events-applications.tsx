@@ -26,6 +26,7 @@ interface ApplicationTeamProps {
   paid: ApplicationTeam[];
   rejected: ApplicationTeam[];
   tabsData: Record<string, string>;
+  tabsDataAdd: Record<string, string>;
 }
 
 export function EventApplications({
@@ -33,6 +34,7 @@ export function EventApplications({
   accepted,
   approved,
   tabsData,
+  tabsDataAdd,
 }: ApplicationTeamProps) {
   if (!paid || !accepted || !approved) {
     return (
@@ -52,15 +54,27 @@ export function EventApplications({
 
   const filteredApplications = useMemo(() => {
     let filtered = [];
+
     if (selectedTabValue === 'paid') {
       filtered = paid;
+
     } else if (selectedTabValue === 'approved') {
       filtered = [...approved, ...paid];
     } else if (selectedTabValue === 'accepted') {
       filtered = accepted;
+    } else if (selectedTabValue === 'paid') {
+      filtered = paid;
+    } else if (selectedTabValue === 'unpaid') {
+      filtered = approved;
+    } else if (selectedTabValue === 'all') {
+      filtered = [...approved, ...paid];
     }
     return filtered;
   }, [selectedTabValue, approved, accepted, paid]);
+
+  
+
+  console.log('filteredApplications ===>', filteredApplications, );
 
   return (
     <>
@@ -74,6 +88,30 @@ export function EventApplications({
           <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
             <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
               {Object.entries(tabsData).map(([key, value]) => (
+                <TabsTrigger
+                  key={key}
+                  className={cn(
+                    'first-of-type:ml-4 last-of-type:mr-4',
+                    'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
+                  )}
+                  value={key}
+                >
+                  {value}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <ScrollBar className="hidden" orientation="horizontal" />
+          </ScrollArea>
+        </Tabs>
+        <Tabs
+          defaultValue={Object.keys(tabsDataAdd)[0]}
+          className="w-full"
+          onValueChange={onTabSelect}
+          value={selectedTabValue}
+        >
+          <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
+            <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
+              {Object.entries(tabsDataAdd).map(([key, value]) => (
                 <TabsTrigger
                   key={key}
                   className={cn(
@@ -105,13 +143,7 @@ export function EventApplications({
                     <H4>Количество участников: {application.members.length}</H4>
                   </div>
                   {/* вставить значок оплаты */}
-                  <Marker variant='blue' children='ждем оплаты' />
-
-                  {/* <div>
-                    <p className="rounded border border-solid border-SuccessGreenStroke bg-SuccessGreenBg p-1 text-[10px] text-SuccessGreenText">
-                      Оплатили участие
-                    </p>
-                  </div> */}
+                  <Marker variant='green' children='оплачено' />
                 </div>
                 <ul className="flex flex-col gap-2">
                   {application.members.map((athlete: ApplicationMember) => (
