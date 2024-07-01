@@ -213,7 +213,10 @@ export async function fetchEventStatistics(
 export async function fetchEventApplications(
   token: string | undefined,
   id: number | string,
-): Promise<Applications> {
+): Promise<Applications | null> {
+  // Добавляю в типе промиса "null", потому что если есть ошибки запроса или токена, то вернётся "null".
+  // При ошибке токена или запроса возвращаю именно "null", а не пустой массив, потому что "null" проще обработать как ошибку,
+  // чтобы показать это пользователю
   if (!token) {
     console.error('Something wrong with token');
     return null;

@@ -6,6 +6,7 @@ import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchEventApplications } from '@/lib/data';
 import { EventApplications } from './events-applications';
 import { INFO } from './const';
+import { PersonDescriptionOnCard } from '@/components/text';
 
 export default async function EventApplicationsPage({
   params,
@@ -18,29 +19,54 @@ export default async function EventApplicationsPage({
   const token = session?.token;
   const applications = await fetchEventApplications(token, id);
 
-  const paid = applications?.paid;
-  const approved = applications?.approved;
-  const accepted = applications?.accepted;
+  // Делаем проверку на отсутствие заявок. Здесь же обрабатывается и ошибка загрузки заявок
+  if (!applications) {
+    return (
+      <CustomSection className="relative bg-transparent">
+        <ContentWraper className="items-start pb-10">
+          <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
+            Заявок пока что нет
+          </PersonDescriptionOnCard>
+        </ContentWraper>
+      </CustomSection>
+    );
+  }
+
+  const paid = applications?.paid || []; // Добавляем "|| []", чтобы у нас хотя бы пустой массив был, а не "undefined"
+  const approved = applications?.approved || [];
+  const accepted = applications?.accepted || [];
+  const rejected = applications?.rejected || []; // почему отклоннённые заявки куда-то пропали?
 
   const tabsData: Record<string, string> = {
+    accepted: 'Новые в ожидании',
     approved: 'Одобренные',
     rejected: 'Отклонённые',
-    accepted: 'Новые в ожидании',
-    // paid: 'Оплаченные',
-  };
-
-  const tabsDataAdd: Record<string, string> = {
-    all: 'Все',
     paid: 'Оплаченные',
-    unpaid: 'Не внесли плату',
   };
 
-
+  // const tabsDataAdd: Record<string, string> = {
+  //   all: 'Все',
+  //   paid: 'Оплаченные',
+  //   unpaid: 'Не внесли плату',
+  // };
 
   return (
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start pb-10">
-        <EventApplications paid={paid} accepted={accepted} approved={approved} tabsData={tabsData} tabsDataAdd={tabsDataAdd} />
+        {Object.keys(applications).length === 0 ? (
+          <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
+            Заявок пока что нет
+          </PersonDescriptionOnCard>
+        ) : (
+          <EventApplications
+            paid={paid}
+            accepted={accepted}
+            approved={approved}
+            rejected={rejected}
+            tabsData={tabsData}
+            // tabsDataAdd={tabsDataAdd}
+          />
+        )}
       </ContentWraper>
     </CustomSection>
   );
