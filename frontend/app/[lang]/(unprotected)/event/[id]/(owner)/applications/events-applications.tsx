@@ -35,17 +35,6 @@ export function EventApplications({
   rejected,
   tabsData,
 }: ApplicationTeamProps) {
-  if (!paid || !accepted || !approved) {
-    // Когда проверяешь массив, то "!array" не работает, потому что пустой массив всегда true.
-    // Проверку следует делать на длину массива "!!array.length".
-    // И конкретно эту проверку нужно делать в самом низу, где ты выводишь список результатов.
-    return (
-      <p className="relative mb-4 mr-auto text-base text-background">
-        Заявок пока что нет
-      </p>
-    );
-  }
-
   const [selectedTabValue, setSelectedTabValue] = useState<string>(
     Object.keys(tabsData)[0],
   );
@@ -57,17 +46,31 @@ export function EventApplications({
   const filteredData = useMemo(() => {
     switch (selectedTabValue) {
       case 'approved':
-        return { applications: approved, color: 'blue' as 'blue' };
+        return {
+          applications: approved,
+          color: 'orange' as 'orange',
+          text: 'Ждём платёж',
+        };
       case 'rejected':
-        return { applications: rejected, color: 'red' as 'red' };
+        return {
+          applications: rejected,
+          color: 'red' as 'red',
+          htext: 'Отклонено',
+        };
       case 'paid':
-        return { applications: paid, color: 'green' as 'green' };
+        return {
+          applications: paid,
+          color: 'green' as 'green',
+          text: 'Оплатили участие',
+        };
       default:
-        return { applications: accepted, color: 'orange' as 'orange' };
+        return {
+          applications: accepted,
+          color: 'blue' as 'blue',
+          text: 'Ждут одобрения',
+        };
     }
   }, [selectedTabValue, approved, accepted, paid, rejected]);
-
-  console.log('filteredData ===>', filteredData);
 
   return (
     <>
@@ -96,35 +99,57 @@ export function EventApplications({
             <ScrollBar className="hidden" orientation="horizontal" />
           </ScrollArea>
         </Tabs>
-        {/* <Tabs
-          defaultValue={Object.keys(tabsDataAdd)[0]}
-          className="w-"
-          onValueChange={onTabSelect}
-          value={selectedTabAddValue}
-        >
-          <ScrollArea className="-mx-4 w-screen sm:mx-0 sm:w-full">
-            <TabsList className="mb-10 flex w-fit justify-between bg-transparent text-text-mutedLight sm:mx-auto">
-              {Object.entries(tabsDataAdd).map(([key, value]) => (
-                <TabsTrigger
-                  key={key}
-                  className={cn(
-                    'first-of-type:ml-4 last-of-type:mr-4',
-                    'sm:first-of-type:ml-0 sm:last-of-type:mr-0',
-                  )}
-                  value={key}
-                >
-                  {value}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <ScrollBar className="hidden" orientation="horizontal" />
-          </ScrollArea>
-        </Tabs> */}
       </div>
       <ul className="relative w-[100%] ">
         <li>
           <ul>
-            {filteredData.applications.map(
+            {!filteredData.applications.length ? (
+              <p className="relative mb-4 mr-auto text-base text-background">
+                Заявок пока что нет
+              </p>
+            ) : (
+              filteredData.applications.map(
+                (application: ApplicationTeam, index: number) => (
+                  <li
+                    className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
+                    key={index}
+                  >
+                    <div className="flex justify-between">
+                      <div className="mb-3 flex justify-between gap-6 px-2">
+                        {' '}
+                        <H4>{application.name}</H4>
+                        <H4>
+                          Количество участников: {application.members.length}
+                        </H4>
+                      </div>
+                      <Marker
+                        variant={filteredData.color}
+                        children={filteredData.text}
+                      />
+                    </div>
+                    <ul className="flex flex-col gap-2">
+                      {application.members.map((athlete: ApplicationMember) => (
+                        <AthleteCard
+                          key={athlete.id}
+                          id={athlete.id}
+                          sirname={athlete.sirname}
+                          name={athlete.name}
+                          fathername={athlete.fathername}
+                          birthdate={athlete.birthdate}
+                          city={athlete.city}
+                          country={athlete.country}
+                          region={athlete.region}
+                          image_field={athlete.image_field || ''}
+                          weight={athlete.weight}
+                          grade_types={athlete.grade_types}
+                        />
+                      ))}
+                    </ul>
+                  </li>
+                ),
+              )
+            )}
+            {/* {filteredData.applications.map(
               (application: ApplicationTeam, index: number) => (
                 <li
                   className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
@@ -138,8 +163,10 @@ export function EventApplications({
                         Количество участников: {application.members.length}
                       </H4>
                     </div>
-                    {/* вставить значок оплаты */}
-                    <Marker variant={filteredData.color} children="оплачено" />
+                    <Marker
+                      variant={filteredData.color}
+                      children={filteredData.text}
+                    />
                   </div>
                   <ul className="flex flex-col gap-2">
                     {application.members.map((athlete: ApplicationMember) => (
@@ -161,7 +188,7 @@ export function EventApplications({
                   </ul>
                 </li>
               ),
-            )}
+            )} */}
           </ul>
         </li>
       </ul>

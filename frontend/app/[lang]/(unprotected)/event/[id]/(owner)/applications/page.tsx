@@ -32,10 +32,10 @@ export default async function EventApplicationsPage({
     );
   }
 
-  const paid = applications?.paid || []; // Добавляем "|| []", чтобы у нас хотя бы пустой массив был, а не "undefined"
+  const paid = applications?.paid || [];
   const approved = applications?.approved || [];
   const accepted = applications?.accepted || [];
-  const rejected = applications?.rejected || []; // почему отклоннённые заявки куда-то пропали?
+  const rejected = applications?.rejected || [];
 
   const tabsData: Record<string, string> = {
     accepted: 'Новые в ожидании',
@@ -44,29 +44,16 @@ export default async function EventApplicationsPage({
     paid: 'Оплаченные',
   };
 
-  // const tabsDataAdd: Record<string, string> = {
-  //   all: 'Все',
-  //   paid: 'Оплаченные',
-  //   unpaid: 'Не внесли плату',
-  // };
-
   return (
     <CustomSection className="relative bg-transparent">
       <ContentWraper className="items-start pb-10">
-        {Object.keys(applications).length === 0 ? (
-          <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
-            Заявок пока что нет
-          </PersonDescriptionOnCard>
-        ) : (
-          <EventApplications
-            paid={paid}
-            accepted={accepted}
-            approved={approved}
-            rejected={rejected}
-            tabsData={tabsData}
-            // tabsDataAdd={tabsDataAdd}
-          />
-        )}
+        <EventApplications
+          paid={paid}
+          accepted={accepted}
+          approved={approved}
+          rejected={rejected}
+          tabsData={tabsData}
+        />
       </ContentWraper>
     </CustomSection>
   );

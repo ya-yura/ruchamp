@@ -1,17 +1,3 @@
-// interface MarkerProps {
-//   children: string;
-// }
-
-// export function Marker({ children }: MarkerProps) {
-//   return (
-//     <div>
-//       <p className="rounded border border-solid border-SuccessGreenStroke bg-SuccessGreenBg p-1 text-[10px] text-SuccessGreenText">
-//         {children}
-//       </p>
-//     </div>
-//   );
-// }
-
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
@@ -24,8 +10,7 @@ const markerVariants = cva('rounded border border-solid p-1 text-[10px] ', {
         'border-SuccessGreenStroke bg-SuccessGreenBg text-SuccessGreenText',
       orange:
         'border-WarningOrangeStroke bg-WarningOrangeBg text-WarningOrangeText',
-      red:
-        'border-DangerRedStroke bg-DangerRedBg text-DangerRedText',
+      red: 'border-DangerRedStroke bg-DangerRedBg text-DangerRedText',
       blue: 'border-BrandBlueStroke bg-BrandBlueBg text-BrandBlueText',
     },
   },
