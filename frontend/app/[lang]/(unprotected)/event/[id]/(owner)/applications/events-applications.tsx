@@ -2,23 +2,12 @@
 
 import { AthleteCard } from '@/components/cards/athlete-card';
 import { H4 } from '@/components/text';
-import {
-  Applications,
-  ApplicationMember,
-  ApplicationTeam,
-} from '@/lib/definitions';
+import { ApplicationMember, ApplicationTeam } from '@/lib/definitions';
 import React, { useState, useMemo, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { se } from 'date-fns/locale';
-import { inter } from '@/app/[lang]/ui/fonts';
 import { Marker } from './marker';
-
-// interface ApplicationsProps {
-//   applications: Applications;
-//   tabsData: Record<string, string>;
-// }
 
 interface ApplicationTeamProps {
   approved: ApplicationTeam[];
@@ -149,46 +138,6 @@ export function EventApplications({
                 ),
               )
             )}
-            {/* {filteredData.applications.map(
-              (application: ApplicationTeam, index: number) => (
-                <li
-                  className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
-                  key={index}
-                >
-                  <div className="flex justify-between">
-                    <div className="mb-3 flex justify-between gap-6 px-2">
-                      {' '}
-                      <H4>{application.name}</H4>
-                      <H4>
-                        Количество участников: {application.members.length}
-                      </H4>
-                    </div>
-                    <Marker
-                      variant={filteredData.color}
-                      children={filteredData.text}
-                    />
-                  </div>
-                  <ul className="flex flex-col gap-2">
-                    {application.members.map((athlete: ApplicationMember) => (
-                      <AthleteCard
-                        key={athlete.id}
-                        id={athlete.id}
-                        sirname={athlete.sirname}
-                        name={athlete.name}
-                        fathername={athlete.fathername}
-                        birthdate={athlete.birthdate}
-                        city={athlete.city}
-                        country={athlete.country}
-                        region={athlete.region}
-                        image_field={athlete.image_field || ''}
-                        weight={athlete.weight}
-                        grade_types={athlete.grade_types}
-                      />
-                    ))}
-                  </ul>
-                </li>
-              ),
-            )} */}
           </ul>
         </li>
       </ul>
