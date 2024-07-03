@@ -247,7 +247,7 @@ export interface EventStatistics {
   };
 }
 
-interface ApplicationMember {
+export interface ApplicationMember {
   id: number;
   sirname: string;
   name: string;
@@ -263,7 +263,7 @@ interface ApplicationMember {
   grade_types: string[];
 }
 
-interface ApplicationTeam {
+export interface ApplicationTeam {
   id: number;
   name: string;
   members: ApplicationMember[];
