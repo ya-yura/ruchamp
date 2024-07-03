@@ -8,6 +8,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Marker } from './marker';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface ApplicationTeamProps {
   approved: ApplicationTeam[];
@@ -60,6 +62,8 @@ export function EventApplications({
         };
     }
   }, [selectedTabValue, approved, accepted, paid, rejected]);
+
+  // console.log('filteredData ===>', filteredData);
 
   return (
     <>
@@ -134,6 +138,44 @@ export function EventApplications({
                         />
                       ))}
                     </ul>
+                    {filteredData.color === 'blue' && (
+                      <div className="mt-2 flex justify-between">
+                        <Button variant={'transparentGreen'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/approve.svg'}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                          Одобрить участие
+                        </Button>
+                        <Button variant={'transparentRed'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/dismiss.svg'}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                          Отказать в участии
+                        </Button>
+                      </div>
+                    )}
+                    {filteredData.color === 'orange' && (
+                      <div className="mt-2">
+                        <Button variant={'transparentRed'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/dismiss.svg'}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                          Отказать в участии
+                        </Button>
+                      </div>
+                    )}
                   </li>
                 ),
               )
@@ -143,4 +185,15 @@ export function EventApplications({
       </ul>
     </>
   );
+}
+
+{
+  /* <div className="flex justify-between">
+<Button variant={'transparentGreen'} size={'sm'}>
+  Одобрить участие
+</Button>
+<Button variant={'transparentRed'} size={'sm'}>
+  Отказать в участии
+</Button>
+</div> */
 }

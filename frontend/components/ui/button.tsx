@@ -26,6 +26,10 @@ const buttonVariants = cva(
           'border border-input bg-transparent text-white text-base font-semibold hover:bg-accent hover:text-accent-foreground border-border dark:border-white',
         ruchampTransparentRedBorder:
           'border border-input bg-transparent text-white text-base  font-semibold hover:bg-accent hover:text-accent-foreground border-destructive/90',
+        transparentGreen:
+          'border border-SuccessDarkGreenStroke text-SuccessDarkGreenText hover:bg-SuccessDarkGreenStroke',
+        transparentRed:
+          'border border-DangerDarkRedStroke text-DangerDarkRedText hover:bg-DangerDarkRedStroke',
       },
       size: {
         default: 'h-10 px-4 py-2',
