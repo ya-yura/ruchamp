@@ -144,7 +144,7 @@ export function EventApplications({
                           <Image
                             className="mr-2"
                             src={'/images/icons/approve.svg'}
-                            alt=""
+                            alt="Иконка одобрить"
                             width={20}
                             height={20}
                           />
@@ -154,7 +154,7 @@ export function EventApplications({
                           <Image
                             className="mr-2"
                             src={'/images/icons/dismiss.svg'}
-                            alt=""
+                            alt="Иконка отклонить"
                             width={20}
                             height={20}
                           />
@@ -168,7 +168,7 @@ export function EventApplications({
                           <Image
                             className="mr-2"
                             src={'/images/icons/dismiss.svg'}
-                            alt=""
+                            alt="Иконка отклонить"
                             width={20}
                             height={20}
                           />

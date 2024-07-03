@@ -7,6 +7,7 @@ import { FeaturesMain } from '@/components/home-page/features-main';
 import { FeaturesAdditional } from '@/components/home-page/features-additional';
 import { SecondHero } from '@/components/home-page/second-hero';
 import { TrustedSection } from '@/components/home-page/trusted-section';
+import { SupportedSection } from '@/components/home-page/supported-section';
 import { getInitials } from '@/lib/utils/text-utils';
 import { getSession } from '@/lib/actions/auth';
 
@@ -51,6 +52,7 @@ export default async function Home({
         <FeaturesAdditional lang={lang} />
         <SecondHero lang={lang} />
         <TrustedSection lang={lang} />
+        <SupportedSection lang={lang} />
       </Container>
       <Footer lang={lang} />
     </>
