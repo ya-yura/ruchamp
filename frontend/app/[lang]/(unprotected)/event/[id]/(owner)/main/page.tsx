@@ -55,7 +55,7 @@ export default async function EventMainPage({
     : getEventStatus(event?.start_datetime, new Date());
 
   return (
-    <CustomSection className="relative bg-transparent">
+    <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start gap-6 pb-10">
         <OwnerMain
           token={token}

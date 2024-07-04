@@ -21,7 +21,7 @@ export default async function EventApplicationsPage({
   // Делаем проверку на отсутствие заявок. Здесь же обрабатывается и ошибка загрузки заявок
   if (!applications) {
     return (
-      <CustomSection className="relative bg-transparent">
+      <CustomSection className="relative bg-primary-background">
         <ContentWraper className="items-start pb-10">
           <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
             Заявок пока что нет
@@ -44,7 +44,7 @@ export default async function EventApplicationsPage({
   };
 
   return (
-    <CustomSection className="relative bg-transparent">
+    <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start pb-10">
         <EventApplications
           paid={paid}
