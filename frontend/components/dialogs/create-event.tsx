@@ -211,7 +211,7 @@ export function CreateEventDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit justify-start bg-transparent py-0 sm:px-3 sm:py-0 w-full md:w-full"
             >
               {Object.entries(CreateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
