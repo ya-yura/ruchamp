@@ -26,7 +26,7 @@ export function ProfileTeams({
     Object.keys(tabsData)[0],
   );
 
-  const filteredTeams = useMemo(() => {
+  const filteredTeams = (() => {
     return selectedTab === 'capitan'
       ? teams.filter((team) => team.captain_id === athleteId)
       : teams.filter((team) => team.captain_id !== athleteId);

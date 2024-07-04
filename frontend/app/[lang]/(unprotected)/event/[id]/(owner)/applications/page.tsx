@@ -5,7 +5,6 @@ import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchEventApplications } from '@/lib/data';
 import { EventApplications } from './events-applications';
-import { INFO } from './const';
 import { PersonDescriptionOnCard } from '@/components/text';
 
 export default async function EventApplicationsPage({
