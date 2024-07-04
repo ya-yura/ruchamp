@@ -20,7 +20,7 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
   const handleLinkClick = () => {
     setIsSheetOpen(false);
   };
-  
+
   const menuMain: TypeMenuItem[] = [
     {
       icon: <HomeIcon className="fill-[#E0E0E0]" />,
@@ -73,44 +73,45 @@ export function MenuWithButton({ lang }: { lang: Locale }) {
           <MenuIcon />
         </Button>
       </SheetTrigger>
-      <SheetOverlay className="bg-lightgray/50">
-        <SheetContent
-          className="top-16 h-fit w-3/4 max-w-[330px] rounded-e-xl border-r-0 bg-black p-8"
-          side="left"
-        >
-          <nav>
-            <ul className="flex flex-col gap-3">
-              {menuMain.map((item) => (
-                <li key={item.text}>
-                  <CustomLink
-                    className="flex w-fit items-center gap-3"
-                    href={item.url}
-                    lang={lang}
-                    onClick={handleLinkClick}
-                  >
-                    {item.icon}
-                    <p className="text-white">{item.text}</p>
-                  </CustomLink>
-                </li>
-              ))}
-              <Separator className="my-3 bg-[#3D3D3D]" />
-              {menuAdditional.map((item) => (
-                <li key={item.text}>
-                  <CustomLink
-                    className="flex w-fit items-center gap-3"
-                    href={item.url}
-                    lang={lang}
-                    onClick={handleLinkClick}
-                  >
-                    {item.icon}
-                    <p className="text-white">{item.text}</p>
-                  </CustomLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </SheetContent>
-      </SheetOverlay>
+      {isSheetOpen && (
+        <SheetOverlay className="bg-lightgray/50">
+          <SheetContent
+            className="top-16 h-fit w-3/4 max-w-[330px] rounded-e-xl border-r-0 bg-black p-8"
+            side="left"
+            onClick={handleLinkClick}
+          >
+            <nav>
+              <ul className="flex flex-col gap-3">
+                {menuMain.map((item) => (
+                  <li key={item.text}>
+                    <CustomLink
+                      className="flex w-fit items-center gap-3"
+                      href={item.url}
+                      lang={lang}
+                    >
+                      {item.icon}
+                      <p className="text-white">{item.text}</p>
+                    </CustomLink>
+                  </li>
+                ))}
+                <Separator className="my-3 bg-[#3D3D3D]"/>
+                {menuAdditional.map((item) => (
+                  <li key={item.text}>
+                    <CustomLink
+                      className="flex w-fit items-center gap-3"
+                      href={item.url}
+                      lang={lang}
+                    >
+                      {item.icon}
+                      <p className="text-white">{item.text}</p>
+                    </CustomLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </SheetContent>
+        </SheetOverlay>
+      )}
     </Sheet>
   );
 }
