@@ -123,7 +123,7 @@ export function CreateTeamDialog({
           Создать команду
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
           <DialogTitle>Команда</DialogTitle>
         </DialogHeader>
