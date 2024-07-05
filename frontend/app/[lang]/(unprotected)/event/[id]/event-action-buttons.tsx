@@ -10,6 +10,7 @@ interface EventActionButtonsProps {
   event: Event;
   token?: string;
   isOwner?: boolean;
+  isAthlete?: boolean;
   lang: Locale;
 }
 
@@ -17,6 +18,7 @@ export function EventActionButtons({
   event,
   token,
   isOwner,
+  isAthlete,
   lang,
 }: EventActionButtonsProps) {
   if (isOwner) {
@@ -43,8 +45,7 @@ export function EventActionButtons({
 
   return (
     <div className="mb-[87px] flex gap-6">
-      <Button variant="ruchampDefault">Участвовать</Button>
-      <Button variant="ruchampTransparent">Купить билеты</Button>
+      {isAthlete && <Button variant="ruchampDefault">Участвовать</Button>}
     </div>
   );
 }
