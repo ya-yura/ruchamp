@@ -90,6 +90,8 @@ def create_test_users(session, num_athletes, num_organizers):
 def create_roles_for_users(session, users):
     for user in users:
         if user.role_id == 1:  # Спортсмен
+            sport_types = [session.get(SportType, 1)]
+            grades = [session.get(CategoryType, 1)]
             athlete_data = {
                 'user_id': user.id,
                 'weight': round(random.uniform(55, 58), 2),
@@ -98,13 +100,13 @@ def create_roles_for_users(session, users):
                 'country': session.query(Country).order_by(func.random()).first().id,
                 'city': fake.city(),
                 'region': session.query(Region).order_by(func.random()).first().id,
-                'sport_types': [1],
+                'sport_types': sport_types,
                 'coaches': fake.random_elements(
                     elements=session.query(Coach).all(),
                     length=fake.random_int(min=1, max=4),
                     unique=True
                 ),
-                'grades': [1],
+                'grades': grades,
             }
             athlete = Athlete(**athlete_data)
             session.add(athlete)
@@ -126,27 +128,28 @@ def create_roles_for_users(session, users):
 
 
 def create_events_for_organizers(session, organizers, num_events):
-    for i in range(num_events):
-        organizer = fake.random_int(min=1_100_000, max=(1_100_000 + num_organizers))
-        event_data = {
-            'id': f'{i + 1_000_000}',
-            'name': f'ТЕСТ ID {i + 1_000_000}',  # Уникальное имя для идентификации
-            'start_datetime': datetime.datetime.now(),  # Начало мероприятия сегодня
-            'end_datetime': datetime.datetime.now() + datetime.timedelta(days=3),  # Конец мероприятия через 3 дня
-            'start_request_datetime': datetime.datetime.now(),  # Начало приема заявок сейчас
-            'end_request_datetime': datetime.datetime.now() + datetime.timedelta(days=2),  # Конец приема заявок через 2 дня
-            'location': fake.address(),
-            'organizer_id': organizer,
-            'event_order': fake.text(),
-            'event_system': fake.word(),
-            'geo': f'{fake.latitude()},{fake.longitude()}',
-            'image_field': fake.image_url(),
-            'description': f'Это проверочное мероприятие с ID {i + 1_000_000}',
-        }
-        event = Event(**event_data)
-        session.add(event)
+    for organizer in organizers:
+        for i in range(num_events):
+            # organizer = fake.random_int(min=1_100_001, max=(1_100_000 + num_organizers))
+            event_data = {
+                'id': f'{i + 1_000_000 + 1}',
+                'name': f'ТЕСТ ID {i + 1_000_000 + 1}',  # Уникальное имя для идентификации
+                'start_datetime': datetime.datetime.now(),  # Начало мероприятия сегодня
+                'end_datetime': datetime.datetime.now() + datetime.timedelta(days=3),  # Конец мероприятия через 3 дня
+                'start_request_datetime': datetime.datetime.now(),  # Начало приема заявок сейчас
+                'end_request_datetime': datetime.datetime.now() + datetime.timedelta(days=2),  # Конец приема заявок через 2 дня
+                'location': fake.address(),
+                'organizer_id': organizer.id,
+                'event_order': fake.text(),
+                'event_system': fake.word(),
+                'geo': f'{fake.latitude()},{fake.longitude()}',
+                'image_field': fake.image_url(),
+                'description': f'Это проверочное мероприятие с ID {i + 1_000_000 + 1}',
+            }
+            event = Event(**event_data)
+            session.add(event)
 
-    session.commit()
+        session.commit()
 
 
 # Создаем весовые категории
@@ -170,40 +173,50 @@ num_athletes = 16
 num_organizers = 2
 num_events = 5
 
-created_users = create_test_users(session, num_athletes, num_organizers)
+# created_users = create_test_users(session, num_athletes, num_organizers)
 
-create_roles_for_users(session, created_users)
+# create_roles_for_users(session, created_users)
 
-organizers = [user for user in created_users if user.role_id == 2]
-athletes = [user for user in created_users if user.role_id == 1]
+# organizers = [user for user in created_users if user.role_id == 2]
+# athletes = [user for user in created_users if user.role_id == 1]
 
-create_events_for_organizers(session, organizers, num_events)
+# Получение всех организаторов из базы данных
+# organizers = session.query(EventOrganizer).all()
+
+# create_events_for_organizers(session, organizers, num_events)
 
 # Создаем матч для самбо
-event = Event(id=fake.random_int(min=1_000_000, max=(1_000_000 + num_events)))
-match = Match(
-    name="Самбо",
-    event_id=event.id,
-    combat_type_id=1,
-    start_datetime=event.start_datetime,
-    end_datetime=event.end_datetime,
-    nominal_time=5,  # Номинальное время матча в минутах
-    mat_vol=3  # Три поля (мата)
-)
-session.add(match)
-session.commit()
+event_id = fake.random_int(min=1_000_000, max=(1_000_000 + num_events))
+event = session.query(Event).filter_by(id=event_id).first()
 
-# Создаем возрастные категории
-age_categories = []
-age_categories.append(MatchAge(id=1_000_001, match_id=match.id, age_from="10", age_till="15"))
-age_categories.append(MatchAge(id=1_000_002, match_id=match.id, age_from="16", age_till="18"))
-age_categories.append(MatchAge(id=1_000_003, match_id=match.id, age_from="19", age_till="40"))
-session.add_all(age_categories)
-session.commit()
+if event:
+    match = Match(
+        name="Самбо",
+        event_id=event.id,
+        combat_type_id=1,
+        start_datetime=event.start_datetime,
+        end_datetime=event.end_datetime,
+        nominal_time=5,  # Номинальное время матча в минутах
+        mat_vol=3  # Три поля (мата)
+    )
+    session.add(match)
+    session.commit()
 
+    # Создаем возрастные категории
+    age_categories = [
+        MatchAge(id=1_000_001, match_id=match.id, age_from=10, age_till=15),
+        MatchAge(id=1_000_002, match_id=match.id, age_from=16, age_till=18),
+        MatchAge(id=1_000_003, match_id=match.id, age_from=19, age_till=40)
+    ]
+    session.add_all(age_categories)
+    session.commit()
+else:
+    print(f"Event with id {event_id} not found.")
+
+athletes = session.query(Athlete).all()
 
 # Создаем записи в дополнительных таблицах для категорий участников
-for athlete in athletes:
+'''for athlete in athletes:
     match_participant = MatchParticipant(
         match_id=match.id,
         player_id=athlete.id,
@@ -215,7 +228,7 @@ for athlete in athletes:
 session.commit()
 
 # Генерируем бои и результаты для турнира по олимпийской системе
-participants = session.query(MatchParticipant).filter_by(match_id=match.id).all()
+#participants = session.query(MatchParticipant).filter_by(match_id=match.id).all()
 
 
 # Создаем функцию для генерации боевой сетки
@@ -264,7 +277,7 @@ def generate_fight_grid(participants):
 
 
 # Генерим боевую сетку
-generate_fight_grid(participants)
+generate_fight_grid(participants)'''
 
 session.commit()
 

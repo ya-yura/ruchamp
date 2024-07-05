@@ -4,7 +4,8 @@ from sqlalchemy import (JSON, TIMESTAMP, Column, Date, DateTime, Enum, Float,
                         ForeignKey, Integer, String)
 from sqlalchemy.orm import relationship
 
-from auth.models import EventOrganizer, User, Spectator, Athlete
+from auth.models import User, Spectator, Athlete
+from event.models import EventOrganizer
 from connection import Base
 from event.models import Event, Match
 

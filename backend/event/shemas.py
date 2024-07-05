@@ -80,7 +80,6 @@ class CreateTournamentApplicationTeam(BaseModel):
 
 
 class CreateTournamentApplicationAthlete(BaseModel):
-    athlete_id: int
     match_id: int
     status: str = 'accepted'
 

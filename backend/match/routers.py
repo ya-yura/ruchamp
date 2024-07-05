@@ -9,17 +9,17 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 
 from auth.models import (AllWeightClass, Athlete, CategoryType, Referee, User,
-                         SportType, Country, Region)
+                         SportType, Country, Region, EventOrganizer)
 from auth.routes import current_user
 from auth.schemas import UserDB
 from connection import get_db
-from event.models import (Event, EventOrganizer, Match, MatchAge,
+from event.models import (Event, Match, MatchAge,
                           MatchGender, MatchSport, MatchWeights,
                           MatchResult, MatchParticipant, CombatType,
                           MatchCategory, Medal, WinnerTable, Fight,
                           FightCounter, FightReferee, FightWinner)
 from match.models import AgeCategory, TempAthlete, TempDrawParticipants
-from match.schemas import MatchDB
+from match.schemas import MatchDB, FigthData
 from match.utils import pairs_generator, split_pairs, round_name
 from teams.models import TeamMember, Team
 from teams.schemas import Participant
@@ -1504,3 +1504,104 @@ async def post_matchs_results_medal(
         await db.commit()
 
     return {"ok"}'''
+
+
+@router.get("/{event_id}/matches")
+async def get_mathches(
+    event_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Match)
+        .where(Match.event_id == event_id)
+    )
+    matches = query.scalars().all()
+    if matches is None:
+        raise HTTPException(status_code=404, detail="Match not found")
+    return matches
+
+
+@router.get("/{match_id}/fights")
+async def get_fights(
+    match_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Fight)
+        .where(Fight.match_id == match_id)
+    )
+    fights = query.scalars().all()
+    if fights is None or fights == []:
+        raise HTTPException(status_code=404, detail="Fights not found")
+    return fights
+
+
+@router.post("/{fight_id}/score")
+async def post_score(
+    fight_id: int,
+    fight_data: FigthData,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Fight).where(Fight.id == fight_id)
+    )
+    fight = query.scalars().first()
+    if fight is None:
+        raise HTTPException(status_code=404, detail="Fight not found")
+
+    if fight_data.player_two == 0:
+        counter = FightCounter(
+            fight_id=fight_id,
+            player=fight_data.player_one,
+            player_score=str(fight_data.score_player_one),
+            set_datetime=func.now(),
+        )
+        db.add(counter)
+        await db.commit()
+        winner = FightWinner(
+            fight_id=fight_id,
+            winner_id=fight_data.player_one,
+            winner_score=fight_data.score_player_one,
+            loser_score=0
+        )
+        db.add(winner)
+        await db.commit()
+    else:
+        counter = FightCounter(
+            fight_id=fight_id,
+            player=fight_data.player_one,
+            player_score=str(fight_data.score_player_one),
+            set_datetime=func.now(),
+        )
+        db.add(counter)
+        await db.commit()
+
+        counter = FightCounter(
+            fight_id=fight_id,
+            player=fight_data.player_two,
+            player_score=str(fight_data.score_player_two),
+            set_datetime=func.now(),
+        )
+        db.add(counter)
+        await db.commit()
+        if fight_data.score_player_one > fight_data.score_player_two:
+            winner = FightWinner(
+                fight_id=fight_id,
+                winner_id=fight_data.player_one,
+                winner_score=fight_data.score_player_one,
+                loser_score=fight_data.score_player_two
+            )
+            db.add(winner)
+            await db.commit()
+        else:
+            winner = FightWinner(
+                fight_id=fight_id,
+                winner_id=fight_data.player_two,
+                winner_score=fight_data.score_player_two,
+                loser_score=fight_data.score_player_one
+            )
+            db.add(winner)
+            await db.commit()
+
+    return {f'Winner: {winner.winner_id}  Score:  {winner.winner_score}'}
+

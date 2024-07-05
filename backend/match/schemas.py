@@ -18,3 +18,10 @@ class MatchDB(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class FigthData(BaseModel):
+    player_one: Optional[int]
+    player_two: Optional[int]
+    score_player_one: Optional[int]
+    score_player_two: Optional[int]

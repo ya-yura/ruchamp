@@ -9,21 +9,22 @@ from starlette.responses import JSONResponse
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
-                     UploadFile, Form)
+                     UploadFile, Form, Query)
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, update, and_, case, func, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
 # from auth.models import SystemAdministrator
 from auth.routes import current_user
 from auth.schemas import UserDB
-from auth.models import (SportType, Athlete, User, athlete_grade_association)
+from auth.models import (SportType, Athlete, User, athlete_grade_association,
+                         EventOrganizer)
 # from auth.models import User, athlete_sport_type_association
 from connection import get_db
-from event.models import (Event, EventOrganizer, Match, CombatType,
+from event.models import (Event, Match, CombatType,
                           CategoryType, AllWeightClass, TournamentApplication,
                           ApplicationStatusHistory, MatchAge, MatchSport,
                           MatchGender, MatchCategory, WinnerTable,
@@ -54,6 +55,49 @@ async def get_sports(
 ):
     query = await db.execute(select(SportType.name))
     return query.scalars().all()
+
+
+@router.get("/events/v2")
+async def get_events_v2(
+    db: AsyncSession = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1)
+):
+    # Получаем все события с нужными связями за один запрос
+    query = await db.execute(
+        select(Event)
+        .options(
+            joinedload(Event.organizer),
+            # joinedload(Event.matches).joinedload(Match.sports).joinedload(MatchSport.sport_type)
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+    events = query.scalars().all()
+
+    result = []
+    for event in events:
+        event_result = {
+            "id": event.id,
+            "name": event.name,
+            "start_request_datetime": event.start_request_datetime,
+            "end_request_datetime": event.end_request_datetime,
+            "start_datetime": event.start_datetime,
+            "end_datetime": event.end_datetime,
+            "organizer_name": event.organizer.organization_name,
+            "location": event.location,
+            "event_system": event.event_system,
+            "event_order": event.event_order,
+            "image_field": event.image_field,
+            "description": event.description,
+            "geo": event.geo,
+            # "sports_in_matches": list(set(
+            #     sport.sport_type.name for match in event.matches for sport in match.sports
+            # ))
+        }
+        result.append(event_result)
+
+    return result
 
 
 @router.get("/events")
@@ -481,6 +525,65 @@ async def get_event_applications(
             application_info[status].append(team_info)
 
     return application_info
+
+
+@router.put("/{event_id}/org-info/{applicaton_id}")
+async def update_status_application(
+    event_id: int,
+    application_id: int,
+    status: UpdateTournamentApplication,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserDB = Depends(current_user)
+):
+    """Обновление статуса заявки организатором"""
+    # Получаем событие и проверяем его существование
+    event_query = await db.execute(
+        select(Event).where(Event.id == event_id)
+    )
+    event = event_query.scalars().first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Проверяем, является ли текущий пользователь организатором данного события
+    organizer_query = await db.execute(
+        select(EventOrganizer)
+        .where(EventOrganizer.user_id == current_user.id)
+    )
+    organizer = organizer_query.scalars().first()
+    if organizer is None:
+        raise HTTPException(
+            status_code=403, detail="You are not an organizer of this event"
+        )
+
+    query = await db.execute(
+        select(Match.id)
+        .where(Match.event_id == event_id)
+    )
+    matches = query.scalars().all()
+    if not matches:
+        raise HTTPException(
+            status_code=404, detail="No matches found for this event"
+        )
+
+    # Получаем заявку и проверяем её существование
+    application_query = await db.execute(
+        select(TournamentApplication)
+        .where(
+            TournamentApplication.id == application_id,
+            TournamentApplication.match_id.in_(matches)
+        )
+    )
+    application = application_query.scalars().first()
+    if application is None:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    await db.execute(
+        update(TournamentApplication)
+        .where(TournamentApplication.id == application_id)
+        .values(status=status.status)
+    )
+    await db.commit()
+    return {f'Application {application_id} - approved!'}
 
 
 @router.get("/{event_id}")
@@ -1274,24 +1377,81 @@ async def create_tournament_application_athlete(
             status_code=400, detail="You are not registered as an athlete"
         )
 
-    query = await db.execute(select(Match.id).where(
-        Match.id == tournament_application_athlete_data.match_id
-    ))
+    query = await db.execute(
+        select(Match.id)
+        .where(
+            Match.id == tournament_application_athlete_data.match_id
+        )
+    )
     match_id = query.scalars().first()
 
     if match_id is None:
         raise HTTPException(status_code=404, detail="Match not found")
 
+    query = await db.execute(
+        select(User.birthdate)
+        .where(User.id == current_user.id)
+    )
+    athlete_birthdate = query.scalars().first()
+    athlete_age = datetime.now().year - athlete_birthdate.year
+
+    query = await db.execute(
+        select(MatchAge.age_from, MatchAge.age_till)
+        .where(
+            MatchAge.match_id == tournament_application_athlete_data.match_id
+        )
+    )
+    match_ages = query.mappings().all()
+
+    match_id_in_aplication = tournament_application_athlete_data.match_id
+
+    query = await db.execute(
+        select(MatchWeights.weight_id)
+        .where(MatchWeights.match_id == match_id_in_aplication)
+    )
+    weight_id = query.scalars().first()
+
+    query = await db.execute(
+        select(AllWeightClass.min_weight, AllWeightClass.max_weight)
+        .where(AllWeightClass.id == weight_id)
+    )
+    match_weights = query.mappings().all()
+
+    query = await db.execute(
+        select(Athlete.weight)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_weight = query.scalars().first()
+
+    for match_age in match_ages:
+        age_from = match_age['age_from']
+        age_till = match_age['age_till']
+        if athlete_age < age_from or athlete_age > age_till:
+            raise HTTPException(
+                status_code=400,
+                detail="Возраст атлета не входит в допустимый диапазон"
+            )
+
+    for match_weight in match_weights:
+        min_weight = match_weight['min_weight']
+        max_weight = match_weight['max_weight']
+        if athlete_weight < min_weight or athlete_weight > max_weight:
+            raise HTTPException(
+                status_code=400,
+                detail="Вес атлета не входит в допустимый диапазон"
+            )
+
     application = TournamentApplication(
         team_id=0,
-        **tournament_application_athlete_data.dict()
+        athlete_id=athlete_id,
+        status=tournament_application_athlete_data.status,
+        match_id=tournament_application_athlete_data.match_id,
     )
     db.add(application)
     await db.commit()
     db.refresh(application)
 
-    return {f"Application ID - {application.id} created"}
-
+    return {f'Application {application.id} created'}
 
 
 @router.put("/tournament-applications/{application_id}/update")

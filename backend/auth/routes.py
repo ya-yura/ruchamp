@@ -23,7 +23,7 @@ from sqlalchemy.orm import aliased, selectinload
 from auth.auth import auth_backend
 from auth.mailer import send_forgot_password_email
 from auth.manager import UserManager, get_user_manager
-from auth.models import (Athlete, EventOrganizer, Referee, Spectator,
+from auth.models import (Athlete, Referee, Spectator,
                          SportType, SystemAdministrator, User,
                          athlete_sport_type_association, Coach,
                          athlete_coach_association, CategoryType,
@@ -32,6 +32,7 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate,
                           Feedback, AthleteSportUpdate)
+from event.models import EventOrganizer
 from connection import get_db
 from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
                           MatchParticipant, MatchAge, MatchCategory,
@@ -305,7 +306,7 @@ async def update_athlete_profile(
 '''  SPECTATOR  '''
 
 
-@router.post("/upload-spectator-photo")
+'''@router.post("/upload-spectator-photo")
 async def upload_spectator_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
@@ -321,7 +322,7 @@ async def update_spectator_profile(
     user_manager: UserManager = Depends(get_user_manager),
 ):
     return await update_profile(Spectator, spectator_data, current_user,
-                                user_manager)
+                                user_manager)'''
 
 
 '''  SYSADMIN  '''
@@ -377,7 +378,7 @@ async def update_organizer_profile(
 '''REFEREES'''
 
 
-@router.post("/upload-referee-photo")
+'''@router.post("/upload-referee-photo")
 async def upload_referee_photo(
     image: UploadFile = File(...),
     current_user: UserDB = Depends(current_user),
@@ -398,7 +399,7 @@ async def update_referee_profile(
         referee_data,
         current_user,
         user_manager
-    )
+    )'''
 
 
 '''  USERS  '''

@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from auth.mailer import send_verification_email
 from auth.models import (AllWeightClass, Athlete, Coach, CombatType,
-                         EventOrganizer, Referee, Role, Spectator,
+                         Referee, Role, Spectator, EventOrganizer,
                          SystemAdministrator)
 from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate)

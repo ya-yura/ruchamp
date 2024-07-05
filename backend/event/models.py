@@ -5,8 +5,8 @@ from sqlalchemy import (TIMESTAMP, Boolean, Column, DateTime, ForeignKey,
 from sqlalchemy.orm import relationship
 
 from auth.models import (AllWeightClass, CategoryType, CombatType,
-                         EventOrganizer, Referee, SportType,
-                         Athlete)
+                         User, Referee, SportType,
+                         Athlete, EventOrganizer)
 from connection import Base
 from teams.models import Team  # TeamMember
 
