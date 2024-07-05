@@ -17,7 +17,7 @@ export function CustomForm({
   return (
     <form
       className={cn(
-        'relative mx-auto flex h-fit w-3/4 flex-col justify-evenly gap-8 rounded-md bg-white px-7 py-8 sm:w-[464px] sm:py-7 sm:px-9 md:mx-0 md:my-auto',
+        'relative mx-auto flex h-fit w-3/4 flex-col justify-evenly gap-8 rounded-md bg-white px-7 py-8 sm:w-[464px] sm:py-7 sm:px-9 min-[768px]:mx-0 my-auto max-[768px]:m-0',
         className,
       )}
       onSubmit={onSubmit}

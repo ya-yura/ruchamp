@@ -32,7 +32,7 @@ export default async function AuthLayout({
           <Logo lang={lang} />
         </ContentWraper>
       </div>
-      <div className="xl:mx-custom-calc relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[0.7fr_1fr]">
+      <div className="relative flex h-full w-full justify-evenly min-[1440px]:justify-center min-[1440px]:gap-x-96  max-[768px]:flex-col max-[768px]:justify-center max-[768px]:items-center ">
         {children}
       </div>
     </main>
