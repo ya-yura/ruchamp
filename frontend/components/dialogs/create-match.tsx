@@ -206,7 +206,7 @@ export function CreateMatchDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:px-3 sm:py-0 w-full md:w-full"
+              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
             >
               {Object.entries(CreateMatchTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
