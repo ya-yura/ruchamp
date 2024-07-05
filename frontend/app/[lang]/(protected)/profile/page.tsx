@@ -34,6 +34,11 @@ export default async function AthleteProfile({
     fetchAthleteMatches(token),
     fetchAthleteTeams(token),
   ]);
+
+  // console.log('teams ===>', teams);
+
+
+
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],
