@@ -27,12 +27,12 @@ export default async function AuthLayout({
         fill={true}
         style={{ objectFit: 'cover' }}
       />
-      <div className="z-10 absolute w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
+      <div className="absolute z-10 w-full px-4 pt-[10px] sm:px-7 sm:pt-[15px] md:px-10 lg:px-[72px]">
         <ContentWraper>
           <Logo lang={lang} />
         </ContentWraper>
       </div>
-      <div className="xl:mx-custom-calc relative grid h-full w-full grid-cols-1 md:grid-cols-[3fr_5fr] lg:grid-cols-[0.7fr_1fr]">
+      <div className="relative flex h-full w-full justify-evenly px-0 max-[768px]:flex-col max-[768px]:items-center max-[768px]:justify-center sm:px-10 lg:px-0 min-[1440px]:justify-center min-[1440px]:gap-x-96 ">
         {children}
       </div>
     </main>
