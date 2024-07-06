@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils';
 import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { Locale } from '@/i18n.config';
@@ -12,8 +11,7 @@ export default async function EventApplicationsPage({
 }: {
   params: { id: string; lang: Locale };
 }) {
-  // const { id, lang } = params;
-  const id = '175';
+  const { id, lang } = params;
   const [session, event] = await Promise.all([getSession(), fetchEvent(id)]);
   const token = session?.token;
   const applications = await fetchEventApplications(token, id);

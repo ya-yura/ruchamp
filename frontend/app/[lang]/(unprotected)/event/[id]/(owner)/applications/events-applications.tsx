@@ -19,7 +19,7 @@ interface ApplicationTeamProps {
   tabsData: Record<string, string>;
 }
 
-interface filteredDataProps {
+interface filteredData {
   applications: ApplicationTeam[];
   color: 'orange' | 'red' | 'green' | 'blue';
   text: string;
@@ -40,7 +40,7 @@ export function EventApplications({
     setSelectedTabValue(value);
   }, []);
 
-  const filteredData: filteredDataProps = useMemo(() => {
+  const filteredData: filteredData = useMemo(() => {
     switch (selectedTabValue) {
       case 'approved':
         return {
