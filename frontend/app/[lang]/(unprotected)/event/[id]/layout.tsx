@@ -33,6 +33,7 @@ export default async function EventPageLayout({
     : null;
   const token = session?.token;
   const isOwner = user?.roleInfo.id === event?.organizer_id;
+  const isAthlete = user?.basicInfo.role_id === 1;
   const randomInt = getRandomInt(100);
   const expectedEvents = getExpectedEvents(events, randomInt, 16);
 
@@ -70,6 +71,7 @@ export default async function EventPageLayout({
             token={token}
             event={event}
             isOwner={isOwner}
+            isAthlete={isAthlete}
             lang={lang}
           />
         }
