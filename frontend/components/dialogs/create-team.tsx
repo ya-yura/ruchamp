@@ -129,7 +129,7 @@ export function CreateTeamDialog({
         </DialogHeader>
         <Tabs className="relative mx-auto w-full" value={tabValue}>
           <div className="absolute top-[-60px] flex h-[36px] w-full">
-            <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
+            <TabsList className="mx-auto flex h-auto w-fit flex-row justify-between bg-transparent text-[#D6D6D6] sm:flex-row sm:gap-3 lg:w-fit gap-o sm:gap-1 p-0 sm:p-1">
               {Object.entries(CreateTeamTabs).map(([key, value]) => (
                 <TabsTrigger className="cursor-default" key={key} value={key}>
                   {value}
@@ -140,7 +140,7 @@ export function CreateTeamDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit w-full justify-start bg-transparent px-0 py-0 sm:px-3 sm:py-0 md:w-full"
             >
               {Object.entries(CreateTeamTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
