@@ -21,7 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from auth.routes import current_user
 from auth.schemas import UserDB
 from auth.models import (SportType, Athlete, User, athlete_grade_association,
-                         EventOrganizer)
+                         EventOrganizer, AthleteSport)
 # from auth.models import User, athlete_sport_type_association
 from connection import get_db
 from event.models import (Event, Match, CombatType,
@@ -1403,6 +1403,15 @@ async def create_tournament_application_athlete(
     )
     match_ages = query.mappings().all()
 
+    for match_age in match_ages:
+        age_from = match_age['age_from']
+        age_till = match_age['age_till']
+        if athlete_age < age_from or athlete_age > age_till:
+            raise HTTPException(
+                status_code=400,
+                detail="Возраст атлета не входит в допустимый диапазон"
+            )
+
     match_id_in_aplication = tournament_application_athlete_data.match_id
 
     query = await db.execute(
@@ -1423,15 +1432,6 @@ async def create_tournament_application_athlete(
     )
     athlete_weight = query.scalars().first()
 
-    for match_age in match_ages:
-        age_from = match_age['age_from']
-        age_till = match_age['age_till']
-        if athlete_age < age_from or athlete_age > age_till:
-            raise HTTPException(
-                status_code=400,
-                detail="Возраст атлета не входит в допустимый диапазон"
-            )
-
     for match_weight in match_weights:
         min_weight = match_weight['min_weight']
         max_weight = match_weight['max_weight']
@@ -1440,6 +1440,23 @@ async def create_tournament_application_athlete(
                 status_code=400,
                 detail="Вес атлета не входит в допустимый диапазон"
             )
+
+    query = await db.execute(
+        select(MatchSport.sport_id)
+        .where(MatchSport.match_id == match_id_in_aplication)
+    )
+    sport_id = query.scalars().one_or_none()
+
+    query = await db.execute(
+        select(AthleteSport.sport_id)
+        .where(AthleteSport.athlete_id == athlete_id)
+    )
+    athlete_sport_id = query.scalars().all()
+
+    if sport_id not in athlete_sport_id:
+        raise HTTPException(
+            status_code=400, detail="Вы не владеете этим спортом"
+        )
 
     application = TournamentApplication(
         team_id=0,
@@ -1451,7 +1468,11 @@ async def create_tournament_application_athlete(
     await db.commit()
     db.refresh(application)
 
-    return {f'Application {application.id} created'}
+    ####
+    '''Дописать, чтоб письмо уходило на почту при создании заявки'''
+    ####
+
+    return {f'Application {application.id} created, status: Accepted'}
 
 
 @router.put("/tournament-applications/{application_id}/update")
