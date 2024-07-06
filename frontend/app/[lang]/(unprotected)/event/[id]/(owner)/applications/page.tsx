@@ -1,11 +1,9 @@
-import { cn } from '@/lib/utils';
 import { ContentWraper } from '@/components/content-wraper';
 import { CustomSection } from '@/components/custom-section';
 import { Locale } from '@/i18n.config';
 import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchEventApplications } from '@/lib/data';
 import { EventApplications } from './events-applications';
-import { INFO } from './const';
 import { PersonDescriptionOnCard } from '@/components/text';
 
 export default async function EventApplicationsPage({
@@ -13,8 +11,7 @@ export default async function EventApplicationsPage({
 }: {
   params: { id: string; lang: Locale };
 }) {
-  // const { id, lang } = params;
-  const id = '175';
+  const { id, lang } = params;
   const [session, event] = await Promise.all([getSession(), fetchEvent(id)]);
   const token = session?.token;
   const applications = await fetchEventApplications(token, id);
@@ -22,7 +19,7 @@ export default async function EventApplicationsPage({
   // Делаем проверку на отсутствие заявок. Здесь же обрабатывается и ошибка загрузки заявок
   if (!applications) {
     return (
-      <CustomSection className="relative bg-transparent">
+      <CustomSection className="relative bg-primary-background">
         <ContentWraper className="items-start pb-10">
           <PersonDescriptionOnCard className="mb-5 mr-auto text-base text-background">
             Заявок пока что нет
@@ -45,7 +42,7 @@ export default async function EventApplicationsPage({
   };
 
   return (
-    <CustomSection className="relative bg-transparent">
+    <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start pb-10">
         <EventApplications
           paid={paid}

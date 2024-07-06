@@ -7,7 +7,7 @@ import { ContentWraper } from '../content-wraper';
 export function SupportedSection({ lang }: { lang: Locale }) {
   return (
     <section className="mb-[90px] w-full">
-      <ContentWraper className="max-w-7xl flex-row gap-[115px] pl-[70px]">
+      <ContentWraper className="max-w-7xl md:flex-row gap-16 md:gap-[115px] px-[70px]">
         <a href="https://fasie.ru/">
           {' '}
           <Image
@@ -18,7 +18,7 @@ export function SupportedSection({ lang }: { lang: Locale }) {
           />
         </a>
 
-        <p className="max-w-[585px] text-base text-background">
+        <p className="max-w-[660px] text-sm md:text-base lg:text-lg text-background">
           Проект создан при поддержке Фонда Содействия Инноваций
           <br />в рамках федерального проекта
           <br />

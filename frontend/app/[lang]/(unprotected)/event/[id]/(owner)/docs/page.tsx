@@ -14,7 +14,7 @@ export default async function EventDocsPage({
   const [session, event] = await Promise.all([getSession(), fetchEvent(id)]);
 
   return (
-    <CustomSection className="relative bg-transparent">
+    <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start gap-6 pb-10">
         <OwnerDocs />
       </ContentWraper>

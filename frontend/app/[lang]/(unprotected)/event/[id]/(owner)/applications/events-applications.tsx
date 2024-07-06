@@ -19,6 +19,12 @@ interface ApplicationTeamProps {
   tabsData: Record<string, string>;
 }
 
+interface filteredData {
+  applications: ApplicationTeam[];
+  color: 'orange' | 'red' | 'green' | 'blue';
+  text: string;
+}
+
 export function EventApplications({
   paid,
   accepted,
@@ -34,7 +40,7 @@ export function EventApplications({
     setSelectedTabValue(value);
   }, []);
 
-  const filteredData = useMemo(() => {
+  const filteredData: filteredData = useMemo(() => {
     switch (selectedTabValue) {
       case 'approved':
         return {
@@ -46,7 +52,7 @@ export function EventApplications({
         return {
           applications: rejected,
           color: 'red' as 'red',
-          htext: 'Отклонено',
+          text: 'Отклонено',
         };
       case 'paid':
         return {
@@ -62,8 +68,6 @@ export function EventApplications({
         };
     }
   }, [selectedTabValue, approved, accepted, paid, rejected]);
-
-  // console.log('filteredData ===>', filteredData);
 
   return (
     <>
@@ -94,106 +98,89 @@ export function EventApplications({
         </Tabs>
       </div>
       <ul className="relative w-[100%] ">
-        <li>
-          <ul>
-            {!filteredData.applications.length ? (
-              <p className="relative mb-4 mr-auto text-base text-background">
-                Заявок пока что нет
-              </p>
-            ) : (
-              filteredData.applications.map(
-                (application: ApplicationTeam, index: number) => (
-                  <li
-                    className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
-                    key={index}
-                  >
-                    <div className="flex justify-between">
-                      <div className="mb-3 flex justify-between gap-6 px-2">
-                        {' '}
-                        <H4>{application.name}</H4>
-                        <H4>
-                          Количество участников: {application.members.length}
-                        </H4>
-                      </div>
-                      <Marker
-                        variant={filteredData.color}
-                        children={filteredData.text}
+        {!filteredData.applications.length ? (
+          <p className="relative mb-4 mr-auto text-base text-background">
+            Заявок пока что нет
+          </p>
+        ) : (
+          filteredData.applications.map(
+            (application: ApplicationTeam, index: number) => (
+              <li
+                className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
+                key={index}
+              >
+                <div className="flex justify-between">
+                  <div className="mb-3 flex justify-between gap-6 px-2">
+                    {' '}
+                    <H4>{application.name}</H4>
+                    <H4>Количество участников: {application.members.length}</H4>
+                  </div>
+                  <Marker
+                    variant={filteredData.color}
+                    children={filteredData.text}
+                  />
+                </div>
+                <ul className="flex flex-col gap-2">
+                  {application.members.map((athlete: ApplicationMember) => (
+                    <AthleteCard
+                      key={athlete.id}
+                      id={athlete.id}
+                      sirname={athlete.sirname}
+                      name={athlete.name}
+                      fathername={athlete.fathername}
+                      birthdate={athlete.birthdate}
+                      city={athlete.city}
+                      country={athlete.country}
+                      region={athlete.region}
+                      image_field={athlete.image_field || ''}
+                      weight={athlete.weight}
+                      grade_types={athlete.grade_types}
+                    />
+                  ))}
+                </ul>
+                {filteredData.color === 'blue' && (
+                  <div className="mt-2 flex justify-between">
+                    <Button variant={'transparentGreen'} size={'sm'}>
+                      <Image
+                        className="mr-2"
+                        src={'/images/icons/approve.svg'}
+                        alt="Иконка одобрить"
+                        width={20}
+                        height={20}
                       />
-                    </div>
-                    <ul className="flex flex-col gap-2">
-                      {application.members.map((athlete: ApplicationMember) => (
-                        <AthleteCard
-                          key={athlete.id}
-                          id={athlete.id}
-                          sirname={athlete.sirname}
-                          name={athlete.name}
-                          fathername={athlete.fathername}
-                          birthdate={athlete.birthdate}
-                          city={athlete.city}
-                          country={athlete.country}
-                          region={athlete.region}
-                          image_field={athlete.image_field || ''}
-                          weight={athlete.weight}
-                          grade_types={athlete.grade_types}
-                        />
-                      ))}
-                    </ul>
-                    {filteredData.color === 'blue' && (
-                      <div className="mt-2 flex justify-between">
-                        <Button variant={'transparentGreen'} size={'sm'}>
-                          <Image
-                            className="mr-2"
-                            src={'/images/icons/approve.svg'}
-                            alt="Иконка одобрить"
-                            width={20}
-                            height={20}
-                          />
-                          Одобрить участие
-                        </Button>
-                        <Button variant={'transparentRed'} size={'sm'}>
-                          <Image
-                            className="mr-2"
-                            src={'/images/icons/dismiss.svg'}
-                            alt="Иконка отклонить"
-                            width={20}
-                            height={20}
-                          />
-                          Отказать в участии
-                        </Button>
-                      </div>
-                    )}
-                    {filteredData.color === 'orange' && (
-                      <div className="mt-2">
-                        <Button variant={'transparentRed'} size={'sm'}>
-                          <Image
-                            className="mr-2"
-                            src={'/images/icons/dismiss.svg'}
-                            alt="Иконка отклонить"
-                            width={20}
-                            height={20}
-                          />
-                          Отказать в участии
-                        </Button>
-                      </div>
-                    )}
-                  </li>
-                ),
-              )
-            )}
-          </ul>
-        </li>
+                      Одобрить участие
+                    </Button>
+                    <Button variant={'transparentRed'} size={'sm'}>
+                      <Image
+                        className="mr-2"
+                        src={'/images/icons/dismiss.svg'}
+                        alt="Иконка отклонить"
+                        width={20}
+                        height={20}
+                      />
+                      Отказать в участии
+                    </Button>
+                  </div>
+                )}
+                {filteredData.color === 'orange' && (
+                  <div className="mt-2">
+                    <Button variant={'transparentRed'} size={'sm'}>
+                      <Image
+                        className="mr-2"
+                        src={'/images/icons/dismiss.svg'}
+                        alt="Иконка отклонить"
+                        width={20}
+                        height={20}
+                      />
+                      Отказать в участии
+                    </Button>
+                  </div>
+                )}
+              </li>
+            ),
+          )
+        )}
       </ul>
     </>
   );
-}
-
-{
-  /* <div className="flex justify-between">
-<Button variant={'transparentGreen'} size={'sm'}>
-  Одобрить участие
-</Button>
-<Button variant={'transparentRed'} size={'sm'}>
-  Отказать в участии
-</Button>
-</div> */
 }
