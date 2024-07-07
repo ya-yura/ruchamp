@@ -1333,6 +1333,12 @@ async def create_tournament_application_team(
 
     if match_id is None:
         raise HTTPException(status_code=404, detail="Match not found")
+    
+    query = await db.execute(
+        select(MatchGender.gender)
+        .where(MatchGender.match_id == match_id)
+    )
+    match_gender = query.scalars().first()
 
     query = await db.execute(
         select(MatchSport.sport_id)
@@ -1368,9 +1374,25 @@ async def create_tournament_application_team(
     )
     team_members = query_team_members.scalars().all()
 
-    team_members_cheked_sport = []
+    team_members_cheked_genger = []
 
     for team_member in team_members:
+        query = await db.execute(
+            select(Athlete.user_id)
+            .where(Athlete.id == team_member)
+        )
+        athlete_user_id = query.scalars().first()
+        query = await db.execute(
+            select(User.gender)
+            .where(User.id == athlete_user_id)
+        )
+        athlete_gender = query.scalars().first()
+        if match_gender == athlete_gender:
+            team_members_cheked_genger.append(team_member)
+
+    team_members_cheked_sport = []
+
+    for team_member in team_members_cheked_genger:
         query = await db.execute(
             select(AthleteSport.sport_id)
             .where(AthleteSport.athlete_id == team_member)
@@ -1482,6 +1504,23 @@ async def create_tournament_application_athlete(
 
     if match_id is None:
         raise HTTPException(status_code=404, detail="Match not found")
+
+    query = await db.execute(
+        select(MatchGender.gender)
+        .where(MatchGender.match_id == match_id)
+    )
+    match_gender = query.scalars().first()
+
+    query = await db.execute(
+        select(User.gender)
+        .where(User.id == current_user.id)
+    )
+    user_gender = query.scalars().first()
+
+    if user_gender != match_gender:
+        raise HTTPException(
+            status_code=400, detail="Пол атлета не подходит для матча"
+        )
 
     query = await db.execute(
         select(User.birthdate)
