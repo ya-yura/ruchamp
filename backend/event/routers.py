@@ -34,7 +34,7 @@ from event.shemas import (EventCreate, EventUpdate, MatchCreate,
                           MatchRead, CreateTournamentApplicationTeam,
                           CreateTournamentApplicationAthlete,
                           UpdateTournamentApplication)
-from teams.models import Team
+from teams.models import Team, TeamMember
 from match.models import AgeCategory
 from shop.models import Ticket, Engagement, Sector, Place, Row, SpectatorTicket
 from geo.geo import get_geo
@@ -582,6 +582,13 @@ async def update_status_application(
         .where(TournamentApplication.id == application_id)
         .values(status=status.status)
     )
+    await db.commit()
+    new_application_history = ApplicationStatusHistory(
+        application_id=application_id,
+        status=status.status,
+        updated_at=datetime.now(),
+    )
+    db.add(new_application_history)
     await db.commit()
     return {f'Application {application_id} - approved!'}
 
@@ -1327,14 +1334,102 @@ async def create_tournament_application_team(
     if match_id is None:
         raise HTTPException(status_code=404, detail="Match not found")
 
-    application = TournamentApplication(
-        **tournament_application_team_data.dict()
+    query = await db.execute(
+        select(MatchSport.sport_id)
+        .where(
+            MatchSport.match_id == tournament_application_team_data.match_id
+        )
     )
-    db.add(application)
-    await db.commit()
-    db.refresh(application)
+    match_sport_id = query.scalars().first()
 
-    return {f"Application ID - {application.id} created"}
+    query = await db.execute(
+        select(MatchAge.age_from, MatchAge.age_till)
+        .where(MatchAge.match_id == tournament_application_team_data.match_id)
+    )
+    match_ages = query.mappings().all()
+
+    query = await db.execute(
+        select(MatchWeights.weight_id)
+        .where(
+            MatchWeights.match_id == tournament_application_team_data.match_id
+        )
+    )
+    match_weight_id = query.scalars().one_or_none()
+
+    query = await db.execute(
+        select(AllWeightClass.min_weight, AllWeightClass.max_weight)
+        .where(AllWeightClass.id == match_weight_id)
+    )
+    match_weights = query.mappings().all()
+
+    query_team_members = await db.execute(
+        select(TeamMember.member)
+        .where(TeamMember.team == tournament_application_team_data.team_id)
+    )
+    team_members = query_team_members.scalars().all()
+
+    team_members_cheked_sport = []
+
+    for team_member in team_members:
+        query = await db.execute(
+            select(AthleteSport.sport_id)
+            .where(AthleteSport.athlete_id == team_member)
+        )
+        athlete_sport_ids = query.scalars().all()
+
+        if match_sport_id in athlete_sport_ids:
+            team_members_cheked_sport.append(team_member)
+
+    team_members_cheked_age = []
+
+    for team_member in team_members_cheked_sport:
+        query = await db.execute(
+            select(Athlete.user_id)
+            .where(Athlete.id == team_member)
+        )
+        athlete_user_id = query.scalars().first()
+        query = await db.execute(
+            select(User.birthdate)
+            .where(User.id == athlete_user_id)
+        )
+        user_birthdate = query.scalars().first()
+        athlete_age = datetime.now().year - user_birthdate.year
+
+        for match_age in match_ages:
+            age_from = match_age['age_from']
+            age_till = match_age['age_till']
+            if age_till >= athlete_age >= age_from:
+                team_members_cheked_age.append(team_member)
+
+    team_members_cheked_weight = []
+
+    for team_member in team_members_cheked_age:
+        query = await db.execute(
+            select(Athlete.weight)
+            .where(Athlete.id == team_member)
+        )
+        athlete_weight = query.scalars().first()
+        for match_weight in match_weights:
+            min_weight = match_weight['min_weight']
+            max_weight = match_weight['max_weight']
+            if max_weight >= athlete_weight >= min_weight:
+                team_members_cheked_weight.append(team_member)
+
+    for team_member in team_members_cheked_weight:
+        application = TournamentApplication(
+            athlete_id=team_member,
+            **tournament_application_team_data.dict()
+        )
+        db.add(application)
+        await db.commit()
+        db.refresh(application)
+
+        ####
+        """Дописать отправку емаил"""
+        ####
+
+    return {f"TeamMembers {team_members_cheked_weight} registred"}
+    # return {"ok"}
 
 
 @router.post("/tournament-applications-team/paid/{team_id}")

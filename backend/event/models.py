@@ -279,7 +279,7 @@ class WinnerTable(Base):
 # Заявки на участие от команд
 class TournamentApplication(Base):
     __tablename__ = "TournamentApplication"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     team_id = Column(
         Integer,
         ForeignKey(Team.id, ondelete="CASCADE"),
