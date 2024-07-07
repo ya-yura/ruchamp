@@ -53,27 +53,30 @@ export const createEventSchema = z.object({
   }),
   event_order: z
     .any()
+    .nullable()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
     }, 'Файл должен быть менее 5MB')
     .refine((file) => {
-      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
+      return !file || ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
     }, 'Допустимые форматы файлов: .pdf, .doc, .docx, .txt'),
   event_system: z
     .any()
+    .nullable()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
     }, 'Файл должен быть менее 5MB')
     .refine((file) => {
-      return ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
+      return !file || ACCEPTED_DOC_FILE_TYPES.includes(file?.type);
     }, 'Допустимые форматы файлов: .pdf, .doc, .docx, .txt'),
   image: z
     .any()
+    .nullable()
     .refine((file) => {
       return !file || file.size <= MAX_UPLOAD_SIZE;
     }, 'Файл должен быть менее 5MB')
     .refine((file) => {
-      return ACCEPTED_IMG_FILE_TYPES.includes(file?.type);
+      return !file || ACCEPTED_IMG_FILE_TYPES.includes(file?.type);
     }, 'Файл должен быть формата .png или .jpg'),
 });
 
@@ -149,9 +152,39 @@ export function CreateEventDialog({
     }
   }
 
-  function onSubmit(values: CreateEventSchema): void {
+  async function onSubmit(values: CreateEventSchema): Promise<void> {
     setIsLoading(true);
     if (token) {
+      if (!values.image) {
+        const imageResponse = await fetch('/ru/files/event_image.jpg');
+        if (imageResponse.ok) {
+          const imageBlob = await imageResponse.blob();
+          values.image = new File([imageBlob], 'event_image.jpg', {
+            type: 'image/jpeg',
+          });
+        }
+      }
+
+      if (!values.event_system) {
+        const docResponse = await fetch('/ru/files/event_system.pdf');
+        if (docResponse.ok) {
+          const docBlob = await docResponse.blob();
+          values.event_system = new File([docBlob], 'event_system.pdf', {
+            type: 'application/pdf',
+          });
+        }
+      }
+
+      if (!values.event_order) {
+        const rulesResponse = await fetch('/ru/files/event_order.pdf');
+        if (rulesResponse.ok) {
+          const rulesBlob = await rulesResponse.blob();
+          values.event_order = new File([rulesBlob], 'event_order.pdf', {
+            type: 'application/pdf',
+          });
+        }
+      }
+
       createEvent(token, values)
         .then((id) => {
           setIsOpen(false);
