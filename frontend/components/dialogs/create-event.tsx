@@ -166,21 +166,21 @@ export function CreateEventDialog({
       }
 
       if (!values.event_system) {
-        const docResponse = await fetch('/ru/files/event_doc.pdf');
+        const docResponse = await fetch('/ru/files/event_system.pdf');
         if (docResponse.ok) {
           const docBlob = await docResponse.blob();
-          values.event_system = new File([docBlob], 'event_doc.pdf', {
+          values.event_system = new File([docBlob], 'event_system.pdf', {
             type: 'application/pdf',
           });
         }
       }
 
       if (!values.event_order) {
-        const rulesResponse = await fetch('/ru/files/event_rules.txt');
+        const rulesResponse = await fetch('/ru/files/event_order.pdf');
         if (rulesResponse.ok) {
           const rulesBlob = await rulesResponse.blob();
-          values.event_order = new File([rulesBlob], 'event_rules.txt', {
-            type: 'text/plain',
+          values.event_order = new File([rulesBlob], 'event_order.pdf', {
+            type: 'application/pdf',
           });
         }
       }
