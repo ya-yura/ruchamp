@@ -25,10 +25,11 @@ import Counter from '@/components/counter';
 interface GridProps {
   info: GridInfo;
   rounds: GridRound[];
+  isOwner: boolean | null;
 }
 
 
-export function Grid({ info, rounds }: GridProps) {
+export function Grid({ info, rounds, isOwner }: GridProps) {
   return (
     <ContentWraper className="min-h-44">
       {info.start_time && info.match_name && (
@@ -58,12 +59,17 @@ export function Grid({ info, rounds }: GridProps) {
         </Tag>
         <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>
-      <GridField rounds={rounds} />
+      <GridField rounds={rounds} isOwner={isOwner} />
     </ContentWraper>
   );
 }
 
-function GridField({ rounds }: { rounds: GridRound[] }) {
+interface GridFieldProps {
+  rounds: GridRound[];
+  isOwner: boolean | null;
+}
+
+function GridField({ rounds, isOwner }: GridFieldProps) {
   const colVariants: Record<number, string> = {
     1: 'grid-cols-1',
     2: 'grid-cols-[repeat(2,_175px)]',
@@ -144,6 +150,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                   isPreSemiFinalCol={index === rounds.length - 3}
                   roundsNumber = {rounds.length}
                   roundIndex={index}
+                  isOwner={isOwner}
                 />
               ))}
             </ul>
@@ -168,6 +175,7 @@ interface GridCardProps {
   roundIndex: number;
   roundsNumber: number;
   className?: string;
+  isOwner: boolean | null;
 }
 
 export function GridCard({
@@ -183,6 +191,7 @@ export function GridCard({
   roundIndex,
   roundsNumber,
   className,
+  isOwner
 }: GridCardProps) {
   const isPlayerFirstWinner = player_1.points > player_2.points;
   const isDraw = player_1.points === player_2.points;
@@ -281,18 +290,20 @@ export function GridCard({
               isWinner={isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
+              isOwner={isOwner}
             />
             <GridCardPlayerId
               player={player_2}
               isWinner={!isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
+              isOwner={isOwner}
             />
           </div>
           {(isLastCol || isPreLastCol) && (
             <div className='text-[11px] font-black text-Grey90 flex flex-col justify-between items-center py-0.5'>
-              <p>{player_1.points}</p>  
-              <p>{player_2.points}</p>  
+              <p>{player_1.points}</p>
+              <p>{player_2.points}</p>
             </div>
           )}
         </div>
@@ -399,11 +410,13 @@ function GridCardPlayerId({
   isWinner,
   isLastCol,
   isPreLastCol,
+  isOwner
 }: {
   player: GridPlayer;
   isWinner: boolean;
   isLastCol: boolean | undefined;
   isPreLastCol: boolean | undefined;
+  isOwner: boolean | null;
 }) {
   return (
     <HoverCard>
@@ -412,12 +425,12 @@ function GridCardPlayerId({
           className={cn(
             'bg-Grey100 relative flex justify-center items-center rounded-md p-[6px] w-[29px] h-5',
             player.first_name ? 'cursor-pointer' : '',
-            isWinner && (isPreLastCol ? 'bg-bronze': 
+            isWinner && (isPreLastCol ? 'bg-bronze':
             isLastCol ? 'bg-gold' : '' ),
             !isWinner && isLastCol ? 'bg-silver' : ''
           )}
         >
-          {isWinner && !isLastCol && !isPreLastCol && (
+          {isWinner && (
             <Image
               className="absolute left-0 top-[calc(50%-5px)]"
               src={'/ru/images/icons/winner-marker.svg'}
@@ -442,6 +455,7 @@ function GridCardPlayerId({
             points={player.points}
             team_id={player.team_id}
             team_name={player.team_name}
+            isOwner={isOwner}
           />
         )}
       </HoverCardContent>
@@ -458,6 +472,7 @@ interface AthleteSmallCardProps {
   team_name: string | null;
   team_id: number;
   points: number;
+  isOwner: boolean | null;
 }
 
 function AthleteSmallCard({
@@ -469,6 +484,7 @@ function AthleteSmallCard({
   team_name,
   team_id,
   points,
+  isOwner
 }: AthleteSmallCardProps) {
   if (!name && !birthdate) {
     return;
@@ -499,10 +515,14 @@ function AthleteSmallCard({
               <i>возраст не указан</i>
             )}
           </PersonDescriptionOnCard>
-          <PersonDescriptionOnCard className="text-neutralForeground3 mt-2">
-          <p>В этом бою набрал:</p>
-          <Counter className='mt-2' />
-        </PersonDescriptionOnCard>
+          {
+            isOwner && (
+              <PersonDescriptionOnCard className="text-neutralForeground3 mt-2">
+                <p>В этом бою набрал:</p>
+                <Counter className='mt-2' />
+              </PersonDescriptionOnCard>
+            )
+          }
 
         </div>
       </div>
