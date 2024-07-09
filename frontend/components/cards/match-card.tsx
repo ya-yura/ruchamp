@@ -5,6 +5,8 @@ import { Button } from '../ui/button';
 import { CustomLink } from '../custom-link';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
+import { determineDateStatus } from '@/lib/utils/date-and-time';
+import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
 
 export interface MatchCardProps {
   name?: string;
@@ -22,6 +24,7 @@ export interface MatchCardProps {
   ageMin: number;
   ageMax: number;
   lang: Locale;
+  regEnd: ValueOption;
 }
 
 export function MatchCard({
@@ -40,7 +43,16 @@ export function MatchCard({
   ageMin,
   ageMax,
   lang,
+  regEnd,
 }: MatchCardProps) {
+  const data = regEnd.value as string;
+
+  //проверяем, закончилась ли регистрация на матч
+  const isRegOver = (data: string): boolean => {
+    return determineDateStatus(data) === 'past';
+  };
+  const regStatus = isRegOver(data);
+
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
       <div className="flex gap-7">
@@ -68,18 +80,22 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {buttonText && (
-          <CustomLink
-            className={cn(
-              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            )}
-            lang={lang}
-            href={`/event/${eventId}/matches/${matchId}`}
-          >
-            {buttonText}
-          </CustomLink>
+        {regStatus ? (
+          buttonText && (
+            <CustomLink
+              className={cn(
+                'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+                'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+                'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              )}
+              lang={lang}
+              href={`/event/${eventId}/matches/${matchId}`}
+            >
+              {buttonText}
+            </CustomLink>
+          )
+        ) : (
+          <Button variant="ruchampTransparent">Участвовать</Button>
         )}
       </div>
     </li>

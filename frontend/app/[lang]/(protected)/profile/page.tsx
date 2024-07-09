@@ -35,6 +35,8 @@ export default async function AthleteProfile({
     fetchAthleteTeams(token),
   ]);
 
+  console.log('session ===>', session);
+
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],

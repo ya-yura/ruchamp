@@ -15,6 +15,7 @@ interface MatchesEventTabsProps {
   handleTabChange: ((value: string) => void) | undefined;
   isOwner?: boolean;
   lang: Locale;
+  regEnd: ValueOption;
 }
 
 export function MatchesEventTabs({
@@ -25,6 +26,7 @@ export function MatchesEventTabs({
   handleTabChange,
   isOwner,
   lang,
+  regEnd
 }: MatchesEventTabsProps) {
   return (
     <ContentWraper className="min-h-44">
@@ -60,7 +62,7 @@ export function MatchesEventTabs({
             value={date.displayedValue as string}
           >
             {!!matches.length && (
-              <MatchesField eventId={eventId} matches={matches} lang={lang} />
+              <MatchesField eventId={eventId} matches={matches} lang={lang} regEnd={regEnd} />
             )}
           </TabsContent>
         ))}
@@ -73,9 +75,10 @@ interface MatchesFieldPops {
   eventId: string;
   matches: EventMatch[];
   lang: Locale;
+  regEnd: ValueOption;
 }
 
-function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
+function MatchesField({ eventId, matches, lang, regEnd }: MatchesFieldPops) {
   return (
     <div className="rounded-lg bg-black px-2 pb-2 pt-4">
       <p className="mb-4 mr-auto text-base text-background">
@@ -101,6 +104,8 @@ function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
             ageMax={match.age_max}
             buttonText={'Турнирная сетка'}
             lang={lang}
+            regEnd={regEnd}
+            
           />
         ))}
       </ul>

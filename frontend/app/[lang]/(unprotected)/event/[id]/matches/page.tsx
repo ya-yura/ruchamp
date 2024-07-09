@@ -4,6 +4,7 @@ import { fetchEvent, fetchMatches } from '@/lib/data';
 import { Locale } from '@/i18n.config';
 import { ValueOption } from '../../../team/[id]/page';
 import { transformDate } from '@/lib/utils/date-and-time';
+import { isCurrentDate } from '@/lib/utils/date-and-time';
 import { filterUniqueDisplayedValues } from '@/lib/utils/other-utils';
 import { CustomSection } from '@/components/custom-section';
 
@@ -49,6 +50,7 @@ export default async function EventMatchesPage({
     ),
   };
   const awardingTime: ValueOption = matchesEnd;
+
   return (
     <CustomSection className="relative mb-10">
       <MatchesEvent

@@ -360,6 +360,29 @@ export async function createMatch(
   return await response.json();
 }
 
+export async function createApplication(
+  token: string,
+  values: {
+    match_id: 1;
+    status: 'accepted';
+  },
+) : Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/event/tournament-applications-athlete/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create match');
+  }
+
+  return await response.json();
+}
+
 // Athlete Profile
 
 export async function fetchAthleteMatches(
