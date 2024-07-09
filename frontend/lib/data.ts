@@ -449,21 +449,6 @@ export async function updateAthleteImage(
   return await response.json();
 }
 
-export async function getProfile(token: string): Promise<any> {
-  const response = await fetch(`${baseUrl}/users/me`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!response.ok) {
-    throw new Error('Failed to get profile data');
-  }
-
-  return await response.json();
-}
-
 export async function updateProfile(
   token: string,
   values: any, // fix "any" later
