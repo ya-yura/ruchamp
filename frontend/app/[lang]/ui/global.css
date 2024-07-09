@@ -75,6 +75,8 @@
     }
   }
 
+/* custom scrollbar styles*/
+
 .custom-scrollbar {
   @apply overflow-y-auto;
 }
