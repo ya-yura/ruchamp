@@ -94,16 +94,17 @@ export function UpdateProfileDialog({
   }, []);
 
   function onSubmit(values: UpdateProfileSchema): void {
+    const currentValues = { ...values.user_update };
     setIsLoading(true);
     if (token) {
-      updateProfile(token, values)
+      updateProfile(token, currentValues)
         .then(() => {
           setIsOpen(false);
-          toast.success('Событие успешно обновлено');
+          toast.success('Данные успешно обновлены');
           // revalidateEvent(eventId);
         })
         .catch((err) => {
-          console.log('Ошибка при обновлении события: ', err);
+          console.log('Ошибка при обновлении данных: ', err);
           toast.error('Что-то пошло не так');
         })
         .finally(() => setIsLoading(false));
