@@ -6,6 +6,8 @@ import shutil
 from typing import Optional
 from transliterate import translit
 from starlette.responses import JSONResponse
+from PIL import Image
+import imghdr
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -42,11 +44,31 @@ from geo.geo import get_geo
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')
 
+MAX_FILE_SIZE_MB = 5
+MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024  # 5 мегабайт в байтах
+
 
 # Функция для транслитерации имени файла
 def transliterate_filename(filename):
     name, ext = os.path.splitext(filename)
     return translit(name, 'ru', reversed=True) + ext
+
+
+def validate_image(image: UploadFile) -> bool:
+    try:
+        # Используем библиотеку Pillow для проверки изображения
+        img = Image.open(image.file)
+        img.verify()  # Проверяем, что это изображение
+        return True
+    except Exception:
+        return False
+
+
+def validate_file_size(file: UploadFile) -> bool:
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+    file.file.seek(0)  # Возвращаем указатель в начало файла
+    return file_size <= MAX_FILE_SIZE
 
 
 @router.get("/sports")
@@ -669,6 +691,21 @@ async def create_event(
     current_user: UserDB = Depends(current_user)
 ):
     try:
+        # Проверка изображения
+        if not validate_image(image):
+            raise HTTPException(
+                status_code=400,
+                detail="The uploaded file is not a valid image."
+            )
+
+        # Проверка размера файлов
+        for file in [image, event_order, event_system]:
+            if not validate_file_size(file):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File size should not exceed {MAX_FILE_SIZE_MB} MB."
+                )
+
         event_data = EventCreate(
             name=name,
             start_datetime=start_datetime,
@@ -713,6 +750,7 @@ async def create_event(
                 os.path.join(image_dir, image_filename)
             )
             with open(image_location, "wb") as file:
+                image.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(image.file, file)
 
         # Сохранение файлов на сервере
@@ -722,6 +760,7 @@ async def create_event(
                 os.path.join(files_dir, event_order_filename)
             )
             with open(event_order_location, "wb") as file:
+                event_order.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(event_order.file, file)
 
         if event_system:
@@ -732,6 +771,7 @@ async def create_event(
                 os.path.join(files_dir, event_system_filename)
             )
             with open(event_system_location, "wb") as file:
+                event_system.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(event_system.file, file)
 
         new_event = Event(
