@@ -41,6 +41,7 @@ from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
 from teams.models import TeamMember, Team
 from match.utils import round_name
 
+
 load_dotenv()
 logger = logging.getLogger(__name__)
 
@@ -122,6 +123,7 @@ async def update_profile(
     data: Type,
     current_user: User = Depends(current_user),
     user_manager: UserManager = Depends(get_user_manager),
+    session: AsyncSession = Depends(get_db),
 ):
     role_id = current_user.role_id
     allowed_roles = {
@@ -136,7 +138,7 @@ async def update_profile(
         raise HTTPException(status_code=403, detail="Permission denied")
 
     update_function = allowed_roles[role_id]
-    await update_function(current_user, data)
+    await update_function(current_user, data, session)
 
     return {"message": f"{model.__name__} profile updated successfully"}
 
@@ -365,14 +367,27 @@ async def upload_organizer_photo(
 async def update_organizer_profile(
     organizer_data: organizer_update,
     current_user: User = Depends(current_user),
-    user_manager: UserManager = Depends(get_user_manager),
+    db: AsyncSession = Depends(get_db),
 ):
-    return await update_profile(
-        EventOrganizer,
-        organizer_data,
-        current_user,
-        user_manager
+    query = await db.execute(
+        select(EventOrganizer)
+        .where(EventOrganizer.user_id == current_user.id)
     )
+    organizer = query.scalars().first()
+
+    if organizer is None:
+        raise HTTPException(status_code=400, detail="Organizer not found")
+
+    # обновление полей атлета
+    update_data = organizer_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(organizer, key, value)
+
+    # сохранение изменений в базу данных
+    await db.commit()
+    await db.refresh(organizer)
+
+    return {"status": "success", "data": organizer_data}
 
 
 '''REFEREES'''
@@ -934,10 +949,10 @@ async def create_user(
 @router.put("/update")
 async def update_user(
     user_update: UserUpdate,
-    user_data: UserData,
+    # user_data: UserData,
     current_user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db),
-    user_manager: UserManager = Depends(get_user_manager),
+    # user_manager: UserManager = Depends(get_user_manager),
 ):
     query = await db.execute(select(User).where(User.id == current_user.id))
     user = query.scalars().one_or_none()
@@ -955,7 +970,7 @@ async def update_user(
         ).values(
             weight=float(user_data.info['athlete_weight']),
             height=int(user_data.info['athlete_height']),
-        ))'''
+        ))
     if user.role_id == 2:
         await db.execute(update(EventOrganizer).where(
             EventOrganizer.user_id == current_user.id
@@ -986,7 +1001,7 @@ async def update_user(
             values(qualification_level=int(user_data.info[
                 'referee_qualification_level'
             ]),)
-        )
+        )'''
     await db.commit()
     return {f"User ID - {current_user.id} updated"}
 

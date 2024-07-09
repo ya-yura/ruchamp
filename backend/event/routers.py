@@ -1326,14 +1326,25 @@ async def create_tournament_application_team(
     if user_id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not a captain")
 
-    query = await db.execute(select(Match.id).where(
-        Match.id == tournament_application_team_data.match_id
-    ))
-    match_id = query.scalars().first()
+    query = await db.execute(
+        select(Match.id, Match.end_datetime)
+        .where(
+            Match.id == tournament_application_team_data.match_id
+        )
+    )
+    match = query.mappings().first()
 
-    if match_id is None:
+    if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
-    
+
+    # Проверка на время окончания подачи заявки
+    if datetime.now() > match['end_datetime']:
+        raise HTTPException(
+            status_code=400, detail="Application deadline has passed"
+        )
+
+    match_id = match['id']
+
     query = await db.execute(
         select(MatchGender.gender)
         .where(MatchGender.match_id == match_id)
@@ -1495,15 +1506,23 @@ async def create_tournament_application_athlete(
         )
 
     query = await db.execute(
-        select(Match.id)
+        select(Match.id, Match.end_datetime)
         .where(
             Match.id == tournament_application_athlete_data.match_id
         )
     )
-    match_id = query.scalars().first()
+    match = query.mappings().first()
 
-    if match_id is None:
+    if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
+
+    # Проверка на время окончания подачи заявки
+    if datetime.now() > match['end_datetime']:
+        raise HTTPException(
+            status_code=400, detail="Application deadline has passed"
+        )
+
+    match_id = match['id']
 
     query = await db.execute(
         select(MatchGender.gender)
