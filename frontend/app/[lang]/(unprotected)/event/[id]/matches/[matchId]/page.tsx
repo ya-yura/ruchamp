@@ -1,5 +1,5 @@
 import React from 'react';
-import { initialGrid } from '@/lib/constants';
+import { initialGrid, userRoles } from '@/lib/constants';
 import { CustomSection } from '@/components/custom-section';
 import { fetchTournamentGrid } from '@/lib/data';
 import { Locale } from '@/i18n.config';
@@ -7,6 +7,7 @@ import { H4 } from '@/components/text';
 import { BackButton } from '@/components/back-button';
 import { Grid } from './grid';
 import { ContentWraper } from '@/components/content-wraper';
+import { getSession } from "@/lib/actions/auth";
 
 export interface GridInfo {
   match_id: number;
@@ -63,6 +64,8 @@ export default async function TournamentGrid({
 }) {
   const { id, matchId, lang } = params;
   const tournamentGrid = await fetchTournamentGrid(matchId);
+  const auth = await getSession();
+  const isOwner = auth && auth?.user[1].role_id == Number(userRoles.organizer);
 
   if (!tournamentGrid || +id !== tournamentGrid.grid_info.event_id) {
     return (
@@ -84,7 +87,7 @@ export default async function TournamentGrid({
 
   return (
     <CustomSection className="relative mb-10">
-      <Grid info={tournamentGrid.grid_info} rounds={rounds} />
+      <Grid info={tournamentGrid.grid_info} rounds={rounds} isOwner={isOwner} />
     </CustomSection>
   );
 }
