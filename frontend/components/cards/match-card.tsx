@@ -7,6 +7,24 @@ import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { determineDateStatus } from '@/lib/utils/date-and-time';
 import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
+export interface MatchCardProps {
+  name?: string;
+  eventId: string;
+  matchId: number;
+  startTime: string;
+  endTime: string;
+  sportType: string;
+  grade: string;
+  gender?: boolean;
+  weightClass: string;
+  weightMin: number;
+  weightMax: number;
+  buttonText?: string;
+  ageMin: number;
+  ageMax: number;
+  lang: Locale;
+  regEnd?: ValueOption;
+}
 
 export interface MatchCardProps {
   name?: string;
@@ -24,7 +42,7 @@ export interface MatchCardProps {
   ageMin: number;
   ageMax: number;
   lang: Locale;
-  regEnd: ValueOption;
+  regEnd?: ValueOption;
 }
 
 export function MatchCard({
@@ -45,13 +63,12 @@ export function MatchCard({
   lang,
   regEnd,
 }: MatchCardProps) {
-  const data = regEnd.value as string;
-
-  //проверяем, закончилась ли регистрация на матч
+  // проверяем, закончилась ли регистрация на матч
   const isRegOver = (data: string): boolean => {
     return determineDateStatus(data) === 'past';
   };
-  const regStatus = isRegOver(data);
+
+  const regStatus = regEnd ? isRegOver(regEnd.value as string) : undefined;
 
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
@@ -80,7 +97,7 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus ? (
+        {regStatus === undefined ? (
           buttonText && (
             <CustomLink
               className={cn(
