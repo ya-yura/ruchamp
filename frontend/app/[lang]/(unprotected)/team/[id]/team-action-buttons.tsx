@@ -16,6 +16,10 @@ export function TeamActionButtons({ id, teamName }: TeamActionButtonsProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isUserInTeam, setIsUserInTeam] = useState<boolean>(false);
 
+  useEffect(() => {
+    getUsersTeamData();
+  }, []);
+
   const submitJoinTeam = async () => {
     setIsLoading(true);
     const session = await getSession();
@@ -52,10 +56,6 @@ export function TeamActionButtons({ id, teamName }: TeamActionButtonsProps) {
         .finally(() => setIsLoading(false));
     }
   };
-
-  useEffect(() => {
-    getUsersTeamData();
-  }, []);
 
   return (
     <div className="mb-[87px] flex gap-6">
