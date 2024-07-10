@@ -276,7 +276,7 @@ export function RegisterForm({
         </CustomForm>
       </Form>
       <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="gap-6 bg-white sm:max-w-[425px]">
+        <DialogContent className="w-11/12 gap-6 bg-white sm:max-w-[425px]">
           <DialogHeader className="gap-4">
             <DialogTitle className="font-bold text-primary-background">
               Поздравляем!

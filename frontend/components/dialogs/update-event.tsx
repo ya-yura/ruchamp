@@ -152,9 +152,11 @@ export function UpdateEventDialog({
           Изменить
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-          <DialogTitle>Изменить событие</DialogTitle>
+          <DialogTitle className="text-3xl sm:text-4xl">
+            Изменить событие
+          </DialogTitle>
         </DialogHeader>
         <Tabs
           className="relative mx-auto w-full"
@@ -162,7 +164,7 @@ export function UpdateEventDialog({
           onValueChange={handleTabChange}
         >
           <div className="absolute top-[-60px] flex h-[36px] w-full">
-            <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
+            <TabsList className="mx-auto flex h-auto w-fit flex-row justify-between gap-1 bg-transparent text-[#D6D6D6] sm:flex-row sm:gap-3 lg:w-fit">
               {Object.entries(UpdateEventTabs).map(([key, value]) => (
                 <TabsTrigger key={key} value={key}>
                   {value}
@@ -173,7 +175,7 @@ export function UpdateEventDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit w-full justify-start bg-transparent px-0 py-0 sm:px-3 sm:py-0 md:w-full"
             >
               {Object.entries(UpdateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -262,7 +264,7 @@ function TimeFieldset({ form }: { form: UseFormReturn<UpdateEventSchema> }) {
 
   return (
     <CustomFieldset<UpdateEventSchema>
-      className="gap-10"
+      className="mx-auto flex w-3/5 flex-col gap-10 sm:grid sm:w-full sm:grid-cols-12"
       form={form}
       fieldsetData={timeFieldsetData}
     />

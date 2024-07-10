@@ -106,16 +106,18 @@ export function UpdateAthleteImageDialog({
           <p className="text-base font-semibold">Обновить фото</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-3/4 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-          <DialogTitle>Обновить фото</DialogTitle>
+        <DialogTitle className="text-3xl sm:text-4xl">
+        Обновить фото</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <CustomForm
             onSubmit={form.handleSubmit(onSubmit)}
-            className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+            className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0 items-center sm:items-start"
           >
             <CustomFieldset<UpdateAthleteImageSchema>
+          
               form={form}
               fieldsetData={imageFieldsetData}
             />
