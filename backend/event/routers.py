@@ -437,35 +437,32 @@ async def get_event_applications(
         )
 
     # Получение заявок на матчи
-    query = await db.execute(
-        select(TournamentApplication.status)
-        .distinct()
-        .where(TournamentApplication.match_id.in_(match_ids))
-    )
-    applications_status = query.scalars().all()
-
-    if not applications_status:
-        raise HTTPException(
-            status_code=404, detail="No applications found for this event"
-        )
-
-    application_info = {}
-
-    for status in applications_status:
-        application_info[status] = []
-
+    for match_id in match_ids:
         query = await db.execute(
-            select(
-                TournamentApplication.team_id
-            )
-            .where(TournamentApplication.status == status)
+            select(TournamentApplication.status)
+            .distinct()
+            .where(TournamentApplication.match_id == match_id)
         )
-        teams = query.scalars().all()
+        applications_status = query.scalars().all()
 
-        # Используем множество для удаления повторений
-        unique_teams = set(teams)
+        application_info = {}
 
-        for team_id in unique_teams:
+        for status in applications_status:
+            application_info[status] = []
+
+            query = await db.execute(
+                select(
+                    TournamentApplication.team_id
+                )
+                .where(TournamentApplication.status == status)
+            )
+            teams = query.scalars().all()
+
+            # Используем множество для удаления повторений
+            unique_teams = set(teams)
+            print(unique_teams)
+
+        '''for team_id in unique_teams:
             team_query = await db.execute(
                 select(Team.id, Team.name)
                 .where(Team.id == team_id)
@@ -555,7 +552,8 @@ async def get_event_applications(
 
             application_info[status].append(team_info)
 
-    return application_info
+    return application_info'''
+    return {"ok"}
 
 
 @router.put("/{event_id}/org-info/{applicaton_id}")
@@ -1570,6 +1568,21 @@ async def create_tournament_application_athlete(
     if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
 
+    match_id_in_aplication = tournament_application_athlete_data.match_id
+
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(TournamentApplication.athlete_id == athlete_id)
+        .where(
+            TournamentApplication.match_id == match_id_in_aplication
+        )
+    )
+    application_exist = query.scalars().first()
+    if application_exist:
+        raise HTTPException(
+            status_code=400, detail="Application already exist"
+        )
+
     event_id = match['event_id']
     query = await db.execute(
         select(Event.end_request_datetime)
@@ -1674,7 +1687,7 @@ async def create_tournament_application_athlete(
     application = TournamentApplication(
         team_id=0,
         athlete_id=athlete_id,
-        status=tournament_application_athlete_data.status,
+        status="accepted",
         match_id=tournament_application_athlete_data.match_id,
     )
     db.add(application)

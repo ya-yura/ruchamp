@@ -7,6 +7,7 @@ import yagmail
 import logging
 import shutil
 from transliterate import translit
+from datetime import datetime
 
 
 from email.mime.multipart import MIMEMultipart
@@ -32,7 +33,7 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate, UserCreate,
                           UserData, UserDB, UserRead, UserUpdate,
                           Feedback, AthleteSportUpdate)
-from event.models import EventOrganizer
+from event.models import EventOrganizer, TournamentApplication
 from connection import get_db
 from event.models import (Match, Event, MatchSport, Medal, WinnerTable,
                           MatchParticipant, MatchAge, MatchCategory,
@@ -884,6 +885,119 @@ async def update_athlete_sport(
     db.add(athlete_data)
     await db.commit()
     return athlete_data
+
+
+@router.get("/me/athlete/applications")
+async def get_current_user_applications(
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    if athlete_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Athlete not found"
+        )
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(TournamentApplication.athlete_id == athlete_id)
+    )
+    applications = query.scalars().all()
+    if not applications:
+        raise HTTPException(
+            status_code=400,
+            detail="No applications found"
+        )
+    application_info = []
+    for application_id in applications:
+        query = await db.execute(
+            select(
+                TournamentApplication.id.label("application_id"),
+                TournamentApplication.team_id,
+                Team.name.label("team_name"),
+                TournamentApplication.match_id,
+                TournamentApplication.status,
+                TournamentApplication.created_at,
+                Match.name.label("match_name"),
+                Match.start_datetime,
+                Match.end_datetime,
+                SportType.name.label("sport_type"),
+                CategoryType.name.label("grade"),
+                Match.event_id,
+                Match.mat_vol,
+                Match.nominal_time,
+                Event.name.label("event_name"),
+                Event.location,
+                EventOrganizer.organization_name.label("organization_name"),
+                Event.event_system,
+                MatchAge.age_from.label("age_min"),
+                MatchAge.age_till.label("age_max"),
+                AllWeightClass.name.label("weight_class"),
+                AllWeightClass.min_weight.label("weight_min"),
+                AllWeightClass.max_weight.label("weight_max"),
+                MatchGender.gender,
+            )
+            .join(Match, Match.id == TournamentApplication.match_id)
+            .join(Team, Team.id == TournamentApplication.team_id)
+            .join(Event, Event.id == Match.event_id)
+            .join(EventOrganizer, EventOrganizer.id == Event.organizer_id)
+            .join(MatchSport, MatchSport.match_id == Match.id)
+            .join(SportType, SportType.id == MatchSport.sport_id)
+            .join(MatchCategory, MatchCategory.match_id == Match.id)
+            .join(CategoryType, CategoryType.id == MatchCategory.category_id)
+            .join(MatchAge, MatchAge.match_id == Match.id)
+            .join(MatchWeights, MatchWeights.match_id == Match.id)
+            .join(AllWeightClass, AllWeightClass.id == MatchWeights.weight_id)
+            .join(MatchGender, MatchGender.match_id == Match.id)
+            .where(TournamentApplication.id == application_id)
+        )
+        application_data = query.mappings().all()
+        application_info.append(application_data[0])
+
+    return application_info
+
+
+@router.put("/me/athlete/{application_id}/rejected")
+async def reject_application(
+    application_id: int,
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    if athlete_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Athlete not found"
+        )
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(TournamentApplication.athlete_id == athlete_id)
+        .where(TournamentApplication.id == application_id)
+    )
+    application_id = query.scalars().first()
+
+    if application_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Application not found"
+        )
+
+    query = await db.execute(
+        update(TournamentApplication)
+        .where(TournamentApplication.id == application_id)
+        .values(status="rejected", updated_at=datetime.now())
+    )
+    await db.commit()
+
+    return {f"Application {application_id} rejected"}
 
 
 @router.post("/me/referee")
