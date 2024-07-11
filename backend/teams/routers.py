@@ -742,8 +742,6 @@ async def change_captain(
 
     query = await db.execute(select(Team.captain).where(Team.id == team_id))
     captain_id = query.scalar_one_or_none()
-    print(athlete_id)
-    print(captain_id)
 
     if athlete_id != captain_id:
         raise HTTPException(

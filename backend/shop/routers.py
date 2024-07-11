@@ -253,7 +253,6 @@ async def check_ticket(
         Ticket.id == ticket_id,
         Ticket.uu_key == uu_key))
     ticket = query.scalars().one_or_none()
-    print(ticket)
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
     if ticket == "reserved":

@@ -859,6 +859,33 @@ async def get_current_user_athlete(
     return athlete
 
 
+@router.post("/me/athlete/update-sport")
+async def update_athlete_sport(
+    sport_id: int,
+    grade_id: int,
+    current_user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(Athlete.id)
+        .where(Athlete.user_id == current_user.id)
+    )
+    athlete_id = query.scalars().first()
+    if athlete_id is None:
+        raise HTTPException(
+            status_code=400, detail="You are not an athlete"
+        )
+
+    athlete_data = AthleteSport(
+        athlete_id=athlete_id,
+        sport_id=sport_id,
+        grade_id=grade_id,
+    )
+    db.add(athlete_data)
+    await db.commit()
+    return athlete_data
+
+
 @router.post("/me/referee")
 async def get_current_user_referee(
     referee_data: referee_update,

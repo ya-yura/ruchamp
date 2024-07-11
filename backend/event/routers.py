@@ -510,11 +510,18 @@ async def get_event_applications(
                         Athlete.region,
                         Athlete.city,
                         CategoryType.name.label("grade_type"),
+                        TournamentApplication.id.label("application_id"),
+                        TournamentApplication.status.label("application_status"),
                     )
                     .join(User, User.id == Athlete.user_id)
+                    .join(TournamentApplication, TournamentApplication.athlete_id == Athlete.id)
                     .where(Athlete.id == member)
+                    .where(TournamentApplication.status == status)
                 )
-                athlete = athlete_query.first()
+                athlete = athlete_query.mappings().first()
+
+                if not athlete:
+                    continue
 
                 query = await db.execute(
                     select(
@@ -528,7 +535,7 @@ async def get_event_applications(
                 grade_types = query.scalars().all()
 
                 member_info = {
-                    "id": athlete.id,
+                    "user_id": athlete.id,
                     "sirname": athlete.sirname,
                     "name": athlete.name,
                     "fathername": athlete.fathername,
@@ -540,7 +547,9 @@ async def get_event_applications(
                     "country": athlete.country,
                     "region": athlete.region,
                     "city": athlete.city,
-                    "grade_types": [grade_type for grade_type in grade_types]
+                    "grade_types": [grade_type for grade_type in grade_types],
+                    "application_id": athlete.application_id,
+                    "application_status": athlete.application_status,
                 }
                 team_info["members"].append(member_info)
 
@@ -651,7 +660,6 @@ async def get_events_id(
         select(Match.id).where(Match.event_id == event_id)
     )
     matches_id = query.scalars().all()
-    print(matches_id)
     sports_in_matches_info = []
     for match_id in matches_id:
         query = await db.execute(
@@ -659,7 +667,7 @@ async def get_events_id(
             .where(MatchSport.match_id == match_id)
         )
         match_sport_id = query.scalars().all()
-        print(match_sport_id)
+
         for sport_id in match_sport_id:
             query = await db.execute(
                 select(SportType.name).where(SportType.id == sport_id)
