@@ -9,7 +9,6 @@ interface CounterProps {
 
 function Counter({ className, fight_id }: CounterProps) {
   const [count, setCount] = useState(0);
-  const [error, setError] = useState<string | null>(null);
 
   async function mockApiCall(url: string, options: any) {
     return new Promise((resolve, reject) => {
@@ -41,10 +40,8 @@ function Counter({ className, fight_id }: CounterProps) {
         throw new Error('Ошибка при изменении очков');
       }
       setCount(newCount);
-      setError(null);
     } catch (err) {
       console.error('Error updating score:', err);
-      setError('Ошибка при изменении очков');
     }
   }
 
