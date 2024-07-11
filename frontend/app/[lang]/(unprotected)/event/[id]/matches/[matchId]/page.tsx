@@ -66,6 +66,9 @@ export default async function TournamentGrid({
   const tournamentGrid = await fetchTournamentGrid(matchId);
   const auth = await getSession();
   const isOwner = auth && auth?.user[1].role_id == Number(userRoles.organizer);
+  const fight_id = initialGrid.map(e => e.fights.map(e => e.fight_info.fight_id));
+
+
 
   if (!tournamentGrid || +id !== tournamentGrid.grid_info.event_id) {
     return (
@@ -87,7 +90,7 @@ export default async function TournamentGrid({
 
   return (
     <CustomSection className="relative mb-10">
-      <Grid info={tournamentGrid.grid_info} rounds={rounds} isOwner={isOwner} />
+      <Grid info={tournamentGrid.grid_info} rounds={rounds} isOwner={isOwner} fight_id={fight_id}/>
     </CustomSection>
   );
 }

@@ -26,10 +26,11 @@ interface GridProps {
   info: GridInfo;
   rounds: GridRound[];
   isOwner: boolean | null;
+  fight_id: []
 }
 
 
-export function Grid({ info, rounds, isOwner }: GridProps) {
+export function Grid({ info, rounds, isOwner, fight_id }: GridProps) {
   return (
     <ContentWraper className="min-h-44">
       {info.start_time && info.match_name && (
@@ -59,7 +60,7 @@ export function Grid({ info, rounds, isOwner }: GridProps) {
         </Tag>
         <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>
-      <GridField rounds={rounds} isOwner={isOwner} />
+      <GridField rounds={rounds} isOwner={isOwner} fight_id={fight_id} />
     </ContentWraper>
   );
 }
@@ -67,9 +68,10 @@ export function Grid({ info, rounds, isOwner }: GridProps) {
 interface GridFieldProps {
   rounds: GridRound[];
   isOwner: boolean | null;
+  fight_id: [];
 }
 
-function GridField({ rounds, isOwner }: GridFieldProps) {
+function GridField({ rounds, isOwner, fight_id }: GridFieldProps) {
   const colVariants: Record<number, string> = {
     1: 'grid-cols-1',
     2: 'grid-cols-[repeat(2,_175px)]',
@@ -151,6 +153,7 @@ function GridField({ rounds, isOwner }: GridFieldProps) {
                   roundsNumber = {rounds.length}
                   roundIndex={index}
                   isOwner={isOwner}
+                  fight_id={fight_id}
                 />
               ))}
             </ul>
@@ -176,6 +179,7 @@ interface GridCardProps {
   roundsNumber: number;
   className?: string;
   isOwner: boolean | null;
+  fight_id: []
 }
 
 export function GridCard({
@@ -191,7 +195,9 @@ export function GridCard({
   roundIndex,
   roundsNumber,
   className,
-  isOwner
+  isOwner,
+                           fight_id,
+
 }: GridCardProps) {
   const isPlayerFirstWinner = player_1.points > player_2.points;
   const isDraw = player_1.points === player_2.points;
@@ -291,6 +297,7 @@ export function GridCard({
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
               isOwner={isOwner}
+              fight_id={fight_id}
             />
             <GridCardPlayerId
               player={player_2}
@@ -298,6 +305,7 @@ export function GridCard({
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
               isOwner={isOwner}
+              fight_id={fight_id}
             />
           </div>
           {(isLastCol || isPreLastCol) && (
@@ -410,13 +418,15 @@ function GridCardPlayerId({
   isWinner,
   isLastCol,
   isPreLastCol,
-  isOwner
+  isOwner,
+                            fight_id,
 }: {
   player: GridPlayer;
   isWinner: boolean;
   isLastCol: boolean | undefined;
   isPreLastCol: boolean | undefined;
   isOwner: boolean | null;
+  fight_id: []
 }) {
   return (
     <HoverCard>
@@ -456,6 +466,7 @@ function GridCardPlayerId({
             team_id={player.team_id}
             team_name={player.team_name}
             isOwner={isOwner}
+            fight_id={fight_id}
           />
         )}
       </HoverCardContent>
@@ -473,6 +484,7 @@ interface AthleteSmallCardProps {
   team_id: number;
   points: number;
   isOwner: boolean | null;
+  fight_id: []
 }
 
 function AthleteSmallCard({
@@ -484,7 +496,8 @@ function AthleteSmallCard({
   team_name,
   team_id,
   points,
-  isOwner
+  isOwner,
+                            fight_id,
 }: AthleteSmallCardProps) {
   if (!name && !birthdate) {
     return;
@@ -519,7 +532,7 @@ function AthleteSmallCard({
             isOwner && (
               <PersonDescriptionOnCard className="text-neutralForeground3 mt-2">
                 <p>В этом бою набрал:</p>
-                <Counter className='mt-2' />
+                <Counter className='mt-2' fight_id={fight_id} />
               </PersonDescriptionOnCard>
             )
           }
