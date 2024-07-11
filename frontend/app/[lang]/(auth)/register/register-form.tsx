@@ -237,7 +237,7 @@ export function RegisterForm({
     <>
       <Greetings title={greetings.title} subtitle={greetings.subtitle} />
       <Form {...form}>
-        <CustomForm onSubmit={form.handleSubmit(onSubmit)}>
+        <CustomForm onSubmit={form.handleSubmit(onSubmit)} className="w-full sm:w-[484px]">
           {step === 1 && (
             <>
               <div className="flex w-auto items-center justify-center">
