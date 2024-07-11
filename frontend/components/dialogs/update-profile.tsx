@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { Locale } from '@/i18n.config';
 import { YandexMapPicker } from '../yandex-map-picker';
-import { revalidateEvent } from '@/lib/actions';
+import { revalidateProfile } from '@/lib/actions';
 import { updateProfile } from '@/lib/data';
 import { Countries } from '@/lib/definitions';
 
@@ -101,7 +101,7 @@ export function UpdateProfileDialog({
         .then(() => {
           setIsOpen(false);
           toast.success('Данные успешно обновлены');
-          // revalidateEvent(eventId);
+          revalidateProfile();
         })
         .catch((err) => {
           console.log('Ошибка при обновлении данных: ', err);

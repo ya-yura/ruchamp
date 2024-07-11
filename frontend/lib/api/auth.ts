@@ -43,7 +43,7 @@ class Auth {
     }).then(checkResponse);
   }
 
-  getCurrentUser(token: string): Promise<any> {
+  getCurrentUser(token: string | undefined): Promise<any> {
     // fix "any"
     return fetch(`${this.baseUrl}/users/me`, {
       method: 'GET',
@@ -51,6 +51,7 @@ class Auth {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      next: { tags: ['profile'] },
     })
       .then(checkResponse)
       .catch((err) => {

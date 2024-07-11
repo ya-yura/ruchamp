@@ -17,3 +17,7 @@ export async function revalidateTeams() {
 export async function revalidateUser() {
   revalidateTag('user');
 }
+
+export async function revalidateProfile() {
+  revalidateTag('profile');
+}
