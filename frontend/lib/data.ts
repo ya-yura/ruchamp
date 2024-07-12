@@ -469,6 +469,26 @@ export async function updateProfile(
   return await response.json();
 }
 
+export async function joinTeam(
+  token: string,
+  id: string,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/team/join-team/${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(id),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to join team');
+  }
+
+  return await response.json();
+}
+
 export async function updateScore(fight_id: number, player_one: number, player_two: number, score_player_one: number, score_player_two: number) {
   const body = {
     player_one: player_one,

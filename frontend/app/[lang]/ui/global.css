@@ -74,3 +74,21 @@
       @apply bg-background text-foreground;
     }
   }
+
+/* custom scrollbar styles*/
+
+.custom-scrollbar {
+  @apply overflow-y-auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-BrandBlueBg;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-primary-mainAccent rounded-sm;
+}

@@ -189,13 +189,13 @@ export function CreateMatchDialog({
           Создать мероприятие
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
           <DialogTitle>{title ? title : 'Мероприятие'}</DialogTitle>
         </DialogHeader>
         <Tabs className="relative mx-auto w-full" value={tabValue}>
           <div className="absolute top-[-60px] flex h-[36px] w-full">
-            <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
+            <TabsList className="mx-auto flex h-auto w-fit flex-row justify-between gap-1 bg-transparent text-[#D6D6D6] sm:flex-row sm:gap-3 lg:w-fit">
               {Object.entries(CreateMatchTabs).map(([key, value]) => (
                 <TabsTrigger className="cursor-default" key={key} value={key}>
                   {value}
@@ -206,7 +206,7 @@ export function CreateMatchDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit justify-start bg-transparent sm:w-full p-0 mx-auto sm:px-3 sm:py-0"
             >
               {Object.entries(CreateMatchTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -279,14 +279,14 @@ function NameFieldset({ form }: { form: UseFormReturn<CreateMatchSchema> }) {
         name: 'start_datetime',
         placeholder: 'Начало',
         label: 'Начало',
-        fieldStyles: 'col-span-4',
+        fieldStyles: 'cols-span-12 md:col-span-4',
       },
       {
         type: 'select',
         name: 'nominal_time',
         placeholder: 'Выберите время',
         label: 'Номинальное время проведения одного соревнования',
-        fieldStyles: 'w-full col-span-8',
+        fieldStyles: 'w-full cols-span-12 md:col-span-8',
         inputStyles: 'w-full',
         selectOptions: timeSelectOptions,
       },
@@ -356,7 +356,7 @@ function MatchCriteriaFieldset({
         name: 'sport_type',
         placeholder: 'Выберите из списка',
         label: 'Вид спорта',
-        fieldStyles: 'col-span-6',
+        fieldStyles: 'col-span-12 md:col-span-6',
         selectOptions: sportSelectOptions,
       },
       {
@@ -364,7 +364,7 @@ function MatchCriteriaFieldset({
         name: 'gender',
         placeholder: 'Выберите значение',
         label: 'Пол участников',
-        fieldStyles: 'col-span-6',
+        fieldStyles: 'col-span-12 md:col-span-6',
         selectOptions: [
           {
             value: 'Мужчины',
@@ -381,7 +381,7 @@ function MatchCriteriaFieldset({
         name: 'grade',
         placeholder: 'Выберите из списка',
         label: 'Уровень спортсменов',
-        fieldStyles: 'col-span-6',
+        fieldStyles: 'col-span-12 md:col-span-6',
         selectOptions: gradeSelectOptions,
       },
       {
@@ -389,7 +389,7 @@ function MatchCriteriaFieldset({
         name: 'combat_type',
         placeholder: 'Выберите из списка',
         label: 'Схема боёв',
-        fieldStyles: 'col-span-6',
+        fieldStyles: 'col-span-12 smdcol-span-6',
         selectOptions: combatSelectOptions,
       },
       {
@@ -415,7 +415,7 @@ function MatchCriteriaFieldset({
   return (
     <>
       <CustomFieldset<CreateMatchSchema>
-        className="mb-5 sm:gap-x-14 sm:gap-y-10"
+        className="flex flex-col md:grid mb-5 sm:gap-x-14 sm:gap-y-10"
         form={form}
         fieldsetData={basicFieldsetData}
       />

@@ -227,13 +227,13 @@ export function CreateEventDialog({
           Создать событие
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
           <DialogTitle>Событие</DialogTitle>
         </DialogHeader>
         <Tabs className="relative mx-auto w-full" value={tabValue}>
           <div className="absolute top-[-60px] flex h-[36px] w-full">
-            <TabsList className="mx-auto flex h-auto w-fit flex-col justify-between gap-3 bg-transparent text-[#D6D6D6] sm:flex-row lg:w-fit">
+            <TabsList className="mx-auto flex h-auto w-fit flex-row justify-between gap-1 bg-transparent text-[#D6D6D6] sm:flex-row sm:gap-3 lg:w-fit">
               {Object.entries(CreateEventTabs).map(([key, value]) => (
                 <TabsTrigger className="cursor-default" key={key} value={key}>
                   {value}
@@ -244,7 +244,7 @@ export function CreateEventDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit w-full justify-start bg-transparent px-0 py-0 sm:px-3 sm:py-0 md:w-full"
             >
               {Object.entries(CreateEventTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -364,7 +364,7 @@ function TimeFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
 
   return (
     <CustomFieldset<CreateEventSchema>
-      className="gap-10"
+      className="mx-auto flex w-3/5 flex-col gap-10 sm:grid sm:w-full sm:grid-cols-12"
       form={form}
       fieldsetData={timeFieldsetData}
     />
@@ -424,18 +424,21 @@ function DocsFieldset({ form }: { form: UseFormReturn<CreateEventSchema> }) {
         name: 'event_order',
         placeholder: 'Загрузить устав',
         label: 'Загрузить устав',
+        fieldStyles: 'w-full items-center sm:items-start',
       },
       {
         type: 'file',
         name: 'event_system',
         placeholder: 'Заргрузить отчёт',
         label: 'Загрузить отчёт',
+        fieldStyles: 'w-full items-center sm:items-start',
       },
     ],
   };
 
   return (
     <CustomFieldset<CreateEventSchema>
+      className="mx-auto flex w-3/5 flex-col gap-10 sm:grid sm:w-full sm:grid-cols-12"
       form={form}
       fieldsetData={docsFieldsetData}
     />

@@ -20,7 +20,7 @@ function Counter({ className, fight_id,id, points, opponent_id, opponent_points,
   const secondPlayerId = is_current_player_first ? opponent_id : id;
   const [count, setCount] = useState(points);
 
-  async function handleScoreChange(value) {
+  async function handleScoreChange(value: number) {
     try {
       const newCount = Math.max(count + value, 0);
       const firstPlayerScore = is_current_player_first ? newCount : opponent_points;

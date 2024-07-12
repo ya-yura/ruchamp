@@ -6,6 +6,8 @@ import shutil
 from typing import Optional
 from transliterate import translit
 from starlette.responses import JSONResponse
+from PIL import Image
+import imghdr
 
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
@@ -42,11 +44,31 @@ from geo.geo import get_geo
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')
 
+MAX_FILE_SIZE_MB = 5
+MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024  # 5 мегабайт в байтах
+
 
 # Функция для транслитерации имени файла
 def transliterate_filename(filename):
     name, ext = os.path.splitext(filename)
     return translit(name, 'ru', reversed=True) + ext
+
+
+def validate_image(image: UploadFile) -> bool:
+    try:
+        # Используем библиотеку Pillow для проверки изображения
+        img = Image.open(image.file)
+        img.verify()  # Проверяем, что это изображение
+        return True
+    except Exception:
+        return False
+
+
+def validate_file_size(file: UploadFile) -> bool:
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+    file.file.seek(0)  # Возвращаем указатель в начало файла
+    return file_size <= MAX_FILE_SIZE
 
 
 @router.get("/sports")
@@ -415,35 +437,32 @@ async def get_event_applications(
         )
 
     # Получение заявок на матчи
-    query = await db.execute(
-        select(TournamentApplication.status)
-        .distinct()
-        .where(TournamentApplication.match_id.in_(match_ids))
-    )
-    applications_status = query.scalars().all()
-
-    if not applications_status:
-        raise HTTPException(
-            status_code=404, detail="No applications found for this event"
-        )
-
-    application_info = {}
-
-    for status in applications_status:
-        application_info[status] = []
-
+    for match_id in match_ids:
         query = await db.execute(
-            select(
-                TournamentApplication.team_id
-            )
-            .where(TournamentApplication.status == status)
+            select(TournamentApplication.status)
+            .distinct()
+            .where(TournamentApplication.match_id == match_id)
         )
-        teams = query.scalars().all()
+        applications_status = query.scalars().all()
 
-        # Используем множество для удаления повторений
-        unique_teams = set(teams)
+        application_info = {}
 
-        for team_id in unique_teams:
+        for status in applications_status:
+            application_info[status] = []
+
+            query = await db.execute(
+                select(
+                    TournamentApplication.team_id
+                )
+                .where(TournamentApplication.status == status)
+            )
+            teams = query.scalars().all()
+
+            # Используем множество для удаления повторений
+            unique_teams = set(teams)
+            print(unique_teams)
+
+        '''for team_id in unique_teams:
             team_query = await db.execute(
                 select(Team.id, Team.name)
                 .where(Team.id == team_id)
@@ -488,11 +507,18 @@ async def get_event_applications(
                         Athlete.region,
                         Athlete.city,
                         CategoryType.name.label("grade_type"),
+                        TournamentApplication.id.label("application_id"),
+                        TournamentApplication.status.label("application_status"),
                     )
                     .join(User, User.id == Athlete.user_id)
+                    .join(TournamentApplication, TournamentApplication.athlete_id == Athlete.id)
                     .where(Athlete.id == member)
+                    .where(TournamentApplication.status == status)
                 )
-                athlete = athlete_query.first()
+                athlete = athlete_query.mappings().first()
+
+                if not athlete:
+                    continue
 
                 query = await db.execute(
                     select(
@@ -506,7 +532,7 @@ async def get_event_applications(
                 grade_types = query.scalars().all()
 
                 member_info = {
-                    "id": athlete.id,
+                    "user_id": athlete.id,
                     "sirname": athlete.sirname,
                     "name": athlete.name,
                     "fathername": athlete.fathername,
@@ -518,13 +544,16 @@ async def get_event_applications(
                     "country": athlete.country,
                     "region": athlete.region,
                     "city": athlete.city,
-                    "grade_types": [grade_type for grade_type in grade_types]
+                    "grade_types": [grade_type for grade_type in grade_types],
+                    "application_id": athlete.application_id,
+                    "application_status": athlete.application_status,
                 }
                 team_info["members"].append(member_info)
 
             application_info[status].append(team_info)
 
-    return application_info
+    return application_info'''
+    return {"ok"}
 
 
 @router.put("/{event_id}/org-info/{applicaton_id}")
@@ -629,7 +658,6 @@ async def get_events_id(
         select(Match.id).where(Match.event_id == event_id)
     )
     matches_id = query.scalars().all()
-    print(matches_id)
     sports_in_matches_info = []
     for match_id in matches_id:
         query = await db.execute(
@@ -637,7 +665,7 @@ async def get_events_id(
             .where(MatchSport.match_id == match_id)
         )
         match_sport_id = query.scalars().all()
-        print(match_sport_id)
+
         for sport_id in match_sport_id:
             query = await db.execute(
                 select(SportType.name).where(SportType.id == sport_id)
@@ -669,6 +697,21 @@ async def create_event(
     current_user: UserDB = Depends(current_user)
 ):
     try:
+        # Проверка изображения
+        if not validate_image(image):
+            raise HTTPException(
+                status_code=400,
+                detail="The uploaded file is not a valid image."
+            )
+
+        # Проверка размера файлов
+        for file in [image, event_order, event_system]:
+            if not validate_file_size(file):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File size should not exceed {MAX_FILE_SIZE_MB} MB."
+                )
+
         event_data = EventCreate(
             name=name,
             start_datetime=start_datetime,
@@ -713,6 +756,7 @@ async def create_event(
                 os.path.join(image_dir, image_filename)
             )
             with open(image_location, "wb") as file:
+                image.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(image.file, file)
 
         # Сохранение файлов на сервере
@@ -722,6 +766,7 @@ async def create_event(
                 os.path.join(files_dir, event_order_filename)
             )
             with open(event_order_location, "wb") as file:
+                event_order.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(event_order.file, file)
 
         if event_system:
@@ -732,6 +777,7 @@ async def create_event(
                 os.path.join(files_dir, event_system_filename)
             )
             with open(event_system_location, "wb") as file:
+                event_system.file.seek(0)  # Возвращаемся к началу файла
                 shutil.copyfileobj(event_system.file, file)
 
         new_event = Event(
@@ -1326,14 +1372,31 @@ async def create_tournament_application_team(
     if user_id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not a captain")
 
-    query = await db.execute(select(Match.id).where(
-        Match.id == tournament_application_team_data.match_id
-    ))
-    match_id = query.scalars().first()
+    query = await db.execute(
+        select(Match.id, Match.event_id)
+        .where(
+            Match.id == tournament_application_team_data.match_id
+        )
+    )
+    match = query.mappings().first()
 
-    if match_id is None:
+    if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
-    
+
+    event_id = match['event_id']
+    query = await db.execute(
+        select(Event.end_request_datetime)
+        .where(Event.id == event_id)
+    )
+    end_request_datetime = query.scalars().first()
+    # Проверка на время окончания подачи заявки
+    if datetime.now() > end_request_datetime:
+        raise HTTPException(
+            status_code=400, detail="Application deadline has passed"
+        )
+
+    match_id = match['id']
+
     query = await db.execute(
         select(MatchGender.gender)
         .where(MatchGender.match_id == match_id)
@@ -1495,15 +1558,44 @@ async def create_tournament_application_athlete(
         )
 
     query = await db.execute(
-        select(Match.id)
+        select(Match.id, Match.event_id)
         .where(
             Match.id == tournament_application_athlete_data.match_id
         )
     )
-    match_id = query.scalars().first()
+    match = query.mappings().first()
 
-    if match_id is None:
+    if match is None:
         raise HTTPException(status_code=404, detail="Match not found")
+
+    match_id_in_aplication = tournament_application_athlete_data.match_id
+
+    query = await db.execute(
+        select(TournamentApplication.id)
+        .where(TournamentApplication.athlete_id == athlete_id)
+        .where(
+            TournamentApplication.match_id == match_id_in_aplication
+        )
+    )
+    application_exist = query.scalars().first()
+    if application_exist:
+        raise HTTPException(
+            status_code=400, detail="Application already exist"
+        )
+
+    event_id = match['event_id']
+    query = await db.execute(
+        select(Event.end_request_datetime)
+        .where(Event.id == event_id)
+    )
+    end_request_datetime = query.scalars().first()
+    # Проверка на время окончания подачи заявки
+    if datetime.now() > end_request_datetime:
+        raise HTTPException(
+            status_code=400, detail="Application deadline has passed"
+        )
+
+    match_id = match['id']
 
     query = await db.execute(
         select(MatchGender.gender)
@@ -1595,7 +1687,7 @@ async def create_tournament_application_athlete(
     application = TournamentApplication(
         team_id=0,
         athlete_id=athlete_id,
-        status=tournament_application_athlete_data.status,
+        status="accepted",
         match_id=tournament_application_athlete_data.match_id,
     )
     db.add(application)
