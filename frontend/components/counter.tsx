@@ -19,7 +19,6 @@ function Counter({ className, fight_id,id, points, opponent_id, opponent_points,
   const firstPlayerId = is_current_player_first ? id : opponent_id;
   const secondPlayerId = is_current_player_first ? opponent_id : id;
   const [count, setCount] = useState(points);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleScoreChange(value) {
     try {
@@ -30,9 +29,8 @@ function Counter({ className, fight_id,id, points, opponent_id, opponent_points,
       await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
       setCount(newCount);
       onPlayerScoreChange(newCount);
-      setError(null);
     } catch (err) {
-      setError('Ошибка при изменении очков');
+      throw new Error('Ошибка при изменении очков')
     }
   }
 
