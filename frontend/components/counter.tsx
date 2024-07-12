@@ -8,17 +8,19 @@ import { updateScore } from "@/lib/data";
 interface CounterProps {
   className?: string;
   fight_id: number;
+  id: number;
+  points: number;
 }
 
-function Counter({ className, fight_id }: CounterProps) {
-  const [count, setCount] = useState(0);
+function Counter({ className, fight_id,id, points }: CounterProps) {
+  const [count, setCount] = useState(points);
   const [error, setError] = useState<string | null>(null);
 
   async function handleScoreChange(value) {
     try {
       const newCount = Math.max(count + value, 0);
-      console.log(`Current count: ${count}, Change value: ${value}, New count: ${newCount}`);
-      await updateScore(fight_id, newCount);
+      console.log(`Current count: ${count}, Change value: ${value}, id:${id} =  New count: ${newCount}`);
+      await updateScore(fight_id, id, newCount);
       setCount(newCount);
       setError(null);
     } catch (err) {

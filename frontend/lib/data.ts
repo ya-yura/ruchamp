@@ -469,13 +469,16 @@ export async function updateProfile(
   return await response.json();
 }
 
-export async function updateScore(fight_id: number, newScore: number) {
+export async function updateScore(fight_id: number, id: number, newScore: number) {
   const response = await fetch(`${baseUrl}/matches/${fight_id}/score`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ score: newScore }),
+    body: JSON.stringify({
+      id: id,
+      points: newScore
+    }),
   });
 
   if (!response.ok) {

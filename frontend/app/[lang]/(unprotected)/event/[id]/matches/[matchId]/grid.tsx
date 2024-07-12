@@ -571,7 +571,7 @@ function AthleteSmallCard({
           {isOwner && (
             <PersonDescriptionOnCard className="mt-2 text-neutralForeground3">
               <p>В этом бою набрал:</p>
-              <Counter className="mt-2" fight_id={fight_id}/>
+              <Counter className="mt-2" fight_id={fight_id} id={id} points={points}/>
             </PersonDescriptionOnCard>
           )}
         </div>
