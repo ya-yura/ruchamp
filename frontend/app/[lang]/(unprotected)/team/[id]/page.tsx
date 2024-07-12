@@ -270,7 +270,7 @@ export default async function TeamPage({
         bages={sportTypes}
         buttons={
           <TeamActionButtons
-            id={id}
+            teamId={id}
             teamName={team.Team.name}
             captainId={captainId}
           />
