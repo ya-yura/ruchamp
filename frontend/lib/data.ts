@@ -487,6 +487,5 @@ export async function updateScore(fight_id: number, player_one: number, player_t
   if (!response.ok) {
     throw new Error('Ошибка при изменении очков');
   }
-
   return await response.json();
 }

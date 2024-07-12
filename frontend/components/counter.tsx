@@ -23,17 +23,15 @@ function Counter({ className, fight_id,id, points, opponent_id, opponent_points,
 
   async function handleScoreChange(value) {
     try {
-
       const newCount = Math.max(count + value, 0);
-      console.log(`Current count: ${count}, Change value: ${value}, id:${id} =  New count: ${newCount}`);
       const firstPlayerScore = is_current_player_first ? newCount : opponent_points;
       const secondPlayerScore = is_current_player_first ? opponent_points : newCount;
+
       await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
       setCount(newCount);
       onPlayerScoreChange(newCount);
       setError(null);
     } catch (err) {
-      console.error('Error updating score:', err);
       setError('Ошибка при изменении очков');
     }
   }
