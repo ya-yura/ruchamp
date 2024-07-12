@@ -31,7 +31,7 @@ export function DatePicker({ date, setDate, className }: DatePickerProps) {
             id="date"
             variant={'ghost'}
             className={cn(
-              'w-[500px] justify-center text-left text-[32px] font-bold text-[#616161] hover:bg-transparent hover:text-[#616161]/80',
+              'w-full justify-center text-left text-[32px] font-bold text-[#616161] hover:bg-transparent hover:text-[#616161]/80 md:w-[500px]',
               !date && 'text-muted-foreground',
             )}
           >
