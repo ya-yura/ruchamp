@@ -10,15 +10,33 @@ import { toast } from 'sonner';
 interface TeamActionButtonsProps {
   id: string;
   teamName: string;
+  captainId: number;
 }
 
-export function TeamActionButtons({ id, teamName }: TeamActionButtonsProps) {
+export function TeamActionButtons({
+  id,
+  teamName,
+  captainId,
+}: TeamActionButtonsProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isUserInTeam, setIsUserInTeam] = useState<boolean>(false);
+  const [isUserCaptain, setIsUserCaptain] = useState<boolean>(false);
 
   useEffect(() => {
     getUsersTeamData();
   }, []);
+
+  useEffect(() => {
+    userInfo();
+  }, [isUserCaptain]);
+
+  const userInfo = async () => {
+    const session = await getSession();
+    const userId = session?.user[0].user_id;
+    if (userId === captainId) {
+      setIsUserCaptain(true);
+    }
+  };
 
   const submitJoinTeam = async () => {
     setIsLoading(true);
@@ -75,7 +93,11 @@ export function TeamActionButtons({ id, teamName }: TeamActionButtonsProps) {
         </Button>
       )}
 
-      <Button variant="ruchampTransparent">Переназначить капитана</Button>
+      {isUserCaptain ? (
+        <Button variant="ruchampTransparent">Переназначить капитана</Button>
+      ) : (
+        ''
+      )}
     </div>
   );
 }
