@@ -1,3 +1,5 @@
+"use client"
+
 import { ContentWraper } from '@/components/content-wraper';
 import { Tag } from '@/components/tag';
 import { cn } from '@/lib/utils';
@@ -21,6 +23,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/back-button';
 import { GridInfo, GridPlayer, GridRound } from './page';
 import Counter from '@/components/counter';
+import { useState } from "react";
 
 interface GridProps {
   info: GridInfo;
@@ -68,7 +71,7 @@ interface GridFieldProps {
   isOwner: boolean | null;
 }
 
-function GridField({ rounds, isOwner, fight_id }: GridFieldProps) {
+function GridField({ rounds, isOwner }: GridFieldProps) {
   const colVariants: Record<number, string> = {
     1: 'grid-cols-1',
     2: 'grid-cols-[repeat(2,_175px)]',
@@ -195,6 +198,8 @@ export function GridCard({
   isOwner,
   fight_id
 }: GridCardProps) {
+  const [player1Score, setPlayer1Score] = useState<number>(player_1.points);
+  const [player2Score, setPlayer2Score] = useState<number>(player_2.points);
   const isPlayerFirstWinner = player_1.points > player_2.points;
   const isDraw = player_1.points === player_2.points;
   const arrowHeight: Record<string, string> = {
@@ -301,25 +306,39 @@ export function GridCard({
           <div className="flex flex-col gap-1">
             <GridCardPlayerId
               player={player_1}
+              onPlayerScoreChange={(newScore: number) => {
+                setPlayer1Score(newScore);
+              }}
+              opponentPlayer={player_2}
+              isCurrentPlayerFirst={true}
               isWinner={isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
               isOwner={isOwner}
               fight_id={fight_id}
+              currentPlayerPoints={player1Score}
+              opponentPlayerPoints={player2Score}
             />
             <GridCardPlayerId
               player={player_2}
+              onPlayerScoreChange={(newScore: number) => {
+                setPlayer2Score(newScore);
+              }}
+              opponentPlayer={player_1}
+              isCurrentPlayerFirst={false}
               isWinner={!isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
               isOwner={isOwner}
               fight_id={fight_id}
+              currentPlayerPoints={player2Score}
+              opponentPlayerPoints={player1Score}
             />
           </div>
           {(isLastCol || isPreLastCol) && (
             <div className="flex flex-col items-center justify-between py-0.5 text-[11px] font-black text-Grey90">
-              <p>{player_1.points}</p>
-              <p>{player_2.points}</p>
+              <p>{player1Score}</p>
+              <p>{player2Score}</p>
             </div>
           )}
         </div>
@@ -346,7 +365,7 @@ export function GridCard({
                   isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                 )}
               >
-                {player_1.points}
+                {player1Score}
               </span>{' '}
               :{' '}
               <span
@@ -354,7 +373,7 @@ export function GridCard({
                   !isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                 )}
               >
-                {player_2.points}
+                {player2Score}
               </span>
             </p>
             <div
@@ -412,7 +431,7 @@ export function GridCard({
                     isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                   )}
                 >
-                  {player_1.points}
+                  {player1Score}
                 </span>{' '}
                 :{' '}
                 <span
@@ -420,7 +439,7 @@ export function GridCard({
                     !isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                   )}
                 >
-                  {player_2.points}
+                  {player2Score}
                 </span>
               </p>
               <div
@@ -455,18 +474,28 @@ export function GridCard({
 
 function GridCardPlayerId({
   player,
+  onPlayerScoreChange,
+  opponentPlayer,
+  isCurrentPlayerFirst,
   isWinner,
   isLastCol,
   isPreLastCol,
   isOwner,
+  currentPlayerPoints,
+  opponentPlayerPoints,
   fight_id
 }: {
   player: GridPlayer;
+  onPlayerScoreChange: (newScore: number) => void;
+  opponentPlayer: GridPlayer;
+  isCurrentPlayerFirst: boolean,
   isWinner: boolean;
   isLastCol: boolean | undefined;
   isPreLastCol: boolean | undefined;
   isOwner: boolean | null;
   fight_id: number;
+  currentPlayerPoints: number;
+  opponentPlayerPoints: number;
 }) {
   return (
     <HoverCard>
@@ -502,11 +531,15 @@ function GridCardPlayerId({
             name={player.first_name}
             birthdate={player.birthdate}
             image_field={''} // add later
-            points={player.points}
+            points={currentPlayerPoints}
             team_id={player.team_id}
             team_name={player.team_name}
             isOwner={isOwner}
             fight_id={fight_id}
+            opponent_id={opponentPlayer.player_id}
+            opponent_points={opponentPlayerPoints}
+            is_current_player_first={isCurrentPlayerFirst}
+            onPlayerScoreChange={onPlayerScoreChange}
           />
         )}
       </HoverCardContent>
@@ -524,7 +557,11 @@ interface AthleteSmallCardProps {
   team_id: number;
   points: number;
   isOwner: boolean | null;
+  opponent_id: number;
+  opponent_points: number;
+  is_current_player_first: boolean,
   fight_id: number;
+  onPlayerScoreChange: (newScore: number) => void;
 }
 
 function AthleteSmallCard({
@@ -537,6 +574,10 @@ function AthleteSmallCard({
   team_id,
   points,
   isOwner,
+  opponent_id,
+  opponent_points,
+  is_current_player_first,
+  onPlayerScoreChange,
   fight_id
 }: AthleteSmallCardProps) {
   if (!name && !birthdate) {
@@ -571,7 +612,7 @@ function AthleteSmallCard({
           {isOwner && (
             <PersonDescriptionOnCard className="mt-2 text-neutralForeground3">
               <p>В этом бою набрал:</p>
-              <Counter className="mt-2" fight_id={fight_id} id={id} points={points}/>
+              <Counter className="mt-2" fight_id={fight_id} id={id} points={points} opponent_id={opponent_id} opponent_points={opponent_points} is_current_player_first={is_current_player_first} onPlayerScoreChange={onPlayerScoreChange}/>
             </PersonDescriptionOnCard>
           )}
         </div>

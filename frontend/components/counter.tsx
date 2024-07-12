@@ -4,24 +4,33 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { updateScore } from "@/lib/data";
 
-
 interface CounterProps {
   className?: string;
   fight_id: number;
   id: number;
   points: number;
+  opponent_id: number;
+  opponent_points: number;
+  is_current_player_first: boolean;
+  onPlayerScoreChange: (newScore: number) => void;
 }
 
-function Counter({ className, fight_id,id, points }: CounterProps) {
+function Counter({ className, fight_id,id, points, opponent_id, opponent_points, is_current_player_first, onPlayerScoreChange }: CounterProps) {
+  const firstPlayerId = is_current_player_first ? id : opponent_id;
+  const secondPlayerId = is_current_player_first ? opponent_id : id;
   const [count, setCount] = useState(points);
   const [error, setError] = useState<string | null>(null);
 
   async function handleScoreChange(value) {
     try {
+
       const newCount = Math.max(count + value, 0);
       console.log(`Current count: ${count}, Change value: ${value}, id:${id} =  New count: ${newCount}`);
-      await updateScore(fight_id, id, newCount);
+      const firstPlayerScore = is_current_player_first ? newCount : opponent_points;
+      const secondPlayerScore = is_current_player_first ? opponent_points : newCount;
+      await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
       setCount(newCount);
+      onPlayerScoreChange(newCount);
       setError(null);
     } catch (err) {
       console.error('Error updating score:', err);
