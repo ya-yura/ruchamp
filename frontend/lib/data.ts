@@ -397,7 +397,8 @@ export async function fetchAthleteTeams(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['userTeams'] },
+
     });
     return res.ok ? await res.json() : null;
   } catch (error) {
