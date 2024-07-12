@@ -7,7 +7,11 @@ import { Hero } from '@/components/hero';
 import { ProfileActionButtons } from './profile-action-buttons';
 import { ProfileColoredCards } from './profile-colored-cards';
 import { ProfileMatches } from './profile-matches';
-import { fetchAthleteMatches, fetchAthleteTeams } from '@/lib/data';
+import {
+  fetchAthleteMatches,
+  fetchAthleteTeams,
+  fetchAthleteApplications,
+} from '@/lib/data';
 import { ProfileTeams } from './profile-teams';
 import { userRoles } from '@/lib/constants';
 
@@ -30,12 +34,11 @@ export default async function AthleteProfile({
   const { lang } = params;
   const session = await getSession();
   const token = session?.token;
-  const [matches, teams] = await Promise.all([
+  const [matches, teams, applications] = await Promise.all([
     fetchAthleteMatches(token),
     fetchAthleteTeams(token),
+    fetchAthleteApplications(token),
   ]);
-
-  console.log('session ===>', session);
 
   const user: UserInfo | null = session
     ? {
@@ -43,6 +46,7 @@ export default async function AthleteProfile({
         roleInfo: session.user[0],
       }
     : null;
+
 
   const userFullName = `${user?.basicInfo.name} ${user?.basicInfo.fathername} ${user?.basicInfo.sirname}`;
 
@@ -62,6 +66,13 @@ export default async function AthleteProfile({
     );
   }
 
+  const tabsData: Record<string, string> = {
+    main: 'Главное',
+    applications: 'Заявки',
+    results: 'Результаты',
+    teams: 'Команды',
+  };
+
   return (
     <Container className="min-h-screen">
       <Hero
@@ -71,6 +82,7 @@ export default async function AthleteProfile({
         buttons={<ProfileActionButtons user={user} token={token} lang={lang} />}
         image={user.roleInfo.image_field || ''}
         lang={lang}
+        tabsData={tabsData}
       />
       <ProfileColoredCards
         weight={user.roleInfo.weight}

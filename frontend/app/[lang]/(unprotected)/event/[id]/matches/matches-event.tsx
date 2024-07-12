@@ -25,7 +25,9 @@ export interface EventMatch {
 }
 
 interface MatchesEventProps {
+  token?: string;
   eventId: string;
+  userId?: number;
   matches: EventMatch[];
   matchDates: ValueOption[];
   regStart: ValueOption;
@@ -37,7 +39,9 @@ interface MatchesEventProps {
 }
 
 export function MatchesEvent({
+  token,
   eventId,
+  userId,
   matches,
   matchDates,
   regStart,
@@ -75,7 +79,9 @@ export function MatchesEvent({
             awardingTime={awardingTime}
           />
           <MatchesEventTabs
+            token={token}
             eventId={eventId}
+            userId={userId}
             matches={filteredMatches}
             matchDates={matchDates}
             value={selectedDate}

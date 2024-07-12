@@ -1,5 +1,6 @@
 import React from 'react';
 import { MatchesEvent } from './matches-event';
+import { getSession } from '@/lib/actions/auth';
 import { fetchEvent, fetchMatches } from '@/lib/data';
 import { Locale } from '@/i18n.config';
 import { ValueOption } from '../../../team/[id]/page';
@@ -14,6 +15,13 @@ export default async function EventMatchesPage({
   params: { id: string; lang: Locale };
 }) {
   const { id, lang } = params;
+  const session = await getSession();
+  const userId = session?.user[1].id;
+  const token = session?.token;
+  const isAthlete = session?.user[1].role_id === 1;
+
+  console.log('isAthlete ===>', isAthlete);
+
   const [event, matches] = await Promise.all([
     fetchEvent(id),
     fetchMatches(id),
@@ -54,7 +62,9 @@ export default async function EventMatchesPage({
   return (
     <CustomSection className="relative mb-10">
       <MatchesEvent
+        token={token}
         eventId={id}
+        userId={userId}
         matches={matches}
         matchDates={matchDates}
         regStart={regStart}

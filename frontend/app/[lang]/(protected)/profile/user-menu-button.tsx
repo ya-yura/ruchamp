@@ -8,8 +8,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { ListItem } from './list-item';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../components/ui/avatar';
+import { ListItem } from '../../../../components/header/list-item';
 import { Locale } from '@/i18n.config';
 import { EnumUserRole } from '@/lib/definitions';
 import { userRoles } from '@/lib/constants';

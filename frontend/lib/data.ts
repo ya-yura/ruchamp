@@ -1,6 +1,7 @@
 import {
   Applications,
   AthleteMatch,
+  AthleteApplications,
   Event,
   EventStatistics,
   TeamDetails,
@@ -361,23 +362,23 @@ export async function createMatch(
 }
 
 export async function createApplication(
-  token: string,
-  values: {
-    match_id: 1;
-    status: 'accepted';
-  },
-) : Promise<void | Response> {
-  const response = await fetch(`${baseUrl}/event/tournament-applications-athlete/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+  token: string | undefined,
+  match_id: number,
+): Promise<void | Response> {
+  const response = await fetch(
+    `${baseUrl}/event/tournament-applications-athlete/create`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({match_id}),
     },
-    body: JSON.stringify(values),
-  });
+  );
 
   if (!response.ok) {
-    throw new Error('Failed to create match');
+    throw new Error('Failed to create application');
   }
 
   return await response.json();
@@ -404,6 +405,28 @@ export async function fetchAthleteMatches(
   } catch (error) {
     console.error('Error while fetching athlete matches: ', error);
     throw new Error('Failed to fetch athlete matches.');
+  }
+}
+
+export async function fetchAthleteApplications(
+  token: string | undefined,
+): Promise<AthleteApplications[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/athlete/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete applications: ', error);
+    throw new Error('Failed to fetch athlete applications.');
   }
 }
 

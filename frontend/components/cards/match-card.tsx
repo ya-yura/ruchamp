@@ -7,6 +7,10 @@ import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { determineDateStatus } from '@/lib/utils/date-and-time';
 import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
+import { createApplication } from '@/lib/data';
+import { ApplicationButton } from '../buttons/application-button';
+
+
 export interface MatchCardProps {
   name?: string;
   eventId: string;
@@ -27,8 +31,10 @@ export interface MatchCardProps {
 }
 
 export interface MatchCardProps {
+  token?: string;
   name?: string;
   eventId: string;
+  userId?: number;
   matchId: number;
   startTime: string;
   endTime: string;
@@ -46,8 +52,10 @@ export interface MatchCardProps {
 }
 
 export function MatchCard({
+  token,
   name,
   eventId,
+  userId,
   matchId,
   startTime,
   endTime,
@@ -69,6 +77,9 @@ export function MatchCard({
   };
 
   const regStatus = regEnd ? isRegOver(regEnd.value as string) : undefined;
+
+  // console.log('userId ===>', userId);
+
 
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
@@ -97,22 +108,21 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus === undefined ? (
-          buttonText && (
-            <CustomLink
-              className={cn(
-                'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-                'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-                'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              )}
-              lang={lang}
-              href={`/event/${eventId}/matches/${matchId}`}
-            >
-              {buttonText}
-            </CustomLink>
-          )
-        ) : (
-          <Button variant="ruchampTransparent">Участвовать</Button>
+        {regStatus === undefined && buttonText && (
+          <CustomLink
+            className={cn(
+              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            )}
+            lang={lang}
+            href={`/event/${eventId}/matches/${matchId}`}
+          >
+            {buttonText}
+          </CustomLink>
+        )}
+        {userId && (
+          <ApplicationButton token={token} matchId={matchId} />
         )}
       </div>
     </li>

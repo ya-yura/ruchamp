@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { Logo } from '../logo';
-import { UserMenuButton } from './user-menu-button';
+import { UserMenuButton } from '../../app/[lang]/(protected)/profile/user-menu-button';
 import { HeaderNavigation } from './navigation';
 import { SearchBar } from './search-box';
 import { AuthButtons } from './auth-buttons';
