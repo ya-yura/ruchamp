@@ -468,3 +468,19 @@ export async function updateProfile(
 
   return await response.json();
 }
+
+export async function updateScore(fight_id: number, newScore: number) {
+  const response = await fetch(`${baseUrl}/matches/${fight_id}/score`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ score: newScore }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при изменении очков');
+  }
+
+  return await response.json();
+}

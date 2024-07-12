@@ -2,46 +2,28 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { updateScore } from "@/lib/data";
+
+
 interface CounterProps {
   className?: string;
-  fight_id: [];
+  fight_id: number;
 }
 
 function Counter({ className, fight_id }: CounterProps) {
   const [count, setCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
-  async function mockApiCall(url: string, options: any) {
-    return new Promise((resolve, reject) => {
-      console.log(`Mock API Call to URL: ${url}`);
-      console.log('Options:', options);
-
-      setTimeout(() => {
-        if (url.includes('matches')) {
-          resolve({ ok: true });
-        } else {
-          reject(new Error('Ошибка при изменении очков'));
-        }
-      }, 500);
-    });
-  }
-
-  async function handleScoreChange(value: 1 | -1) {
+  async function handleScoreChange(value) {
     try {
       const newCount = Math.max(count + value, 0);
-      const response: any = await mockApiCall(`https://sportplatform.ru/api/matches/${fight_id}/score`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ score: newCount }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Ошибка при изменении очков');
-      }
+      console.log(`Current count: ${count}, Change value: ${value}, New count: ${newCount}`);
+      await updateScore(fight_id, newCount);
       setCount(newCount);
+      setError(null);
     } catch (err) {
       console.error('Error updating score:', err);
+      setError('Ошибка при изменении очков');
     }
   }
 
