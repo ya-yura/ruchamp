@@ -268,7 +268,13 @@ export default async function TeamPage({
         type={'team'}
         title={team.Team.name}
         bages={sportTypes}
-        buttons={<TeamActionButtons id={id} teamName={team.Team.name} />}
+        buttons={
+          <TeamActionButtons
+            teamId={id}
+            teamName={team.Team.name}
+            captainId={captainId}
+          />
+        }
         image={team.Team.image_field}
         tabsContent={tabsContent}
         tabsObj={TeamTabs}

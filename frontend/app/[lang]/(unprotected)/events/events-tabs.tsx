@@ -120,7 +120,7 @@ export function EventsTabs({
               className="hidden lg:flex"
             />
           </div>
-          <div className="relative flex justify-center">
+          <div className="relative flex flex-col items-center justify-center">
             <DatePicker
               className="mb-4 flex justify-center"
               date={date}
@@ -128,7 +128,7 @@ export function EventsTabs({
             />
             {isOrg && (
               <CreateEventDialog
-                className="absolute right-0 top-0"
+                className="order-first mb-4 md:absolute md:right-0 md:top-0 md:mb-0"
                 token={token}
                 lang={lang}
               />

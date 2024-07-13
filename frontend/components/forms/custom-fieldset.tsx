@@ -239,7 +239,7 @@ export function CustomFieldset<T extends FieldValues>({
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className={`flex flex-${item.orientation}`}
+                  className={`flex flex-col sm:flex-${item.orientation}`}
                 >
                   {Object.entries(item.radioOptions).map(([key, value]) => (
                     <FormItem

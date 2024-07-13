@@ -10,6 +10,8 @@ import { TrustedSection } from '@/components/home-page/trusted-section';
 import { SupportedSection } from '@/components/home-page/supported-section';
 import { getInitials } from '@/lib/utils/text-utils';
 import { getSession } from '@/lib/actions/auth';
+import { UserInfo } from '@/lib/definitions';
+import { auth } from '@/lib/api/auth';
 
 export default async function Home({
   params: { lang },
@@ -17,33 +19,26 @@ export default async function Home({
   params: { lang: Locale };
 }) {
   const session = await getSession();
-  let userEmail: string;
-  let userAvatar: string | null;
-  let initials: string;
-  let roleId: number;
-  if (!session || !session.user) {
-    userEmail = '';
-    userAvatar = '';
-    initials = '';
-    roleId = 0;
-  } else {
-    const user = session.user;
-    const firstName: string = user[1].name;
-    const lastName: string = user[1].sirname;
-    userEmail = user[1].email;
-    userAvatar = user[0].image_field;
-    roleId = user[1].role_id;
-    initials = getInitials(firstName, lastName);
-  }
+  const token = session?.token;
+  const profile = await auth.getCurrentUser(token);
+
+  const user: UserInfo | null = session
+    ? {
+        basicInfo: profile[1],
+        roleInfo: profile[0],
+      }
+    : null;
+
+  const initials = getInitials(user?.basicInfo.name, user?.basicInfo.sirname);
 
   return (
     <>
       <Header
-        userEmail={userEmail}
-        userAvatar={userAvatar}
+        userEmail={user?.basicInfo.email}
+        userAvatar={user?.roleInfo.image_field}
         initials={initials}
         isLoggedIn={!!session}
-        roleId={roleId}
+        roleId={user?.basicInfo.role_id}
         lang={lang}
       />
       <Container>
