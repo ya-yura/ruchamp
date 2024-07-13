@@ -426,13 +426,9 @@ export async function createApplication(
       },
     );
 
-    if (!response.ok) {
+if (!response.ok) {
       const errorData = await response.json();
-      if (errorData.detail === 'Application already exist') {
-        throw new Error('Заявка уже подана');
-      } else {
-        throw new Error(errorData.message || 'Failed to create application');
-      }
+      throw new Error(errorData.detail || 'Failed to create application');
     }
 
     return await response.json();

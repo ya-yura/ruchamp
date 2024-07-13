@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 import { H5 } from '../text';
 import { Tag } from '../tag';
 import { Button } from '../ui/button';
@@ -72,19 +72,18 @@ export function MatchCard({
   isAthlete,
 }: MatchCardProps) {
   // проверяем, закончилась ли регистрация на матч
-  const isRegOver = (data: string): boolean => {
-    return determineDateStatus(data) === 'past';
+  const isRegOver = (date: string): boolean => {
+    return isAfter(new Date(), new Date(date));
   };
 
-  const regStatus = regEnd ? isRegOver(regEnd.value as string) : undefined;
-
-  // console.log('userId ===>', userId);
+  const regStatus = regEnd ? isRegOver(regEnd.value as string) : false;
 
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
       <div className="flex gap-7">
         <H5 className="whitespace-nowrap text-xl font-semibold text-white">
-          {format(startTime, 'HH:mm')} – {format(endTime, 'HH:mm')}
+          {format(new Date(startTime), 'HH:mm')} –{' '}
+          {format(new Date(endTime), 'HH:mm')}
         </H5>
         <H5 className="truncate text-xl font-normal text-neutralForeground3Rest">
           {sportType}
@@ -107,7 +106,22 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus === undefined && buttonText && (
+        {regStatus ? (buttonText && (
+          <CustomLink
+            className={cn(
+              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            )}
+            lang={lang}
+            href={`/event/${eventId}/matches/${matchId}`}
+          >
+            {buttonText}
+          </CustomLink>
+        )) : (isAthlete && (
+          <ApplicationCreateButton token={token} matchId={matchId} />
+        ))}
+        {/* {regStatus && buttonText && (
           <CustomLink
             className={cn(
               'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
@@ -120,7 +134,9 @@ export function MatchCard({
             {buttonText}
           </CustomLink>
         )}
-        {isAthlete && <ApplicationCreateButton token={token} matchId={matchId} />}
+        {isAthlete && (
+          <ApplicationCreateButton token={token} matchId={matchId} />
+        )} */}
       </div>
     </li>
   );
