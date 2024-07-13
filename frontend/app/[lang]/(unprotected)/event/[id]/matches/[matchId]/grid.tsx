@@ -306,7 +306,7 @@ export function GridCard({
             <GridCardPlayerId
               player={player_1}
               onPlayerScoreChange={(newScore: number) => {
-                setPlayer1Score(newScore);
+                setPlayer1Score((prevState) => prevState + newScore);
               }}
               opponentPlayer={player_2}
               isCurrentPlayerFirst={true}
@@ -316,12 +316,11 @@ export function GridCard({
               isOwner={isOwner}
               fight_id={fight_id}
               currentPlayerPoints={player1Score}
-              opponentPlayerPoints={player2Score}
             />
             <GridCardPlayerId
               player={player_2}
               onPlayerScoreChange={(newScore: number) => {
-                setPlayer2Score(newScore);
+                setPlayer2Score((prevState) => prevState + newScore);
               }}
               opponentPlayer={player_1}
               isCurrentPlayerFirst={false}
@@ -331,7 +330,6 @@ export function GridCard({
               isOwner={isOwner}
               fight_id={fight_id}
               currentPlayerPoints={player2Score}
-              opponentPlayerPoints={player1Score}
             />
           </div>
           {(isLastCol || isPreLastCol) && (
@@ -481,7 +479,6 @@ function GridCardPlayerId({
   isPreLastCol,
   isOwner,
   currentPlayerPoints,
-  opponentPlayerPoints,
   fight_id
 }: {
   player: GridPlayer;
@@ -494,7 +491,6 @@ function GridCardPlayerId({
   isOwner: boolean | null;
   fight_id: number;
   currentPlayerPoints: number;
-  opponentPlayerPoints: number;
 }) {
   return (
     <HoverCard>
@@ -536,7 +532,6 @@ function GridCardPlayerId({
             isOwner={isOwner}
             fight_id={fight_id}
             opponent_id={opponentPlayer.player_id}
-            opponent_points={opponentPlayerPoints}
             is_current_player_first={isCurrentPlayerFirst}
             onPlayerScoreChange={onPlayerScoreChange}
           />
@@ -557,7 +552,6 @@ interface AthleteSmallCardProps {
   points: number;
   isOwner: boolean | null;
   opponent_id: number;
-  opponent_points: number;
   is_current_player_first: boolean,
   fight_id: number;
   onPlayerScoreChange: (newScore: number) => void;
@@ -573,7 +567,6 @@ function AthleteSmallCard({
   points,
   isOwner,
   opponent_id,
-  opponent_points,
   is_current_player_first,
   onPlayerScoreChange,
   fight_id
@@ -610,7 +603,7 @@ function AthleteSmallCard({
           {isOwner && (
             <PersonDescriptionOnCard className="mt-2 text-neutralForeground3">
               <p>В этом бою набрал:</p>
-              <Counter className="mt-2" fight_id={fight_id} id={id} points={points} opponent_id={opponent_id} opponent_points={opponent_points} is_current_player_first={is_current_player_first} onPlayerScoreChange={onPlayerScoreChange}/>
+              <Counter className="mt-2" fight_id={fight_id} id={id} opponent_id={opponent_id} is_current_player_first={is_current_player_first} onPlayerScoreChange={onPlayerScoreChange}/>
             </PersonDescriptionOnCard>
           )}
         </div>

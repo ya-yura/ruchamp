@@ -8,27 +8,26 @@ interface CounterProps {
   className?: string;
   fight_id: number;
   id: number;
-  points: number;
   opponent_id: number;
-  opponent_points: number;
   is_current_player_first: boolean;
   onPlayerScoreChange: (newScore: number) => void;
 }
 
-function Counter({ className, fight_id,id, points, opponent_id, opponent_points, is_current_player_first, onPlayerScoreChange }: CounterProps) {
+function Counter({ className, fight_id,id, opponent_id, is_current_player_first, onPlayerScoreChange }: CounterProps) {
   const firstPlayerId = is_current_player_first ? id : opponent_id;
   const secondPlayerId = is_current_player_first ? opponent_id : id;
-  const [count, setCount] = useState(points);
+  const [count, setCount] = useState<number>(0);
 
   async function handleScoreChange(value: number) {
     try {
-      const newCount = Math.max(count + value, 0);
-      const firstPlayerScore = is_current_player_first ? newCount : opponent_points;
-      const secondPlayerScore = is_current_player_first ? opponent_points : newCount;
+      const firstPlayerScore = is_current_player_first ? value :0;
+      const secondPlayerScore = is_current_player_first ? 0 : value;
+      console.log(firstPlayerScore)
+      console.log(secondPlayerScore)
 
       await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
-      setCount(newCount);
-      onPlayerScoreChange(newCount);
+      setCount(c => c + value);
+      onPlayerScoreChange(value);
     } catch (err) {
       throw new Error('Ошибка при изменении очков')
     }
