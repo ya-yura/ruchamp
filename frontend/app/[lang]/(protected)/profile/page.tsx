@@ -114,6 +114,7 @@ export default async function AthleteProfile({
 
       {applications ? (
         <ProfileApplications
+        token={token}
           applications={applications}
           tabsData={applicationsTabsData}
           lang={lang}

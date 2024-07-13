@@ -7,8 +7,7 @@ import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
 import { determineDateStatus } from '@/lib/utils/date-and-time';
 import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
-import { createApplication } from '@/lib/data';
-import { ApplicationButton } from '../buttons/application-button';
+import { ApplicationCreateButton } from '../buttons/create-application-button';
 
 export interface MatchCardProps {
   name?: string;
@@ -121,7 +120,7 @@ export function MatchCard({
             {buttonText}
           </CustomLink>
         )}
-        {isAthlete && <ApplicationButton token={token} matchId={matchId} />}
+        {isAthlete && <ApplicationCreateButton token={token} matchId={matchId} />}
       </div>
     </li>
   );

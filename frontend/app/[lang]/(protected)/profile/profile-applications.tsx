@@ -7,16 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/i18n.config';
 import { AthleteApplications } from '@/lib/definitions';
 import { cn } from '@/lib/utils';
-import {
-  divideEventsByDateTime,
-  transformDate,
-} from '@/lib/utils/date-and-time';
-import { H5 } from '@/components/text';
-import { Tag } from '@/components/tag';
-import { CustomLink } from '@/components/custom-link';
-import { Marker } from '../../(unprotected)/event/[id]/(owner)/applications/marker';
+import { ProfileMatchCard } from './profile-match-card';
 
 interface ProfileApplicationsProps {
+  token?: string;
   applications: AthleteApplications[];
   tabsData: Record<string, string>;
   lang: Locale;
@@ -35,6 +29,7 @@ interface FilteredData {
 }
 
 export function ProfileApplications({
+  token,
   applications,
   tabsData,
   lang,
@@ -83,7 +78,7 @@ export function ProfileApplications({
     }
   }, [selectedTab, applications]);
 
-  // console.log('filteredData ====>', filteredData);
+  console.log('filteredData ====>', filteredData);
 
   return (
     <CustomSection className="relative pt-[76px]">
@@ -115,6 +110,7 @@ export function ProfileApplications({
           {Object.entries(tabsData).map(([key, value]) => (
             <TabsContent className="mt-0" key={key} value={key}>
               <ProfileApplicationsField
+                token={token}
                 applications={filteredData.applications}
                 lang={lang}
                 color={filteredData.color}
@@ -129,6 +125,7 @@ export function ProfileApplications({
 }
 
 interface ProfileApplicationsFieldPops {
+  token?: string;
   applications: AthleteApplications[];
   color:
     | 'greenTransparent'
@@ -142,6 +139,7 @@ interface ProfileApplicationsFieldPops {
 }
 
 function ProfileApplicationsField({
+  token,
   applications,
   color,
   text,
@@ -157,6 +155,7 @@ function ProfileApplicationsField({
         <ul className="flex flex-col gap-3 ">
           {applications.map((application) => (
             <ProfileMatchCard
+            token={token}
               key={application.application_id}
               eventId={application.event_id}
               eventName={application.event_name}
@@ -172,6 +171,7 @@ function ProfileApplicationsField({
               weightMax={application.weight_max}
               ageMin={application.age_min}
               ageMax={application.age_max}
+              status={application.status}
               // result={application.athlete_result}
               buttonText={'Отозвать заявку'}
               lang={lang}
@@ -182,107 +182,5 @@ function ProfileApplicationsField({
         </ul>
       )}
     </div>
-  );
-}
-
-export interface ProfileMatchCardProps {
-  name?: string;
-  eventId: string | number;
-  eventName: string;
-  matchId: number;
-  matchName: string;
-  applicationId: number;
-  startTime: string;
-  sportType: string;
-  grade: string;
-  gender?: boolean;
-  weightClass: string;
-  weightMin: number;
-  weightMax: number;
-  buttonText?: string;
-  ageMin: number;
-  ageMax: number;
-  result?: string;
-  lang: Locale;
-  color:
-    | 'greenTransparent'
-    | 'darkRedSolid'
-    | 'greenSolid'
-    | 'blueTransparent'
-    | null
-    | undefined;
-  text: string;
-}
-
-export function ProfileMatchCard({
-  name,
-  eventId,
-  eventName,
-  matchId,
-  matchName,
-  applicationId,
-  startTime,
-  sportType,
-  grade,
-  gender,
-  weightClass,
-  weightMin,
-  weightMax,
-  buttonText,
-  ageMin,
-  ageMax,
-  result,
-  color,
-  text,
-  lang,
-}: ProfileMatchCardProps) {
-  return (
-    <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
-      {/* <H5 className="whitespace-nowrap text-xl font-normal text-white">
-        {eventName}
-      </H5> */}
-      <div className="flex justify-between">
-        <div className="flex gap-7">
-          <H5 className="whitespace-nowrap text-xl font-semibold text-white">
-            {transformDate(startTime)}
-          </H5>
-          <H5 className="truncate text-xl font-normal text-neutralForeground3Rest">
-            {matchName}
-          </H5>
-        </div>
-        <Marker variant={color} children={text} />
-      </div>
-      <div className="flex flex-col justify-between gap-5 md:flex-row">
-        <div className="flex flex-wrap gap-2">
-          <Tag variant={'transparentAccentBorder'}>
-            {gender !== undefined ? (gender ? 'Муж' : 'Жен') : 'Пол не указан'}
-          </Tag>
-          {ageMax !== 0 && (
-            <Tag variant={'transparentGrayBorder'}>
-              {ageMin} – {ageMax} лет
-            </Tag>
-          )}
-          {weightClass && (
-            <Tag variant={'transparentGrayBorder'}>
-              {weightClass}: от {weightMin} кг до {weightMax} кг
-            </Tag>
-          )}
-          {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
-        </div>
-        {/* {buttonText && (
-          <CustomLink
-            className={cn(
-              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            )}
-            lang={lang}
-            href={`/event/${eventId}/matches/${matchId}`}
-          >
-            {buttonText}
-          </CustomLink>
-        )} */}
-      </div>
-    </li>
   );
 }
