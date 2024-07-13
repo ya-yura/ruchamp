@@ -19,7 +19,7 @@ export default async function AuthLayout({
   }
 
   return (
-    <main className="absolute left-0 top-0 h-[100vh] w-full bg-primary-background">
+    <main className="absolute left-0 top-0 h-[100vh] w-full bg-primary-background overflow-y-scroll">
       <Image
         className="relative opacity-50"
         src="/ru/images/background-auth.jpeg"
@@ -32,7 +32,7 @@ export default async function AuthLayout({
           <Logo lang={lang} />
         </ContentWraper>
       </div>
-      <div className="relative flex h-full w-full justify-evenly px-0 max-[768px]:flex-col max-[768px]:items-center max-[768px]:justify-center sm:px-10 lg:px-0 min-[1440px]:justify-center min-[1440px]:gap-x-96 ">
+      <div className="relative flex w-full justify-between px-12 xl:px-36 flex-col lg:flex-row items-center sm:px-10 mt-24 lg:mt-52">
         {children}
       </div>
     </main>
