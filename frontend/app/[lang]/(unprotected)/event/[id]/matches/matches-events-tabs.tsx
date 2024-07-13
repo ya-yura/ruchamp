@@ -10,7 +10,6 @@ import { userAgent } from 'next/server';
 
 interface MatchesEventTabsProps {
   token?: string;
-
   eventId: string;
   userId?: number;
   matches: EventMatch[];
@@ -20,6 +19,7 @@ interface MatchesEventTabsProps {
   isOwner?: boolean;
   lang: Locale;
   regEnd: ValueOption;
+  isAthlete?: boolean;
 }
 
 export function MatchesEventTabs({
@@ -30,9 +30,9 @@ export function MatchesEventTabs({
   matchDates,
   value,
   handleTabChange,
-  isOwner,
   lang,
   regEnd,
+  isAthlete,
 }: MatchesEventTabsProps) {
   return (
     <ContentWraper className="min-h-44">
@@ -75,6 +75,7 @@ export function MatchesEventTabs({
                 matches={matches}
                 lang={lang}
                 regEnd={regEnd}
+                isAthlete={isAthlete}
               />
             )}
           </TabsContent>
@@ -91,6 +92,7 @@ interface MatchesFieldPops {
   matches: EventMatch[];
   lang: Locale;
   regEnd: ValueOption;
+  isAthlete?: boolean;
 }
 
 function MatchesField({
@@ -100,6 +102,7 @@ function MatchesField({
   matches,
   lang,
   regEnd,
+  isAthlete,
 }: MatchesFieldPops) {
   return (
     <div className="rounded-lg bg-black px-2 pb-2 pt-4">
@@ -129,6 +132,7 @@ function MatchesField({
             buttonText={'Турнирная сетка'}
             lang={lang}
             regEnd={regEnd}
+            isAthlete={isAthlete}
           />
         ))}
       </ul>

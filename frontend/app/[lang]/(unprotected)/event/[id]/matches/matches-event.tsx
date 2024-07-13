@@ -36,6 +36,7 @@ interface MatchesEventProps {
   matchesEnd: ValueOption;
   awardingTime: ValueOption;
   lang: Locale;
+  isAthlete?: boolean;
 }
 
 export function MatchesEvent({
@@ -50,6 +51,7 @@ export function MatchesEvent({
   matchesEnd,
   awardingTime,
   lang,
+  isAthlete,
 }: MatchesEventProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
     matchDates[0]?.displayedValue || '',
@@ -88,6 +90,7 @@ export function MatchesEvent({
             handleTabChange={handleTabChange}
             lang={lang}
             regEnd={regEnd}
+            isAthlete={isAthlete}
           />
         </>
       ) : (

@@ -10,7 +10,6 @@ import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { createApplication } from '@/lib/data';
 import { ApplicationButton } from '../buttons/application-button';
 
-
 export interface MatchCardProps {
   name?: string;
   eventId: string;
@@ -49,6 +48,7 @@ export interface MatchCardProps {
   ageMax: number;
   lang: Locale;
   regEnd?: ValueOption;
+  isAthlete?: boolean;
 }
 
 export function MatchCard({
@@ -70,6 +70,7 @@ export function MatchCard({
   ageMax,
   lang,
   regEnd,
+  isAthlete,
 }: MatchCardProps) {
   // проверяем, закончилась ли регистрация на матч
   const isRegOver = (data: string): boolean => {
@@ -79,7 +80,6 @@ export function MatchCard({
   const regStatus = regEnd ? isRegOver(regEnd.value as string) : undefined;
 
   // console.log('userId ===>', userId);
-
 
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
@@ -121,9 +121,7 @@ export function MatchCard({
             {buttonText}
           </CustomLink>
         )}
-        {userId && (
-          <ApplicationButton token={token} matchId={matchId} />
-        )}
+        {isAthlete && <ApplicationButton token={token} matchId={matchId} />}
       </div>
     </li>
   );

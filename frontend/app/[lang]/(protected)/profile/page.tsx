@@ -14,11 +14,22 @@ import {
 } from '@/lib/data';
 import { ProfileTeams } from './profile-teams';
 import { userRoles } from '@/lib/constants';
+import { ProfileApplications } from './profile-applications';
 
 const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   upcoming: 'Будут',
   past: 'Были',
   canceled: 'Отменены',
+};
+
+const applicationsTabsData: Record<
+  'accepted' | 'approved' | 'paid' | 'rejected',
+  string
+> = {
+  accepted: 'Отправленные',
+  approved: 'Ждут оплату',
+  paid: 'Оплаченные',
+  rejected: 'Отклонённые',
 };
 
 const teamsTabsData: Record<string, string> = {
@@ -40,13 +51,14 @@ export default async function AthleteProfile({
     fetchAthleteApplications(token),
   ]);
 
+  // console.log('applications ===>', applications);
+
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],
         roleInfo: session.user[0],
       }
     : null;
-
 
   const userFullName = `${user?.basicInfo.name} ${user?.basicInfo.fathername} ${user?.basicInfo.sirname}`;
 
@@ -82,7 +94,7 @@ export default async function AthleteProfile({
         buttons={<ProfileActionButtons user={user} token={token} lang={lang} />}
         image={user.roleInfo.image_field || ''}
         lang={lang}
-        tabsData={tabsData}
+        // tabsData={tabsData}
       />
       <ProfileColoredCards
         weight={user.roleInfo.weight}
@@ -98,6 +110,16 @@ export default async function AthleteProfile({
         />
       ) : (
         <H4>Вы не участвовали в мероприятиях или произошла ошибка загрузки</H4>
+      )}
+
+      {applications ? (
+        <ProfileApplications
+          applications={applications}
+          tabsData={applicationsTabsData}
+          lang={lang}
+        />
+      ) : (
+        <H4>У вас нет заявок или произошла ошибка загрузки</H4>
       )}
 
       {teams ? (

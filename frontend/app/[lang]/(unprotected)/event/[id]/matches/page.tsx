@@ -20,8 +20,6 @@ export default async function EventMatchesPage({
   const token = session?.token;
   const isAthlete = session?.user[1].role_id === 1;
 
-  console.log('isAthlete ===>', isAthlete);
-
   const [event, matches] = await Promise.all([
     fetchEvent(id),
     fetchMatches(id),
@@ -73,6 +71,7 @@ export default async function EventMatchesPage({
         matchesEnd={matchesEnd}
         awardingTime={awardingTime}
         lang={lang}
+        isAthlete={isAthlete}
       />
     </CustomSection>
   );
