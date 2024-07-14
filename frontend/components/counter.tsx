@@ -1,7 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { updateScore } from "@/lib/data";
+import { updateScore } from '@/lib/data';
+import { revalidateGrid } from '@/lib/actions';
 
 interface CounterProps {
   className?: string;
@@ -13,19 +14,34 @@ interface CounterProps {
   points: number;
 }
 
-function Counter({ className, fight_id,id, opponent_id, is_current_player_first, onPlayerScoreChange, points }: CounterProps) {
+function Counter({
+  className,
+  fight_id,
+  id,
+  opponent_id,
+  is_current_player_first,
+  onPlayerScoreChange,
+  points,
+}: CounterProps) {
   const firstPlayerId = is_current_player_first ? id : opponent_id;
   const secondPlayerId = is_current_player_first ? opponent_id : id;
 
   async function handleScoreChange(value: number) {
     try {
-      const firstPlayerScore = is_current_player_first ? value :0;
+      const firstPlayerScore = is_current_player_first ? value : 0;
       const secondPlayerScore = is_current_player_first ? 0 : value;
 
-      await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
+      await updateScore(
+        fight_id,
+        firstPlayerId,
+        secondPlayerId,
+        firstPlayerScore,
+        secondPlayerScore,
+      );
       onPlayerScoreChange(value);
+      revalidateGrid();
     } catch (err) {
-      throw new Error('Ошибка при изменении очков')
+      throw new Error('Ошибка при изменении очков');
     }
   }
 

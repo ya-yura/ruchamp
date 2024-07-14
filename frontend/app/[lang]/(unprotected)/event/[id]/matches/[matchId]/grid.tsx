@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { ContentWraper } from '@/components/content-wraper';
 import { Tag } from '@/components/tag';
@@ -23,7 +23,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/back-button';
 import { GridInfo, GridPlayer, GridRound } from './page';
 import Counter from '@/components/counter';
-import { useState } from "react";
+import { useState } from 'react';
 
 interface GridProps {
   info: GridInfo;
@@ -31,7 +31,7 @@ interface GridProps {
   isOwner: boolean | null;
 }
 
-export function Grid({ info, rounds, isOwner}: GridProps) {
+export function Grid({ info, rounds, isOwner }: GridProps) {
   return (
     <ContentWraper className="min-h-44">
       {info.start_time && info.match_name && (
@@ -195,7 +195,7 @@ export function GridCard({
   roundsNumber,
   className,
   isOwner,
-  fight_id
+  fight_id,
 }: GridCardProps) {
   const [player1Score, setPlayer1Score] = useState<number>(player_1.points);
   const [player2Score, setPlayer2Score] = useState<number>(player_2.points);
@@ -479,12 +479,12 @@ function GridCardPlayerId({
   isPreLastCol,
   isOwner,
   currentPlayerPoints,
-  fight_id
+  fight_id,
 }: {
   player: GridPlayer;
   onPlayerScoreChange: (newScore: number) => void;
   opponentPlayer: GridPlayer;
-  isCurrentPlayerFirst: boolean,
+  isCurrentPlayerFirst: boolean;
   isWinner: boolean;
   isLastCol: boolean | undefined;
   isPreLastCol: boolean | undefined;
@@ -552,7 +552,7 @@ interface AthleteSmallCardProps {
   points: number;
   isOwner: boolean | null;
   opponent_id: number;
-  is_current_player_first: boolean,
+  is_current_player_first: boolean;
   fight_id: number;
   onPlayerScoreChange: (newScore: number) => void;
 }
@@ -569,7 +569,7 @@ function AthleteSmallCard({
   opponent_id,
   is_current_player_first,
   onPlayerScoreChange,
-  fight_id
+  fight_id,
 }: AthleteSmallCardProps) {
   if (!name && !birthdate) {
     return;
@@ -603,7 +603,15 @@ function AthleteSmallCard({
           {isOwner && (
             <PersonDescriptionOnCard className="mt-2 text-neutralForeground3">
               <p>В этом бою набрал:</p>
-              <Counter className="mt-2" fight_id={fight_id} id={id} opponent_id={opponent_id} is_current_player_first={is_current_player_first} onPlayerScoreChange={onPlayerScoreChange} points={points}/>
+              <Counter
+                className="mt-2"
+                fight_id={fight_id}
+                id={id}
+                opponent_id={opponent_id}
+                is_current_player_first={is_current_player_first}
+                onPlayerScoreChange={onPlayerScoreChange}
+                points={points}
+              />
             </PersonDescriptionOnCard>
           )}
         </div>

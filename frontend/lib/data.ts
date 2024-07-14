@@ -104,7 +104,9 @@ export async function fetchResults(id: string): Promise<EventResult[]> {
 
 export async function fetchTournamentGrid(id: string): Promise<GridData> {
   try {
-    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {});
+    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {
+      next: { revalidate: 300, tags: ['update-grid'] },
+    });
     return res.ok ? await res.json() : null;
   } catch (error) {
     console.error(
@@ -489,13 +491,19 @@ export async function joinTeam(
   return await response.json();
 }
 
-export async function updateScore(fight_id: number, player_one: number, player_two: number, score_player_one: number, score_player_two: number) {
+export async function updateScore(
+  fight_id: number,
+  player_one: number,
+  player_two: number,
+  score_player_one: number,
+  score_player_two: number,
+) {
   const body = {
     player_one: player_one,
     player_two: player_two,
     score_player_one: score_player_one,
-    score_player_two: score_player_two
-  }
+    score_player_two: score_player_two,
+  };
   const response = await fetch(`${baseUrl}/matches/${fight_id}/score`, {
     method: 'POST',
     headers: {
