@@ -20,7 +20,7 @@ import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { Locale } from '@/i18n.config';
-import { revalidateEvent } from '@/lib/actions';
+import { revalidateEvent, revalidateEvents } from '@/lib/actions';
 import { updateEventImage } from '@/lib/data';
 import Image from 'next/image';
 
@@ -82,6 +82,7 @@ export function UpdateEventImageDialog({
           setIsOpen(false);
           toast.success('Афиша успешно обновлена');
           revalidateEvent(eventId);
+          revalidateEvents();
         })
         .catch((err) => {
           console.log('Ошибка при обновлении афиши: ', err);

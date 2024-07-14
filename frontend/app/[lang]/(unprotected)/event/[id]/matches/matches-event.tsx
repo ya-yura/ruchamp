@@ -67,8 +67,6 @@ export function MatchesEvent({
     setSelectedDate(value);
   }
 
-  console.log('regEnd ===>', regEnd);
-
   return (
     <ContentWraper className="min-h-44 gap-16">
       {!!matches.length ? (

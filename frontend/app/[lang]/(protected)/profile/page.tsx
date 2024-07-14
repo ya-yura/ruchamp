@@ -15,6 +15,8 @@ import {
 import { ProfileTeams } from './profile-teams';
 import { userRoles } from '@/lib/constants';
 import { ProfileApplications } from './profile-applications';
+import { CustomSection } from '@/components/custom-section';
+import { ContentWraper } from '@/components/content-wraper';
 
 const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   upcoming: 'Будут',
@@ -37,6 +39,13 @@ const teamsTabsData: Record<string, string> = {
   member: 'Я участник',
 };
 
+const generalTabsData: Record<string, string> = {
+  main: 'Главное',
+  applications: 'Заявки',
+  results: 'Результаты',
+  teams: 'Команды',
+};
+
 export default async function AthleteProfile({
   params,
 }: {
@@ -51,16 +60,12 @@ export default async function AthleteProfile({
     fetchAthleteApplications(token),
   ]);
 
-  // console.log('applications ===>', applications);
-
   const user: UserInfo | null = session
     ? {
         basicInfo: session.user[1],
         roleInfo: session.user[0],
       }
     : null;
-
-  const userFullName = `${user?.basicInfo.name} ${user?.basicInfo.fathername} ${user?.basicInfo.sirname}`;
 
   if (!user) {
     return (
@@ -70,6 +75,8 @@ export default async function AthleteProfile({
     );
   }
 
+  const userFullName = `${user.basicInfo.name} ${user.basicInfo.fathername} ${user.basicInfo.sirname}`;
+
   if (user.basicInfo.role_id === +userRoles['organizer']) {
     return (
       <Container className="min-h-screen">
@@ -77,13 +84,6 @@ export default async function AthleteProfile({
       </Container>
     );
   }
-
-  const tabsData: Record<string, string> = {
-    main: 'Главное',
-    applications: 'Заявки',
-    results: 'Результаты',
-    teams: 'Команды',
-  };
 
   return (
     <Container className="min-h-screen">
@@ -94,7 +94,6 @@ export default async function AthleteProfile({
         buttons={<ProfileActionButtons user={user} token={token} lang={lang} />}
         image={user.roleInfo.image_field || ''}
         lang={lang}
-        // tabsData={tabsData}
       />
       <ProfileColoredCards
         weight={user.roleInfo.weight}
@@ -102,28 +101,28 @@ export default async function AthleteProfile({
         grades={user.roleInfo.grades}
         achievements={user.roleInfo.achievements}
       />
-      {matches ? (
+      {!!matches?.length ? (
         <ProfileMatches
           matches={matches}
           tabsData={matchesTabsData}
           lang={lang}
         />
       ) : (
-        <H4>Вы не участвовали в мероприятиях или произошла ошибка загрузки</H4>
+        <NoDataSection message={'Вы пока что не участвуете в мероприятиях'} />
       )}
 
-      {applications ? (
+      {!!applications?.length ? (
         <ProfileApplications
-        token={token}
+          token={token}
           applications={applications}
           tabsData={applicationsTabsData}
           lang={lang}
         />
       ) : (
-        <H4>У вас нет заявок или произошла ошибка загрузки</H4>
+        <NoDataSection message={'У вас пока что нет заявок на мероприятия'} />
       )}
 
-      {teams ? (
+      {!!teams?.length ? (
         <ProfileTeams
           athleteId={user.roleInfo.id}
           teams={teams}
@@ -131,11 +130,20 @@ export default async function AthleteProfile({
           lang={lang}
         />
       ) : (
-        <H4>
-          Вы не являетесь участником ни одной команды или произошла ошибка
-          загрузки
-        </H4>
+        <NoDataSection message={'Вы пока что не состоите ни в одной команде'} />
       )}
     </Container>
+  );
+}
+
+function NoDataSection({ message }: { message: string }) {
+  return (
+    <CustomSection className="relative pt-[76px]">
+      <ContentWraper>
+        <h5 className="mb-10 mr-auto text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
+          {message}
+        </h5>
+      </ContentWraper>
+    </CustomSection>
   );
 }

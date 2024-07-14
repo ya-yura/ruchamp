@@ -8,17 +8,16 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '../../../../components/ui/avatar';
-import { ListItem } from '../../../../components/header/list-item';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { ListItem } from './list-item';
 import { Locale } from '@/i18n.config';
-import { EnumUserRole } from '@/lib/definitions';
-import { userRoles } from '@/lib/constants';
+import { fallbackImage, userRoles } from '@/lib/constants';
 
 interface UserMenuButtonProps {
-  userEmail: string;
-  userAvatar: string | null;
+  userEmail: string | undefined;
+  userAvatar: string | null | undefined;
   initials: string;
-  roleId: number;
+  roleId: number | undefined;
   lang: Locale;
 }
 
@@ -29,13 +28,20 @@ export function UserMenuButton({
   roleId,
   lang,
 }: UserMenuButtonProps) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const imageUrl = userAvatar
+    ? userAvatar.startsWith('http')
+      ? userAvatar
+      : `${baseUrl}/${userAvatar.startsWith('/') ? userAvatar.slice(1) : userAvatar}`
+    : fallbackImage;
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger className="group flex h-9 gap-2 border-none bg-transparent px-0 py-1 text-base font-semibold hover:bg-transparent hover:text-background data-[active]:bg-transparent data-[state=closed]:bg-transparent data-[state=open]:bg-transparent data-[active]:text-primary-mainAccent data-[state=closed]:text-background data-[state=open]:text-primary-mainAccent">
             <Avatar className="h-8 w-8 text-foreground duration-300 group-hover:text-primary-mainAccent">
-              {userAvatar && <AvatarImage src={userAvatar} alt="" />}
+              {userAvatar && <AvatarImage src={imageUrl} alt="" />}
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <p className="hidden sm:block">{userEmail}</p>

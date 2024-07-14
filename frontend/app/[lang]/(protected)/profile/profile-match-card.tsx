@@ -1,11 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { Locale } from '@/i18n.config';
-import {
-  divideEventsByDateTime,
-  transformDate,
-} from '@/lib/utils/date-and-time';
+import { transformDate } from '@/lib/utils/date-and-time';
 import { H5 } from '@/components/text';
 import { Tag } from '@/components/tag';
 import { Marker } from '../../(unprotected)/event/[id]/(owner)/applications/marker';
@@ -66,10 +63,6 @@ export function ProfileMatchCard({
   text,
   lang,
 }: ProfileMatchCardProps) {
-  // const handleRejectClick = (applicationId) => {
-
-  // }
-
   return (
     <li className="flex cursor-default flex-col gap-3 rounded-lg bg-card-background px-4 py-4">
       {/* <H5 className="whitespace-nowrap text-xl font-normal text-white">

@@ -18,7 +18,7 @@ interface MatchesEventTabsProps {
   handleTabChange: ((value: string) => void) | undefined;
   isOwner?: boolean;
   lang: Locale;
-  regEnd: ValueOption;
+  regEnd?: ValueOption;
   isAthlete?: boolean;
 }
 
@@ -91,7 +91,7 @@ interface MatchesFieldPops {
   userId?: number;
   matches: EventMatch[];
   lang: Locale;
-  regEnd: ValueOption;
+  regEnd?: ValueOption;
   isAthlete?: boolean;
 }
 

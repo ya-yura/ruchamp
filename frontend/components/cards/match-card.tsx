@@ -1,11 +1,9 @@
 import { format, isAfter } from 'date-fns';
 import { H5 } from '../text';
 import { Tag } from '../tag';
-import { Button } from '../ui/button';
 import { CustomLink } from '../custom-link';
 import { cn } from '@/lib/utils';
 import { Locale } from '@/i18n.config';
-import { determineDateStatus } from '@/lib/utils/date-and-time';
 import { ValueOption } from '@/app/[lang]/(unprotected)/team/[id]/page';
 import { ApplicationCreateButton } from '../buttons/create-application-button';
 
@@ -106,37 +104,23 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus ? (buttonText && (
-          <CustomLink
-            className={cn(
-              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        {regStatus
+          ? buttonText && (
+              <CustomLink
+                className={cn(
+                  'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+                  'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+                  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                )}
+                lang={lang}
+                href={`/event/${eventId}/matches/${matchId}`}
+              >
+                {buttonText}
+              </CustomLink>
+            )
+          : isAthlete && (
+              <ApplicationCreateButton token={token} matchId={matchId} />
             )}
-            lang={lang}
-            href={`/event/${eventId}/matches/${matchId}`}
-          >
-            {buttonText}
-          </CustomLink>
-        )) : (isAthlete && (
-          <ApplicationCreateButton token={token} matchId={matchId} />
-        ))}
-        {/* {regStatus && buttonText && (
-          <CustomLink
-            className={cn(
-              'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-              'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-              'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            )}
-            lang={lang}
-            href={`/event/${eventId}/matches/${matchId}`}
-          >
-            {buttonText}
-          </CustomLink>
-        )}
-        {isAthlete && (
-          <ApplicationCreateButton token={token} matchId={matchId} />
-        )} */}
       </div>
     </li>
   );

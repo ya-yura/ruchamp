@@ -78,8 +78,6 @@ export function ProfileApplications({
     }
   }, [selectedTab, applications]);
 
-  console.log('filteredData ====>', filteredData);
-
   return (
     <CustomSection className="relative pt-[76px]">
       <ContentWraper className="min-h-44">
@@ -107,7 +105,7 @@ export function ProfileApplications({
               </TabsTrigger>
             ))}
           </TabsList>
-          {Object.entries(tabsData).map(([key, value]) => (
+          {Object.entries(tabsData).map(([key, _]) => (
             <TabsContent className="mt-0" key={key} value={key}>
               <ProfileApplicationsField
                 token={token}
@@ -155,7 +153,7 @@ function ProfileApplicationsField({
         <ul className="flex flex-col gap-3 ">
           {applications.map((application) => (
             <ProfileMatchCard
-            token={token}
+              token={token}
               key={application.application_id}
               eventId={application.event_id}
               eventName={application.event_name}
