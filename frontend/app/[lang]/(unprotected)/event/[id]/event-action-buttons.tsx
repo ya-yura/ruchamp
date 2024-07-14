@@ -45,7 +45,7 @@ export function EventActionButtons({
 
   return (
     <div className="mb-[87px] flex gap-6">
-      {isAthlete && <Button variant="ruchampDefault">Участвовать</Button>}
+      {/* {isAthlete && <Button variant="ruchampDefault">Участвовать</Button>} */}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { inter } from '@/app/[lang]/ui/fonts';
+
 export const Countries: Record<string, string> = {
   1: 'Россия',
   2: 'Беларусь',
@@ -186,6 +188,33 @@ export interface AthleteMatch {
   weight_max: number;
   gender: boolean;
   athlete_result: string;
+}
+
+export interface AthleteApplications {
+  application_id: number;
+  team_id: number;
+  team_name: string;
+  match_id: number;
+  status: string;
+  created_at: string;
+  match_name: string;
+  start_datetime: string;
+  end_datetime: string;
+  sport_type: string;
+  grade: string;
+  event_id: number;
+  mat_vol: number;
+  nominal_time: number;
+  event_name: string;
+  location: string;
+  organization_name: string;
+  event_system: string;
+  age_min: number;
+  age_max: number;
+  weight_class: string;
+  weight_min: number;
+  weight_max: number;
+  gender: boolean;
 }
 
 interface Captain {

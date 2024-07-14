@@ -1,6 +1,7 @@
 import {
   Applications,
   AthleteMatch,
+  AthleteApplications,
   Event,
   EventStatistics,
   TeamDetails,
@@ -383,6 +384,86 @@ export async function fetchAthleteMatches(
     console.error('Error while fetching athlete matches: ', error);
     throw new Error('Failed to fetch athlete matches.');
   }
+}
+
+// получить все заявки атлета
+export async function fetchAthleteApplications(
+  token: string | undefined,
+): Promise<AthleteApplications[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/athlete/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete applications: ', error);
+    throw new Error('Failed to fetch athlete applications.');
+  }
+}
+
+//создать заявку
+export async function createApplication(
+  token: string | undefined,
+  match_id: number,
+): Promise<void | Response> {
+  try {
+    const response = await fetch(
+      `${baseUrl}/event/tournament-applications-athlete/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ match_id }),
+      },
+    );
+
+if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to create application');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Unknown error occurred');
+    }
+  }
+}
+
+//отозвать заявку
+export async function rejectAthleteApplication(
+  token: string | undefined,
+  application_id: number,
+) {
+  const response = await fetch(
+    `${baseUrl}/users/me/athlete/${application_id}/rejected`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(application_id),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to reject application');
+  }
+
+  return await response.json();
 }
 
 export async function fetchAthleteTeams(
