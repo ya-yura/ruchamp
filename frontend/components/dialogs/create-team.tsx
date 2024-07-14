@@ -21,11 +21,10 @@ import { CustomFieldset, TypeFieldsetData } from '../forms/custom-fieldset';
 import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { useRouter } from 'next/navigation';
-import { path } from '@/lib/utils/other-utils';
 import { Locale } from '@/i18n.config';
 import { createTeam } from '@/lib/data';
-import { revalidateTeams } from '@/lib/actions';
 import { AllRegions, Countries } from '@/lib/definitions';
+import { revalidateUserTeams } from '@/lib/actions';
 
 export const createTeamSchema = z.object({
   name: z.string().min(1, 'Это обязательное поле'),
@@ -98,12 +97,12 @@ export function CreateTeamDialog({
         .then((id) => {
           setIsOpen(false);
           toast.success('Команда успешно создана');
-          revalidateTeams();
           form.reset();
           setTabValue('1');
+          revalidateUserTeams();
         })
         .catch((err) => {
-          console.log('Ошибка при создании события: ', err);
+          console.log('Ошибка при создании команды: ', err);
           toast.error('Что-то пошло не так');
         })
         .finally(() => setIsLoading(false));
@@ -129,7 +128,7 @@ export function CreateTeamDialog({
         </DialogHeader>
         <Tabs className="relative mx-auto w-full" value={tabValue}>
           <div className="absolute top-[-60px] flex h-[36px] w-full">
-            <TabsList className="mx-auto flex h-auto w-fit flex-row justify-between bg-transparent text-[#D6D6D6] sm:flex-row sm:gap-3 lg:w-fit gap-o sm:gap-1 p-0 sm:p-1">
+            <TabsList className="gap-o mx-auto flex h-auto w-fit flex-row justify-between bg-transparent p-0 text-[#D6D6D6] sm:flex-row sm:gap-1 sm:gap-3 sm:p-1 lg:w-fit">
               {Object.entries(CreateTeamTabs).map(([key, value]) => (
                 <TabsTrigger className="cursor-default" key={key} value={key}>
                   {value}

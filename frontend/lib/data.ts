@@ -120,9 +120,8 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
-      next: { revalidate: 300, tags: ['teams'] },
+      next: { revalidate: 300 },
     });
-    // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);
@@ -397,8 +396,7 @@ export async function fetchAthleteTeams(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300, tags: ['userTeams'] },
-
+      next: { revalidate: 300, tags: ['user-teams'] },
     });
     return res.ok ? await res.json() : null;
   } catch (error) {
