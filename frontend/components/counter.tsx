@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { updateScore } from "@/lib/data";
 
@@ -11,22 +10,19 @@ interface CounterProps {
   opponent_id: number;
   is_current_player_first: boolean;
   onPlayerScoreChange: (newScore: number) => void;
+  points: number;
 }
 
-function Counter({ className, fight_id,id, opponent_id, is_current_player_first, onPlayerScoreChange }: CounterProps) {
+function Counter({ className, fight_id,id, opponent_id, is_current_player_first, onPlayerScoreChange, points }: CounterProps) {
   const firstPlayerId = is_current_player_first ? id : opponent_id;
   const secondPlayerId = is_current_player_first ? opponent_id : id;
-  const [count, setCount] = useState<number>(0);
 
   async function handleScoreChange(value: number) {
     try {
       const firstPlayerScore = is_current_player_first ? value :0;
       const secondPlayerScore = is_current_player_first ? 0 : value;
-      console.log(firstPlayerScore)
-      console.log(secondPlayerScore)
 
       await updateScore(fight_id, firstPlayerId, secondPlayerId, firstPlayerScore, secondPlayerScore);
-      setCount(c => c + value);
       onPlayerScoreChange(value);
     } catch (err) {
       throw new Error('Ошибка при изменении очков')
@@ -42,7 +38,7 @@ function Counter({ className, fight_id,id, opponent_id, is_current_player_first,
         >
           -
         </button>
-        <span className="text-xs text-neutralForeground3Rest">{count}</span>
+        <span className="text-xs text-neutralForeground3Rest">{points}</span>
         <button
           onClick={() => handleScoreChange(+1)}
           className="flex h-3 w-3 items-center justify-between text-base text-neutralForeground3Rest"
