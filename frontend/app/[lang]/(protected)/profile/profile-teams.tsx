@@ -35,6 +35,7 @@ export function ProfileTeams({
   function handleTabChange(value: string): void {
     setSelectedTab(value);
   }
+
   return (
     <CustomSection className="relative pt-[76px]">
       <ContentWraper className="min-h-44">
@@ -47,7 +48,7 @@ export function ProfileTeams({
           onValueChange={handleTabChange}
           value={selectedTab}
         >
-          <TabsList className="flex mb-5 w-fit justify-between bg-transparent text-text-mutedLight">
+          <TabsList className="mb-5 flex w-fit justify-between bg-transparent text-text-mutedLight">
             {Object.entries(tabsData).map(([key, value]) => (
               <TabsTrigger
                 key={key}

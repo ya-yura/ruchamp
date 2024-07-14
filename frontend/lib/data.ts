@@ -105,7 +105,9 @@ export async function fetchResults(id: string): Promise<EventResult[]> {
 
 export async function fetchTournamentGrid(id: string): Promise<GridData> {
   try {
-    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {});
+    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {
+      next: { revalidate: 300, tags: ['update-grid'] },
+    });
     return res.ok ? await res.json() : null;
   } catch (error) {
     console.error(
@@ -121,9 +123,8 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
-      next: { revalidate: 300, tags: ['teams'] },
+      next: { revalidate: 300 },
     });
-    // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);
@@ -478,7 +479,7 @@ export async function fetchAthleteTeams(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['user-teams'] },
     });
     return res.ok ? await res.json() : null;
   } catch (error) {
@@ -547,5 +548,52 @@ export async function updateProfile(
     throw new Error('Failed to update event');
   }
 
+  return await response.json();
+}
+
+export async function joinTeam(
+  token: string,
+  id: string,
+): Promise<void | Response> {
+  const response = await fetch(`${baseUrl}/team/join-team/${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(id),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to join team');
+  }
+
+  return await response.json();
+}
+
+export async function updateScore(
+  fight_id: number,
+  player_one: number,
+  player_two: number,
+  score_player_one: number,
+  score_player_two: number,
+) {
+  const body = {
+    player_one: player_one,
+    player_two: player_two,
+    score_player_one: score_player_one,
+    score_player_two: score_player_two,
+  };
+  const response = await fetch(`${baseUrl}/matches/${fight_id}/score`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при изменении очков');
+  }
   return await response.json();
 }

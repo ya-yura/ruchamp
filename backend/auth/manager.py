@@ -5,6 +5,7 @@ from fastapi import Depends, HTTPException, Request, BackgroundTasks
 from fastapi_users import (BaseUserManager, IntegerIDMixin, exceptions, models,
                            schemas)
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.mailer import send_verification_email
 from auth.models import (AllWeightClass, Athlete, Coach, CombatType,
@@ -14,6 +15,8 @@ from auth.schemas import (AthleteUpdate, OrganizerUpdate, RefereeUpdate,
                           SpectatorUpdate, SysAdminUpdate)
 from config import SECRET
 from connection import User, get_user_db
+
+from typing import Type
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -29,6 +32,21 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         query = select(Coach).where(Coach.name.in_(names))
         coaches = await self.database.fetch_all(query)
         return coaches
+
+    async def update_organizer_profile(self, user: User, data: Type, session: AsyncSession):
+        query = select(EventOrganizer).where(EventOrganizer.user_id == user.id)
+        result = await session.execute(query)
+        organizer = result.scalars().first()
+        if not organizer:
+            raise HTTPException(status_code=404, detail="Organizer profile not found")
+
+        for field, value in data.dict().items():
+            setattr(organizer, field, value)
+
+        session.add(organizer)
+        await session.commit()
+
+        return organizer
 
     async def create(
         self,
@@ -138,7 +156,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         return sysadmin
 
-    async def update_organizer_profile(
+    '''async def update_organizer_profile(
         self,
         user: User,
         organizer_data: OrganizerUpdate,
@@ -152,7 +170,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         # можно добавить дополнительной логики после обновления
         # например, сохранить это в логах или отправить что-нибудь пользователю
 
-        return organizer
+        return organizer'''
 
     async def update_referee_profile(
         self,

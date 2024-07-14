@@ -68,7 +68,7 @@ export function DeleteEventDialog({
           Удалить
         </Button>
       </DialogTrigger>
-      <DialogContent className="">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="mb-10">
           <DialogTitle className="text-xl">
             Вы уверены, что хотите удалить событие?

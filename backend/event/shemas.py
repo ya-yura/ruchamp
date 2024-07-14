@@ -73,7 +73,6 @@ class MatchCreate(BaseModel):
 class CreateTournamentApplicationTeam(BaseModel):
     team_id: int
     match_id: int
-    status: str = 'accepted'
 
     class Config:
         from_attributes = True
@@ -81,10 +80,6 @@ class CreateTournamentApplicationTeam(BaseModel):
 
 class CreateTournamentApplicationAthlete(BaseModel):
     match_id: int
-    status: str = 'accepted'
-
-    class Config:
-        from_attributes = True
 
 
 class UpdateTournamentApplication(BaseModel):

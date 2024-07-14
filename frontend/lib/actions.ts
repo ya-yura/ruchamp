@@ -10,10 +10,17 @@ export async function revalidateEvent(id: number | string) {
   revalidateTag(`update-event-${id}`);
 }
 
-export async function revalidateTeams() {
-  revalidateTag('teams');
-}
-
 export async function revalidateUser() {
   revalidateTag('user');
+}
+
+export async function revalidateUserTeams() {
+  revalidateTag('user-teams');
+
+export async function revalidateGrid() {
+  revalidateTag('update-grid');
+}
+
+export async function revalidateProfile() {
+  revalidateTag('profile');
 }

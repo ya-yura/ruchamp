@@ -17,6 +17,7 @@ import { userRoles } from '@/lib/constants';
 import { ProfileApplications } from './profile-applications';
 import { CustomSection } from '@/components/custom-section';
 import { ContentWraper } from '@/components/content-wraper';
+import { auth } from '@/lib/api/auth';
 
 const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   upcoming: 'Будут',
@@ -54,16 +55,17 @@ export default async function AthleteProfile({
   const { lang } = params;
   const session = await getSession();
   const token = session?.token;
-  const [matches, teams, applications] = await Promise.all([
+  const [matches, teams, applications, profile] = await Promise.all([
     fetchAthleteMatches(token),
     fetchAthleteTeams(token),
     fetchAthleteApplications(token),
+    auth.getCurrentUser(token),
   ]);
 
   const user: UserInfo | null = session
     ? {
-        basicInfo: session.user[1],
-        roleInfo: session.user[0],
+        basicInfo: profile[1],
+        roleInfo: profile[0],
       }
     : null;
 

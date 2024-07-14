@@ -17,7 +17,7 @@ export function ProfileActionButtons({
   lang,
 }: ProfileActionButtonsProps) {
   return (
-    <div className="mb-[87px] flex gap-6">
+    <div className="mb-[87px] flex gap-6 flex-col sm:flex-row">
       <CreateTeamDialog token={token} lang={lang} />
       <UpdateAthleteImageDialog token={token} lang={lang} />
       <UpdateProfileDialog

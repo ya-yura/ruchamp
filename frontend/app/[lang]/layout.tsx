@@ -61,7 +61,7 @@ export default async function RootLayout({
   return (
     <html lang={params.lang}>
       <body
-        className={`${inter.className} relative mx-auto w-full bg-primary-background antialiased`}
+        className={`${inter.className} custom-scrollbar relative mx-auto bg-primary-background antialiased`}
         // suppressHydrationWarning={false} // To switch off warnings
       >
         <Providers dictionary={dictionary}>{children}</Providers>

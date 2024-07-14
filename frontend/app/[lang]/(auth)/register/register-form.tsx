@@ -237,7 +237,7 @@ export function RegisterForm({
     <>
       <Greetings title={greetings.title} subtitle={greetings.subtitle} />
       <Form {...form}>
-        <CustomForm onSubmit={form.handleSubmit(onSubmit)}>
+        <CustomForm onSubmit={form.handleSubmit(onSubmit)} className="w-full sm:w-[484px]">
           {step === 1 && (
             <>
               <div className="flex w-auto items-center justify-center">
@@ -276,7 +276,7 @@ export function RegisterForm({
         </CustomForm>
       </Form>
       <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="gap-6 bg-white sm:max-w-[425px]">
+        <DialogContent className="w-11/12 gap-6 bg-white sm:max-w-[425px]">
           <DialogHeader className="gap-4">
             <DialogTitle className="font-bold text-primary-background">
               Поздравляем!

@@ -1,3 +1,5 @@
+'use client';
+
 import { ContentWraper } from '@/components/content-wraper';
 import { Tag } from '@/components/tag';
 import { cn } from '@/lib/utils';
@@ -21,14 +23,15 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/back-button';
 import { GridInfo, GridPlayer, GridRound } from './page';
 import Counter from '@/components/counter';
+import { useState } from 'react';
 
 interface GridProps {
   info: GridInfo;
   rounds: GridRound[];
+  isOwner: boolean | null;
 }
 
-
-export function Grid({ info, rounds }: GridProps) {
+export function Grid({ info, rounds, isOwner }: GridProps) {
   return (
     <ContentWraper className="min-h-44">
       {info.start_time && info.match_name && (
@@ -37,7 +40,7 @@ export function Grid({ info, rounds }: GridProps) {
             <H4 className="mr-4">{transformDate(info.start_time, true)}</H4>
           )}
           {info.match_name && (
-            <H4 className="text-Grey101 font-normal">{info.sport_name}</H4>
+            <H4 className="font-normal text-Grey101">{info.sport_name}</H4>
           )}
           <BackButton className="ml-auto" />
         </div>
@@ -58,12 +61,17 @@ export function Grid({ info, rounds }: GridProps) {
         </Tag>
         <Tag variant={'transparentGrayBorder'}>{info.method}</Tag>
       </div>
-      <GridField rounds={rounds} />
+      <GridField rounds={rounds} isOwner={isOwner} />
     </ContentWraper>
   );
 }
 
-function GridField({ rounds }: { rounds: GridRound[] }) {
+interface GridFieldProps {
+  rounds: GridRound[];
+  isOwner: boolean | null;
+}
+
+function GridField({ rounds, isOwner }: GridFieldProps) {
   const colVariants: Record<number, string> = {
     1: 'grid-cols-1',
     2: 'grid-cols-[repeat(2,_175px)]',
@@ -108,7 +116,7 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                   />
                 )
               ) : (
-                <p className="text-center text-4xl font-bold text-card-background pr-[53px]">
+                <p className="pr-[53px] text-center text-4xl font-bold text-card-background">
                   {round.name}
                 </p>
               )}
@@ -142,8 +150,10 @@ function GridField({ rounds }: { rounds: GridRound[] }) {
                   isLastCol={index === rounds.length - 1}
                   isPreLastCol={index === rounds.length - 2}
                   isPreSemiFinalCol={index === rounds.length - 3}
-                  roundsNumber = {rounds.length}
+                  roundsNumber={rounds.length}
                   roundIndex={index}
+                  isOwner={isOwner}
+                  fight_id={fight.fight_info.fight_id}
                 />
               ))}
             </ul>
@@ -168,6 +178,8 @@ interface GridCardProps {
   roundIndex: number;
   roundsNumber: number;
   className?: string;
+  isOwner: boolean | null;
+  fight_id: number;
 }
 
 export function GridCard({
@@ -176,14 +188,17 @@ export function GridCard({
   mat_number,
   player_1,
   player_2,
-  isFirstCol,
   isLastCol,
   isPreLastCol,
   isPreSemiFinalCol,
   roundIndex,
   roundsNumber,
   className,
+  isOwner,
+  fight_id,
 }: GridCardProps) {
+  const [player1Score, setPlayer1Score] = useState<number>(player_1.points);
+  const [player2Score, setPlayer2Score] = useState<number>(player_2.points);
   const isPlayerFirstWinner = player_1.points > player_2.points;
   const isDraw = player_1.points === player_2.points;
   const arrowHeight: Record<string, string> = {
@@ -257,11 +272,21 @@ export function GridCard({
   };
 
   return (
-    <li className={cn('group grid cursor-default',
-      isPreSemiFinalCol ? 'grid-cols-[122px_381px]':
-      (!isLastCol && !isPreLastCol) ? `grid-cols-[122px_153px]` : '',
-      roundsNumber === 3 ? 'last:grid-rows-[1fr_0]' : (roundIndex === 0 || roundIndex === 1) ? '' : 'last:grid-rows-[1fr_40px]',
-    )}>
+    <li
+      className={cn(
+        'group grid cursor-default',
+        isPreSemiFinalCol
+          ? 'grid-cols-[122px_381px]'
+          : !isLastCol && !isPreLastCol
+            ? `grid-cols-[122px_153px]`
+            : '',
+        roundsNumber === 3
+          ? 'last:grid-rows-[1fr_0]'
+          : roundIndex === 0 || roundIndex === 1
+            ? ''
+            : 'last:grid-rows-[1fr_40px]',
+      )}
+    >
       <div className={cn('flex flex-col', isPreLastCol ? 'mr-2' : '')}>
         <div
           className={cn(
@@ -270,121 +295,171 @@ export function GridCard({
           )}
         >
           <div>
-            <H4low className="text-white text-nowrap">{format(time, 'HH:mm')}</H4low>
-            <p className="text-ColorsGrey26 text-nowrap text-sm">
+            <H4low className="text-nowrap text-white">
+              {format(time, 'HH:mm')}
+            </H4low>
+            <p className="text-nowrap text-sm text-ColorsGrey26">
               Мат № {mat_number}
             </p>
           </div>
           <div className="flex flex-col gap-1">
             <GridCardPlayerId
               player={player_1}
+              onPlayerScoreChange={(newScore: number) => {
+                setPlayer1Score((prevState) => prevState + newScore);
+              }}
+              opponentPlayer={player_2}
+              isCurrentPlayerFirst={true}
               isWinner={isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
+              isOwner={isOwner}
+              fight_id={fight_id}
+              currentPlayerPoints={player1Score}
             />
             <GridCardPlayerId
               player={player_2}
+              onPlayerScoreChange={(newScore: number) => {
+                setPlayer2Score((prevState) => prevState + newScore);
+              }}
+              opponentPlayer={player_1}
+              isCurrentPlayerFirst={false}
               isWinner={!isPlayerFirstWinner && !isDraw}
               isPreLastCol={isPreLastCol}
               isLastCol={isLastCol}
+              isOwner={isOwner}
+              fight_id={fight_id}
+              currentPlayerPoints={player2Score}
             />
           </div>
           {(isLastCol || isPreLastCol) && (
-            <div className='text-[11px] font-black text-Grey90 flex flex-col justify-between items-center py-0.5'>
-              <p>{player_1.points}</p>  
-              <p>{player_2.points}</p>  
+            <div className="flex flex-col items-center justify-between py-0.5 text-[11px] font-black text-Grey90">
+              <p>{player1Score}</p>
+              <p>{player2Score}</p>
             </div>
           )}
         </div>
       </div>
       {!(isLastCol || isPreLastCol) && (
         <>
-          <div className={cn('relative flex w-full items-end',
-            fight_index % 2 === 0 ? arrowTopShift[roundIndex] : arrowBottomShift[roundIndex])}>
-            <div className="border-Grey102 w-[53px] border-b border-dashed h-full"></div>
-            <p className={cn('relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
-              fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]'
-            )}>
+          <div
+            className={cn(
+              'relative flex w-full items-end',
+              fight_index % 2 === 0
+                ? arrowTopShift[roundIndex]
+                : arrowBottomShift[roundIndex],
+            )}
+          >
+            <div className="h-full w-[53px] border-b border-dashed border-Grey102"></div>
+            <p
+              className={cn(
+                'relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
+                fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]',
+              )}
+            >
               <span
-                className={cn(isPlayerFirstWinner && !isDraw ? 'text-white' : '')}
+                className={cn(
+                  isPlayerFirstWinner && !isDraw ? 'text-white' : '',
+                )}
               >
-                {player_1.points}
+                {player1Score}
               </span>{' '}
               :{' '}
               <span
                 className={cn(
-                  !isPlayerFirstWinner && !isDraw ? 'text-white' : ''
+                  !isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                 )}
               >
-                {player_2.points}
+                {player2Score}
               </span>
             </p>
             <div
               className={cn(
-                'border-Grey102 relative w-1/2 border-e border-dashed',
-                fight_index % 2 === 0 ? `rounded-tr-md border-t ${arrowTop[roundIndex]}` : 'rounded-br-md border-b',
+                'relative w-1/2 border-e border-dashed border-Grey102',
+                fight_index % 2 === 0
+                  ? `rounded-tr-md border-t ${arrowTop[roundIndex]}`
+                  : 'rounded-br-md border-b',
                 isLastCol
                   ? 'relative bottom-0 right-[90%] w-[calc(100%+40%)]'
                   : '',
                 isLastCol
                   ? arrowHeight[roundIndex - 1]
-                  : arrowHeight[roundIndex]
+                  : arrowHeight[roundIndex],
               )}
             >
               <Image
                 className={cn(
                   'absolute right-[-4px]  h-[7px] w-[7px]',
-                  fight_index % 2 === 0 ? 'bottom-[-1px]' : 'rotate-180 top-[-1px]'
+                  fight_index % 2 === 0
+                    ? 'bottom-[-1px]'
+                    : 'top-[-1px] rotate-180',
                 )}
                 src={'/ru/images/icons/triangle.svg'}
                 alt=""
                 width={10}
-                height={10} />
+                height={10}
+              />
             </div>
           </div>
           <div
             className={cn(
-              'group-last:h-0 group-last:mt-0',
-                isLastCol ? spaceHeight[roundIndex - 1] : spaceHeight[roundIndex]
+              'group-last:mt-0 group-last:h-0',
+              isLastCol ? spaceHeight[roundIndex - 1] : spaceHeight[roundIndex],
             )}
           ></div>
           {isPreSemiFinalCol && (
-            <div className={cn('relative flex w-[151px] items-end',
-              fight_index % 2 === 0 ? `${bronzeArrowTopShift[roundsNumber]} ${arrowTopShift[roundIndex]}` : `${bronzeArrowBottomShift[roundsNumber]} ${arrowBottomShift[roundIndex]}`)}>
-              <div className="border-Grey102 w-[53px] border-b border-dashed h-full"></div>
-              <p className={cn('relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
-                fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]'
-              )}>
+            <div
+              className={cn(
+                'relative flex w-[151px] items-end',
+                fight_index % 2 === 0
+                  ? `${bronzeArrowTopShift[roundsNumber]} ${arrowTopShift[roundIndex]}`
+                  : `${bronzeArrowBottomShift[roundsNumber]} ${arrowBottomShift[roundIndex]}`,
+              )}
+            >
+              <div className="h-full w-[53px] border-b border-dashed border-Grey102"></div>
+              <p
+                className={cn(
+                  'relative text-nowrap px-[5.5px] text-xs font-semibold text-text-muted',
+                  fight_index % 2 === 0 ? 'top-[7px]' : 'bottom-[-8px]',
+                )}
+              >
                 <span
-                  className={cn(isPlayerFirstWinner && !isDraw ? 'text-white' : '')}
+                  className={cn(
+                    isPlayerFirstWinner && !isDraw ? 'text-white' : '',
+                  )}
                 >
-                  {player_1.points}
+                  {player1Score}
                 </span>{' '}
                 :{' '}
                 <span
                   className={cn(
-                    !isPlayerFirstWinner && !isDraw ? 'text-white' : ''
+                    !isPlayerFirstWinner && !isDraw ? 'text-white' : '',
                   )}
                 >
-                  {player_2.points}
+                  {player2Score}
                 </span>
               </p>
               <div
                 className={cn(
-                  'border-Grey102 relative w-[60px] border-e border-dashed',
-                  fight_index % 2 === 0 ? `rounded-tr-md border-t ${bronzeArrowTop[roundsNumber]}` : 'rounded-br-md border-b',
-                  bronzeArrowHeight[roundsNumber]
+                  'relative w-[60px] border-e border-dashed border-Grey102',
+                  fight_index % 2 === 0
+                    ? `rounded-tr-md border-t ${bronzeArrowTop[roundsNumber]}`
+                    : 'rounded-br-md border-b',
+                  bronzeArrowHeight[roundsNumber],
                 )}
               >
                 <Image
                   className={cn(
                     'absolute right-[-4px]  h-[7px] w-[7px]',
-                    fight_index % 2 === 0 ? 'bottom-[-1px]' : 'rotate-180 top-[-1px]'
+                    fight_index % 2 === 0
+                      ? 'bottom-[-1px]'
+                      : 'top-[-1px] rotate-180',
                   )}
                   src={'/ru/images/icons/triangle.svg'}
                   alt=""
                   width={10}
-                  height={10} />
+                  height={10}
+                />
               </div>
             </div>
           )}
@@ -396,25 +471,37 @@ export function GridCard({
 
 function GridCardPlayerId({
   player,
+  onPlayerScoreChange,
+  opponentPlayer,
+  isCurrentPlayerFirst,
   isWinner,
   isLastCol,
   isPreLastCol,
+  isOwner,
+  currentPlayerPoints,
+  fight_id,
 }: {
   player: GridPlayer;
+  onPlayerScoreChange: (newScore: number) => void;
+  opponentPlayer: GridPlayer;
+  isCurrentPlayerFirst: boolean;
   isWinner: boolean;
   isLastCol: boolean | undefined;
   isPreLastCol: boolean | undefined;
+  isOwner: boolean | null;
+  fight_id: number;
+  currentPlayerPoints: number;
 }) {
   return (
     <HoverCard>
       <HoverCardTrigger>
         <div
           className={cn(
-            'bg-Grey100 relative flex justify-center items-center rounded-md p-[6px] w-[29px] h-5',
+            'relative flex h-5 w-[29px] items-center justify-center rounded-md bg-Grey100 p-[6px]',
             player.first_name ? 'cursor-pointer' : '',
-            isWinner && (isPreLastCol ? 'bg-bronze': 
-            isLastCol ? 'bg-gold' : '' ),
-            !isWinner && isLastCol ? 'bg-silver' : ''
+            isWinner &&
+              (isPreLastCol ? 'bg-bronze' : isLastCol ? 'bg-gold' : ''),
+            !isWinner && isLastCol ? 'bg-silver' : '',
           )}
         >
           {isWinner && !isLastCol && !isPreLastCol && (
@@ -426,7 +513,7 @@ function GridCardPlayerId({
               height={10}
             />
           )}
-          <p className="text-Grey101 text-[10px] font-semibold">
+          <p className="text-[10px] font-semibold text-Grey101">
             {player.player_id}
           </p>
         </div>
@@ -439,9 +526,14 @@ function GridCardPlayerId({
             name={player.first_name}
             birthdate={player.birthdate}
             image_field={''} // add later
-            points={player.points}
+            points={currentPlayerPoints}
             team_id={player.team_id}
             team_name={player.team_name}
+            isOwner={isOwner}
+            fight_id={fight_id}
+            opponent_id={opponentPlayer.player_id}
+            is_current_player_first={isCurrentPlayerFirst}
+            onPlayerScoreChange={onPlayerScoreChange}
           />
         )}
       </HoverCardContent>
@@ -458,6 +550,11 @@ interface AthleteSmallCardProps {
   team_name: string | null;
   team_id: number;
   points: number;
+  isOwner: boolean | null;
+  opponent_id: number;
+  is_current_player_first: boolean;
+  fight_id: number;
+  onPlayerScoreChange: (newScore: number) => void;
 }
 
 function AthleteSmallCard({
@@ -467,8 +564,12 @@ function AthleteSmallCard({
   image_field,
   birthdate,
   team_name,
-  team_id,
   points,
+  isOwner,
+  opponent_id,
+  is_current_player_first,
+  onPlayerScoreChange,
+  fight_id,
 }: AthleteSmallCardProps) {
   if (!name && !birthdate) {
     return;
@@ -499,11 +600,20 @@ function AthleteSmallCard({
               <i>возраст не указан</i>
             )}
           </PersonDescriptionOnCard>
-          <PersonDescriptionOnCard className="text-neutralForeground3 mt-2">
-          <p>В этом бою набрал:</p>
-          <Counter className='mt-2' />
-        </PersonDescriptionOnCard>
-
+          {isOwner && (
+            <PersonDescriptionOnCard className="mt-2 text-neutralForeground3">
+              <p>В этом бою набрал:</p>
+              <Counter
+                className="mt-2"
+                fight_id={fight_id}
+                id={id}
+                opponent_id={opponent_id}
+                is_current_player_first={is_current_player_first}
+                onPlayerScoreChange={onPlayerScoreChange}
+                points={points}
+              />
+            </PersonDescriptionOnCard>
+          )}
         </div>
       </div>
       <div className="w-full sm:w-1/3">
@@ -514,7 +624,6 @@ function AthleteSmallCard({
           <b>Команда: {team_name}</b>
         </PersonDescriptionOnCard>
       </div>
-
     </TextCard>
   );
 }

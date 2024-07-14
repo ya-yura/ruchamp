@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { Locale } from '@/i18n.config';
 import { YandexMapPicker } from '../yandex-map-picker';
-import { revalidateEvent } from '@/lib/actions';
+import { revalidateProfile } from '@/lib/actions';
 import { updateProfile } from '@/lib/data';
 import { Countries } from '@/lib/definitions';
 
@@ -94,16 +94,17 @@ export function UpdateProfileDialog({
   }, []);
 
   function onSubmit(values: UpdateProfileSchema): void {
+    const currentValues = { ...values.user_update };
     setIsLoading(true);
     if (token) {
-      updateProfile(token, values)
+      updateProfile(token, currentValues)
         .then(() => {
           setIsOpen(false);
-          toast.success('Событие успешно обновлено');
-          // revalidateEvent(eventId);
+          toast.success('Данные успешно обновлены');
+          revalidateProfile();
         })
         .catch((err) => {
-          console.log('Ошибка при обновлении события: ', err);
+          console.log('Ошибка при обновлении данных: ', err);
           toast.error('Что-то пошло не так');
         })
         .finally(() => setIsLoading(false));
@@ -124,9 +125,10 @@ export function UpdateProfileDialog({
           Изменить
         </Button>
       </DialogTrigger>
-      <DialogContent className="top-[25%] h-fit w-[752px] max-w-[752px] translate-y-[0]">
+      <DialogContent className="top-[25%] h-fit w-11/12 max-w-[752px] translate-y-[0]">
         <DialogHeader className="absolute left-0 right-0 top-[-92px] flex flex-col">
-          <DialogTitle>Изменить профиль</DialogTitle>
+        <DialogTitle className="text-3xl sm:text-4xl">
+        Изменить профиль</DialogTitle>
         </DialogHeader>
         <Tabs
           className="relative mx-auto w-full"
@@ -145,7 +147,7 @@ export function UpdateProfileDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent py-0 sm:w-full sm:px-3 sm:py-0"
+              className="dark h-fit w-full justify-start bg-transparent px-0 py-0 sm:px-3 sm:py-0 md:w-full"
             >
               {Object.entries(UpdateProfileTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
