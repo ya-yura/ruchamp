@@ -18,6 +18,11 @@ export async function revalidateUser() {
   revalidateTag('user');
 }
 
+export async function revalidateGrid() {
+  revalidateTag('update-grid');
+}
+
 export async function revalidateProfile() {
   revalidateTag('profile');
 }
+
