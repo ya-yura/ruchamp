@@ -30,6 +30,7 @@ export function MatchesEventTabs({
   matchDates,
   value,
   handleTabChange,
+  isOwner,
   lang,
   regEnd,
   isAthlete,
@@ -76,6 +77,7 @@ export function MatchesEventTabs({
                 lang={lang}
                 regEnd={regEnd}
                 isAthlete={isAthlete}
+                isOwner={isOwner}
               />
             )}
           </TabsContent>
@@ -93,6 +95,7 @@ interface MatchesFieldPops {
   lang: Locale;
   regEnd?: ValueOption;
   isAthlete?: boolean;
+  isOwner?: boolean;
 }
 
 function MatchesField({
@@ -103,6 +106,7 @@ function MatchesField({
   lang,
   regEnd,
   isAthlete,
+  isOwner,
 }: MatchesFieldPops) {
   return (
     <div className="rounded-lg bg-black px-2 pb-2 pt-4">
@@ -133,6 +137,7 @@ function MatchesField({
             lang={lang}
             regEnd={regEnd}
             isAthlete={isAthlete}
+            isOwner={isOwner}
           />
         ))}
       </ul>

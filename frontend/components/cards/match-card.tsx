@@ -46,6 +46,7 @@ export interface MatchCardProps {
   lang: Locale;
   regEnd?: ValueOption;
   isAthlete?: boolean;
+  isOwner?: boolean;
 }
 
 export function MatchCard({
@@ -68,6 +69,7 @@ export function MatchCard({
   lang,
   regEnd,
   isAthlete,
+  isOwner,
 }: MatchCardProps) {
   // проверяем, закончилась ли регистрация на матч
   const isRegOver = (date: string): boolean => {
@@ -104,7 +106,7 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus
+        {regStatus || isOwner
           ? buttonText && (
               <CustomLink
                 className={cn(
