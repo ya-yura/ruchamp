@@ -6,25 +6,33 @@ import { cn } from '@/lib/utils';
 import { MatchCard } from '@/components/cards/match-card';
 import { Locale } from '@/i18n.config';
 import { EventMatch } from './matches-event';
+import { userAgent } from 'next/server';
 
 interface MatchesEventTabsProps {
+  token?: string;
   eventId: string;
+  userId?: number;
   matches: EventMatch[];
   matchDates: ValueOption[];
   value: string;
   handleTabChange: ((value: string) => void) | undefined;
   isOwner?: boolean;
   lang: Locale;
+  regEnd?: ValueOption;
+  isAthlete?: boolean;
 }
 
 export function MatchesEventTabs({
+  token,
   eventId,
+  userId,
   matches,
   matchDates,
   value,
   handleTabChange,
-  isOwner,
   lang,
+  regEnd,
+  isAthlete,
 }: MatchesEventTabsProps) {
   return (
     <ContentWraper className="min-h-44">
@@ -60,7 +68,15 @@ export function MatchesEventTabs({
             value={date.displayedValue as string}
           >
             {!!matches.length && (
-              <MatchesField eventId={eventId} matches={matches} lang={lang} />
+              <MatchesField
+                token={token}
+                eventId={eventId}
+                userId={userId}
+                matches={matches}
+                lang={lang}
+                regEnd={regEnd}
+                isAthlete={isAthlete}
+              />
             )}
           </TabsContent>
         ))}
@@ -70,12 +86,24 @@ export function MatchesEventTabs({
 }
 
 interface MatchesFieldPops {
+  token?: string;
   eventId: string;
+  userId?: number;
   matches: EventMatch[];
   lang: Locale;
+  regEnd?: ValueOption;
+  isAthlete?: boolean;
 }
 
-function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
+function MatchesField({
+  token,
+  eventId,
+  userId,
+  matches,
+  lang,
+  regEnd,
+  isAthlete,
+}: MatchesFieldPops) {
   return (
     <div className="rounded-lg bg-black px-2 pb-2 pt-4">
       <p className="mb-4 mr-auto text-base text-background">
@@ -87,7 +115,9 @@ function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
         {matches.map((match) => (
           <MatchCard
             key={match.id}
+            token={token}
             eventId={eventId}
+            userId={userId}
             matchId={match.id}
             startTime={match.start_datetime}
             endTime={match.end_datetime}
@@ -101,6 +131,8 @@ function MatchesField({ eventId, matches, lang }: MatchesFieldPops) {
             ageMax={match.age_max}
             buttonText={'Турнирная сетка'}
             lang={lang}
+            regEnd={regEnd}
+            isAthlete={isAthlete}
           />
         ))}
       </ul>

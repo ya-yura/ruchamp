@@ -31,6 +31,7 @@ export default async function EventPageLayout({
         roleInfo: session.user[0],
       }
     : null;
+
   const token = session?.token;
   const isOwner = user?.roleInfo.id === event?.organizer_id;
   const isAthlete = user?.basicInfo.role_id === 1;

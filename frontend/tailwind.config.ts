@@ -52,6 +52,7 @@ const config = {
         orange: '#FCD483',
         purple: '#7567D7',
         darkRed: '#582025',
+        darkRedForeground: '#420610',
         SuccessGreenBg: '#052505',
         SuccessGreenStroke: '#107C10',
         SuccessGreenText: '#54B054',

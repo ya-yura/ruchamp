@@ -1,6 +1,7 @@
 import {
   Applications,
   AthleteMatch,
+  AthleteApplications,
   Event,
   EventStatistics,
   TeamDetails,
@@ -104,7 +105,9 @@ export async function fetchResults(id: string): Promise<EventResult[]> {
 
 export async function fetchTournamentGrid(id: string): Promise<GridData> {
   try {
-    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {});
+    const res = await fetch(`${baseUrl}/matches/tournament-grid/${id}`, {
+      next: { revalidate: 300, tags: ['update-grid'] },
+    });
     return res.ok ? await res.json() : null;
   } catch (error) {
     console.error(
@@ -120,9 +123,8 @@ export async function fetchTournamentGrid(id: string): Promise<GridData> {
 export async function fetchTeams(): Promise<TeamDataFromServer[]> {
   try {
     const res = await fetch(`${baseUrl}/team/get-all-teams`, {
-      next: { revalidate: 300, tags: ['teams'] },
+      next: { revalidate: 300 },
     });
-    // revalidatePath('/teams');
     return res.ok ? await res.json() : [];
   } catch (error) {
     console.error(`Error while fetching teams: `, error);
@@ -384,6 +386,86 @@ export async function fetchAthleteMatches(
   }
 }
 
+// получить все заявки атлета
+export async function fetchAthleteApplications(
+  token: string | undefined,
+): Promise<AthleteApplications[] | null> {
+  if (!token) {
+    console.error('Something wrong with token');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/users/me/athlete/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      next: { revalidate: 300 },
+    });
+    return res.ok ? await res.json() : null;
+  } catch (error) {
+    console.error('Error while fetching athlete applications: ', error);
+    throw new Error('Failed to fetch athlete applications.');
+  }
+}
+
+//создать заявку
+export async function createApplication(
+  token: string | undefined,
+  match_id: number,
+): Promise<void | Response> {
+  try {
+    const response = await fetch(
+      `${baseUrl}/event/tournament-applications-athlete/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ match_id }),
+      },
+    );
+
+if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to create application');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Unknown error occurred');
+    }
+  }
+}
+
+//отозвать заявку
+export async function rejectAthleteApplication(
+  token: string | undefined,
+  application_id: number,
+) {
+  const response = await fetch(
+    `${baseUrl}/users/me/athlete/${application_id}/rejected`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(application_id),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to reject application');
+  }
+
+  return await response.json();
+}
+
 export async function fetchAthleteTeams(
   token: string | undefined,
 ): Promise<TeamDetails[] | null> {
@@ -397,7 +479,7 @@ export async function fetchAthleteTeams(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ['user-teams'] },
     });
     return res.ok ? await res.json() : null;
   } catch (error) {
@@ -489,25 +571,48 @@ export async function joinTeam(
   return await response.json();
 }
 
-
 export async function getGrades(): Promise<any> {
   try {
     const response = await fetch('https://sportplatform.ru/api/event/grades', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Добавьте здесь другие необходимые заголовки, например, для аутентификации
       },
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
     console.error('Ошибка при получении грейдов:', error);
     throw error;
   }
+
+export async function updateScore(
+  fight_id: number,
+  player_one: number,
+  player_two: number,
+  score_player_one: number,
+  score_player_two: number,
+) {
+  const body = {
+    player_one: player_one,
+    player_two: player_two,
+    score_player_one: score_player_one,
+    score_player_two: score_player_two,
+  };
+  const response = await fetch(`${baseUrl}/matches/${fight_id}/score`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при изменении очков');
+  }
+  return await response.json();
 }

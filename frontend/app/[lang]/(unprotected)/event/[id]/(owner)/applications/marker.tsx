@@ -12,6 +12,10 @@ const markerVariants = cva('rounded border border-solid p-1 text-[10px] ', {
         'border-WarningOrangeStroke bg-WarningOrangeBg text-WarningOrangeText',
       red: 'border-DangerRedStroke bg-DangerRedBg text-DangerRedText',
       blue: 'border-BrandBlueStroke bg-BrandBlueBg text-BrandBlueText',
+      blueTransparent: 'border-primary-mainAccent text-primary-mainAccent bg-transparent',
+      greenTransparent: 'border-SuccessDarkGreenText text-SuccessDarkGreenText bg-transparent',
+      greenSolid: 'bg-SuccessGreenStroke text-white border-none',
+      darkRedSolid: 'bg-darkRedForeground text-white border-none',
     },
   },
   defaultVariants: {

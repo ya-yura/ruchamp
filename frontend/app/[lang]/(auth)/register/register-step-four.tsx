@@ -195,6 +195,7 @@ export function RegisterStepFour({
         lang={lang}
         fieldsetData={fields[userRoleId]}
         errorMessage={errorMessage}
+        className="flex flex-col sm:grid sm:w-full sm:grid-cols-12"
       />
       <ButtonsBlock>
         <Button

@@ -58,6 +58,7 @@ export function RegisterStepTwo({
         form={form}
         lang={lang}
         fieldsetData={regStepTwoFieldset}
+        className="flex flex-col sm:grid sm:w-full sm:grid-cols-12"
       />
       <ButtonsBlock>
         <Button

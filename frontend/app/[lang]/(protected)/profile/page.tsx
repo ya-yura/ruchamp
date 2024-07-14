@@ -7,9 +7,17 @@ import { Hero } from '@/components/hero';
 import { ProfileActionButtons } from './profile-action-buttons';
 import { ProfileColoredCards } from './profile-colored-cards';
 import { ProfileMatches } from './profile-matches';
-import { fetchAthleteMatches, fetchAthleteTeams } from '@/lib/data';
+import {
+  fetchAthleteMatches,
+  fetchAthleteTeams,
+  fetchAthleteApplications,
+} from '@/lib/data';
 import { ProfileTeams } from './profile-teams';
 import { userRoles } from '@/lib/constants';
+import { ProfileApplications } from './profile-applications';
+import { CustomSection } from '@/components/custom-section';
+import { ContentWraper } from '@/components/content-wraper';
+import { auth } from '@/lib/api/auth';
 
 const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   upcoming: 'Будут',
@@ -17,9 +25,26 @@ const matchesTabsData: Record<'upcoming' | 'past' | 'canceled', string> = {
   canceled: 'Отменены',
 };
 
+const applicationsTabsData: Record<
+  'accepted' | 'approved' | 'paid' | 'rejected',
+  string
+> = {
+  accepted: 'Отправленные',
+  approved: 'Ждут оплату',
+  paid: 'Оплаченные',
+  rejected: 'Отклонённые',
+};
+
 const teamsTabsData: Record<string, string> = {
   capitan: 'Я капитан',
   member: 'Я участник',
+};
+
+const generalTabsData: Record<string, string> = {
+  main: 'Главное',
+  applications: 'Заявки',
+  results: 'Результаты',
+  teams: 'Команды',
 };
 
 export default async function AthleteProfile({
@@ -30,19 +55,19 @@ export default async function AthleteProfile({
   const { lang } = params;
   const session = await getSession();
   const token = session?.token;
-  const [matches, teams] = await Promise.all([
+  const [matches, teams, applications, profile] = await Promise.all([
     fetchAthleteMatches(token),
     fetchAthleteTeams(token),
+    fetchAthleteApplications(token),
+    auth.getCurrentUser(token),
   ]);
 
   const user: UserInfo | null = session
     ? {
-        basicInfo: session.user[1],
-        roleInfo: session.user[0],
+        basicInfo: profile[1],
+        roleInfo: profile[0],
       }
     : null;
-
-  const userFullName = `${user?.basicInfo.name} ${user?.basicInfo.fathername} ${user?.basicInfo.sirname}`;
 
   if (!user) {
     return (
@@ -51,6 +76,8 @@ export default async function AthleteProfile({
       </Container>
     );
   }
+
+  const userFullName = `${user.basicInfo.name} ${user.basicInfo.fathername} ${user.basicInfo.sirname}`;
 
   if (user.basicInfo.role_id === +userRoles['organizer']) {
     return (
@@ -76,17 +103,28 @@ export default async function AthleteProfile({
         grades={user.roleInfo.grades}
         achievements={user.roleInfo.achievements}
       />
-      {matches ? (
+      {!!matches?.length ? (
         <ProfileMatches
           matches={matches}
           tabsData={matchesTabsData}
           lang={lang}
         />
       ) : (
-        <H4>Вы не участвовали в мероприятиях или произошла ошибка загрузки</H4>
+        <NoDataSection message={'Вы пока что не участвуете в мероприятиях'} />
       )}
 
-      {teams ? (
+      {!!applications?.length ? (
+        <ProfileApplications
+          token={token}
+          applications={applications}
+          tabsData={applicationsTabsData}
+          lang={lang}
+        />
+      ) : (
+        <NoDataSection message={'У вас пока что нет заявок на мероприятия'} />
+      )}
+
+      {!!teams?.length ? (
         <ProfileTeams
           athleteId={user.roleInfo.id}
           teams={teams}
@@ -94,11 +132,20 @@ export default async function AthleteProfile({
           lang={lang}
         />
       ) : (
-        <H4>
-          Вы не являетесь участником ни одной команды или произошла ошибка
-          загрузки
-        </H4>
+        <NoDataSection message={'Вы пока что не состоите ни в одной команде'} />
       )}
     </Container>
+  );
+}
+
+function NoDataSection({ message }: { message: string }) {
+  return (
+    <CustomSection className="relative pt-[76px]">
+      <ContentWraper>
+        <h5 className="mb-10 mr-auto text-xl font-light tracking-tighter text-ColorsGrey26 md:text-[28px]">
+          {message}
+        </h5>
+      </ContentWraper>
+    </CustomSection>
   );
 }

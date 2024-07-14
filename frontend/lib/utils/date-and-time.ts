@@ -78,6 +78,13 @@ export function isCurrentYear(date: Date): boolean {
   return currentDate.getFullYear() === date?.getFullYear();
 }
 
+export function isCurrentDate(date: string | number[]): boolean {
+  const currentDate = new Date();
+  return currentDate.toISOString().slice(0, 10) === date?.slice(0, 10);
+}
+
+
+
 export function isDateInRange(
   date: string,
   dateRange: DateRange | undefined,

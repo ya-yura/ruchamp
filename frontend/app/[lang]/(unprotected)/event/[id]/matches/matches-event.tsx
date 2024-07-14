@@ -25,7 +25,9 @@ export interface EventMatch {
 }
 
 interface MatchesEventProps {
+  token?: string;
   eventId: string;
+  userId?: number;
   matches: EventMatch[];
   matchDates: ValueOption[];
   regStart: ValueOption;
@@ -34,10 +36,13 @@ interface MatchesEventProps {
   matchesEnd: ValueOption;
   awardingTime: ValueOption;
   lang: Locale;
+  isAthlete?: boolean;
 }
 
 export function MatchesEvent({
+  token,
   eventId,
+  userId,
   matches,
   matchDates,
   regStart,
@@ -46,6 +51,7 @@ export function MatchesEvent({
   matchesEnd,
   awardingTime,
   lang,
+  isAthlete,
 }: MatchesEventProps) {
   const [selectedDate, setSelectedDate] = useState<string>(
     matchDates[0]?.displayedValue || '',
@@ -73,12 +79,16 @@ export function MatchesEvent({
             awardingTime={awardingTime}
           />
           <MatchesEventTabs
+            token={token}
             eventId={eventId}
+            userId={userId}
             matches={filteredMatches}
             matchDates={matchDates}
             value={selectedDate}
             handleTabChange={handleTabChange}
             lang={lang}
+            regEnd={regEnd}
+            isAthlete={isAthlete}
           />
         </>
       ) : (
