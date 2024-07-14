@@ -75,7 +75,6 @@ export function MatchCard({
   const isRegOver = (date: string): boolean => {
     return isAfter(new Date(), new Date(date));
   };
-
   const regStatus = regEnd ? isRegOver(regEnd.value as string) : false;
 
   return (
@@ -106,23 +105,23 @@ export function MatchCard({
           )}
           {grade && <Tag variant={'transparentGrayBorder'}>{grade}</Tag>}
         </div>
-        {regStatus || isOwner
-          ? buttonText && (
-              <CustomLink
-                className={cn(
-                  'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
-                  'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
-                  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                )}
-                lang={lang}
-                href={`/event/${eventId}/matches/${matchId}`}
-              >
-                {buttonText}
-              </CustomLink>
-            )
-          : isAthlete && (
-              <ApplicationCreateButton token={token} matchId={matchId} />
-            )}
+        {!regStatus && isAthlete ? (
+          <ApplicationCreateButton token={token} matchId={matchId} />
+        ) : (
+          buttonText && (
+            <CustomLink
+              className={cn(
+                'h-10 bg-primary-mainAccent px-4 py-2 text-base font-semibold text-primary-foreground hover:bg-primary-mainAccent/90',
+                'inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background',
+                'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              )}
+              lang={lang}
+              href={`/event/${eventId}/matches/${matchId}`}
+            >
+              {buttonText}
+            </CustomLink>
+          )
+        )}
       </div>
     </li>
   );
