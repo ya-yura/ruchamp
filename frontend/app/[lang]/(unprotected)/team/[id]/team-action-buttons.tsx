@@ -2,6 +2,7 @@
 
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
+import { revalidateUserTeams } from '@/lib/actions';
 import { getSession } from '@/lib/actions/auth';
 import { fetchAthleteTeams, joinTeam } from '@/lib/data';
 import React, { useEffect, useState } from 'react';
@@ -56,6 +57,7 @@ export function TeamActionButtons({
         toast.success(`Поздравляем! Вы вступили в команду - ${teamName}`);
         return getUsersTeamData();
       })
+      .then(() => revalidateUserTeams())
       .catch((err) => {
         console.log('Ошибка при добавлении в команду: ', err);
         toast.error('Что-то пошло не так');
