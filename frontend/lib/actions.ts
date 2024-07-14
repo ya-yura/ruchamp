@@ -16,6 +16,7 @@ export async function revalidateUser() {
 
 export async function revalidateUserTeams() {
   revalidateTag('user-teams');
+}
 
 export async function revalidateGrid() {
   revalidateTag('update-grid');

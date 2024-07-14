@@ -427,7 +427,7 @@ export async function createApplication(
       },
     );
 
-if (!response.ok) {
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.detail || 'Failed to create application');
     }
@@ -589,6 +589,7 @@ export async function getGrades(): Promise<any> {
     console.error('Ошибка при получении грейдов:', error);
     throw error;
   }
+}
 
 export async function updateScore(
   fight_id: number,
