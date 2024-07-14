@@ -77,7 +77,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
 
   return (
     <Form {...form}>
-      <CustomForm action={dispatch}>
+      <CustomForm action={dispatch} className="w-full sm:w-[484px]">
         <div className="flex w-auto items-center justify-center">
           <AuthSwitcher
             selectedValue={selectedTabValue}
@@ -89,6 +89,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
           lang={lang}
           fieldsetData={loginFields}
           errorMessage={errorMessage}
+          className="flex flex-col sm:grid sm:w-full sm:grid-cols-12"
         />
 
         <ButtonsBlock>

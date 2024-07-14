@@ -3,7 +3,7 @@ import uuid
 import re
 from datetime import timedelta, datetime
 import shutil
-from typing import Optional
+from typing import Optional, Dict, List
 from transliterate import translit
 from starlette.responses import JSONResponse
 from PIL import Image
@@ -120,6 +120,16 @@ async def get_events_v2(
         result.append(event_result)
 
     return result
+
+
+@router.get("/grades")
+async def get_grades(
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(
+        select(CategoryType.name)
+    )
+    return query.scalars().all()
 
 
 @router.get("/events")
@@ -436,33 +446,34 @@ async def get_event_applications(
             status_code=404, detail="No matches found for this event"
         )
 
-    # Получение заявок на матчи
-    for match_id in match_ids:
+    # Получение всех уникальных статусов заявок для всех матчей
+    query = await db.execute(
+        select(TournamentApplication.match_id, TournamentApplication.status)
+        .distinct()
+        .where(TournamentApplication.match_id.in_(match_ids))
+    )
+    applications_statuses = query.fetchall()
+
+    # Структура для хранения заявок
+    application_info: Dict[int, Dict[str, List[Dict]]] = {}
+
+    for match_id, status in applications_statuses:
+        if match_id not in application_info:
+            application_info[match_id] = {}
+        if status not in application_info[match_id]:
+            application_info[match_id][status] = []
+
+        # Получение команд для текущего матча и статуса
         query = await db.execute(
-            select(TournamentApplication.status)
+            select(TournamentApplication.team_id)
             .distinct()
             .where(TournamentApplication.match_id == match_id)
+            .where(TournamentApplication.status == status)
         )
-        applications_status = query.scalars().all()
+        teams = query.scalars().all()
+        unique_teams = set(teams)
 
-        application_info = {}
-
-        for status in applications_status:
-            application_info[status] = []
-
-            query = await db.execute(
-                select(
-                    TournamentApplication.team_id
-                )
-                .where(TournamentApplication.status == status)
-            )
-            teams = query.scalars().all()
-
-            # Используем множество для удаления повторений
-            unique_teams = set(teams)
-            print(unique_teams)
-
-        '''for team_id in unique_teams:
+        for team_id in unique_teams:
             team_query = await db.execute(
                 select(Team.id, Team.name)
                 .where(Team.id == team_id)
@@ -480,18 +491,14 @@ async def get_event_applications(
 
             # Получение информации об участниках команды
             members_query = await db.execute(
-                select(
-                    TournamentApplication.athlete_id
-                )
-                .where(
-                    TournamentApplication.status == status,
-                    TournamentApplication.team_id == team_id
-                )
+                select(TournamentApplication.athlete_id)
+                .where(TournamentApplication.status == status)
+                .where(TournamentApplication.team_id == team_id)
+                .where(TournamentApplication.match_id == match_id)
             )
             members = members_query.scalars().all()
 
             for member in members:
-
                 athlete_query = await db.execute(
                     select(
                         User.id,
@@ -508,10 +515,15 @@ async def get_event_applications(
                         Athlete.city,
                         CategoryType.name.label("grade_type"),
                         TournamentApplication.id.label("application_id"),
-                        TournamentApplication.status.label("application_status"),
+                        TournamentApplication.status.label(
+                            "application_status"
+                        ),
                     )
                     .join(User, User.id == Athlete.user_id)
-                    .join(TournamentApplication, TournamentApplication.athlete_id == Athlete.id)
+                    .join(
+                        TournamentApplication,
+                        TournamentApplication.athlete_id == Athlete.id
+                    )
                     .where(Athlete.id == member)
                     .where(TournamentApplication.status == status)
                 )
@@ -520,16 +532,12 @@ async def get_event_applications(
                 if not athlete:
                     continue
 
-                query = await db.execute(
-                    select(
-                        CategoryType.name
-                    )
+                grade_query = await db.execute(
+                    select(CategoryType.name)
                     .join(athlete_grade_association)
-                    .where(
-                        athlete_grade_association.c.athlete_id == member
-                    )
+                    .where(athlete_grade_association.c.athlete_id == member)
                 )
-                grade_types = query.scalars().all()
+                grade_types = grade_query.scalars().all()
 
                 member_info = {
                     "user_id": athlete.id,
@@ -550,9 +558,9 @@ async def get_event_applications(
                 }
                 team_info["members"].append(member_info)
 
-            application_info[status].append(team_info)
+            application_info[match_id][status].append(team_info)
 
-    return application_info'''
+    return application_info
     return {"ok"}
 
 

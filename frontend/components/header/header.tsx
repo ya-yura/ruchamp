@@ -10,11 +10,11 @@ import { MagniglassIcon } from '../icons';
 import { MenuWithButton } from './menu-with-button';
 
 interface HeaderProps {
-  userEmail: string;
-  userAvatar: string | null;
+  userEmail: string | undefined;
+  userAvatar: string | null | undefined;
   initials: string;
   isLoggedIn: boolean;
-  roleId: number;
+  roleId: number | undefined;
   lang: Locale;
 }
 

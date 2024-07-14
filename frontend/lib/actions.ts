@@ -21,3 +21,8 @@ export async function revalidateUser() {
 export async function revalidateGrid() {
   revalidateTag('update-grid');
 }
+
+export async function revalidateProfile() {
+  revalidateTag('profile');
+}
+

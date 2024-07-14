@@ -97,6 +97,7 @@ export function RegisterStepThree({
         form={form}
         lang={lang}
         fieldsetData={regStepThreeFieldset}
+        className="flex flex-col sm:grid sm:w-full sm:grid-cols-12"
       />
       <ButtonsBlock>
         <Button

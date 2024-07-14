@@ -52,10 +52,11 @@ export function RegisterStepOne({
         form={form}
         lang={lang}
         fieldsetData={regStepOneFieldset}
+        className="flex flex-col sm:grid sm:w-full sm:grid-cols-12"
       />
       <ButtonsBlock>
         <CustomLink
-          className="transition-opacity duration-300 hover:opacity-70 order-1 sm:-order-1"
+          className="order-1 transition-opacity duration-300 hover:opacity-70 sm:-order-1"
           href={`/login`}
           lang={lang}
         >
