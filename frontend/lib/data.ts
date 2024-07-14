@@ -571,6 +571,25 @@ export async function joinTeam(
   return await response.json();
 }
 
+export async function getGrades(): Promise<any> {
+  try {
+    const response = await fetch('https://sportplatform.ru/api/event/grades', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Ошибка при получении грейдов:', error);
+    throw error;
+  }
+
 export async function updateScore(
   fight_id: number,
   player_one: number,

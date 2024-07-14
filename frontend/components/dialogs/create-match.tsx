@@ -1,6 +1,12 @@
 'use client';
 
-import React, { Dispatch, ReactNode, SetStateAction, useState } from 'react';
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +28,7 @@ import { toast } from 'sonner';
 import { Spinner } from '../spinner';
 import { Locale } from '@/i18n.config';
 import { RangeSlider } from '@/app/[lang]/(unprotected)/teams/range-slider';
-import { createMatch } from '@/lib/data';
+import { createMatch, getGrades } from '@/lib/data';
 import { revalidateEvent, revalidateEvents } from '@/lib/actions';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 
@@ -206,7 +212,7 @@ export function CreateMatchDialog({
           <Form {...form}>
             <CustomForm
               onSubmit={form.handleSubmit(onSubmit)}
-              className="dark h-fit justify-start bg-transparent sm:w-full p-0 mx-auto sm:px-3 sm:py-0"
+              className="dark mx-auto h-fit justify-start bg-transparent p-0 sm:w-full sm:px-3 sm:py-0"
             >
               {Object.entries(CreateMatchTabsContent).map(([key, value]) => (
                 <TabsContent key={key} value={key}>
@@ -315,6 +321,11 @@ interface MatchCriteriaFieldsetProps {
   ageRange: number[];
 }
 
+type GradeOption = {
+  value: string;
+  option: string;
+};
+
 function MatchCriteriaFieldset({
   form,
   sportTypes,
@@ -331,16 +342,19 @@ function MatchCriteriaFieldset({
     value: option,
     option: option,
   }));
-  const gradeSelectOptions = [
-    {
-      value: '1',
-      option: 'МС',
-    },
-    {
-      value: '2',
-      option: 'КМС',
-    },
-  ];
+
+  const [grades, setGrades] = useState<GradeOption[]>([]);
+
+  useEffect(() => {
+    getGrades().then((data) => {
+      setGrades(data.map((grade: string) => ({ value: grade, option: grade })));
+    });
+  }, []);
+
+  const gradeSelectOptions = grades.map((grade) => ({
+    value: grade.value,
+    option: grade.option,
+  }));
 
   const combatSelectOptions = [
     {
@@ -389,7 +403,7 @@ function MatchCriteriaFieldset({
         name: 'combat_type',
         placeholder: 'Выберите из списка',
         label: 'Схема боёв',
-        fieldStyles: 'col-span-12 smdcol-span-6',
+        fieldStyles: 'col-span-12 md:col-span-6',
         selectOptions: combatSelectOptions,
       },
       {
@@ -415,7 +429,7 @@ function MatchCriteriaFieldset({
   return (
     <>
       <CustomFieldset<CreateMatchSchema>
-        className="flex flex-col md:grid mb-5 sm:gap-x-14 sm:gap-y-10"
+        className="mb-5 flex flex-col sm:gap-x-14 sm:gap-y-10 md:grid"
         form={form}
         fieldsetData={basicFieldsetData}
       />
