@@ -298,12 +298,14 @@ export interface ApplicationTeam {
   members: ApplicationMember[];
 }
 
-export interface Applications {
-  approved?: ApplicationTeam[];
-  rejected?: ApplicationTeam[];
-  paid?: ApplicationTeam[];
-  accepted?: ApplicationTeam[];
+interface MatchApplications {
+  approved: ApplicationTeam[];
+  accepted: ApplicationTeam[];
+  paid: ApplicationTeam[];
+  rejected: ApplicationTeam[];
 }
+
+export type Applications = Record<number, MatchApplications>;
 
 // *** Teams ***
 

@@ -11,25 +11,26 @@ import { Marker } from './marker';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
-interface ApplicationTeamProps {
+interface MatchApplications {
   approved: ApplicationTeam[];
   accepted: ApplicationTeam[];
   paid: ApplicationTeam[];
   rejected: ApplicationTeam[];
+}
+
+interface ApplicationTeamProps {
+  applications: Record<number, MatchApplications>;
   tabsData: Record<string, string>;
 }
 
-interface filteredData {
+interface FilteredData {
   applications: ApplicationTeam[];
   color: 'orange' | 'red' | 'green' | 'blue';
   text: string;
 }
 
 export function EventApplications({
-  paid,
-  accepted,
-  approved,
-  rejected,
+  applications,
   tabsData,
 }: ApplicationTeamProps) {
   const [selectedTabValue, setSelectedTabValue] = useState<string>(
@@ -40,34 +41,43 @@ export function EventApplications({
     setSelectedTabValue(value);
   }, []);
 
-  const filteredData: filteredData = useMemo(() => {
-    switch (selectedTabValue) {
-      case 'approved':
-        return {
-          applications: approved,
-          color: 'orange' as 'orange',
-          text: 'Ждём платёж',
-        };
-      case 'rejected':
-        return {
-          applications: rejected,
-          color: 'red' as 'red',
-          text: 'Отклонено',
-        };
-      case 'paid':
-        return {
-          applications: paid,
-          color: 'green' as 'green',
-          text: 'Оплатили участие',
-        };
-      default:
-        return {
-          applications: accepted,
-          color: 'blue' as 'blue',
-          text: 'Ждут одобрения',
-        };
-    }
-  }, [selectedTabValue, approved, accepted, paid, rejected]);
+  const getFilteredData = useCallback(
+    (matchApplications: MatchApplications): FilteredData => {
+      switch (selectedTabValue) {
+        case 'approved':
+          return {
+            applications: matchApplications.approved || [],
+            color: 'orange',
+            text: 'Ждём платёж',
+          };
+        case 'rejected':
+          return {
+            applications: matchApplications.rejected || [],
+            color: 'red',
+            text: 'Отклонено',
+          };
+        case 'paid':
+          return {
+            applications: matchApplications.paid || [],
+            color: 'green',
+            text: 'Оплатили участие',
+          };
+        default:
+          return {
+            applications: matchApplications.accepted || [],
+            color: 'blue',
+            text: 'Ждут одобрения',
+          };
+      }
+    },
+    [selectedTabValue],
+  );
+  const hasApplications = useMemo(() => {
+    return Object.values(applications).some((matchApplications) => {
+      const filteredData = getFilteredData(matchApplications);
+      return filteredData.applications.length > 0;
+    });
+  }, [applications, getFilteredData]);
 
   return (
     <>
@@ -97,90 +107,98 @@ export function EventApplications({
           </ScrollArea>
         </Tabs>
       </div>
-      <ul className="relative w-[100%] ">
-        {!filteredData.applications.length ? (
-          <p className="relative mb-4 mr-auto text-base text-background">
-            Заявок пока что нет
-          </p>
-        ) : (
-          filteredData.applications.map(
-            (application: ApplicationTeam, index: number) => (
-              <li
-                className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
-                key={index}
-              >
-                <div className="flex justify-between">
-                  <div className="mb-3 flex justify-between gap-6 px-2">
-                    {' '}
-                    <H4>{application.name}</H4>
-                    <H4>Количество участников: {application.members.length}</H4>
-                  </div>
-                  <Marker
-                    variant={filteredData.color}
-                    children={filteredData.text}
-                  />
-                </div>
-                <ul className="flex flex-col gap-2">
-                  {application.members.map((athlete: ApplicationMember) => (
-                    <AthleteCard
-                      key={athlete.id}
-                      id={athlete.id}
-                      sirname={athlete.sirname}
-                      name={athlete.name}
-                      fathername={athlete.fathername}
-                      birthdate={athlete.birthdate}
-                      city={athlete.city}
-                      country={athlete.country}
-                      region={athlete.region}
-                      image_field={athlete.image_field || ''}
-                      weight={athlete.weight}
-                      grade_types={athlete.grade_types}
-                    />
-                  ))}
-                </ul>
-                {filteredData.color === 'blue' && (
-                  <div className="mt-2 flex justify-between">
-                    <Button variant={'transparentGreen'} size={'sm'}>
-                      <Image
-                        className="mr-2"
-                        src={'/images/icons/approve.svg'}
-                        alt="Иконка одобрить"
-                        width={20}
-                        height={20}
-                      />
-                      Одобрить участие
-                    </Button>
-                    <Button variant={'transparentRed'} size={'sm'}>
-                      <Image
-                        className="mr-2"
-                        src={'/images/icons/dismiss.svg'}
-                        alt="Иконка отклонить"
-                        width={20}
-                        height={20}
-                      />
-                      Отказать в участии
-                    </Button>
-                  </div>
-                )}
-                {filteredData.color === 'orange' && (
-                  <div className="mt-2">
-                    <Button variant={'transparentRed'} size={'sm'}>
-                      <Image
-                        className="mr-2"
-                        src={'/images/icons/dismiss.svg'}
-                        alt="Иконка отклонить"
-                        width={20}
-                        height={20}
-                      />
-                      Отказать в участии
-                    </Button>
-                  </div>
-                )}
-              </li>
-            ),
-          )
-        )}
-      </ul>
+      {!hasApplications ? (
+        <p className="relative mb-4 mr-auto text-base text-background">
+          Заявок пока что нет
+        </p>
+      ) : (
+        Object.entries(applications).map(([matchId, matchApplications]) => {
+          const filteredData = useMemo(
+            () => getFilteredData(matchApplications),
+            [matchApplications, getFilteredData],
+          );
+          return (
+            <div className="relative w-[100%]" key={matchId}>
+              <ul>
+                {filteredData.applications.map((application, index) => (
+                  <li
+                    className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
+                    key={index}
+                  >
+                    <div className="flex justify-between">
+                      <div className="mb-3 flex justify-between gap-6 px-2">
+                        <H4>{application.name}</H4>
+                        <H4>
+                          Количество участников: {application.members.length}
+                        </H4>
+                      </div>
+                      <Marker variant={filteredData.color}>
+                        {filteredData.text}
+                      </Marker>
+                    </div>
+                    <ul className="flex flex-col gap-2">
+                      {application.members.map((athlete) => (
+                        <AthleteCard
+                          key={athlete.id}
+                          id={athlete.id}
+                          sirname={athlete.sirname}
+                          name={athlete.name}
+                          fathername={athlete.fathername}
+                          birthdate={athlete.birthdate}
+                          city={athlete.city}
+                          country={athlete.country}
+                          region={athlete.region}
+                          image_field={athlete.image_field || ''}
+                          weight={athlete.weight}
+                          grade_types={athlete.grade_types}
+                        />
+                      ))}
+                    </ul>
+                    {filteredData.color === 'blue' && (
+                      <div className="mt-2 flex justify-between">
+                        <Button variant={'transparentGreen'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/approve.svg'}
+                            alt="Иконка одобрить"
+                            width={20}
+                            height={20}
+                          />
+                          Одобрить участие
+                        </Button>
+                        <Button variant={'transparentRed'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/dismiss.svg'}
+                            alt="Иконка отклонить"
+                            width={20}
+                            height={20}
+                          />
+                          Отказать в участии
+                        </Button>
+                      </div>
+                    )}
+                    {filteredData.color === 'orange' && (
+                      <div className="mt-2">
+                        <Button variant={'transparentRed'} size={'sm'}>
+                          <Image
+                            className="mr-2"
+                            src={'/images/icons/dismiss.svg'}
+                            alt="Иконка отклонить"
+                            width={20}
+                            height={20}
+                          />
+                          Отказать в участии
+                        </Button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })
+      )}
     </>
   );
 }

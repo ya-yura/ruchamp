@@ -29,11 +29,6 @@ export default async function EventApplicationsPage({
     );
   }
 
-  const paid = applications?.paid || [];
-  const approved = applications?.approved || [];
-  const accepted = applications?.accepted || [];
-  const rejected = applications?.rejected || [];
-
   const tabsData: Record<string, string> = {
     accepted: 'Новые в ожидании',
     approved: 'Одобренные',
@@ -45,13 +40,19 @@ export default async function EventApplicationsPage({
     <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start pb-10">
         <EventApplications
-          paid={paid}
-          accepted={accepted}
-          approved={approved}
-          rejected={rejected}
+          // paid={paid}
+          // accepted={accepted}
+          // approved={approved}
+          // rejected={rejected}
           tabsData={tabsData}
+          applications={applications}
         />
       </ContentWraper>
     </CustomSection>
   );
 }
+
+// const paid = applications?.paid || [];
+// const approved = applications?.approved || [];
+// const accepted = applications?.accepted || [];
+// const rejected = applications?.rejected || [];
