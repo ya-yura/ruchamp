@@ -238,6 +238,42 @@ export async function fetchEventApplications(
   }
 }
 
+export async function updateApplicationStatus(
+  token: string,
+  event_id: number,
+  application_id: number,
+  status: string
+): Promise<Response> {
+  if (!token) {
+    return Promise.reject(new Error('Token is required'));
+  }
+  try {
+    const response = await fetch(
+      `${baseUrl}/event/${event_id}/org-info/${application_id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to update event');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Unknown error occurred');
+    }
+  }
+}
+
 export async function createEvent(
   token: string,
   values: CreateEventSchema,

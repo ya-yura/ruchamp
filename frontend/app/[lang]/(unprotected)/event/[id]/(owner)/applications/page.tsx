@@ -16,6 +16,7 @@ export default async function EventApplicationsPage({
   const token = session?.token;
   const applications = await fetchEventApplications(token, id);
 
+
   // Делаем проверку на отсутствие заявок. Здесь же обрабатывается и ошибка загрузки заявок
   if (!applications) {
     return (
@@ -40,10 +41,8 @@ export default async function EventApplicationsPage({
     <CustomSection className="relative bg-primary-background">
       <ContentWraper className="items-start pb-10">
         <EventApplications
-          // paid={paid}
-          // accepted={accepted}
-          // approved={approved}
-          // rejected={rejected}
+          id={id}
+          token={token}
           tabsData={tabsData}
           applications={applications}
         />

@@ -21,6 +21,7 @@ interface AthleteCardProps extends AthleteWithPoints {
 
 export function AthleteCard({
   id,
+  application_id,
   sirname,
   name,
   fathername,

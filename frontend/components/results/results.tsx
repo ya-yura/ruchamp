@@ -12,6 +12,7 @@ import { ContentWraper } from '../content-wraper';
 
 export interface AthleteWithPoints {
   id: number;
+  application_id?: number,
   sirname: string;
   name: string;
   fathername: string;

@@ -278,6 +278,7 @@ export interface EventStatistics {
 
 export interface ApplicationMember {
   id: number;
+  application_id: number,
   sirname: string;
   name: string;
   fathername: string;
