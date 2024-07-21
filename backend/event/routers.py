@@ -8,7 +8,11 @@ from transliterate import translit
 from starlette.responses import JSONResponse
 from PIL import Image
 import imghdr
+import smtplib
+from dotenv import load_dotenv
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from aiofiles import open as async_open
 from fastapi import (APIRouter, Depends, File, HTTPException,
                      UploadFile, Form, Query)
@@ -39,13 +43,46 @@ from event.shemas import (EventCreate, EventUpdate, MatchCreate,
 from teams.models import Team, TeamMember
 from match.models import AgeCategory
 from shop.models import Ticket, Engagement, Sector, Place, Row, SpectatorTicket
-from geo.geo import get_geo
+
 
 router = APIRouter(prefix="/event", tags=["Events"])
 templates = Jinja2Templates(directory='templates')
 
 MAX_FILE_SIZE_MB = 5
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024  # 5 мегабайт в байтах
+
+load_dotenv()
+
+EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = int(os.getenv("SMTP_PORT"))
+
+
+# Функция для отправки email
+async def send_email(to_email: str, subject: str, body: str):
+    # Настройки SMTP сервера
+    smtp_server = SMTP_SERVER
+    smtp_port = SMTP_PORT
+    smtp_user = EMAIL_USERNAME
+    smtp_password = EMAIL_PASSWORD
+
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.sendmail(smtp_user, to_email, msg.as_string())
+        server.quit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to send email: {e}"
+        )
 
 
 # Функция для транслитерации имени файла
@@ -79,7 +116,7 @@ async def get_sports(
     return query.scalars().all()
 
 
-@router.get("/events/v2")
+'''@router.get("/events/v2")
 async def get_events_v2(
     db: AsyncSession = Depends(get_db),
     skip: int = Query(0, ge=0),
@@ -119,7 +156,7 @@ async def get_events_v2(
         }
         result.append(event_result)
 
-    return result
+    return result'''
 
 
 @router.get("/grades")
@@ -484,7 +521,7 @@ async def get_event_applications(
                 continue
 
             team_info = {
-                "id": team["id"],
+                "team_id": team["id"],
                 "name": team["name"],
                 "members": []
             }
@@ -524,8 +561,13 @@ async def get_event_applications(
                         TournamentApplication,
                         TournamentApplication.athlete_id == Athlete.id
                     )
-                    .where(Athlete.id == member)
-                    .where(TournamentApplication.status == status)
+                    .where(
+                        and_(
+                            TournamentApplication.status == status,
+                            TournamentApplication.team_id == team_id,
+                            TournamentApplication.match_id == match_id
+                        )
+                    )
                 )
                 athlete = athlete_query.mappings().first()
 
@@ -564,7 +606,7 @@ async def get_event_applications(
     return {"ok"}
 
 
-@router.put("/{event_id}/org-info/{applicaton_id}")
+@router.put("/{event_id}/org-info/{application_id}")
 async def update_status_application(
     event_id: int,
     application_id: int,
@@ -1299,20 +1341,6 @@ async def create_match(
     return {f"Match ID {new_match.id} - created"}
 
 
-'''@router.get("/matches/{match_id}", response_model=MatchRead)
-async def get_matches_id(
-    match_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    # Подумать: если матч еще не прошел, что выводим?
-
-    query = await db.execute(select(Match).where(Match.id == match_id))
-    match = query.scalars().one_or_none()
-    if match is None:
-        raise HTTPException(status_code=404, detail="Match not found")
-    return match'''
-
-
 @router.put("/matches/update/{match_id}")
 async def update_match(
     match_id: int,
@@ -1702,9 +1730,38 @@ async def create_tournament_application_athlete(
     await db.commit()
     db.refresh(application)
 
-    ####
-    '''Дописать, чтоб письмо уходило на почту при создании заявки'''
-    ####
+    '''query = await db.execute(
+        select(Event.name, Event.start_datetime, Event.location)
+        .join(Match, Match.event_id == Event.id)
+        .where(Match.id == match_id_in_aplication)
+    )
+    event_data = query.mappings().all()
+    event_name = event_data[0]['name']
+    event_start_datetime = event_data[0]['start_datetime']
+    event_location = event_data[0]['location']
+
+    query = await db.execute(
+        select(User.email)
+        .where(User.id == current_user.id)
+    )
+    user_email = query.scalars().first()
+
+    subject = "Ваша заявка принята!"
+    body = f"""
+        Уважаемый пользователь,
+
+        Ваша заявка на мероприятие "{event_name}" принята.
+
+        Дата и время: {event_start_datetime}
+        Место проведения: {event_location}
+
+        Спасибо за участие!
+
+        С уважением,
+        Команда организаторов
+        """
+
+    await send_email(user_email, subject, body)'''
 
     return {f'Application {application.id} created, status: Accepted'}
 
