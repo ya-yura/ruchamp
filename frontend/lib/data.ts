@@ -256,6 +256,7 @@ export async function updateApplicationStatus(
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        next: { revalidate: 300, tags: ['update-applications'] },
         body: JSON.stringify({ status }),
       },
     );

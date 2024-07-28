@@ -25,3 +25,7 @@ export async function revalidateGrid() {
 export async function revalidateProfile() {
   revalidateTag('profile');
 }
+
+export async function revalidateApplications() {
+  revalidateTag('update-applications');
+}

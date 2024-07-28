@@ -11,6 +11,7 @@ import { Marker } from './marker';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { updateApplicationStatus } from '@/lib/data';
+import { revalidateApplications } from '@/lib/actions';
 
 interface MatchApplications {
   approved: ApplicationTeam[];
@@ -38,6 +39,9 @@ export function EventApplications({
   applications,
   tabsData,
 }: ApplicationTeamProps) {
+
+  console.log('applications:', applications);
+
   const [selectedTabValue, setSelectedTabValue] = useState<string>(
     Object.keys(tabsData)[0],
   );
@@ -92,6 +96,7 @@ export function EventApplications({
         application_id,
         status,
       );
+      await revalidateApplications();
     } catch (error) {
       console.error('Failed to approve application:', error);
     }
@@ -125,122 +130,127 @@ export function EventApplications({
           </ScrollArea>
         </Tabs>
       </div>
-      {Object.entries(applications).map(([matchId, matchApplications]) => {
+      {Object.entries(applications).map(([index, matchApplications]) => {
         const filteredData = useMemo(
           () => getFilteredData(matchApplications),
           [matchApplications, getFilteredData],
         );
         return (
-          <div className="relative w-[100%]" key={matchId}>
+          <div className="relative w-[100%]" key={index}>
             {filteredData.applications.length === 0 && (
               <p className="relative mb-4 mr-auto text-base text-background">
                 Заявок пока что нет
               </p>
             )}
             <ul>
-              {filteredData.applications.map((application, index) => (
-                <li
-                  className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
-                  key={index}
-                >
-                  <div className="flex justify-between">
-                    <div className="mb-3 flex justify-between gap-6 px-2">
-                      <H4>{application.name}</H4>
-                      <H4>
-                        Количество участников: {application.members.length}
-                      </H4>
-                    </div>
-                    <Marker variant={filteredData.color}>
-                      {filteredData.text}
-                    </Marker>
-                  </div>
-                  <ul className="flex flex-col gap-2">
-                    {application.members.map((athlete) => (
-                      <AthleteCard
-                        key={athlete.id}
-                        id={athlete.id}
-                        sirname={athlete.sirname}
-                        name={athlete.name}
-                        fathername={athlete.fathername}
-                        birthdate={athlete.birthdate}
-                        city={athlete.city}
-                        country={athlete.country}
-                        region={athlete.region}
-                        image_field={athlete.image_field || ''}
-                        weight={athlete.weight}
-                        grade_types={athlete.grade_types}
-                      />
-                    ))}
-                  </ul>
-                  {filteredData.color === 'blue' && (
-                    <div className="mt-2 flex justify-between">
-                      <Button
-                        onClick={() =>
-                          handleApprove(
-                            id,
-                            application.members[0].application_id,
-                            'approved',
-                          )
-                        }
-                        variant={'transparentGreen'}
-                        size={'sm'}
-                      >
-                        <Image
-                          className="mr-2"
-                          src={'/images/icons/approve.svg'}
-                          alt="Иконка одобрить"
-                          width={20}
-                          height={20}
-                        />
-                        Одобрить участие
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          handleApprove(
-                            id,
-                            application.members[0].application_id,
-                            'rejected',
-                          )
-                        }
-                        variant={'transparentRed'}
-                        size={'sm'}
-                      >
-                        <Image
-                          className="mr-2"
-                          src={'/images/icons/dismiss.svg'}
-                          alt="Иконка отклонить"
-                          width={20}
-                          height={20}
-                        />
-                        Отказать в участии
-                      </Button>
-                    </div>
+              {filteredData.applications.map((application, appIndex) => (
+                <div key={appIndex}>
+                  {application.team_id === 0 && (
+                    <li
+                      className="mb-3 flex flex-col gap-2 rounded-lg bg-black px-4 pb-4 pt-4"
+                      key={appIndex}
+                    >
+                      <div className="flex justify-between">
+                        <div className="mb-3 flex justify-between gap-6 px-2">
+                          <H4>{application.name}</H4>
+                          <H4>
+                            Количество участников: {application.members.length}
+                          </H4>
+                        </div>
+                        <Marker variant={filteredData.color}>
+                          {filteredData.text}
+                        </Marker>
+                      </div>
+                      <ul className="flex flex-col gap-2">
+                        {application.members.map((athlete) => (
+                          <>
+                            <AthleteCard
+                              id={athlete.id}
+                              sirname={athlete.sirname}
+                              name={athlete.name}
+                              fathername={athlete.fathername}
+                              birthdate={athlete.birthdate}
+                              city={athlete.city}
+                              country={athlete.country}
+                              region={athlete.region}
+                              image_field={athlete.image_field || ''}
+                              weight={athlete.weight}
+                              grade_types={athlete.grade_types}
+                            />
+                            {filteredData.color === 'blue' && (
+                              <div className="mt-2 flex justify-between">
+                                <Button
+                                  onClick={() =>
+                                    handleApprove(
+                                      id,
+                                      athlete.application_id,
+                                      'approved',
+                                    )
+                                  }
+                                  variant={'transparentGreen'}
+                                  size={'sm'}
+                                >
+                                  <Image
+                                    className="mr-2"
+                                    src={'/images/icons/approve.svg'}
+                                    alt="Иконка одобрить"
+                                    width={20}
+                                    height={20}
+                                  />
+                                  Одобрить участие
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    handleApprove(
+                                      id,
+                                      athlete.application_id,
+                                      'rejected',
+                                    )
+                                  }
+                                  variant={'transparentRed'}
+                                  size={'sm'}
+                                >
+                                  <Image
+                                    className="mr-2"
+                                    src={'/images/icons/dismiss.svg'}
+                                    alt="Иконка отклонить"
+                                    width={20}
+                                    height={20}
+                                  />
+                                  Отказать в участии
+                                </Button>
+                              </div>
+                            )}
+                            {filteredData.color === 'orange' && (
+                              <div className="mt-2">
+                                <Button
+                                  onClick={() =>
+                                    handleApprove(
+                                      id,
+                                      athlete.application_id,
+                                      'rejected',
+                                    )
+                                  }
+                                  variant={'transparentRed'}
+                                  size={'sm'}
+                                >
+                                  <Image
+                                    className="mr-2"
+                                    src={'/images/icons/dismiss.svg'}
+                                    alt="Иконка отклонить"
+                                    width={20}
+                                    height={20}
+                                  />
+                                  Отказать в участии
+                                </Button>
+                              </div>
+                            )}
+                          </>
+                        ))}
+                      </ul>
+                    </li>
                   )}
-                  {filteredData.color === 'orange' && (
-                    <div className="mt-2">
-                      <Button
-                        onClick={() =>
-                          handleApprove(
-                            id,
-                            application.members[0].application_id,
-                            'rejected',
-                          )
-                        }
-                        variant={'transparentRed'}
-                        size={'sm'}
-                      >
-                        <Image
-                          className="mr-2"
-                          src={'/images/icons/dismiss.svg'}
-                          alt="Иконка отклонить"
-                          width={20}
-                          height={20}
-                        />
-                        Отказать в участии
-                      </Button>
-                    </div>
-                  )}
-                </li>
+                </div>
               ))}
             </ul>
           </div>

@@ -279,22 +279,23 @@ export interface EventStatistics {
 export interface ApplicationMember {
   id: number;
   application_id: number,
-  sirname: string;
-  name: string;
-  fathername: string;
+  athlete_id: number;
   birthdate: string;
-  gender: boolean;
-  height: number;
-  weight: number;
-  image_field: string | null;
-  country: number;
-  region: number;
   city: string;
+  country: number;
+  fathername: string;
+  gender: boolean;
   grade_types: string[];
+  height: number;
+  image_field: string | null;
+  name: string;
+  region: number;
+  sirname: string;
+  weight: number;
 }
 
 export interface ApplicationTeam {
-  id: number;
+  team_id: number;
   name: string;
   members: ApplicationMember[];
 }
